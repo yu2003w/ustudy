@@ -1,0 +1,18 @@
+Initiated by Jared on May 12, 2017.
+This is URL schema design document for information center.
+1, URL to retrieve student list information
+   services/info/list/stu
+
+Scripts to populate databases as below,
+mysql --> root/mysql
+create database infocenter character set utf8;
+create table student (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+grade ENUM('Ele1', 'Ele2', 'Ele3', 'Jun1','Jun2','Jun3','Sen1','Sen'2','Sen3'),
+class CHAR(10),
+no CHAR(20),
+category ENUM('gen', 'gym', 'art'),
+PRIMARY KEY(id, name)
+);
+
