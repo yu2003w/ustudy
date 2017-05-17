@@ -8,14 +8,19 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 import com.ustudy.datawrapper.InfoList;
+import com.ustudy.datawrapper.InterStatement;
+import com.ustudy.datawrapper.ItemBuilder;
 
 /**
  * Root resource (exposed at root "/" path)
@@ -52,11 +57,31 @@ public class InfoCenter {
     @Produces(MediaType.APPLICATION_JSON)
     public String getList(@PathParam("type") String type) {
     	System.out.print(type);
-    	if ((type.compareTo("stu") == 0 || type.compareTo("exam") == 0 ||
-    		type.compareTo("teach") == 0 || type.compareTo("sch") == 0) 
-    	    && (ds != null))
+    	if (isSupportedType(type) && (ds != null))
     		return InfoList.getList(ds, type);
+    	
     	return "{\"result\":\"No Data\"}";
+    }
+    
+    /**
+     * 
+     * @param type indicate which item should be created
+     * @param data json string contains the information for constructing the item
+     * @return 
+     */
+    @POST
+    @Path("item/add/{type}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String addItem(@PathParam("type") String type, final String data) {
+    	System.out.print("JsonObject received:" + data + type);
+    	if (!isSupportedType(type))
+    		return "{\"result\":\"Not supported\"}";
+    	if (ItemBuilder.buildItem(ds, type, data)) {
+    		return "{\"result\":\"ok\"}";
+    	}
+    	else
+    		return "{\"result\":\"false\"}";
     }
     
     /**
@@ -70,5 +95,13 @@ public class InfoCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    }
+    
+    private boolean isSupportedType(final String type) {
+    	if (type.compareTo(InterStatement.STU_TYPE) == 0 || type.compareTo("exam") == 0 ||
+    		type.compareTo("teach") == 0 || type.compareTo("sch") == 0)
+    		return true;
+    	
+    	return false;
     }
 }

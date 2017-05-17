@@ -26,7 +26,9 @@ public class InfoList {
 		try {
 			conn = datas.getConnection();
 			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(InterStatement.STU_LIST);
+			ResultSet rs = null;
+			if (type.compareTo(InterStatement.STU_TYPE) == 0)
+				rs = st.executeQuery(InterStatement.STU_LIST);
 			result = assembleList(rs);
 			rs.close();
 			st.close();
