@@ -9,8 +9,9 @@ package com.ustudy.datawrapper;
 public class InterStatement {
 
 	public static final String STU_TYPE = "student";
+	public static final String TEA_TYPE = "teacher";
 	
-	public static final String STU_LIST = "select name, grade, class from student";
+	public static final String STU_LIST = "select id, name, grade, class from student";
 	
 	//SQL statement prefix
 	public static final String STU_INSERT_PREFIX = "insert into student values (null,'";

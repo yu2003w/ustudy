@@ -27,9 +27,10 @@ public class InfoList {
 			conn = datas.getConnection();
 			Statement st = conn.createStatement();
 			ResultSet rs = null;
-			if (type.compareTo(InterStatement.STU_TYPE) == 0)
+			if (type.compareTo(InterStatement.STU_TYPE) == 0) {
 				rs = st.executeQuery(InterStatement.STU_LIST);
-			result = assembleList(rs);
+				result = assembleStuList(rs);
+			}
 			rs.close();
 			st.close();
 			conn.close();
@@ -47,17 +48,19 @@ public class InfoList {
 		
 	}
 	
-	private static String assembleList(ResultSet rs) {
+	private static String assembleStuList(ResultSet rs) {
 		String result = null;
 		try {
 			while (rs.next()){
 				if (result == null) {
-					result = "{\"Students\":[{\"Name\":\"" + rs.getString("Name") + 
+					result = "{\"Students\":[{\"id\":\"" + rs.getString("id") + 
+							"\",\"Name\":\"" + rs.getString("Name") + 
 							"\", \"Grade\":\"" + rs.getString("Grade") + 
 							"\",\"Class\":\"" + rs.getString("Class") + "\"}";;
 				}
 				else {
-					result += ",{\"Name\":\"" + rs.getString("Name") + 
+					result += ",{\"id\":\"" + rs.getString("id") +
+							"\",\"Name\":\"" + rs.getString("Name") + 
 							"\", \"Grade\":\"" + rs.getString("Grade") +
 							"\",\"Class\":\"" + rs.getString("Class") + "\"}";
 				}
