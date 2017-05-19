@@ -26,7 +26,7 @@
     <!-- url: The JDBC connection url for connecting to your MySQL database.
          -->
 
-  <Resource name="mysql/infocenter" 
+    <Resource name="mysql/infocenter" 
             auth="Container"
             type="javax.sql.DataSource"
             validationQuery="SELECT 1"

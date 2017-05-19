@@ -10,9 +10,14 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import com.ustudy.datawrapper.InterStatement;
 
 public class InfoList {
+	
+	private static final Logger logger = LogManager.getLogger(InfoList.class);
 	
 	/**
 	 * 
@@ -56,7 +61,7 @@ public class InfoList {
 					result = "{\"Students\":[{\"id\":\"" + rs.getString("id") + 
 							"\",\"Name\":\"" + rs.getString("Name") + 
 							"\", \"Grade\":\"" + rs.getString("Grade") + 
-							"\",\"Class\":\"" + rs.getString("Class") + "\"}";;
+							"\",\"Class\":\"" + rs.getString("Class") + "\"}";
 				}
 				else {
 					result += ",{\"id\":\"" + rs.getString("id") +
@@ -70,10 +75,11 @@ public class InfoList {
 				result += "]}";
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 			return null;
 		}
 		
+		logger.debug(result);
 		return result;
 	}
 }

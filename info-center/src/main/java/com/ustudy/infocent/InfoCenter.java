@@ -18,6 +18,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import com.ustudy.datawrapper.InfoList;
 import com.ustudy.datawrapper.InterStatement;
 import com.ustudy.datawrapper.ItemBuilder;
@@ -28,6 +31,8 @@ import com.ustudy.datawrapper.ItemBuilder;
 @Path("/")
 public class InfoCenter {
 
+	private static final Logger logger = LogManager.getLogger(InfoCenter.class);
+	
 	private DataSource ds = null;
 	
 	public InfoCenter() {
@@ -56,11 +61,21 @@ public class InfoCenter {
     @Path("list/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getList(@PathParam("type") String type) {
-    	System.out.print(type);
+    	logger.trace("List information for " + type);
     	if (isSupportedType(type) && (ds != null))
     		return InfoList.getList(ds, type);
     	
     	return "{\"result\":\"No Data\"}";
+    }
+    
+    @GET
+    @Path("item/{type}/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getItem(@PathParam("type") String type, @PathParam("id") int id) {
+    	logger.debug("Get item of " + type + " with id " + id);
+    	if (isSupportedType(type) && (ds != null))
+    		return ItemBuilder.getItem(ds, type, id);
+    	return null;
     }
     
     /**
@@ -74,7 +89,7 @@ public class InfoCenter {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public String addItem(@PathParam("type") String type, final String data) {
-    	System.out.print("JsonObject received:" + data + type);
+    	logger.info("data received for " + type + ":", data);
     	if (!isSupportedType(type))
     		return "{\"result\":\"Not supported\"}";
     	if (ItemBuilder.buildItem(ds, type, data)) {
@@ -91,7 +106,7 @@ public class InfoCenter {
 		try {
 			Context initCtx = new InitialContext();
 			Context envCtx = (Context)initCtx.lookup("java:comp/env");
-			ds = (DataSource)envCtx.lookup("mysql/infocenter");
+			ds = (DataSource)envCtx.lookup(InterStatement.INFO_CENTER_DS);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

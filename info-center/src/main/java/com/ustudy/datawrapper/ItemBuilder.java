@@ -15,11 +15,17 @@ import java.io.StringReader;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.ResultSet;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 public class ItemBuilder {
 
+	private static final Logger logger = LogManager.getLogger(ItemBuilder.class);
+	
 	public static boolean buildItem(DataSource ds, final String type, final String data) {
 		if (type.compareTo(InterStatement.STU_TYPE) == 0) {
 			String state = buildStuItem(data);
@@ -28,8 +34,16 @@ public class ItemBuilder {
 			}
 			return false;
 		}
-		
 		return true;
+	}
+	
+	
+	public static String getItem(DataSource ds, final String type, int id) {
+		if (type.compareTo(InterStatement.STU_TYPE) == 0) {
+			String item = getStuItem(ds, id);
+			return item;
+		}
+		return null;
 	}
 	
 	/**
@@ -44,7 +58,7 @@ public class ItemBuilder {
 		String name = jObj.getString(InterStatement.STU_NAME);
 		String stuno = jObj.getString(InterStatement.STU_NO);
 		if (name.isEmpty() || stuno.isEmpty()) {
-			System.out.println("buildStuItem() called");
+			logger.info("name or stuno is empty");
 			return null;
 		}
 				
@@ -72,7 +86,7 @@ public class ItemBuilder {
 		else
 			result += "null";
 		result += ");";
-		System.out.println(result);
+		logger.debug(result);
 		return result;
 	}
 	
@@ -90,15 +104,57 @@ public class ItemBuilder {
 			else
 				return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.warn(e.getMessage());
 			if (conn != null) {
 				try {
 					conn.close();
 				} catch (Exception ce) {
-					ce.printStackTrace();
+					logger.warn(ce.getMessage());
 				}
 			}
 		}
 		return false;
+	}
+	
+	private static String getStuItem(DataSource ds, int id) {
+		String result = null;
+		Connection conn = null;
+		try {
+			conn = ds.getConnection();
+			Statement st = conn.createStatement();
+			String statem = InterStatement.STU_GET_PREFIX + String.valueOf(id);
+			ResultSet rs = st.executeQuery(statem);
+			if (rs.next()) {
+				result = "{\"id\":\"" + rs.getString(InterStatement.STU_ID) +
+						"\",\"Name\":\"" + rs.getString(InterStatement.STU_NAME) + 
+						"\",\"Stuno\":\"" + rs.getString(InterStatement.STU_NO) +
+						"\", \"Grade\":\"" + rs.getString(InterStatement.STU_GRADE) +
+						"\",\"Class\":\"" + rs.getString(InterStatement.STU_CLASS) +
+						"\",\"Category\":\"" + rs.getString(InterStatement.STU_CATEGORY) +
+						"\",\"Transient\":\"" + rs.getString(InterStatement.STU_TRANS) + "\"}";
+				if (rs.next()) {
+					logger.error("Duplicated records in student for " + id);
+				}
+			}
+			else {
+				logger.info("No record fetched in student for " + id);
+				return null;
+			}
+			rs.close();
+			st.close();
+			conn.close();
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (Exception ce) {
+					logger.warn(ce.getMessage());
+				}
+			}
+		}
+		
+		logger.debug(result);
+		return result;
 	}
 }
