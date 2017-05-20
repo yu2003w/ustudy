@@ -5,21 +5,8 @@ This is URL schema design document for information center.
 2, create item 
    services/info/add/student/
 
-Scripts to populate databases as below,
-mysql --> root/mysql
-create database infocenter character set utf8;
-create table student (
-id INT NOT NULL AUTO_INCREMENT,
-name VARCHAR(100) NOT NULL,
-grade ENUM('Ele1', 'Ele2', 'Ele3', 'Jun1','Jun2','Jun3','Sen1','Sen2','Sen3'),
-class CHAR(10),
-stuno CHAR(20) NOT NULL,
-category ENUM('gen', 'gym', 'art'),
-transient boolean default false,
-PRIMARY KEY(id),
-INDEX (name, stuno),
-UNIQUE KEY (stuno)
-);
+# To display chinese character via mysql command line, need to run following command after
+# log on mysql, set names "utf8"
 
 # test with curl
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"name":"jared", "stuno": "100003", "grade": "Ele1", "class": "123", "category":"gen", "transient":"true"}' http://192.168.0.107:8080/services/info/item/add/student/

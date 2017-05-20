@@ -9,6 +9,7 @@ import javax.naming.InitialContext;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
@@ -60,12 +61,17 @@ public class InfoCenter {
     @GET
     @Path("list/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getList(@PathParam("type") String type) {
+    public Response getList(@PathParam("type") String type) {
     	logger.trace("List information for " + type);
-    	if (isSupportedType(type) && (ds != null))
-    		return InfoList.getList(ds, type);
-    	
-    	return "{\"result\":\"No Data\"}";
+    	if (isSupportedType(type) && (ds != null)) {
+    		String result = InfoList.getList(ds, type);
+    		if (result == null) {
+    			return Response.status(200).entity("{\"Result\":\"Empty result set\"}").build();
+    		}
+    		else
+    			return Response.status(200).entity(InfoList.getList(ds, type)).build();
+    	}
+    	return Response.status(404).entity("{\"Result\":\"Not supported type\"}").build();
     }
     
     @GET
@@ -78,6 +84,11 @@ public class InfoCenter {
     	return null;
     }
     
+    @DELETE @Path("item/delete/{type}/{id}")
+    public void deleteItem(@PathParam("type") String type, @PathParam("id") String id) {
+    	return;
+    }
+    
     /**
      * 
      * @param type indicate which item should be created
@@ -88,15 +99,16 @@ public class InfoCenter {
     @Path("item/add/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String addItem(@PathParam("type") String type, final String data) {
+    public Response addItem(@PathParam("type") String type, final String data) {
     	logger.info("data received for " + type + ":", data);
     	if (!isSupportedType(type))
-    		return "{\"result\":\"Not supported\"}";
+    		return Response.status(204).encoding("Not supported").build();
     	if (ItemBuilder.buildItem(ds, type, data)) {
-    		return "{\"result\":\"ok\"}";
+    		String loc = "services/info/item/student/7";
+    		return Response.status(201).header("Location", loc).build();
     	}
     	else
-    		return "{\"result\":\"false\"}";
+    		return Response.status(409).entity("Already existed").build();
     }
     
     /**
@@ -113,8 +125,10 @@ public class InfoCenter {
     }
     
     private boolean isSupportedType(final String type) {
-    	if (type.compareTo(InterStatement.STU_TYPE) == 0 || type.compareTo("exam") == 0 ||
-    		type.compareTo("teach") == 0 || type.compareTo("sch") == 0)
+    	if (type.compareTo(InterStatement.STU_TYPE) == 0 ||
+    		type.compareTo(InterStatement.TEACH_TYPE) == 0 ||
+    		type.compareTo(InterStatement.EXAM_TYPE) == 0 ||
+    		type.compareTo(InterStatement.SCHOOL_TYPE) == 0)
     		return true;
     	
     	return false;
