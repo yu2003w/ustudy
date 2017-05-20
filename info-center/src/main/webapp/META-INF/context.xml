@@ -24,6 +24,8 @@
          -->
 
     <!-- url: The JDBC connection url for connecting to your MySQL database.
+         In order to display and store chinese characters, need to specify characterEncoding
+         with proper value.
          -->
 
     <Resource name="mysql/infocenter" 
@@ -39,6 +41,6 @@
             password="mysql"
             driverClassName="com.mysql.jdbc.Driver"
             factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-            url="jdbc:mysql://192.168.0.107:13306/infocenter"/>
+            url="jdbc:mysql://192.168.0.107:13306/infocenter?characterEncoding=UTF-8"/>
 
 </Context>
