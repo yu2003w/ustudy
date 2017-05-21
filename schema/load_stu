@@ -1,0 +1,5 @@
+LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE infocenter.student
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
