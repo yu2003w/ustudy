@@ -8,27 +8,66 @@ package com.ustudy.datawrapper;
 
 public class InterStatement {
 
+	public enum ItemType {
+		STUDENT ("student"),
+		TEACHER ("teacher"),
+		SCHOOL ("school"),
+		EXAM ("exam"),
+		UNSUPPORTED ("unsupported");
+		
+		private String val;
+		private ItemType(String type) {
+			if (type.compareTo("student") == 0 || type.compareTo("teacher") == 0 ||
+					type.compareTo("school") == 0 || type.compareTo("exam") == 0) {
+				this.val = type;
+			}
+			else
+				this.val = "unsupported";
+		}	
+		public String getVal() {
+			return this.val;
+		}
+	}
+	
+	public static final String REST_PREFIX = "services/info/";
 	public static final String INFO_CENTER_DS = "mysql/infocenter";
-	
-	public static final String STU_TYPE = "student";
-	public static final String TEACH_TYPE = "teacher";
-	public static final String SCHOOL_TYPE = "school";
-	public static final String EXAM_TYPE = "exam";
-	
-	public static final String STU_LIST = "select id, name, grade, class from student";
+	public static final String STU_LIST =
+			"select id, name, grade, class, stuno, category, transient from student";
 	
 	//SQL statement prefix
 	public static final String STU_INSERT_PREFIX = "insert into student values (null,'";
 	public static final String STU_GET_PREFIX = "select * from student where id = ";
-	
-	public static final String STU_ID = "id";
+	public static final String STU_DELETE_PREFIX = "delete from student where id = ";
 	
 	// labels for fields in table student
-	public static final String STU_NAME = "name";
-	public static final String STU_GRADE = "grade";
-	public static final String STU_CLASS = "class";
-	public static final String STU_NO = "stuno";
-	public static final String STU_CATEGORY = "category";
-	public static final String STU_TRANS = "transient";
+	public static final String STU_ID = "id";
+	public static final String STU_NAME = "姓名";
+	public static final String STU_GRADE = "年级";
+	public static final String STU_CLASS = "班级";
+	public static final String STU_NO = "学籍号";
+	public static final String STU_CATEG = "类别";
+	public static final String STU_TRANS = "是否借读";
 	
+	// columns in table student
+	public static final String COL_STU_ID = "id";
+	public static final String COL_STU_NAME = "name";
+	public static final String COL_STU_GRADE = "grade";
+	public static final String COL_STU_CLASS = "class";
+	public static final String COL_STU_NO = "stuno";
+	public static final String COL_STU_CATEG = "category";
+	public static final String COL_STU_TRANS = "transient";
+	
+	// lables and columns for table infocenter.student
+	public static final String [][] STU_TABLE = {
+		{"id", "name", "grade", "class", "stuno", "category", "transient"},
+		{"id", "姓名", "年级", "班级", "学籍号", "类别", "是否借读"},
+	};
+	
+	public static final String ResultEmpty = "{\"Result\":\"Empty\"}";
+	public static final String ResultNotSupported = "{\"Result\":\"Not supported\"}";
+	public static final String ResultDuplicated = "{\"Result\":\"Duplicated\"}";
+	public static final String ResultDeleted = "{\"Result\":\"Deleted\"}";
+	public static final String ResultUpdated = "{\"Result\":\"Updated\"}";
+	public static final String ResultDBError = "{\"Result\":\"Internal DB error\"}";
+	public static final String ResultNoContent = "{\"Result\":\"No content\"}";
 }
