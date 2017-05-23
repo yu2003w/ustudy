@@ -1,5 +1,7 @@
 Initiated by Jared on May 12, 2017.
+
 This is URL schema design document for information center.
+Below is example for student.
 1, retrieve list
    services/info/list/student/
 2, create item 
@@ -11,9 +13,4 @@ This is URL schema design document for information center.
 5, update item
    services/info/update/student/id
    
-# To display chinese character via mysql command line, need to run following command after
-# log on mysql, set names "utf8"
 
-# test with curl
-curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"姓名":"韦小宝", "学籍号": "100003", "年级": "高三", "class": "5班", "类别":"普通", "是否借读":"true"}' http://192.168.0.107:8080/services/info/add/student/
-curl -v -X DELETE http://192.168.0.107:8080/services/info/delete/student/20

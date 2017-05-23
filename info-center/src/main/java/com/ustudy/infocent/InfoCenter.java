@@ -112,11 +112,12 @@ public class InfoCenter {
     	ItemType it = supportedType(type);
     	if (it == ItemType.UNSUPPORTED)
     		return Response.status(OpStatus.OP_BadRequest.getVal()).
-    				entity(InterStatement.ResultNotSupported).build();
+    			entity(InterStatement.ResultNotSupported).build();
     	int key = ItemBuilder.buildItem(ds, it, data);
     	if (key > 1) {
     		String loc = "item/" + type + "/" + key;
-    		return Response.status(201).header("Location", loc).build();
+    		return Response.status(201).header("Location", loc).
+    			entity(InterStatement.ResultItemCreated).build();
     	}
     	else
     		return Response.status(409).entity(InterStatement.ResultDuplicated).build();

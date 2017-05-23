@@ -70,4 +70,7 @@ public class InterStatement {
 	public static final String ResultUpdated = "{\"Result\":\"Updated\"}";
 	public static final String ResultDBError = "{\"Result\":\"Internal DB error\"}";
 	public static final String ResultNoContent = "{\"Result\":\"No content\"}";
+	public static final String ResultInvalidJson = "{\"Result\":\"Invalid Json Data\"}";
+	public static final String ResultInterErr = "{\"Result\":\"Internal Error\"}";
+	public static final String ResultItemCreated = "{\"Result\":\"Item Created\"}";
 }
