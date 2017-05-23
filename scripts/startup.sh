@@ -1,16 +1,35 @@
 #!/bin/sh
 # Initiated by Jared on May 12, 2017.
-# To test the build in tomcat container 9.0
-rm -rf /home/jared/bench/webapps/services
-if [ $? != 0 ]; then
-  echo "Failed to delete deployed war"
-  exit 1
+# To start the build in tomcat container 9.0
+
+if [ $# != 1 ]; then
+  echo "Please specify WORK_DIR firstly"
+  exit
 fi
 
-cp -f /home/repo/ustudy/info-center/target/services.war /home/jared/bench/webapps/services.war
+WORK_DIR=$1
+echo "Working directory is " ${WORK_DIR}
+if [ -d ${WORK_DIR}/webapps/services ]; then
+  rm -rf ${WORK_DIR}/webapps/services  ${WORK_DIR}/webapps/services.war
+  if [ $? != 0 ]; then
+    echo "Failed to delete deployed war"
+    exit 1
+  fi
+else
+  mkdir -p ${WORK_DIR}/webapps/
+  if [ $? != 0 ]; then
+    echo "Failed to create directory" ${WORK_DIR}/webapps/
+    exit 1
+  fi
+fi
+
+cp -f /home/repo/ustudy/info-center/target/services.war ${WORK_DIR}/webapps/services.war
 if [ $? != 0 ]; then
   echo "Failed to copy infoservice.war into destination directory"
   exit 1
 fi
-docker run --rm -p 8080:8080 -v /home/jared/bench/webapps/:/usr/local/tomcat/webapps \
-    -v /home/jared/bench/logs:/usr/local/tomcat/logs/ tomcat:9.0
+echo "Deploying services.war successfully"
+
+docker run --rm -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
+    -v ${WORK_DIR}/logs:/usr/local/tomcat/logs/ tomcat:9.0
+

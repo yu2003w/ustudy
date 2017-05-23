@@ -10,12 +10,12 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonReader;
+import javax.json.JsonException;
 
 import java.io.StringReader;
 
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -79,8 +79,8 @@ public class ItemBuilder {
 				logger.warn("Unsupported type for " + id);
 				res = new OpResult(OpStatus.OP_BadRequest,
 						InterStatement.ResultNotSupported);
-				conn.close();
 				st.close();
+				conn.close();
 				return res;
 			}
 			int ret = st.executeUpdate(sqlState);
@@ -93,9 +93,19 @@ public class ItemBuilder {
 			}
 			st.close();
 			conn.close();
+		} catch (JsonException jsone) {
+			logger.info(jsone.getMessage());
+			logger.warn("Input JSON data is not proper");
+			res = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultInvalidJson);
+		} catch (SQLException sqle) {
+			logger.info(sqle.getMessage());
+			logger.warn("Encountered DB problems when update item.");
+			res = new OpResult(OpStatus.Op_InterServerError, InterStatement.ResultDBError);
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
-			logger.warn("Encountered problems when update item.");
+			logger.info(e.getMessage());
+			logger.warn("Failed to update item, unexpected exceptions caught");
+			res = new OpResult(OpStatus.Op_InterServerError, InterStatement.ResultInterErr);
+		} finally {
 			if (conn != null) {
 				try {
 					conn.close();
@@ -104,7 +114,6 @@ public class ItemBuilder {
 					logger.warn("Encountered problems when closing connection");
 				}
 			}
-			res = new OpResult(OpStatus.Op_InterServerError, InterStatement.ResultDBError);
 		}
 		return res;
 	}
@@ -165,6 +174,8 @@ public class ItemBuilder {
 		JsonReader reader = Json.createReader(new StringReader(data));
 		JsonObject jObj = reader.readObject();
 		reader.close();
+		
+		// noted: before insert operation, need to check value of each field is proper
 		String name = jObj.getString(InterStatement.STU_NAME);
 		String stuno = jObj.getString(InterStatement.STU_NO);
 		if (name.isEmpty()) {
@@ -206,10 +217,11 @@ public class ItemBuilder {
 		JsonObject jObj = reader.readObject();
 		reader.close();
 		boolean first = true;
-				
+		
 		// first element is table column, second element is table label
 		int len = InterStatement.STU_TABLE[0].length;
-		for (int i = 1; i <= len; i++) {
+		for (int i = 1; i < len; i++) {
+			// logger.info(InterStatement.STU_TABLE[1][i]);
 			JsonString jVal = jObj.getJsonString(InterStatement.STU_TABLE[1][i]);
 			if (jVal != null) {
 				String val = jVal.getString();
@@ -217,16 +229,16 @@ public class ItemBuilder {
 					if (first) {
 						first = false;
 						res = "update student set " + InterStatement.STU_TABLE[0][i] +
-								"=" + val;
+								" = \"" + val + "\"";
 					}
 					else
-						res += "," + InterStatement.STU_TABLE[0][i] + "=" + val;
+						res += ", " + InterStatement.STU_TABLE[0][i] + " = \"" + val + "\"";
 				}
 				// if the field is empty, just ignore it
 			}	
 		}
 		if (!first)
-			res += "where id = " + id + ";";
+			res += " where id = " + id + ";";
 		logger.debug("SQL for update ->" + res);
 		return res;
 	}
@@ -312,20 +324,17 @@ public class ItemBuilder {
 	 * @return JSON format string for single student item
 	 */
 	public static String stuItemJson(ResultSet rs) throws SQLException {
-		String result = "{\"" + InterStatement.STU_ID + "\":\"" + 
-	        rs.getString(InterStatement.COL_STU_ID) +
-			"\",\"" + InterStatement.STU_NAME + "\":\"" + 
-	        rs.getString(InterStatement.COL_STU_NAME) + 
-			"\",\"" + InterStatement.STU_GRADE + "\":\"" +
-	        rs.getString(InterStatement.COL_STU_GRADE) + 
-			"\",\"" + InterStatement.STU_CLASS + "\":\"" +
-	        rs.getString(InterStatement.COL_STU_CLASS) + 
-			"\",\"" + InterStatement.STU_NO + "\":\"" +
-	        rs.getString(InterStatement.COL_STU_NO) +
-			"\",\"" + InterStatement.STU_CATEG + "\":\"" +
-	        rs.getString(InterStatement.COL_STU_CATEG) +
-			"\",\"" + InterStatement.STU_TRANS + "\":\"" + 
-	        rs.getString(InterStatement.COL_STU_TRANS) + "\"}";
+		String result = "{\"";
+		boolean first = true;
+		for (String field : InterStatement.STU_TABLE[0]) {
+			if (first) {
+				result += field + "\":\"" + rs.getString(field);
+				first = false;
+			}
+			result += "\",\"" + field + "\":\"" + rs.getString(field);
+		}
+		result += "\"}";
+		
 		return result;
 	}
 }
