@@ -9,6 +9,7 @@ import javax.naming.InitialContext;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
@@ -18,9 +19,15 @@ import javax.ws.rs.core.Response;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import com.ustudy.datawrapper.InfoList;
 import com.ustudy.datawrapper.InterStatement;
+import com.ustudy.datawrapper.InterStatement.ItemType;
 import com.ustudy.datawrapper.ItemBuilder;
+import com.ustudy.datawrapper.OpResult;
+import com.ustudy.datawrapper.OpResult.OpStatus;
 
 /**
  * Root resource (exposed at root "/" path)
@@ -28,6 +35,8 @@ import com.ustudy.datawrapper.ItemBuilder;
 @Path("/")
 public class InfoCenter {
 
+	private static final Logger logger = LogManager.getLogger(InfoCenter.class);
+	
 	private DataSource ds = null;
 	
 	public InfoCenter() {
@@ -55,12 +64,38 @@ public class InfoCenter {
     @GET
     @Path("list/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getList(@PathParam("type") String type) {
-    	System.out.print(type);
-    	if (isSupportedType(type) && (ds != null))
-    		return InfoList.getList(ds, type);
-    	
-    	return "{\"result\":\"No Data\"}";
+    public Response getList(@PathParam("type") String type) {
+    	logger.trace("List information for " + type);
+    	ItemType it = supportedType(type);
+    	if (it != ItemType.UNSUPPORTED && (ds != null)) {
+    		OpResult res = InfoList.getList(ds, it);
+    		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
+    	}
+    	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity("{\"Result\":\"Not supported type\"}").build();
+    }
+    
+    @GET
+    @Path("item/{type}/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getItem(@PathParam("type") String type, @PathParam("id") int id) {
+    	logger.debug("Get item of " + type + " with id " + id);
+    	ItemType it = supportedType(type);
+    	if (it != ItemType.UNSUPPORTED && (ds != null))
+    		return ItemBuilder.getItem(ds, it, id);
+    	return null;
+    }
+    
+    @DELETE @Path("delete/{type}/{id}")
+    public Response deleteItem(@PathParam("type") String type, @PathParam("id") String id) {
+    	logger.debug("Item of " + type + " "+ id + " is to be deleted.");
+    	ItemType it = supportedType(type);
+    	if (it != ItemType.UNSUPPORTED && (ds != null)) {
+    		OpResult res = ItemBuilder.deleteItem(ds, it, id);
+    		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
+    	}
+    	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultNotSupported).build();
     }
     
     /**
@@ -69,20 +104,42 @@ public class InfoCenter {
      * @param data json string contains the information for constructing the item
      * @return 
      */
-    @POST
-    @Path("item/add/{type}")
+    @POST  @Path("add/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String addItem(@PathParam("type") String type, final String data) {
-    	System.out.print("JsonObject received:" + data + type);
-    	if (!isSupportedType(type))
-    		return "{\"result\":\"Not supported\"}";
-    	if (ItemBuilder.buildItem(ds, type, data)) {
-    		return "{\"result\":\"ok\"}";
+    public Response createItem(@PathParam("type") String type, final String data) {
+    	logger.info("Create item for " + type + ":", data);
+    	ItemType it = supportedType(type);
+    	if (it == ItemType.UNSUPPORTED)
+    		return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultNotSupported).build();
+    	int key = ItemBuilder.buildItem(ds, it, data);
+    	if (key > 1) {
+    		String loc = "item/" + type + "/" + key;
+    		return Response.status(201).header("Location", loc).
+    			entity(InterStatement.ResultItemCreated).build();
     	}
     	else
-    		return "{\"result\":\"false\"}";
+    		return Response.status(409).entity(InterStatement.ResultDuplicated).build();
     }
+    
+    @POST  @Path("update/{type}/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateItem(@PathParam("type") String type,
+    		@PathParam("id") String id, final String data) {
+    	
+    	logger.info("Update item for " + type + "-->" + data);
+    	ItemType it = supportedType(type);
+    	if (it != ItemType.UNSUPPORTED && ds != null) {
+    		OpResult res = ItemBuilder.updateItem(ds, it, id, data);
+    		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
+    	}
+    	
+    	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultNotSupported).build(); 
+    }
+    
     
     /**
      * Init DataSource when the application is started up
@@ -91,17 +148,23 @@ public class InfoCenter {
 		try {
 			Context initCtx = new InitialContext();
 			Context envCtx = (Context)initCtx.lookup("java:comp/env");
-			ds = (DataSource)envCtx.lookup("mysql/infocenter");
+			ds = (DataSource)envCtx.lookup(InterStatement.INFO_CENTER_DS);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.debug(e.getMessage());
+			logger.warn("Failed to get data source");
 		}
     }
     
-    private boolean isSupportedType(final String type) {
-    	if (type.compareTo(InterStatement.STU_TYPE) == 0 || type.compareTo("exam") == 0 ||
-    		type.compareTo("teach") == 0 || type.compareTo("sch") == 0)
-    		return true;
-    	
-    	return false;
+    private ItemType supportedType(final String type) {
+    	if (type.compareTo(ItemType.STUDENT.getVal()) == 0)
+    		return ItemType.STUDENT;
+    	else if (type.compareTo(ItemType.TEACHER.getVal()) == 0)
+    		return ItemType.TEACHER;
+    	else if (type.compareTo(ItemType.EXAM.getVal()) == 0)
+    		return ItemType.EXAM;
+    	else if (type.compareTo(ItemType.SCHOOL.getVal()) == 0)
+    		return ItemType.SCHOOL;
+    	else
+    		return ItemType.UNSUPPORTED;
     }
 }

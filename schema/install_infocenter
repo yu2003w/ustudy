@@ -1,0 +1,15 @@
+set names "utf8";
+create database if not exists infocenter character set utf8;
+create table if not exists infocenter.student (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+grade ENUM('初一', '初二', '初三', '高一','高二','高三'),
+class CHAR(10),
+stuno CHAR(20),
+category ENUM('普通', '体育', '艺术'),
+transient boolean default false,
+PRIMARY KEY(id),
+INDEX (name, stuno),
+UNIQUE KEY (stuno)
+);
+
