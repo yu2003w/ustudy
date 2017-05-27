@@ -27,12 +27,14 @@
          In order to display and store chinese characters, need to specify characterEncoding
          with proper value.
          -->
+    <!-- testWhileIdle: Make sure the database connection is always available before use -->
 
     <Resource name="mysql/infocenter" 
             auth="Container"
             type="javax.sql.DataSource"
             validationQuery="SELECT 1"
             validationInterval="30000"
+            testWhileIdle="true"
             timeBetweenEvictionRunsMillis="30000"
             maxTotal="100"
             maxIdle="30"
