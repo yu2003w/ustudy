@@ -1,3 +1,5 @@
+# some tips for configuration and deployment
+# when deploy on cloud platform, jdbc driver url should use internal IP address.
 
 # To display chinese character via mysql command line, need to run following command after
 # log on mysql, set names "utf8"
