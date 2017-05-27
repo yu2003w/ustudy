@@ -1,5 +1,11 @@
 package com.ustudy.datawrapper;
 
+/**
+ * Initiated by Jared on May 26, 2017.
+ * 
+ * Separate database logic from application logic.
+ * 
+ */
 
 import java.sql.Connection;
 import java.sql.ResultSet;
