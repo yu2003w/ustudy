@@ -22,10 +22,10 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.ustudy.datawrapper.InfoList;
+import com.ustudy.datawrapper.ListAssemble;
 import com.ustudy.datawrapper.InterStatement;
 import com.ustudy.datawrapper.InterStatement.ItemType;
-import com.ustudy.datawrapper.ItemBuilder;
+import com.ustudy.datawrapper.ItemManager;
 import com.ustudy.datawrapper.OpResult;
 import com.ustudy.datawrapper.OpResult.OpStatus;
 
@@ -62,28 +62,44 @@ public class InfoCenter {
      *         list of information related with parameter "type"
      */
     @GET
-    @Path("list/{type}")
+    @Path("list/{type}/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getList(@PathParam("type") String type) {
+    public Response getList(@PathParam("type") String type, @PathParam("id") int id) {
     	logger.trace("List information for " + type);
     	ItemType it = supportedType(type);
     	if (it != ItemType.UNSUPPORTED && (ds != null)) {
-    		OpResult res = InfoList.getList(ds, it);
+    		OpResult res = ListAssemble.assemble(ds, it, id);
     		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
     	}
-    	return Response.status(OpStatus.OP_BadRequest.getVal()).
-    			entity("{\"Result\":\"Not supported type\"}").build();
+    
+    	if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+        	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultTypeNotSupported).build();
     }
     
     @GET
     @Path("item/{type}/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getItem(@PathParam("type") String type, @PathParam("id") int id) {
+    public Response getItem(@PathParam("type") String type, @PathParam("id") String id) {
     	logger.debug("Get item of " + type + " with id " + id);
     	ItemType it = supportedType(type);
-    	if (it != ItemType.UNSUPPORTED && (ds != null))
-    		return ItemBuilder.getItem(ds, it, id);
-    	return null;
+    	if (it != ItemType.UNSUPPORTED && (ds != null)) {
+    		OpResult res = ItemManager.getItem(ds, it, id);
+    		return Response.status(res.getStatus().getVal()).
+    			entity(res.getData()).build();
+    	}
+        if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+        	return Response.status(OpStatus.OP_BadRequest.getVal()).
+        		entity(InterStatement.ResultTypeNotSupported).build();
+
     }
     
     @DELETE @Path("delete/{type}/{id}")
@@ -91,11 +107,17 @@ public class InfoCenter {
     	logger.debug("Item of " + type + " "+ id + " is to be deleted.");
     	ItemType it = supportedType(type);
     	if (it != ItemType.UNSUPPORTED && (ds != null)) {
-    		OpResult res = ItemBuilder.deleteItem(ds, it, id);
+    		OpResult res = ItemManager.deleteItem(ds, it, id);
     		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
     	}
-    	return Response.status(OpStatus.OP_BadRequest.getVal()).
-    			entity(InterStatement.ResultNotSupported).build();
+    	
+    	if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+        	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultTypeNotSupported).build();
     }
     
     /**
@@ -104,26 +126,38 @@ public class InfoCenter {
      * @param data json string contains the information for constructing the item
      * @return 
      */
-    @POST  @Path("add/{type}")
+    @POST
+    @Path("add/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createItem(@PathParam("type") String type, final String data) {
     	logger.info("Create item for " + type + ":", data);
     	ItemType it = supportedType(type);
-    	if (it == ItemType.UNSUPPORTED)
-    		return Response.status(OpStatus.OP_BadRequest.getVal()).
-    			entity(InterStatement.ResultNotSupported).build();
-    	int key = ItemBuilder.buildItem(ds, it, data);
-    	if (key > 1) {
-    		String loc = "item/" + type + "/" + key;
-    		return Response.status(201).header("Location", loc).
-    			entity(InterStatement.ResultItemCreated).build();
+    	if (it != ItemType.UNSUPPORTED && ds != null) {
+    		OpResult ret = ItemManager.buildItem(ds, it, data);
+    		int id = ret.getKey();
+        	if (id > 0) {
+        		String loc = "item/" + type + "/" + String.valueOf(id);
+        		return Response.status(OpStatus.OP_Created.getVal()).header("Location", loc).
+        			entity(InterStatement.ResultItemCreated).build();
+        	}
+        	else
+        		return Response.status(OpStatus.OP_BadRequest.getVal()).
+        			entity(InterStatement.ResultDuplicated).build();
     	}
-    	else
-    		return Response.status(409).entity(InterStatement.ResultDuplicated).build();
+    	
+    	if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+    		return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultTypeNotSupported).build();
+    	
     }
     
-    @POST  @Path("update/{type}/{id}")
+    @POST
+    @Path("update/{type}/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateItem(@PathParam("type") String type,
@@ -132,12 +166,17 @@ public class InfoCenter {
     	logger.info("Update item for " + type + "-->" + data);
     	ItemType it = supportedType(type);
     	if (it != ItemType.UNSUPPORTED && ds != null) {
-    		OpResult res = ItemBuilder.updateItem(ds, it, id, data);
+    		OpResult res = ItemManager.updateItem(ds, it, id, data);
     		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
     	}
     	
-    	return Response.status(OpStatus.OP_BadRequest.getVal()).
-    			entity(InterStatement.ResultNotSupported).build(); 
+    	if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+        	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultTypeNotSupported).build(); 
     }
     
     
@@ -150,8 +189,8 @@ public class InfoCenter {
 			Context envCtx = (Context)initCtx.lookup("java:comp/env");
 			ds = (DataSource)envCtx.lookup(InterStatement.INFO_CENTER_DS);
 		} catch (Exception e) {
-			logger.debug(e.getMessage());
-			logger.warn("Failed to get data source");
+			logger.warn(e.getMessage());
+			logger.fatal("Failed to get data source from configured information");
 		}
     }
     

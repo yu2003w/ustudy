@@ -27,6 +27,9 @@ public class OpResult {
 	// json data for SQL statement result
 	private String data;
 	
+	// auto increment key for insert operation
+	private int autoid = -1;
+	
 	public OpResult(OpStatus st, String res) {
 		status = st;
 		data = res;
@@ -46,5 +49,13 @@ public class OpResult {
 	
 	public String getData () {
 		return data;
+	}
+	
+	public void setKey(int val) {
+		autoid = val;
+	}
+	
+	public int getKey() {
+		return autoid;
 	}
 }
