@@ -194,8 +194,8 @@ public class StuSchema extends ItemSchema {
 			}
 			else {
 				if (i == (len - 1)) {
-					result += "\",\"" + schT[1][i] + "\":\"" +
-						    Boolean.valueOf(rs.getString(schT[0][i]));
+					result += "\",\"" + schT[1][i] + "\":" +
+						    Boolean.valueOf(rs.getString(schT[0][i])) + "}";
 				}
 				else {
 					result += "\",\"" + schT[1][i] + "\":\"" +
@@ -203,7 +203,6 @@ public class StuSchema extends ItemSchema {
 				}
 			}
 		}
-		result += "\"}";
 		
 		return result;
 	}
