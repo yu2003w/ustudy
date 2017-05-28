@@ -4,6 +4,8 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.List;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -145,6 +147,24 @@ public class StuSchema extends ItemSchema {
 		}
 		sqlSt = InterStatement.STU_DELETE_PREFIX + id;
 		return true;
+	}
+	
+	@Override
+	public boolean genDelSetSql(String data) {
+		// need to parse id set firstly
+		List<String> ids = parseIds(data);
+		sqlSt = InterStatement.STU_DELETE_PREFIX;
+		int len = ids.size();
+		for (int i = 0; i < len; i++) {
+	        if (i == 0)
+	        	sqlSt += ids.get(i);
+	        else
+			    sqlSt += " or id = " + ids.get(i);
+		}
+		logger.debug(sqlSt);
+		if (sqlSt != null)
+		    return true;
+		return false;
 	}
 	
 	@Override

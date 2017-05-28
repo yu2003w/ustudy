@@ -40,7 +40,7 @@ public class InterStatement {
 	public static final String STU_UPDATE_PREFIX = "update student set ";
 	
 	// labels for fields in table student
-	public static final String STU_ID = "id";
+	public static final String ID = "id";
 	public static final String STU_NAME = "姓名";
 	public static final String STU_GRADE = "年级";
 	public static final String STU_CLASS = "班级";
@@ -49,6 +49,7 @@ public class InterStatement {
 	public static final String STU_TRANS = "是否借读";
 	
 	public static final String STU_LIST_HEADER = "学生信息";
+
 	// columns in table student
 	public static final String COL_STU_ID = "id";
 	public static final String COL_STU_NAME = "name";
@@ -75,9 +76,7 @@ public class InterStatement {
 	public static final String ResultInterErr = "{\"Result\":\"Internal Error\"}";
 	public static final String ResultItemCreated = "{\"Result\":\"Item Created\"}";
 	public static final String ResultQueryIDInvalid = 
-			"{\"Result\":\"Start ID for query is in valid\"}";
-	public static final String ResultDataInvalid = "{\"Result\":\"Json data invalid\"}";
-
+			"{\"Result\":\"Start ID for query is invalid\"}";
 	
-	public static final int STU_LIMIT = 2000;
+	public static final int STU_LIMIT = 10000;
 }
