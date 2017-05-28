@@ -181,4 +181,30 @@ public class StuSchema extends ItemSchema {
 		
 		return result;
 	}
+	
+	@Override
+	public String assembleItem(ResultSet rs) throws SQLException {
+		String result = "{\"";
+		
+		int len = schT[0].length;
+		
+		for (int i = 0; i < len; i++) {
+			if (i == 0) {
+				result += schT[1][i] + "\":\"" + rs.getString(schT[0][i]);
+			}
+			else {
+				if (i == (len - 1)) {
+					result += "\",\"" + schT[1][i] + "\":\"" +
+						    Boolean.valueOf(rs.getString(schT[0][i]));
+				}
+				else {
+					result += "\",\"" + schT[1][i] + "\":\"" +
+						    rs.getString(schT[0][i]);
+				}
+			}
+		}
+		result += "\"}";
+		
+		return result;
+	}
 }

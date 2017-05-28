@@ -61,7 +61,7 @@ public class InterStatement {
 	// lables and columns for table infocenter.student
 	public static final String [][] STU_TABLE = {
 		{"id", "name", "grade", "class", "stuno", "category", "transient"},
-		{"id", "姓名", "年级", "班级", "学籍号", "类别", "是否借读"},
+		{"id", "studentName", "grade", "class", "studentId", "type", "isTemp"},
 	};
 	
 	public static final String ResultEmpty = "{\"Result\":\"Empty\"}";

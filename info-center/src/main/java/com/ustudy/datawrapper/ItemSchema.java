@@ -44,7 +44,7 @@ public abstract class ItemSchema {
 	 * @return  JSON string for single item
 	 * @throws SQLException
 	 */
-	protected String assembleItem(ResultSet rs) throws SQLException {
+	public String assembleItem(ResultSet rs) throws SQLException {
 		String result = "{\"";
 		boolean first = true;
 		int len = schT[0].length;
@@ -54,12 +54,14 @@ public abstract class ItemSchema {
 				result += schT[1][i] + "\":\"" + rs.getString(schT[0][i]);
 				first = false;
 			}
-			result += "\",\"" + schT[1][i] + "\":\"" +
-			    rs.getString(schT[0][i]);
+			else {
+				result += "\",\"" + schT[1][i] + "\":\"" +
+					    rs.getString(schT[0][i]);
+			}
 		}
 		result += "\"}";
 		
 		return result;
-	}
+	} 
 	
 }

@@ -2,8 +2,9 @@ Initiated by Jared on May 12, 2017.
 
 This is URL schema design document for information center.
 Below is example for student.
+IP address is 47.92.53.57:8080
 1, retrieve list
-   services/info/list/student/
+   services/info/list/student/0/
 2, create item 
    services/info/add/student/
 3, view item
@@ -12,5 +13,7 @@ Below is example for student.
    services/info/delete/student/id
 5, update item
    services/info/update/student/id
+6, delete items (post request, including ids in json format)
+   services/info/delete/student/
    
 
