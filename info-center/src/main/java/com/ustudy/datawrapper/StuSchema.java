@@ -4,6 +4,8 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.List;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -148,6 +150,28 @@ public class StuSchema extends ItemSchema {
 	}
 	
 	@Override
+	public boolean genDelSetSql(String data) {
+		// need to parse id set firstly
+		List<String> ids = parseIds(data);
+		if (ids.isEmpty()) {
+			logger.debug("No valid ids provided for delete");
+			return false;
+		}
+		sqlSt = InterStatement.STU_DELETE_PREFIX;
+		int len = ids.size();
+		for (int i = 0; i < len; i++) {
+	        if (i == 0)
+	        	sqlSt += ids.get(i);
+	        else
+			    sqlSt += " or id = " + ids.get(i);
+		}
+		logger.debug(sqlSt);
+		if (sqlSt != null)
+		    return true;
+		return false;
+	}
+	
+	@Override
 	public boolean genGetSql(String id) {
 		if (Integer.valueOf(id) < 0) {
 			logger.debug("Invalid parameter, start id is negative");
@@ -178,6 +202,31 @@ public class StuSchema extends ItemSchema {
 		}
 		
 		logger.debug(result);
+		
+		return result;
+	}
+	
+	@Override
+	public String assembleItem(ResultSet rs) throws SQLException {
+		String result = "{\"";
+		
+		int len = schT[0].length;
+		
+		for (int i = 0; i < len; i++) {
+			if (i == 0) {
+				result += schT[1][i] + "\":\"" + rs.getString(schT[0][i]);
+			}
+			else {
+				if (i == (len - 1)) {
+					result += "\",\"" + schT[1][i] + "\":" +
+						    Boolean.valueOf(rs.getString(schT[0][i])) + "}";
+				}
+				else {
+					result += "\",\"" + schT[1][i] + "\":\"" +
+						    rs.getString(schT[0][i]);
+				}
+			}
+		}
 		
 		return result;
 	}

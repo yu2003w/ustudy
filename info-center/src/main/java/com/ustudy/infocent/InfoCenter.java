@@ -177,7 +177,27 @@ public class InfoCenter {
     			entity(InterStatement.ResultTypeNotSupported).build(); 
     }
     
-    
+    @POST
+    @Path("delete/{type}/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteItemSet(@PathParam("type") String type, final String data) {
+    	logger.info("Delete items for " + type + "-->" + data);
+    	ItemType it = supportedType(type);
+    	if (it != ItemType.UNSUPPORTED && ds != null) {
+    		OpResult res = ItemManager.deleteItemSet(ds, it, data);
+    		return Response.status(res.getStatus().getVal()).entity(res.getData()).build();
+    	}
+    	
+    	if (ds == null) {
+        	return Response.status(OpStatus.Op_InterServerError.getVal()).
+        		entity(InterStatement.ResultDBError).build();
+        }
+        else
+        	return Response.status(OpStatus.OP_BadRequest.getVal()).
+    			entity(InterStatement.ResultTypeNotSupported).build(); 
+    	
+    }
     /**
      * Init DataSource when the application is started up
      */

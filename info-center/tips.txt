@@ -8,6 +8,8 @@
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"姓名":"韦小宝", "学籍号": "100003", "年级": "高三", "班级": "5班", "类别":"普通", "是否借读":"0"}' http://192.168.0.107:8080/services/info/add/student/
 # update item with curl
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"姓名":"任我行", "学籍号": "100030", "年级": "高三", "班级": "5班", "类别":"普通", "是否借读":"0"}' http://192.168.0.107:8080/services/info/update/student/6
+# delete items
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '[{"id": 124 },{"id": 123}]' http://192.168.0.107:8080/services/info/delete/student/
 
 curl -v -X DELETE http://192.168.0.107:8080/services/info/delete/student/20
 

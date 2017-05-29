@@ -40,7 +40,7 @@ public class InterStatement {
 	public static final String STU_UPDATE_PREFIX = "update student set ";
 	
 	// labels for fields in table student
-	public static final String STU_ID = "id";
+	public static final String ID = "id";
 	public static final String STU_NAME = "姓名";
 	public static final String STU_GRADE = "年级";
 	public static final String STU_CLASS = "班级";
@@ -48,7 +48,8 @@ public class InterStatement {
 	public static final String STU_CATEG = "类别";
 	public static final String STU_TRANS = "是否借读";
 	
-	public static final String STU_LIST_HEADER = "学生信息";
+	public static final String STU_LIST_HEADER = "students";
+
 	// columns in table student
 	public static final String COL_STU_ID = "id";
 	public static final String COL_STU_NAME = "name";
@@ -61,7 +62,7 @@ public class InterStatement {
 	// lables and columns for table infocenter.student
 	public static final String [][] STU_TABLE = {
 		{"id", "name", "grade", "class", "stuno", "category", "transient"},
-		{"id", "姓名", "年级", "班级", "学籍号", "类别", "是否借读"},
+		{"id", "studentName", "grade", "class", "studentId", "type", "isTemp"},
 	};
 	
 	public static final String ResultEmpty = "{\"Result\":\"Empty\"}";
@@ -75,9 +76,7 @@ public class InterStatement {
 	public static final String ResultInterErr = "{\"Result\":\"Internal Error\"}";
 	public static final String ResultItemCreated = "{\"Result\":\"Item Created\"}";
 	public static final String ResultQueryIDInvalid = 
-			"{\"Result\":\"Start ID for query is in valid\"}";
-	public static final String ResultDataInvalid = "{\"Result\":\"Json data invalid\"}";
-
+			"{\"Result\":\"Start ID for query is invalid\"}";
 	
-	public static final int STU_LIMIT = 2000;
+	public static final int STU_LIMIT = 10000;
 }

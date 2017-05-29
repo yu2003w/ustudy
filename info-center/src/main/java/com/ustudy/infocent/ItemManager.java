@@ -37,7 +37,7 @@ public class ItemManager {
 			ret = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultTypeNotSupported);
 		}
 		if (!sch.genAddSql(data)) {
-			ret = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultDataInvalid);
+			ret = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultInvalidJson);
 		}
 		else {
 			ret = DataProvider.execUpdate(ds, sch);
@@ -117,4 +117,23 @@ public class ItemManager {
 		return res;
 	}
 	
+	public static OpResult deleteItemSet(DataSource ds, final ItemType type, String data) {
+		
+		OpResult res = null;
+		ItemSchema sch = SchemaFactory.createSchema(type);
+		if (sch == null) {
+			logger.debug("Failed to create ItemSchema");
+			res = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultTypeNotSupported);
+		}
+		if (!sch.genDelSetSql(data)) {
+			res = new OpResult(OpStatus.OP_BadRequest, InterStatement.ResultInvalidJson);
+		}
+		else {
+			res = DataProvider.execUpdate(ds, sch);
+			if (res.getStatus() == OpStatus.OP_Successful)
+			    res.setData(InterStatement.ResultDeleted);
+		}
+		
+		return res;
+	}
 }
