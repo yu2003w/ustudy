@@ -153,6 +153,10 @@ public class StuSchema extends ItemSchema {
 	public boolean genDelSetSql(String data) {
 		// need to parse id set firstly
 		List<String> ids = parseIds(data);
+		if (ids.isEmpty()) {
+			logger.debug("No valid ids provided for delete");
+			return false;
+		}
 		sqlSt = InterStatement.STU_DELETE_PREFIX;
 		int len = ids.size();
 		for (int i = 0; i < len; i++) {

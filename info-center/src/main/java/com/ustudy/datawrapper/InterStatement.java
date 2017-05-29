@@ -48,7 +48,7 @@ public class InterStatement {
 	public static final String STU_CATEG = "类别";
 	public static final String STU_TRANS = "是否借读";
 	
-	public static final String STU_LIST_HEADER = "学生信息";
+	public static final String STU_LIST_HEADER = "students";
 
 	// columns in table student
 	public static final String COL_STU_ID = "id";

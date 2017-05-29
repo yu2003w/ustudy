@@ -100,7 +100,7 @@ public abstract class ItemSchema {
 			int len = jArr.size();
 			for (int i = 0; i < len; i++) {
 				JsonObject obj = jArr.getJsonObject(i);
-				ret.add(String.valueOf(obj.getJsonNumber(InterStatement.ID).intValue()));
+				ret.add(obj.getJsonString(InterStatement.ID).getString());
 			}
 		} catch (JsonException je) {
 			logger.info(je.getMessage());
