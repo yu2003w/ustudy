@@ -51,37 +51,25 @@ public class StuSchema extends ItemSchema {
 			reader.close();
 			
 			// noted: before insert operation, need to check value of each field is proper
-			String name = jObj.getString(InterStatement.STU_NAME);
-			String stuno = jObj.getString(InterStatement.STU_NO);
-			if (name.isEmpty()) {
-				logger.warn("name is empty which is not allowed");
+			int len = InterStatement.STU_TABLE[0].length - 1;
+			String val = jObj.getString(InterStatement.STU_TABLE[1][1]);
+			if (val.isEmpty()) {
+				logger.warn(InterStatement.STU_TABLE[1][1]+ " must have a value");
 				return false;
 			}
-					
-			sqlSt = InterStatement.STU_INSERT_PREFIX + name + "',";
-			JsonString jgrade = jObj.getJsonString(InterStatement.STU_GRADE);
-			if (jgrade != null)
-				sqlSt += "'" + jgrade.getString() + "',";
 			else
-				sqlSt += "null,";
-			JsonString jstuclass = jObj.getJsonString(InterStatement.STU_CLASS);
-			if (jstuclass != null)
-				sqlSt += "'" + jstuclass.getString() + "',";
-			else
-				sqlSt += "null,";
-			sqlSt += "'" + stuno + "',";
-			JsonString jcate = jObj.getJsonString(InterStatement.STU_CATEG);
-			if (jcate != null)
-				sqlSt += "'" + jcate.getString() + "',";
-			else
-				sqlSt += "null,";
-			JsonString jtrans = jObj.getJsonString(InterStatement.STU_TRANS);
-			// noted, transient is boolean value
-			if (jtrans != null)
-				sqlSt += jtrans.getString();
-			else
-				sqlSt += "null";
-			sqlSt += ");";
+				sqlSt = InterStatement.STU_INSERT_PREFIX + val + "'";
+			
+			for (int i = 2; i < len; i++) {
+				JsonString jVal = jObj.getJsonString(InterStatement.STU_TABLE[1][i]);
+				if (jVal != null)
+					sqlSt += ",'" + jVal.getString() + "'";
+				else
+					sqlSt += ",null";
+			}
+			boolean isTransient = jObj.getBoolean(InterStatement.STU_TABLE[1][len], false);
+			sqlSt += "," + String.valueOf(isTransient);
+			sqlSt += ");";		
 		} catch (JsonException je) {
 			logger.info(je.getMessage());
 			logger.warn("Invalid json data in request for adding item");
@@ -92,6 +80,7 @@ public class StuSchema extends ItemSchema {
 			return false;
 		}
 
+		// logger.debug(sqlSt);
 		return true;
 	}
 	
@@ -107,25 +96,31 @@ public class StuSchema extends ItemSchema {
 			// first element is table column, second element is table label
 			int len = schT[0].length;
 			for (int i = 1; i < len; i++) {
-				
-				JsonString jVal = jObj.getJsonString(schT[1][i]);
-				if (jVal != null) {
-					String val = jVal.getString();
-					if (!val.isEmpty()) {
-						if (first) {
-							first = false;
-							sqlSt = InterStatement.STU_UPDATE_PREFIX + schT[0][i] +
-									" = \"" + val + "\"";
-						}
-						else
-							sqlSt += ", " + schT[0][i] + " = \"" + val + "\"";
+				String val = null;
+				JsonString jVal = null;
+				if (i == len -1) {
+					val = String.valueOf(jObj.getBoolean(schT[1][i], false));
+				}
+				else {
+					jVal = jObj.getJsonString(schT[1][i]);
+					if (jVal != null)
+						val = jVal.getString();
+					if (val != null && !val.isEmpty())
+						val = "\"" + val + "\"";
+				}
+				if (val != null && !val.isEmpty()) {
+					// if the field is empty, just ignore it	
+					if (first) {
+						first = false;
+						sqlSt = InterStatement.STU_UPDATE_PREFIX + schT[0][i] +
+								" = " + val;
 					}
-					// if the field is empty, just ignore it
-				}	
+					else
+						sqlSt += ", " + schT[0][i] + " = " + val;
+				}
 			}
 			if (!first)
 				sqlSt += " where id = " + id + ";";
-			logger.debug("SQL for update ->" + sqlSt);
 		} catch (JsonException je) {
 			logger.info(je.getMessage());
 			logger.warn("Invalid json data in request for updating item");
@@ -219,7 +214,7 @@ public class StuSchema extends ItemSchema {
 			else {
 				if (i == (len - 1)) {
 					result += "\",\"" + schT[1][i] + "\":" +
-						    Boolean.valueOf(rs.getString(schT[0][i])) + "}";
+						    String.valueOf(rs.getBoolean(schT[0][i])) + "}";
 				}
 				else {
 					result += "\",\"" + schT[1][i] + "\":\"" +
