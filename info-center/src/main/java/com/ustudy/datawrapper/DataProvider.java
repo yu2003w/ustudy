@@ -27,7 +27,6 @@ public class DataProvider {
 		
 		OpResult ret = null;
 		String statem = schema.getSqlSt();
-		logger.debug(statem);
 		Connection conn = null;
 		ResultSet rs = null;
 		
@@ -62,7 +61,7 @@ public class DataProvider {
 		OpResult res = null;
 		Connection conn = null;
 		String sqlSt = schema.getSqlSt();
-		logger.debug(sqlSt);
+
 		try {
 			conn = ds.getConnection();
 			Statement st = conn.createStatement();
