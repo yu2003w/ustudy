@@ -39,26 +39,9 @@ public class InterStatement {
 	public static final String STU_DELETE_PREFIX = "delete from student where id = ";
 	public static final String STU_UPDATE_PREFIX = "update student set ";
 	
-	// labels for fields in table student
 	public static final String ID = "id";
-	public static final String STU_NAME = "姓名";
-	public static final String STU_GRADE = "年级";
-	public static final String STU_CLASS = "班级";
-	public static final String STU_NO = "学籍号";
-	public static final String STU_CATEG = "类别";
-	public static final String STU_TRANS = "是否借读";
-	
 	public static final String STU_LIST_HEADER = "students";
 
-	// columns in table student
-	public static final String COL_STU_ID = "id";
-	public static final String COL_STU_NAME = "name";
-	public static final String COL_STU_GRADE = "grade";
-	public static final String COL_STU_CLASS = "class";
-	public static final String COL_STU_NO = "stuno";
-	public static final String COL_STU_CATEG = "category";
-	public static final String COL_STU_TRANS = "transient";
-	
 	// lables and columns for table infocenter.student
 	public static final String [][] STU_TABLE = {
 		{"id", "name", "grade", "class", "stuno", "category", "transient"},

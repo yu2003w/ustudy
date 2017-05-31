@@ -80,7 +80,6 @@ public class StuSchema extends ItemSchema {
 			return false;
 		}
 
-		// logger.debug(sqlSt);
 		return true;
 	}
 	
@@ -113,7 +112,7 @@ public class StuSchema extends ItemSchema {
 					if (first) {
 						first = false;
 						sqlSt = InterStatement.STU_UPDATE_PREFIX + schT[0][i] +
-								" = " + val;
+							" = " + val;
 					}
 					else
 						sqlSt += ", " + schT[0][i] + " = " + val;
@@ -213,12 +212,13 @@ public class StuSchema extends ItemSchema {
 			}
 			else {
 				if (i == (len - 1)) {
+					// processing JsonBoolean value
 					result += "\",\"" + schT[1][i] + "\":" +
-						    String.valueOf(rs.getBoolean(schT[0][i])) + "}";
+						String.valueOf(rs.getBoolean(schT[0][i])) + "}";
 				}
 				else {
 					result += "\",\"" + schT[1][i] + "\":\"" +
-						    rs.getString(schT[0][i]);
+						rs.getString(schT[0][i]);
 				}
 			}
 		}

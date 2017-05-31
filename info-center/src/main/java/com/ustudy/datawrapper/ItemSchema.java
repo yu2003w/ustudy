@@ -72,7 +72,7 @@ public abstract class ItemSchema {
 			}
 			else {
 				result += "\",\"" + schT[1][i] + "\":\"" +
-					    rs.getString(schT[0][i]);
+					rs.getString(schT[0][i]);
 			}
 		}
 		result += "\"}";
