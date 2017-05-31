@@ -31,5 +31,5 @@ fi
 echo "Deploying services.war successfully"
 
 docker run --rm --name infocenter -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
-    -v ${WORK_DIR}/logs:/usr/local/tomcat/logs/ tomcat:9.0
+    -v ${WORK_DIR}/logs/infocenter:/usr/local/tomcat/logs/ -d tomcat:9.0
 
