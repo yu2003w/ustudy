@@ -1,4 +1,9 @@
 #!/bin/sh
+# Initiated by Jared on May, 2017.
+#
+# Start mysql container to host data
+#
+
 if [ $# != 1 ]; then
   echo "Please specify WORK_DIR firstly"
   exit
@@ -19,6 +24,8 @@ if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   fi
 fi
 
+chown -R 999:999 ${WORK_DIR}/mysql/
+
 MYSQL_LOG_DIR=${WORK_DIR}/logs/mysql/
 if [ ! -d ${MYSQL_LOG_DIR} ]; then
   mkdir -p ${MYSQL_LOG_DIR}
@@ -30,14 +37,25 @@ if [ ! -d ${MYSQL_LOG_DIR} ]; then
   fi
 fi
 
+# noted here, mysql image uses sbt user whose id is 999
+# after successfully created the logs directory, need to chown to sbt in order
+# to create log files successfully
+chown 999:999 ${MYSQL_LOG_DIR}
+
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
 docker run --rm -it --name web-mysql -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
-    -v ${WORK_DIR}/mysql/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/lib/mysql/logs/ \
+    -v ${WORK_DIR}/mysql/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
     -p 13306:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
-    --log-error="logs/mysqld.log"  \
-    --general_log=1 --general_log_file logs/gen.log \
-    --slow_query_log=1 --slow_query_log_file logs/slow.log
+    --log-error=/var/log/mysql/mysqld.log  \
+    --general_log=1 --general_log_file /var/log/mysql/gen.log \
+    --slow_query_log=1 --slow_query_log_file /var/log/mysql/slow.log
+
+if [ $? != 0 ];then
+  echo "Failed to launch web-mysql container"
+else
+  echo "Launched web-mysql container successfully"
+fi
 
 # docker exec -u root web-mysql /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_infocenter'
 
