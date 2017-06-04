@@ -15,13 +15,16 @@ if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   if [ $? != 0 ]; then
     echo "Failed to create schema directory" ${WORK_DIR}/mysql/schema/
     exit
-  fi
-  cp -Rf /home/repo/ustudy/schema/ ${WORK_DIR}/mysql/
-  if [ $? != 0 ]; then
-    echo "Failed to copy schema files into " ${WORK_DIR}/mysql/schema/
   else
-    echo "Copy schema files into " ${WORK_DIR}/mysql/schema/ " successfully"
+    echo "Created schema directory" ${WORK_DIR}/mysql/schema/
   fi
+fi
+
+cp -Rf /home/repo/ustudy/schema/ ${WORK_DIR}/mysql/
+if [ $? != 0 ]; then
+  echo "Failed to copy schema files into " ${WORK_DIR}/mysql/schema/
+else
+  echo "Copy schema files into " ${WORK_DIR}/mysql/schema/ " successfully"
 fi
 
 chown -R 999:999 ${WORK_DIR}/mysql/
