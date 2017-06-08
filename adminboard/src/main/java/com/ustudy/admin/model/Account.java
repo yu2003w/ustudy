@@ -2,6 +2,7 @@ package com.ustudy.admin.model;
 
 public class Account {
 	private String username = null;
+	private String password = null;
 	
 	public Account(String name) {
 		username = name;

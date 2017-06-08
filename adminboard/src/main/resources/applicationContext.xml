@@ -11,9 +11,9 @@
       
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/s/login"/>
-        <property name="successUrl" value="/s/index"/>
-        <property name="unauthorizedUrl" value="/s/unauthorized"/>
+        <property name="loginUrl" value="/dashboard/login"/>
+        <property name="successUrl" value="/dashboard/index"/>
+        <property name="unauthorizedUrl" value="/dashboard/unauthorized"/>
         <property name="filterChainDefinitions">
             <value>
                 /dashboard/users/list = authc, roles[admin]
