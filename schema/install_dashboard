@@ -1,0 +1,37 @@
+set names "utf8";
+create database if not exists dashboard character set utf8;
+
+create table if not exists dashboard.users (
+id INT NOT NULL AUTO_INCREMENT,
+loginname VARCHAR(64) NOT NULL,
+usr_passwd VARCHAR(256) NOT NULL,
+usr_passwdsalt VARCHAR(256) NOT NULL,
+PRIMARY KEY (id),
+INDEX (loginname),
+UNIQUE KEY (loginname)
+);
+
+create table if not exists dashboard.roles (
+id INT NOT NULL AUTO_INCREMENT,
+role_name VARCHAR(32) NOT NULL,
+user_id INT NOT NULL,
+PRIMARY KEY (id),
+UNIQUE KEY (role_name),
+INDEX(user_id),
+FOREIGN KEY (user_id)
+    REFERENCES dashboard.users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create table if not exists dashboard.permissions (
+id INT NOT NULL AUTO_INCREMENT,
+perm_name VARCHAR(64) NOT NULL,
+role_id INT NOT NULL,
+PRIMARY KEY (id),
+UNIQUE KEY (perm_name),
+INDEX (role_id),
+FOREIGN KEY (role_id)
+    REFERENCES dashboard.roles (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+

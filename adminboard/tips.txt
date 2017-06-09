@@ -1,0 +1,1 @@
+curl -X POST -F 'username=test' -F 'password=test123' http://192.168.0.107:8080/dashboard/login/
