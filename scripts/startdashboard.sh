@@ -23,13 +23,13 @@ else
   fi
 fi
 
-cp -f /home/repo/test/ustudy/adminboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
+cp -f /home/repo/ustudy/adminboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
 if [ $? != 0 ]; then
-  echo "Failed to copy infoservice.war into destination directory"
+  echo "Failed to copy dashboard.war into destination directory"
   exit 1
 fi
-echo "Deploying services.war successfully"
+echo "Deploying dashboard.war successfully"
 
-docker run --rm --name ustudy -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
-    -v ${WORK_DIR}/logs/ustudy:/usr/local/tomcat/logs/ -d tomcat:9.0
+docker run --rm --name dashboard -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
+    -v ${WORK_DIR}/logs/dashboard:/usr/local/tomcat/logs/ -d tomcat:9.0
 
