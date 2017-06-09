@@ -11,9 +11,9 @@
       
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/dashboard/login"/>
-        <property name="successUrl" value="/dashboard/index"/>
-        <property name="unauthorizedUrl" value="/dashboard/unauthorized"/>
+        <property name="loginUrl" value="login"/>
+        <property name="successUrl" value="index"/>
+        <property name="unauthorizedUrl" value="unauthorized"/>
         <property name="filterChainDefinitions">
             <value>
                 /dashboard/users/list = authc, roles[admin]
@@ -28,7 +28,8 @@
     <bean id="adminboard" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://192.168.0.107:13306/dashboard?characterEncoding=UTF-8"/>  
+                <property name="url" value="jdbc:mysql://192.168.0.107:13306/dashboard?characterEncoding=UTF-8"/>
+                <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/dashboard?characterEncoding=UTF-8"/> -->
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
@@ -44,11 +45,11 @@
                 <!--
                 <property name="removeAbandonedTimeout" value="60"/>  
                 <property name="minEvictableIdleTimeMillis" value="30000"/>  
-                <property name="minIdle" value="10"/>  
-                <property name="logAbandoned" value="true"/>  
+                <property name="minIdle" value="10"/>
+                <property name="logAbandoned" value="true"/>
                 <property name="removeAbandoned" value="true"/>  
                 <property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"/>
-                -->  
+                -->
             </bean>  
         </property>  
     </bean>
@@ -68,6 +69,8 @@
         <property name="dataSource" ref="adminboard" />
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select usr_passwd from users where loginname = ?" />
+        <property name="userRolesQuery" value="select role_name from roles where user_id = (select id from users where loginname = ? )" />
+        <property name="permissionsQuery" value="select perm_name from permissions where role_id = (select id from roles where role_name = ?)" />
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
     <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">

@@ -2,6 +2,9 @@ package com.ustudy.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +22,9 @@ public class AccountController {
 	@Autowired
 	private AccountService ac;
 	
+	@RequiresAuthentication
+	@RequiresRoles("user, admin")
+	@RequiresPermissions("dashboard:view")
 	@RequestMapping(value = "/list/", method = RequestMethod.GET)
 	public Account list() {
 
