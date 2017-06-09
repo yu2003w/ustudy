@@ -47,7 +47,7 @@ chown 999:999 ${MYSQL_LOG_DIR}
 
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
-docker run --rm -it --name web-mysql -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
+docker run --rm -it --name ustudy-dw -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
     -v ${WORK_DIR}/mysql/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
     -p 13306:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
     --log-error=/var/log/mysql/mysqld.log  \
@@ -55,9 +55,9 @@ docker run --rm -it --name web-mysql -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
     --slow_query_log=1 --slow_query_log_file /var/log/mysql/slow.log
 
 if [ $? != 0 ];then
-  echo "Failed to launch web-mysql container"
+  echo "Failed to launch ustudy-dw container"
 else
-  echo "Launched web-mysql container successfully"
+  echo "Launched ustudy-dw container successfully"
 fi
 
 # docker exec -u root web-mysql /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_infocenter'

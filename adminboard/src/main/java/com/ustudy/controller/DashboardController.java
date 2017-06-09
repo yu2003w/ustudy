@@ -10,14 +10,14 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 
 @RestController
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/index")
 public class DashboardController {
 
 	private static final Logger logger = LogManager.getLogger(DashboardController.class);
 	
 	
 	@RequiresAuthentication
-	@RequiresPermissions("admin:view")
+	// @RequiresPermissions("admin:view")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String welcome() {
 		return "Welcome to Administration dashboard";

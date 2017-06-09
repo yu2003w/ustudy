@@ -1,8 +1,12 @@
 package com.ustudy.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -18,8 +22,8 @@ public class LoginController {
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
 	
 	@RequestMapping(value="/login/", method=RequestMethod.POST)
-	public String login(HttpServletRequest request) {
-		 
+	public String login(HttpServletRequest request, HttpServletResponse response) {
+				
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
@@ -31,10 +35,23 @@ public class LoginController {
 		Subject currentUser = SecurityUtils.getSubject();
 		try {
 			currentUser.login(token);
-			logger.debug(currentUser.isAuthenticated());
-		}catch (AuthenticationException ae) {
+		} catch (UnknownAccountException | IncorrectCredentialsException uae) {
+			logger.info("Attempt to access with invalid account -> username:" + username);
+			request.setAttribute("loginresult", "invalid account");
+		} catch (LockedAccountException lae) {
+			logger.warn("Account is locked, username:" + username);
+		} catch (AuthenticationException ae) {
 			logger.debug(ae.getMessage());
 		}
-		return null;
+		
+		if (currentUser.isAuthenticated()) {
+			logger.debug("Authentication successful");
+			response.setHeader("currentUser", username);
+		}
+		else {
+			token.clear();
+		}
+		
+		return "/login";
 	}
 }
