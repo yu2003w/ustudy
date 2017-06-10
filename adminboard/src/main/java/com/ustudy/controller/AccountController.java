@@ -1,5 +1,7 @@
 package com.ustudy.controller;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -23,17 +25,15 @@ public class AccountController {
 	private AccountService ac;
 	
 	@RequiresAuthentication
-	@RequiresRoles("user, admin")
+	@RequiresRoles(value={"user"})
 	@RequiresPermissions("dashboard:view")
 	@RequestMapping(value = "/list/", method = RequestMethod.GET)
-	public Account list() {
+	public List<Account> list() {
 
 		logger.debug("endpoint /list is visited");
-		Account u = new Account("jared");
+				
+		return ac.query();
 		
-		ac.invoke();
-		
-		return u;
 	}
 
 }

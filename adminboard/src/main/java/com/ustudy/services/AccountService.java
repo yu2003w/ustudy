@@ -2,6 +2,7 @@ package com.ustudy.services;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,20 +21,20 @@ public class AccountService {
 	@Autowired
 	private JdbcTemplate jdbcT;
 	
-	public void invoke() {
-	
-	String sql = "select * from sec_users;";
-	
-	try {
-	jdbcT.query(sql, new RowMapper<Account>(){
-		@Override
-		public Account mapRow(ResultSet rs, int num) throws SQLException{
-			Account usr = new Account("jared");
-			return usr;
+	public List<Account> query() {
+		List<Account> acList = null;
+		String sql = "select * from users;";
+		try {
+			acList = jdbcT.query(sql, new RowMapper<Account>(){	
+				@Override
+				public Account mapRow(ResultSet rs, int num) throws SQLException{
+					Account usr = new Account(rs.getString("loginname"));
+					return usr;
+				}
+		    });
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
 		}
-	});
-	} catch (Exception e) {
-		logger.debug(e.getMessage());
-	}
+		return acList;
 	}
 }
