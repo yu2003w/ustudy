@@ -28,7 +28,6 @@ public class AccountService {
 			acList = jdbcT.query(sql, new RowMapper<Account>(){	
 				@Override
 				public Account mapRow(ResultSet rs, int num) throws SQLException{
-					
 					Account usr = new Account(rs.getString("loginname"));
 					return usr;
 				}

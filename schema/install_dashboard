@@ -33,3 +33,38 @@ FOREIGN KEY (role_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+create table if not exists dashboard.school (
+id INT NOT NULL AUTO_INCREMENT,
+school_id  VARCHAR(64) NOT NULL,
+school_name VARCHAR(128) NOT NULL,
+school_type ENUM('高中', '初中', '完中', '九年制', '小学', '十二年制', '补习', '其他'),
+province  VARCHAR(32) NOT NULL,
+city      VARCHAR(32) NOT NULL,
+district  VARCHAR(32) NOT NULL,
+PRIMARY KEY (id),
+INDEX(school_id, school_name),
+UNIQUE KEY(school_name, school_id)
+);
+
+create table if not exists dashboard.grade (
+id INT NOT NULL AUTO_INCREMENT,
+grade_name VARCHAR(32) NOT NULL,
+school_id INT NOT NULL,
+PRIMARY KEY(id),
+INDEX(school_id),
+FOREIGN KEY (school_id)
+    REFERENCES dashboard.school(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create table if not exists dashboard.course (
+id INT NOT NULL AUTO_INCREMENT,
+course_name VARCHAR(32) NOT NULL,
+grade_id INT NOT NULL,
+PRIMARY KEY(id),
+INDEX(grade_id),
+FOREIGN KEY (grade_id)
+    REFERENCES dashboard.grade(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
