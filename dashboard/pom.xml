@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ustudy</groupId>
-	<artifactId>admin-dashboard</artifactId>
+	<artifactId>dashboard</artifactId>
 	<version>0.0.1</version>
 	<packaging>war</packaging>
 
