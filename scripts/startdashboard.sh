@@ -23,7 +23,7 @@ else
   fi
 fi
 
-cp -f /home/repo/ustudy/adminboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
+cp -f /home/repo/ustudy/dashboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
 if [ $? != 0 ]; then
   echo "Failed to copy dashboard.war into destination directory"
   exit 1

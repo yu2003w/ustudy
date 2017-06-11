@@ -1,4 +1,4 @@
-package com.ustudy.admin.model;
+package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
 
@@ -30,6 +30,11 @@ public class Account implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@Override
+	public String toString() {
+		return "username:" + username; 
 	}
 
 }
