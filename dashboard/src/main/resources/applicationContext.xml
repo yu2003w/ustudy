@@ -78,4 +78,6 @@
     </bean>
 
     <bean id="accountService" class="com.ustudy.dashboard.services.AccountService" />
+    <bean id="schoolService" class="com.ustudy.dashboard.services.SchoolService" />
+    
 </beans>
