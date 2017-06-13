@@ -2,6 +2,7 @@ package com.ustudy.dashboard.services;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.dashboard.model.Subject;
 import com.ustudy.dashboard.model.Grade;
 import com.ustudy.dashboard.model.School;
 
@@ -24,24 +26,53 @@ public class SchoolService {
 	private JdbcTemplate jdbcT;
 	
 	public List<School> getList(int id) {
-		List<School> res = null;
-		String sqlSt = "select * from school where id > ? limit 10000";
+		List<School> schs = null;
+		String sqlSch = "select * from school where id > ? limit 10000";
 		try {
-			res = jdbcT.query(sqlSt, new RowMapper<School>() {
+			schs = jdbcT.query(sqlSch, new RowMapper<School>() {
 				
 				@Override
 				public School mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Grade[] grades = null;
-					School item = new School(rs.getString(0), rs.getString(1),
-						rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), 
-						rs.getString(6), grades);
+					logger.debug("Firstly column -> " + rs.getString(1));
+					School item = new School(rs.getString("id"), rs.getString("school_id"), 
+						rs.getString("school_name"), rs.getString("school_type"),
+						rs.getString("province"), rs.getString("city"), rs.getString("district"));
 					return item;
 				}
-			});
+			}, id);
+			for (School sch: schs) {
+				logger.debug(sch.toString());
+				
+				List<String> gNames = null;
+				String sqlGra = "select distinct grade_name from course where school_id = ?;";
+				gNames = jdbcT.query(sqlGra, new RowMapper<String>() {
+					@Override
+					public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+						return rs.getString("grade_name");
+						
+					}
+				}, sch.getSchoolId());
+				
+				List<Grade> grades = new ArrayList<Grade>();
+				for (String gn : gNames) {
+					List<Subject> cs = null;
+					String sqlCs = "select distinct course_name from course where school_id = ? and grade_name = ?;";
+					cs = jdbcT.query(sqlCs, new RowMapper<Subject>() {
+						@Override
+						public Subject mapRow(ResultSet rs, int rowNum) throws SQLException {
+							Subject item = new Subject(rs.getString("course_name"));
+							return item;
+						}
+					}, sch.getSchoolId(), gn);
+					grades.add(new Grade(gn, cs));
+				}
+				sch.setGrades(grades);
+			}
+			
 	    } catch (DataAccessException e) {
 			logger.warn("SchoolService.getList() from id " + id + " failed with spring DAO exceptions");
 			logger.warn(e.getMessage());
 		} 
-		return res;
+		return schs;
 	}
 }

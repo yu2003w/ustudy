@@ -1,4 +1,4 @@
-package com.ustudy.dashboard.application;
+package com.ustudy.dashboard;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;

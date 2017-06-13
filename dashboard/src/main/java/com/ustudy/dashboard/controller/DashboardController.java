@@ -19,9 +19,11 @@ public class DashboardController {
 
 	private static final Logger logger = LogManager.getLogger(DashboardController.class);
 
+	/*
 	@RequiresAuthentication
 	@RequiresRoles("admin")
-	@RequiresPermissions("dashboard:update")
+	@RequiresPermissions("dashboard:update") */
+	
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String welcome(HttpServletRequest request) {
 		logger.debug("/dashboard/index is accessed");

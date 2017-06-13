@@ -1,5 +1,7 @@
 package com.ustudy.dashboard.util;
 
+import java.util.List;
+
 public class JsonAssembler {
 
 	/**
@@ -12,14 +14,14 @@ public class JsonAssembler {
 	 * @param array   Data for assembling JsonArrary
 	 * @return JsonArray
 	 */
-	public static String arrayToJson(String label, String[] array) {
+	public static String arrayToJson(String label, List<String> array) {
 		String res = "[";
-		int len = array.length;
+		int len = array.size();
 		for (int i = 0; i < len; i++) {
 			if (i == 0)
-				res += "{\"" + label + "\":" + "\"" + array[i] + "\"}";
+				res += "{\"" + label + "\":" + "\"" + array.get(i) + "\"}";
 			else
-				res += ",{\"" + label + "\":" + "\"" + array[i] + "\"}";
+				res += ",{\"" + label + "\":" + "\"" + array.get(i) + "\"}";
 		}
 		res += "]";
 		return res;

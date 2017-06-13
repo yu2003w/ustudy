@@ -1,3 +1,8 @@
+# endpoints available for use
+/dashboard/index/
+/dashboard/school/list/{id}/
+/dashboard/users/list/{id}/
+
 curl -X POST -F 'username=test' -F 'password=test123' http://192.168.0.107:8080/dashboard/login/
 curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/dashboard/login/
 

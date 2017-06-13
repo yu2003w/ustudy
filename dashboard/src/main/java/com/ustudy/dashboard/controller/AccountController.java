@@ -9,6 +9,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,7 @@ import com.ustudy.dashboard.model.Account;
 import com.ustudy.dashboard.services.AccountService;
 
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/users/")
 public class AccountController {
 
 	private static final Logger logger = LogManager.getLogger(AccountController.class);
@@ -25,16 +26,17 @@ public class AccountController {
 	@Autowired
 	private AccountService ac;
 	
+	/*
 	@RequiresAuthentication
 	@RequiresRoles(value={"user"})
-	@RequiresPermissions("dashboard:view")
-	@RequestMapping(value = "/list/", method = RequestMethod.GET)
-	@Transactional
-	public List<Account> list() {
+	@RequiresPermissions("dashboard:view") 
+	@Transactional*/
+	
+	@RequestMapping(value = "/list/{id}/", method = RequestMethod.GET)
+	public List<Account> list(@PathVariable String id) {
 
 		logger.debug("endpoint /list is visited");
-				
-		return ac.query();
+		return ac.query(id);
 		
 	}
 
