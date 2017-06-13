@@ -21,9 +21,9 @@ public class AccountService {
 	@Autowired
 	private JdbcTemplate jdbcT;
 	
-	public List<Account> query() {
+	public List<Account> query(String id) {
 		List<Account> acList = null;
-		String sql = "select * from users;";
+		String sql = "select * from users where id > ?;";
 		try {
 			acList = jdbcT.query(sql, new RowMapper<Account>(){	
 				@Override
@@ -31,7 +31,7 @@ public class AccountService {
 					Account usr = new Account(rs.getString("loginname"));
 					return usr;
 				}
-		    });
+		    }, id);
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		}
