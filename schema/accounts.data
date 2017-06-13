@@ -1,0 +1,3 @@
+id,loginname,usr_passwd,usr_passwdsalt
+null,test,test123,123456
+null,admin,admin123,123456

@@ -1,39 +1,46 @@
 package com.ustudy.dashboard.model;
 
-import java.io.Serializable;
+import java.util.List;
 
-import com.ustudy.dashboard.util.JsonAssembler;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Grade implements Serializable {
-	
+public class Grade {
+
+	@JsonProperty("grade")
 	private String name = null;
-	private String [] courses = null;
+	private List<Subject> subjects = null;
+	@JsonProperty("numOfClasses")
+	private int num = 0;
 	
-	public Grade(String name, String[] courses) {
-		super();
+	public Grade(String name, List<Subject> cs) {
 		this.name = name;
-		this.courses = courses;
+		this.subjects = cs;
+		this.setNum(cs.size());
 	}
-	
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String[] getCourses() {
-		return courses;
+
+	public List<Subject> getSubjects() {
+		return subjects;
 	}
-	public void setCourses(String[] courses) {
-		this.courses = courses;
+
+	public void setSubjects(List<Subject> courses) {
+		this.subjects = courses;
 	}
+
+	public int getNum() {
+		return num;
+	}
+
+	public void setNum(int num) {
+		this.num = num;
+	}	
 	
-	@Override
-	public String toString() {
-		String res = "\"name\":\"" + name + "\", \"courses\":" +
-			JsonAssembler.arrayToJson("subject", courses) + 
-			",\"numberOfCourses\":" + String.valueOf(courses.length);
-		return res;
-	}
 	
 }
