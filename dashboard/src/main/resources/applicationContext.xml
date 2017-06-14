@@ -11,16 +11,16 @@
       
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login.html"/>
+        <property name="loginUrl" value="/login.jsp"/>
         <property name="successUrl" value="index"/>
         <property name="unauthorizedUrl" value="unauthorized"/>
         <property name="filterChainDefinitions">
             <value>
-                /dashboard/users/list = authc, roles[admin]
-                /dashboard/users/view/* = authc, roles[admin]
-                /dashboard/users/update/* = authc, roles[super]
-                /dashboard/users/delete/* = authc, roles[super]
-                /dashboard/users/** = authc, roles[admin]
+                /users/list = authc, roles[admin]
+                /users/view/* = authc, roles[admin]
+                /users/update/* = authc, roles[super]
+                /users/delete/* = authc, roles[super]
+                /users/** = authc, roles[admin]
             </value>
         </property>
     </bean>
