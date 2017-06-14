@@ -26,7 +26,7 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ImportResource({"classpath*:applicationContext.xml"})
-public class Dashboard extends SpringBootServletInitializer {
+public class Dashboard {
 
 	public static void main(String[] args) throws Exception {
          SpringApplication.run(Dashboard.class, args);
