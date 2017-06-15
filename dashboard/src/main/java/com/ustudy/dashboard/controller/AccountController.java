@@ -26,13 +26,11 @@ public class AccountController {
 	@Autowired
 	private AccountService ac;
 	
-	/*
 	@RequiresAuthentication
 	@RequiresRoles(value={"user"})
 	@RequiresPermissions("dashboard:view") 
-	@Transactional*/
-	
 	@RequestMapping(value = "/list/{id}/", method = RequestMethod.GET)
+	@Transactional
 	public List<Account> list(@PathVariable String id) {
 
 		logger.debug("endpoint /list is visited");
