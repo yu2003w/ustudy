@@ -12,7 +12,6 @@ public class Account implements Serializable {
 	private String name = null;
 	private String loginname = null;
 	private String pswd = null;
-	private String email = null;
 	private String phone = null;
 	private String createTime = null;
 	private String lastLoginTime = null;
@@ -20,21 +19,19 @@ public class Account implements Serializable {
 	
 	public Account() {}
 	
-	public Account(String name, String loginname, String pswd,String email,String phone,int status) {
+	public Account(String name, String loginname, String pswd,String phone,int status) {
 		this.name = name;
 		this.loginname = loginname;
 		this.pswd = pswd;
-		this.email = email;
 		this.phone = phone;
 		this.status = status;
 	}
 	
-	public Account(int id, String name, String loginname, String pswd,String email,String phone,String createTime,String lastLoginTime,int status) {
+	public Account(int id, String name, String loginname, String pswd,String phone,String createTime,String lastLoginTime,int status) {
 		this.id = id;
 		this.name = name;
 		this.loginname = loginname;
 		this.pswd = pswd;
-		this.email = email;
 		this.phone = phone;
 		this.createTime = createTime;
 		this.lastLoginTime = lastLoginTime;
@@ -46,7 +43,6 @@ public class Account implements Serializable {
 		this.name = rs.getString("name");
 		this.loginname = rs.getString("login_name");
 		this.pswd = rs.getString("pswd");
-		this.email = rs.getString("email");
 		this.phone = rs.getString("phone");
 		this.createTime = rs.getString("create_time");
 		this.lastLoginTime = rs.getString("last_login_time");
@@ -83,14 +79,6 @@ public class Account implements Serializable {
 
 	public void setPswd(String pswd) {
 		this.pswd = pswd;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getPhone() {

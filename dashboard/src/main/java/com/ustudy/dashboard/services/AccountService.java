@@ -40,9 +40,6 @@ public class AccountService {
 			if(null != account.getPswd()){
 				sql.append(" and pswd='" + account.getPswd() + "'");
 			}
-			if(null != account.getEmail()){
-				sql.append(" and email='" + account.getEmail() + "'");
-			}
 			if(null != account.getPhone()){
 				sql.append(" and phone='" + account.getPhone() + "'");
 			}
@@ -161,9 +158,6 @@ public class AccountService {
 		if(null != account.getPswd()){
 			sql.append("pswd,");
 		}
-		if(null != account.getEmail()){
-			sql.append("email,");
-		}
 		if(null != account.getPhone()){
 			sql.append("phone,");
 		}
@@ -180,9 +174,6 @@ public class AccountService {
 		}
 		if(null != account.getPswd()){
 			sql.append("'"+account.getPswd()+"',");
-		}
-		if(null != account.getEmail()){
-			sql.append("'"+account.getEmail()+"',");
 		}
 		if(null != account.getPhone()){
 			sql.append("'"+account.getPhone()+"',");
@@ -216,9 +207,6 @@ public class AccountService {
 			}
 			if(null != account.getPswd()){
 				sql.append("pswd='" + account.getPswd() + "',");
-			}
-			if(null != account.getEmail()){
-				sql.append("email='" + account.getEmail() + "',");
 			}
 			if(null != account.getPhone()){
 				sql.append("phone='" + account.getPhone() + "',");
