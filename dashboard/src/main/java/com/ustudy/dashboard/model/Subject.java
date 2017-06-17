@@ -12,26 +12,33 @@ public class Subject implements Serializable {
 	private static final long serialVersionUID = -375085025372724305L;
 	
 	@JsonProperty("subject")
-	private String name = null;
+	private String courseName = null;
 
-	public Subject(String name) {
+	
+	public Subject() {
 		super();
-		this.name = name;
+		// TODO Auto-generated constructor stub
 	}
 
 	
-	public String getName() {
-		return name;
+	public Subject(String courseName) {
+		super();
+		this.courseName = courseName;
 	}
 
 
-	public void setName(String name) {
-		this.name = name;
+	public String getCourseName() {
+		return courseName;
 	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
 
 	@Override
 	public String toString() {
-		return "Subject [subject=" + name + "]";
+		return "Subject [subject=" + courseName + "]";
 	}	
 	
 }

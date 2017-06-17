@@ -21,6 +21,12 @@ public class School implements Serializable {
 	private List<Grade> grades = null;
 
 
+	// Noted here: default constructor is required to make http.post to transfer json
+	// string into object of "school"
+	public School() {
+		super();
+	}
+
 	public School(String id, String schoolId, String schoolName, String schoolType, 
 			String province, String city, String district) {
 		super();
@@ -31,6 +37,15 @@ public class School implements Serializable {
 		this.province = province;
 		this.city = city;
 		this.district = district;
+	}
+
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getSchoolId() {
@@ -79,14 +94,17 @@ public class School implements Serializable {
 	public void setGrades(List<Grade> grades) {
 		this.grades = grades;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "School [id=" + id + ", schoolId=" + schoolId + ", schoolName=" + schoolName +
-			", schoolType="	+ schoolType + ", province=" + province + ", city=" + city +
-			", district=" + district + ", grades=" + grades + "]";
+		String tmp = new String();
+		for (Grade gr: grades) {
+			tmp += "{" + gr.toString() + "},";
+		}
+		return "School [id=" + id + ", schoolId=" + schoolId + ", schoolName=" + schoolName + ", schoolType="
+				+ schoolType + ", province=" + province + ", city=" + city + ", district=" + district + ", grades="
+				+ tmp + "]";
 	}
-	
 	
 	
 }

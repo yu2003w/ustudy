@@ -3,6 +3,7 @@ package com.ustudy.dashboard;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.ImportResource;
 
 
 @SpringBootApplication
+@EnableTransactionManagement
 @ImportResource({"classpath*:applicationContext.xml"})
 public class Dashboard {
 
