@@ -8,7 +8,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +29,6 @@ public class AccountController {
 	@RequiresRoles(value={"user"})
 	@RequiresPermissions("dashboard:view") 
 	@RequestMapping(value = "/list/{id}/", method = RequestMethod.GET)
-	@Transactional
 	public List<Account> list(@PathVariable String id) {
 
 		logger.debug("endpoint /list is visited");
