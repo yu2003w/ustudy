@@ -2,7 +2,6 @@ package com.ustudy.dashboard.services;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.dashboard.model.Subject;
+import com.ustudy.dashboard.util.GradeRowMapper;
+import com.ustudy.dashboard.util.SchoolRowMapper;
+import com.ustudy.dashboard.util.SubjectRowMapper;
 import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.dashboard.model.Grade;
 import com.ustudy.dashboard.model.School;
@@ -35,45 +36,15 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public List<School> getList(int id) {
 		List<School> schs = null;
-		String sqlSch = "select * from school where id > ? limit 10000";
+		String sqlSch = "select * from dashboard.school where id > ? limit 10000";
 		try {
-			schs = jdbcT.query(sqlSch, new RowMapper<School>() {
-				
-				@Override
-				public School mapRow(ResultSet rs, int rowNum) throws SQLException {
-					School item = new School(rs.getString("id"), rs.getString("school_id"), 
-						rs.getString("school_name"), rs.getString("school_type"),
-						rs.getString("province"), rs.getString("city"), rs.getString("district"));
-					return item;
-				}
-			}, id);
+			if (id < 0)
+				id = 0;
+			schs = jdbcT.query(sqlSch, new SchoolRowMapper(), id);
+			logger.debug("Fetched " + schs.size() + " items of school");
 			for (School sch: schs) {
+				assembleGrades(sch);
 				logger.debug(sch.toString());
-				
-				List<String> gNames = null;
-				String sqlGra = "select distinct grade_name from course where school_id = ?;";
-				gNames = jdbcT.query(sqlGra, new RowMapper<String>() {
-					@Override
-					public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-						return rs.getString("grade_name");
-						
-					}
-				}, sch.getSchoolId());
-				
-				List<Grade> grades = new ArrayList<Grade>();
-				for (String gn : gNames) {
-					List<Subject> cs = null;
-					String sqlCs = "select distinct course_name from course where school_id = ? and grade_name = ?;";
-					cs = jdbcT.query(sqlCs, new RowMapper<Subject>() {
-						@Override
-						public Subject mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Subject item = new Subject(rs.getString("course_name"));
-							return item;
-						}
-					}, sch.getSchoolId(), gn);
-					grades.add(new Grade(gn, cs));
-				}
-				sch.setGrades(grades);
 			}
 			
 	    } catch (DataAccessException e) {
@@ -98,8 +69,8 @@ public class SchoolServiceImp implements SchoolService {
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
-		//int num = jdbcT.update(sqlSch, null, data.getSchoolId(), data.getSchoolName(), data.getSchoolType(),
-		//		data.getProvince(), data.getCity(), data.getDistrict());
+	
+		// need to retrieve auto id of school item which is returned back in header location
 		int num = jdbcT.update(new PreparedStatementCreator(){
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
@@ -141,5 +112,37 @@ public class SchoolServiceImp implements SchoolService {
 		}
 
 		return id;
+	}
+	
+	@Transactional
+	@Override
+	public int deleteItem(int id) {
+		
+		String sqlDel = "delete from dashboard.school where id = ?";
+		return jdbcT.update(sqlDel, id);
+	}
+	
+	@Override
+	public School displayItem(int id) {
+		String sqlDis = "select * from dashboard.school where id = ?";
+		School item = jdbcT.queryForObject(sqlDis, new SchoolRowMapper(), id);
+		// need to query and assemble grade/course information
+		assembleGrades(item);
+		return item;
+	}
+	
+	private void assembleGrades(School sch) {
+		List<String> gNames = null;
+		String sqlGra = "select distinct grade_name from course where school_id = ?;";
+		gNames = jdbcT.query(sqlGra, new GradeRowMapper(), sch.getSchoolId());
+		
+		List<Grade> grades = new ArrayList<Grade>();
+		for (String gn : gNames) {
+			List<Subject> cs = null;
+			String sqlCs = "select distinct course_name from course where school_id = ? and grade_name = ?;";
+			cs = jdbcT.query(sqlCs, new SubjectRowMapper(), sch.getSchoolId(), gn);
+			grades.add(new Grade(gn, cs));
+		}
+		sch.setGrades(grades);
 	}
 }

@@ -23,4 +23,9 @@ public interface SchoolService {
 	 * @return  --- index in the datababse
 	 */
 	public int createItem(School data);
+	
+	public int deleteItem(int id);
+	
+	public School displayItem(int id);
+	
 }

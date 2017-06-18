@@ -98,8 +98,10 @@ public class School implements Serializable {
 	@Override
 	public String toString() {
 		String tmp = new String();
-		for (Grade gr: grades) {
-			tmp += "{" + gr.toString() + "},";
+		if (grades != null) {
+			for (Grade gr: grades) {
+				tmp += "{" + gr.toString() + "},";
+			}
 		}
 		return "School [id=" + id + ", schoolId=" + schoolId + ", schoolName=" + schoolName + ", schoolType="
 				+ schoolType + ", province=" + province + ", city=" + city + ", district=" + district + ", grades="
