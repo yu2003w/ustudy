@@ -28,4 +28,6 @@ public interface SchoolService {
 	
 	public School displayItem(int id);
 	
+	public int updateItem(School data, int id);
+	
 }

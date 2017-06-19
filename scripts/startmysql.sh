@@ -4,11 +4,13 @@
 # Start mysql container to host data
 #
 
-if [ $# != 1 ]; then
-  echo "Please specify WORK_DIR firstly"
+if [ $# != 2 ]; then
+  echo "Please specify WORK_DIR SCHEMA_DIR firstly"
+  echo "Usage: startmysql.sh [work_dir] [schema_dir]"
   exit
 fi
 WORK_DIR=$1
+SCHEMA_DIR=$2
 echo "Using ${WORK_DIR} as working directory"
 if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   mkdir -p ${WORK_DIR}/mysql/schema/ 
@@ -20,7 +22,7 @@ if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   fi
 fi
 
-cp -Rf /home/repo/ustudy/schema/ ${WORK_DIR}/mysql/
+cp -Rf ${SCHEMA_DIR} ${WORK_DIR}/mysql/
 if [ $? != 0 ]; then
   echo "Failed to copy schema files into " ${WORK_DIR}/mysql/schema/
 else

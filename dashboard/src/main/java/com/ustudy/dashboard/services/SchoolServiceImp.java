@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +27,11 @@ import com.ustudy.dashboard.util.SubjectRowMapper;
 import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.dashboard.model.Grade;
 import com.ustudy.dashboard.model.School;
+
+/**
+ * @author jared
+ *
+ */
 
 @Service
 public class SchoolServiceImp implements SchoolService {
@@ -54,17 +62,18 @@ public class SchoolServiceImp implements SchoolService {
 		return schs;
 	}
 	
+	
+	/**
+	 *  Noted: spring framework will handle runtime exceptions, so don't need to write
+	 *  try {} catch{} here. Just throw out runtime exceptions.
+	 */
 	@Transactional
 	@Override
 	public int createItem(School data) {
-		
-		// Noted: spring framework will handle runtime exceptions, so don't need to 
-		// try {} catch{} here. Just throw out runtime exceptions.
-		List<Grade> grades = data.getGrades();
+			
 		// Noted: Schema for table dashboard.school is as below,
 		// id, school_id, school_name, school_type, province, city, district
 		String sqlSch = "insert into dashboard.school values(?,?,?,?,?,?,?);";
-		String sqlGr = "insert into dashboard.course values(?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -98,20 +107,48 @@ public class SchoolServiceImp implements SchoolService {
 			throw new RuntimeException(msg);
 		}
 
-		for (Grade gr : grades) {
-			List<Subject> subs = gr.getSubjects();
-			for (Subject sub : subs) {
-				num = jdbcT.update(sqlGr, null, gr.getGradeName(), sub.getCourseName(), data.getSchoolId());
-				if (num != 1) {
-					String msg = "SchoolServiceImpl.createItem(), return value for course insert is " + num;
-					logger.warn(msg);
-					throw new RuntimeException(msg);
-				}
-				logger.debug("number of affected rows is " + num);
-			}
-		}
+		int numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
+		logger.info(numOfGr + " grade items saved into database");
 
 		return id;
+	}
+	
+	@Transactional
+	@Override
+	public int updateItem(School data, int id) {
+		String updateSch = "update dashboard.school set ";
+		School origin = displayItem(id);
+		Map<String, String> schDiff = data.compare(origin);
+		if (schDiff.size() == 0) {
+			logger.info("No changes in school and no need to update");
+		}
+		else {
+			// some stuff in school changed, need to populate changed fields
+			Set<Map.Entry<String,String>> fields = schDiff.entrySet();
+			boolean first = true;
+			for (Map.Entry<String, String> elem : fields) {
+				if (first) {
+					updateSch += elem.getKey() + " = '" + elem.getValue() + "'";
+					first = false;
+				}
+				else
+					updateSch += ", " + elem.getKey() + " = '" + elem.getValue() + "'";
+			}
+			logger.debug("Update SQL for school item " + id + " -->" + updateSch);
+		}
+		updateSch += " where id = ?";
+		int num = jdbcT.update(updateSch, id);
+		
+		// for grades related information, need to replace previous information
+		// delete origin grades information firstly, then insert new values
+		String sqlDelGr = "delete from course where school_id = ?";
+		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
+		logger.info(numOfGr + " grade items deleted for update.");
+		
+		numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
+		logger.info(numOfGr + " grade items saved into database");
+		
+		return num;
 	}
 	
 	@Transactional
@@ -145,4 +182,26 @@ public class SchoolServiceImp implements SchoolService {
 		}
 		sch.setGrades(grades);
 	}
+	
+	
+	// Store grades information into database
+	private int saveGrades(List<Grade> grades, final String schId) {
+		int num = 0;
+		String sqlGr = "insert into dashboard.course values(?,?,?,?);";
+		for (Grade gr : grades) {
+			List<Subject> subs = gr.getSubjects();
+			for (Subject sub : subs) {
+				num = jdbcT.update(sqlGr, null, gr.getGradeName(), sub.getCourseName(), schId);
+				if (num != 1) {
+					String msg = "SchoolServiceImpl.createItem(), return value for course insert is " + num;
+					logger.warn(msg);
+					throw new RuntimeException(msg);
+				}
+				logger.debug(schId + "," + gr.getGradeName() + "," + sub.getCourseName() + "inserted.");
+			}
+			logger.debug("Num of courses for " + schId + "," + gr.getGradeName() + " is " + subs.size());
+		}
+		return grades.size();
+	}
+	
 }
