@@ -4,6 +4,7 @@
 
 if [ $# != 2 ]; then
   echo "Please specify WORK_DIR SOURCE_DIR firstly"
+  echo "Usage: startup.sh [work_dir] [source_dir]"
   exit
 fi
 
@@ -25,7 +26,7 @@ else
   fi
 fi
 
-cp -f ${SOURCE_DIR}/repo/ustudy/dashboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
+cp -f ${SOURCE_DIR}/ustudy/dashboard/target/dashboard.war ${WORK_DIR}/webapps/dashboard.war
 if [ $? != 0 ]; then
   echo "Failed to copy dashboard.war into destination directory"
   exit 1
@@ -46,7 +47,7 @@ else
   fi
 fi
 
-cp -f ${SOURCE_DIR}/repo/ustudy/info-center/target/services.war ${WORK_DIR}/webapps/services.war
+cp -f ${SOURCE_DIR}/ustudy/info-center/target/services.war ${WORK_DIR}/webapps/services.war
 if [ $? != 0 ]; then
   echo "Failed to copy infoservice.war into destination directory"
   exit 1
