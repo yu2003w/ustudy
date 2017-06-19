@@ -56,14 +56,14 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Transactional
 	@Override
-	public int createItem(School data) {
+	public int createItem(final School data) {
 		
 		// Noted: spring framework will handle runtime exceptions, so don't need to 
 		// try {} catch{} here. Just throw out runtime exceptions.
 		List<Grade> grades = data.getGrades();
 		// Noted: Schema for table dashboard.school is as below,
 		// id, school_id, school_name, school_type, province, city, district
-		String sqlSch = "insert into dashboard.school values(?,?,?,?,?,?,?);";
+		final String sqlSch = "insert into dashboard.school values(?,?,?,?,?,?,?);";
 		String sqlGr = "insert into dashboard.course values(?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
