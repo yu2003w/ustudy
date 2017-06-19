@@ -7,7 +7,10 @@ curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/da
 # endpoints available for use
 /dashboard/index/
 /dashboard/school/list/{id}/
-/dashboard/users/list/{id}/
+/dashboard/school/add/
+/dashboard/school/item/{id}/
+/dashboard/school/delete/{id}/
+
 
 curl -X POST -F 'username=test' -F 'password=test123' http://192.168.0.107:8080/dashboard/login/
 curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/dashboard/login/
@@ -15,3 +18,8 @@ curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/da
 # test permissions
  curl -X POST -F 'username=test' -F 'password=test123' http://192.168.0.107:8080/dashboard/login/ -c cook.file
  curl -v -L  http://192.168.0.107:8080/dashboard/users/list/ -b cook.file
+ 
+ 
+ # delete item
+ curl -v -X DELETE http://192.168.0.107:8080/dashboard/school/delete/20
+ curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"schoolId":"0003", "schoolName": "西工大附属中学", "schoolType": "高中", "province": "陕西省", "city":"西安市", "district":"雁塔区","grades":[{"subjects":[{"subject":"语文"},{"subject":"数学"},{"subject":"英语"},{"subject":"地理"},{"subject":"化学"}],"grade":"高一","numOfClasses":5},{"subjects":[{"subject":"语文"},{"subject":"数学"},{"subject":"英语"},{"subject":"物理"},{"subject":"化学"}],"grade":"高二","numOfClasses":5}]}' http://192.168.0.107:8080/dashboard/school/add/
