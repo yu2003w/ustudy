@@ -56,7 +56,7 @@ public class SchoolController {
 		    logger.debug("School created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
-		    	builder.path("/school/item/{index}").buildAndExpand(index).toString());
+		    	builder.path("/school/view/{index}").buildAndExpand(index).toString());
 		    result = "create item successfully";
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
@@ -64,6 +64,28 @@ public class SchoolController {
 			resp.setStatus(500);
 		}
 		
+		return result;
+	}
+	
+	@RequestMapping(value="/update/{id}", method = RequestMethod.POST)
+	public String updateItem(@RequestBody @Valid School data, @PathVariable int id, HttpServletResponse resp) {
+		logger.debug("endpoint /school/update/" + id + " is visited.");
+		String result = null;
+		try {
+			int numOfRows = ss.updateItem(data, id);
+			if (numOfRows == 1)
+				logger.debug("update item successfully");
+			else {
+				String msg = numOfRows + " items are updated, maybe something goes wrong";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			result = "update item successfully";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			result = "update item failed";
+			resp.setStatus(500);
+		}
 		return result;
 	}
 	
@@ -85,9 +107,9 @@ public class SchoolController {
 		return result;
 	}
 	
-	@RequestMapping(value="/item/{id}", method = RequestMethod.GET) 
+	@RequestMapping(value="/view/{id}", method = RequestMethod.GET) 
 	public School displayItem(@PathVariable int id, HttpServletResponse resp) {
-		logger.debug("endpoint /item/" + id + " is visited.");
+		logger.debug("endpoint /school/" + id + " is visited.");
 		School item = null;
 		try {
 			item = ss.displayItem(id);
@@ -102,4 +124,5 @@ public class SchoolController {
 		} 
 		return item;
 	}
+	
 }
