@@ -5,12 +5,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.dashboard.model.Permission;
@@ -23,50 +21,32 @@ public class PermissionController {
 	@Autowired
 	private PermissionService permissionService;
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/list")
-	@RequestMapping("/list")
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public List<Permission> list(Permission permission,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.list(permission);
 	}
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/insert")
-	@RequestMapping("/insert")
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
 	public boolean insert(Permission permission,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.insertPermission(permission);
 	}
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/delete")
-	@RequestMapping("/delete/{id}")
+	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
 	public boolean delete(@PathVariable("id")int id,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.deletePermissionById(id);
 	}
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/detail")
-	@RequestMapping("/detailByName/{name}")
+	@RequestMapping(value = "/detailByName/{name}", method = RequestMethod.GET)
 	public Permission detailByName(@PathVariable("name")String name,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.findPermissionByName(name);
 	}
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/detail")
-	@RequestMapping("/detail/{id}")
+	@RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
 	public Permission detailById(@PathVariable("id")int id,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.findPermissionById(id);
 	}
 	
-	@RequiresAuthentication
-	@RequiresRoles(value={"888888"})
-	@RequiresPermissions("/permission/update")
-	@RequestMapping("/update")
+	@RequestMapping(value = "/update", method = RequestMethod.PUT)
 	public boolean update(Permission permission,HttpServletRequest request,HttpServletResponse response) {
 		return permissionService.updatePermission(permission);
 	}
