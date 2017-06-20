@@ -30,4 +30,5 @@ public interface SchoolService {
 	
 	public int updateItem(School data, int id);
 	
+	public int delItemSet(String ids);
 }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.dashboard.model.Subject;
+import com.ustudy.dashboard.util.DashboardUtil;
 import com.ustudy.dashboard.util.GradeRowMapper;
 import com.ustudy.dashboard.util.SchoolRowMapper;
 import com.ustudy.dashboard.util.SubjectRowMapper;
@@ -56,7 +57,7 @@ public class SchoolServiceImp implements SchoolService {
 			}
 			
 	    } catch (DataAccessException e) {
-			logger.warn("SchoolService.getList() from id " + id + " failed with spring DAO exceptions");
+			logger.warn("SchoolService.getList() retrieve data from id " + id + " failed.");
 			logger.warn(e.getMessage());
 		} 
 		return schs;
@@ -159,12 +160,36 @@ public class SchoolServiceImp implements SchoolService {
 		return jdbcT.update(sqlDel, id);
 	}
 	
+	@Transactional
+	@Override
+	public int delItemSet(String ids) {
+	
+		List<String> idsList = DashboardUtil.parseIds(ids);
+		int len = idsList.size();
+		if (len == 0)
+			return 0;
+		
+		String sqlDel = "delete from dashboard.school where ";
+		for (int i = 0; i < len; i++) {
+			if (i == 0) {
+				sqlDel += "id = '" + idsList.get(0) + "'";
+			}
+			else
+				sqlDel += " or id = '" + idsList.get(i) + "'";
+		}
+		logger.debug("Assembled sql for batch deletion --> " + sqlDel);
+		return jdbcT.update(sqlDel);	
+	}
+	
 	@Override
 	public School displayItem(int id) {
 		String sqlDis = "select * from dashboard.school where id = ?";
+		
 		School item = jdbcT.queryForObject(sqlDis, new SchoolRowMapper(), id);
 		// need to query and assemble grade/course information
-		assembleGrades(item);
+		if (item != null)
+		    assembleGrades(item);
+		
 		return item;
 	}
 	

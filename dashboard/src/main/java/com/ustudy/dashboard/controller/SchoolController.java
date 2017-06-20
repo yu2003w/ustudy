@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class SchoolController {
 	@Autowired
 	private SchoolService ss;
 	
-	@RequestMapping(value="/list/{id}/", method = RequestMethod.GET)
+	@RequestMapping(value="/list/{id}", method = RequestMethod.GET)
 	public List<School> getList(@PathVariable int id, HttpServletResponse resp) {
 		logger.debug("endpoint /school/list/ is visited");
 		List<School> res = null;
@@ -107,21 +108,54 @@ public class SchoolController {
 		return result;
 	}
 	
+	/**
+	 * To delete several items as a batch operation, list of ids should be assembled into 
+	 * a list of 'ids'. Batch operation should be managed as transaction.
+	 * @return
+	 */
+	@RequestMapping(value="/delete", method = RequestMethod.POST)
+	public String delSet(@RequestBody @Valid String data, HttpServletResponse resp) {
+		logger.debug("endpoint /school/delete is visited.");
+		String result = null;
+		try {
+			int num = ss.delItemSet(data);
+			if (num < 1)
+				throw new RuntimeException("Number of deleted items is " + num);
+			else {
+				result = num + " items deleted";
+			}
+				
+		} catch (Exception e) {
+			result = "delete items failed";
+			logger.warn("delSet()," + result + " --> " + e.getMessage());
+			resp.setStatus(500);
+		}
+		return result;
+	}
+	
 	@RequestMapping(value="/view/{id}", method = RequestMethod.GET) 
 	public School displayItem(@PathVariable int id, HttpServletResponse resp) {
-		logger.debug("endpoint /school/" + id + " is visited.");
+		logger.debug("endpoint /school/view/" + id + " is visited.");
 		School item = null;
+		String msg = null;
 		try {
 			item = ss.displayItem(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			logger.warn("displayItem(), " + ie.getLocalizedMessage());
+			msg = "No items found for specified id = " + id;
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			String msg = "Failed to retrieve item " + id;
+			logger.warn("displayItem(), " + e.getMessage());
+			msg = "Failed to retrieve item " + id;
+		}
+		
+		if (item == null) {
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("Failed to set error status in response");
+				logger.warn("displayItem(), Failed to set error status in response");
 			}
-		} 
+		}
+				
 		return item;
 	}
 	
