@@ -1,7 +1,9 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class School implements Serializable {
 
@@ -108,5 +110,23 @@ public class School implements Serializable {
 				+ tmp + "]";
 	}
 	
-	
+	public Map<String,String> compare(School target) {
+		HashMap<String, String> comRes = new HashMap<String,String>();
+		if (target == this)
+			return null;
+		if (target.getSchoolId() != this.schoolId)
+			comRes.put("school_id", this.schoolId);
+		if (target.getSchoolName() != this.schoolName)
+			comRes.put("school_name", this.schoolName);
+		if (target.getSchoolType() != this.schoolType)
+			comRes.put("school_type", this.schoolType);
+		if (target.getProvince() != this.province)
+			comRes.put("province", this.province);
+		if (target.getCity() != this.city)
+			comRes.put("city", this.city);
+		if (target.getDistrict() != this.district)
+			comRes.put("district", this.district);
+		return comRes;
+		
+	}
 }
