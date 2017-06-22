@@ -38,7 +38,8 @@ public class Subject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Subject [subject=" + courseName + "]";
-	}	
+		return "Subject [subject = " + courseName + "]";
+	}
+
 	
 }
