@@ -3,7 +3,6 @@ package com.ustudy.dashboard.services;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.dashboard.model.Subject;
+import com.ustudy.dashboard.util.DashboardUtil;
 import com.ustudy.dashboard.util.GradeRowMapper;
 import com.ustudy.dashboard.util.SchoolRowMapper;
 import com.ustudy.dashboard.util.SubjectRowMapper;
@@ -56,7 +56,7 @@ public class SchoolServiceImp implements SchoolService {
 			}
 			
 	    } catch (DataAccessException e) {
-			logger.warn("SchoolService.getList() from id " + id + " failed with spring DAO exceptions");
+			logger.warn("SchoolService.getList() retrieve data from id " + id + " failed.");
 			logger.warn(e.getMessage());
 		} 
 		return schs;
@@ -141,7 +141,7 @@ public class SchoolServiceImp implements SchoolService {
 		
 		// for grades related information, need to replace previous information
 		// delete origin grades information firstly, then insert new values
-		String sqlDelGr = "delete from course where school_id = ?";
+		String sqlDelGr = "delete from dashboard.grade where school_id = ?";
 		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
 		logger.info(numOfGr + " grade items deleted for update.");
 		
@@ -159,47 +159,103 @@ public class SchoolServiceImp implements SchoolService {
 		return jdbcT.update(sqlDel, id);
 	}
 	
+	@Transactional
+	@Override
+	public int delItemSet(String ids) {
+	
+		List<String> idsList = DashboardUtil.parseIds(ids);
+		int len = idsList.size();
+		if (len == 0)
+			return 0;
+		
+		String sqlDel = "delete from dashboard.school where ";
+		for (int i = 0; i < len; i++) {
+			if (i == 0) {
+				sqlDel += "id = '" + idsList.get(0) + "'";
+			}
+			else
+				sqlDel += " or id = '" + idsList.get(i) + "'";
+		}
+		logger.debug("Assembled sql for batch deletion --> " + sqlDel);
+		return jdbcT.update(sqlDel);	
+	}
+	
 	@Override
 	public School displayItem(int id) {
 		String sqlDis = "select * from dashboard.school where id = ?";
+		
 		School item = jdbcT.queryForObject(sqlDis, new SchoolRowMapper(), id);
 		// need to query and assemble grade/course information
-		assembleGrades(item);
+		if (item != null)
+		    assembleGrades(item);
+		
 		return item;
 	}
 	
 	private void assembleGrades(School sch) {
-		List<String> gNames = null;
-		String sqlGra = "select distinct grade_name from course where school_id = ?;";
+		List<Grade> gNames = null;
+		String sqlGra = "select id, grade_name, classes_num from dashboard.grade where school_id = ?;";
 		gNames = jdbcT.query(sqlGra, new GradeRowMapper(), sch.getSchoolId());
 		
-		List<Grade> grades = new ArrayList<Grade>();
-		for (String gn : gNames) {
+		for (Grade gn : gNames) {
 			List<Subject> cs = null;
-			String sqlCs = "select distinct course_name from course where school_id = ? and grade_name = ?;";
-			cs = jdbcT.query(sqlCs, new SubjectRowMapper(), sch.getSchoolId(), gn);
-			grades.add(new Grade(gn, cs));
+			String sqlCs = "select course_name from dashboard.course where grade_id = ?;";
+			cs = jdbcT.query(sqlCs, new SubjectRowMapper(), gn.getId());
+			gn.setSubjects(cs);
+			// logger.debug(gn.toString());
 		}
-		sch.setGrades(grades);
+		sch.setGrades(gNames);
 	}
 	
 	
 	// Store grades information into database
 	private int saveGrades(List<Grade> grades, final String schId) {
 		int num = 0;
-		String sqlGr = "insert into dashboard.course values(?,?,?,?);";
+		String msg = null;
+		// grade schema is as below,
+		// id, grade_name, classes_num, school_id
+		String sqlGr = "insert into dashboard.grade values(?,?,?,?)";
+		String sqlCla = "insert into dashboard.course values(?,?,?);";
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
+			// insert grade related information into dashboard.grade firstly
+			// need to retrieve auto generated key
+			int id = -1;
+			KeyHolder keyH = new GeneratedKeyHolder();
+			num = jdbcT.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlGr, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, gr.getGradeName());
+					psmt.setInt(3, gr.getNum());
+					psmt.setString(4, schId);
+					return psmt;
+				}
+			}, keyH);
+			if (num != 1) {
+				msg = "saveGrades(), return value from grade insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			id = keyH.getKey().intValue();
+			if (id < 0) {
+				msg = "saveGrades(), auto generated id is " + id;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
 			for (Subject sub : subs) {
-				num = jdbcT.update(sqlGr, null, gr.getGradeName(), sub.getCourseName(), schId);
+				// course schema is as below,
+				// id, grade_id, course_name
+				num = jdbcT.update(sqlCla, null, id, sub.getCourseName());
 				if (num != 1) {
-					String msg = "SchoolServiceImpl.createItem(), return value for course insert is " + num;
+					msg = "saveGrades(), return value for course insert is " + num;
 					logger.warn(msg);
 					throw new RuntimeException(msg);
 				}
-				logger.debug(schId + "," + gr.getGradeName() + "," + sub.getCourseName() + "inserted.");
 			}
 			logger.debug("Num of courses for " + schId + "," + gr.getGradeName() + " is " + subs.size());
+			logger.debug(schId + " of " + gr.getGradeName() + " has " + gr.getNum() + " classes");
 		}
 		return grades.size();
 	}

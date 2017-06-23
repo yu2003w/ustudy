@@ -3,6 +3,7 @@ package com.ustudy.dashboard.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Grade implements Serializable{
@@ -13,6 +14,9 @@ public class Grade implements Serializable{
 	 */
 	private static final long serialVersionUID = -3092091154717959822L;
 	
+	// id is not need for grade information
+	@JsonIgnore
+	private String id = null;
 	@JsonProperty("grade")
 	private String gradeName = null;
 	private List<Subject> subjects = null;
@@ -25,10 +29,20 @@ public class Grade implements Serializable{
 		// TODO Auto-generated constructor stub
 	}
 
-	public Grade(String name, List<Subject> cs) {
-		this.gradeName = name;
-		this.subjects = cs;
-		this.setNum(cs.size());
+	
+	public Grade(String id, String gradeName, int num) {
+		super();
+		this.id = id;
+		this.gradeName = gradeName;
+		this.num = num;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getGradeName() {
@@ -63,6 +77,5 @@ public class Grade implements Serializable{
 		}
 		return "Grade [name=" + gradeName + ", subjects=" + tmp + ", num=" + num + "]";
 	}	
-	
 	
 }

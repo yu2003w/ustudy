@@ -1,0 +1,7 @@
+id, grade_name, classes_num,school_id
+null,高一,5,0001
+null,高二,4,0001
+null,高三,3,0001
+null,高一,8,0002
+null,高二,7,0002
+null,高三,6,0002

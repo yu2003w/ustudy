@@ -47,18 +47,29 @@ province  VARCHAR(32) NOT NULL,
 city      VARCHAR(32) NOT NULL,
 district  VARCHAR(32) NOT NULL,
 PRIMARY KEY (id),
-INDEX(school_id, school_name),
-UNIQUE KEY(school_name, school_id)
-);
+INDEX(school_name),
+UNIQUE KEY (school_id)
+) ENGINE=InnoDB;
 
-create table if not exists dashboard.course (
+create table if not exists dashboard.grade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
-course_name VARCHAR(32) NOT NULL,
+classes_num INT NOT NULL,
 school_id VARCHAR(32) NOT NULL,
-PRIMARY KEY (id),
+PRIMARY KEY(id),
 INDEX(school_id, grade_name),
 FOREIGN KEY (school_id)
     REFERENCES dashboard.school(school_id)
     ON DELETE CASCADE ON UPDATE CASCADE
-);
+) ENGINE=InnoDB;
+
+create table if not exists dashboard.course (
+id INT NOT NULL AUTO_INCREMENT,
+grade_id INT NOT NULL,
+course_name VARCHAR(32) NOT NULL,
+PRIMARY KEY (id),
+INDEX(grade_id),
+FOREIGN KEY (grade_id)
+    REFERENCES dashboard.grade(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;

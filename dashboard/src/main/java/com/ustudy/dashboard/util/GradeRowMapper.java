@@ -5,11 +5,14 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-public class GradeRowMapper implements RowMapper<String> {
+import com.ustudy.dashboard.model.Grade;
+
+public class GradeRowMapper implements RowMapper<Grade> {
 
 	@Override
-	public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return rs.getString("grade_name");
-		
+	public Grade mapRow(ResultSet rs, int rowNum) throws SQLException {
+		return new Grade(rs.getString("id"),
+				rs.getString("grade_name"),
+				rs.getInt("classes_num"));
 	}
 }
