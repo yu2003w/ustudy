@@ -141,7 +141,7 @@ public class SchoolServiceImp implements SchoolService {
 		
 		// for grades related information, need to replace previous information
 		// delete origin grades information firstly, then insert new values
-		String sqlDelGr = "delete from course where school_id = ?";
+		String sqlDelGr = "delete from dashboard.grade where school_id = ?";
 		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
 		logger.info(numOfGr + " grade items deleted for update.");
 		
