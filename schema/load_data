@@ -18,7 +18,27 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/course.data' INTO TABLE dashboard.cou
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/accounts.data' INTO TABLE dashboard.users
+LOAD DATA LOCAL INFILE '/root/mysql/schema/accounts.data' INTO TABLE dashboard.sec_users
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/permission.data' INTO TABLE dashboard.sec_permission
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/role.data' INTO TABLE dashboard.sec_role
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/role_permission.data' INTO TABLE dashboard.sec_role_permission
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/user_role.data' INTO TABLE dashboard.sec_user_role
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

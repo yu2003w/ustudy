@@ -1,37 +1,42 @@
 set names "utf8";
 create database if not exists dashboard character set utf8;
 
-create table if not exists dashboard.users (
-id INT NOT NULL AUTO_INCREMENT,
-loginname VARCHAR(64) NOT NULL,
-usr_passwd VARCHAR(256) NOT NULL,
-usr_passwdsalt VARCHAR(256) NOT NULL,
-PRIMARY KEY (id),
-INDEX (loginname),
-UNIQUE KEY (loginname)
-);
+create table if not exists dashboard.sec_permission (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  url varchar(256) DEFAULT NULL COMMENT 'url地址',
+  name varchar(64) DEFAULT NULL COMMENT 'url描述',
+  PRIMARY KEY (id),
+  KEY permission_name (name) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
-create table if not exists dashboard.roles (
-id INT NOT NULL AUTO_INCREMENT,
-role_name VARCHAR(32) NOT NULL,
-user_id INT NOT NULL,
-PRIMARY KEY (id),
-INDEX(user_id),
-FOREIGN KEY (user_id)
-    REFERENCES dashboard.users(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
+create table if not exists dashboard.sec_role (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  name varchar(32) DEFAULT NULL COMMENT '角色名称',
+  type varchar(10) DEFAULT NULL COMMENT '角色类型',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-create table if not exists dashboard.permissions (
-id INT NOT NULL AUTO_INCREMENT,
-perm_name VARCHAR(64) NOT NULL,
-role_id INT NOT NULL,
-PRIMARY KEY (id),
-INDEX (role_id),
-FOREIGN KEY (role_id)
-    REFERENCES dashboard.roles (id)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
+create table if not exists dashboard.sec_role_permission (
+  rid bigint(20) DEFAULT NULL COMMENT '角色ID',
+  pid bigint(20) DEFAULT NULL COMMENT '权限ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table if not exists dashboard.sec_user_role (
+  uid bigint(20) DEFAULT NULL COMMENT '用户ID',
+  rid bigint(20) DEFAULT NULL COMMENT '角色ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table if not exists dashboard.sec_users (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  login_name varchar(32) DEFAULT NULL COMMENT '登录名称',
+  name varchar(20) DEFAULT NULL COMMENT '姓名',
+  phone varchar(20) DEFAULT NULL COMMENT '联系电话',
+  pswd varchar(32) DEFAULT NULL COMMENT '密码',
+  create_time datetime DEFAULT NULL COMMENT '创建时间',
+  last_login_time datetime DEFAULT NULL COMMENT '最后登录时间',
+  status bigint(1) DEFAULT '1' COMMENT '1:有效，0:禁止登录',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 create table if not exists dashboard.school (
 id INT NOT NULL AUTO_INCREMENT,
@@ -68,4 +73,3 @@ FOREIGN KEY (grade_id)
     REFERENCES dashboard.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
-
