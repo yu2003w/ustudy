@@ -18,16 +18,14 @@
       
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login.html"/>
-        <property name="successUrl" value="index"/>
-        <property name="unauthorizedUrl" value="unauthorized"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
         <property name="filterChainDefinitions">
             <value>
-                /dashboard/users/list = authc, roles[admin]
-                /dashboard/users/view/* = authc, roles[admin]
-                /dashboard/users/update/* = authc, roles[super]
-                /dashboard/users/delete/* = authc, roles[super]
-                /dashboard/users/** = authc, roles[admin]
+                /user/** = authc, roles[888888]
+                /role/** = authc, roles[888888]
+                /permission/** = authc, roles[888888]
             </value>
         </property>
     </bean>
@@ -35,11 +33,12 @@
     <bean id="adminboard" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://192.168.0.107:13306/dashboard?characterEncoding=UTF-8"/>
+                <property name="url" value="jdbc:mysql://127.0.0.1:3306/dashboard?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <!-- <property name="url" value="jdbc:mysql://192.168.0.107:13306/dashboard?characterEncoding=UTF-8"/> -->
                 <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/dashboard?characterEncoding=UTF-8"/> -->
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
-                <property name="password" value="mysql"/>
+                <property name="password" value="root"/>
                 <property name="testWhileIdle" value="true"/>  
                 <property name="testOnBorrow" value="true"/>  
                 <property name="validationInterval" value="30000"/>  
@@ -75,9 +74,9 @@
     <bean id="adminRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
         <property name="dataSource" ref="adminboard" />
         <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select usr_passwd from users where loginname = ?" />
-        <property name="userRolesQuery" value="select role_name from roles where user_id = (select id from users where loginname = ? )" />
-        <property name="permissionsQuery" value="select perm_name from permissions where role_id = (select id from roles where role_name = ?)" />
+        <property name="authenticationQuery" value="select pswd from sec_users where login_name = ?" />
+        <property name="userRolesQuery" value="SELECT r.type FROM sec_role r where r.id in (SELECT DISTINCT ur.rid from sec_users u LEFT JOIN sec_user_role ur on u.id=ur.uid where u.name = ?)" />
+        <property name="permissionsQuery" value="SELECT p.url FROM sec_permission p where p.id in (SELECT DISTINCT rp.pid from sec_role r LEFT JOIN sec_role_permission rp on r.id=rp.rid where r.type = ?)" />
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
     <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">

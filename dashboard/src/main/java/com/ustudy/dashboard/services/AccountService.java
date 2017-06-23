@@ -1,40 +1,27 @@
 package com.ustudy.dashboard.services;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
 
 import com.ustudy.dashboard.model.Account;
 
-@Service
-public class AccountService {
+public interface AccountService {
 
-	private static final Logger logger = LogManager.getLogger(AccountService.class);
+	public List<Account> list(Account account, String startTime, String endTime) ;
 	
-	@Autowired
-	private JdbcTemplate jdbcT;
+	public Account findUserByLoginName(String username) ;
 	
-	public List<Account> query(String id) {
-		List<Account> acList = null;
-		String sql = "select * from users where id > ?;";
-		try {
-			acList = jdbcT.query(sql, new RowMapper<Account>(){	
-				@Override
-				public Account mapRow(ResultSet rs, int num) throws SQLException{
-					Account usr = new Account(rs.getString("loginname"));
-					return usr;
-				}
-		    }, id);
-		} catch (Exception e) {
-			logger.debug(e.getMessage());
-		}
-		return acList;
-	}
+	public Account findUserById(int id) ;
+	
+	public boolean deleteUserById(int id) ;
+	
+	public boolean deleteUserByIds(String ids) ;
+	
+	public boolean insertUser(Account account) ;
+	
+	public boolean updateUser(Account account) ;
+	
+	public boolean addRoles(int userId,String roleId) ;
+	
+	public boolean deleteRoles(int userId,String roleId) ;
+	
 }
