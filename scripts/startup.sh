@@ -33,8 +33,8 @@ if [ $? != 0 ]; then
 fi
 echo "Deploying dashboard.war successfully"
 
-if [ -d ${WORK_DIR}/webapps/services ]; then
-  rm -rf ${WORK_DIR}/webapps/services  ${WORK_DIR}/webapps/services.war
+if [ -d ${WORK_DIR}/webapps/infocen ]; then
+  rm -rf ${WORK_DIR}/webapps/infocen  ${WORK_DIR}/webapps/infocen.war
   if [ $? != 0 ]; then
     echo "Failed to delete deployed war"
     exit 1
@@ -47,12 +47,12 @@ else
   fi
 fi
 
-cp -f ${SOURCE_DIR}/ustudy/info-center/target/services.war ${WORK_DIR}/webapps/services.war
+cp -f ${SOURCE_DIR}/ustudy/infocen/target/infocen.war ${WORK_DIR}/webapps/infocen.war
 if [ $? != 0 ]; then
   echo "Failed to copy infoservice.war into destination directory"
   exit 1
 fi
-echo "Deploying services.war successfully"
+echo "Deploying infocen.war successfully"
 
 
 docker run --rm --name ustudy -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
