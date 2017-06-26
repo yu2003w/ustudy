@@ -50,8 +50,12 @@ public class SchoolServiceImp implements SchoolService {
 				id = 0;
 			schs = jdbcT.query(sqlSch, new SchoolRowMapper(), id);
 			logger.debug("Fetched " + schs.size() + " items of school");
+			
 			for (School sch: schs) {
-				assembleGrades(sch);
+				// Noted: for getList() service, front end doesn't need grades related information
+				// to display, so here, no need to assemble grades information. To do so, whole 
+				// processing could be speedup.
+				// assembleGrades(sch);
 				logger.debug(sch.toString());
 			}
 			
