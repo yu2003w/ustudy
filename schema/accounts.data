@@ -1,5 +1,0 @@
-id ,login_name ,name ,phone ,pswd ,create_time ,last_login_time ,status
-1, admin, admin, null, admin, 2016-06-16 11:15:33, 2017-06-09 22:52:04, 1
-11, soso, soso, null, d57ffbe486910dd5b26d0167d034f9ad, 2016-05-26 20:50:54, 2016-06-16 11:24:35, 1
-12, 8446666, 8446666, null, 4afdc875a67a55528c224ce088be2ab8, 2016-05-27 22:34:19, 2016-06-15 17:03:16, 1
-13, loginname, name, phone, 57eb72e6b78a87a12d46a7f5e9315138, 2017-06-12 22:05:36, null, 0

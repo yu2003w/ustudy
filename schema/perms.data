@@ -1,0 +1,4 @@
+id,permissions,role
+null,school:view,admin
+null,school:update,admin
+null,school:view,user
