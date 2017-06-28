@@ -1,4 +1,12 @@
 id,permissions,role
 null,school:view,admin
 null,school:update,admin
-null,school:view,user
+null,school:delete,admin
+null,school:view,operator
+null,school:update,operator
+null,school:view,seller
+null,user:view,admin
+null,user:update,admin
+null,user:delete,admin
+null,user:view,operator
+null,user:update,operator
