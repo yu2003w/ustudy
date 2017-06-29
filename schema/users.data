@@ -1,0 +1,4 @@
+id,loginname,fullname,phone,passwd,group,create_time,last_login_time,status
+null,admin,admin,null,admin123,管理员,2016-06-16 11:15:33,2017-06-09 22:52:04,正常
+null,test,test,null,test123,运营,2017-06-12 22:05:36,null,正常
+null,li,jared,null,seller,市场,null,null,未激活

@@ -11,9 +11,11 @@ curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/da
 /dashboard/school/view/{id}
 /dashboard/school/delete/{id}
 /dashboard/school/delete
-/databoard/school/update/{id}
-
-
+/dashboard/school/update/{id}
+/dashboard/user/list/{id}
+/dashboard/user/view/{id}
+/dashboard/user/delete/{id}
+/dashboard/user/delete
 
 curl -X POST -F 'username=test' -F 'password=test123' http://192.168.0.107:8080/dashboard/login/
 curl -X POST -F 'username=test' -F 'password=test123' http://47.92.53.57:8082/dashboard/login/

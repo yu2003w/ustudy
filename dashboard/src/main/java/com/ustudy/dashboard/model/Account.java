@@ -1,59 +1,46 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = -5386334949501785419L;
 	
-	private int id;
+	private String id;
 	private String name = null;
 	private String loginname = null;
-	private String pswd = null;
 	private String phone = null;
+	private String pswd = null;
 	private String createTime = null;
 	private String lastLoginTime = null;
-	private int status = 1;
+	private String userGroup = null;
+	private String status = null;
 	
-	public Account() {}
 	
-	public Account(String name, String loginname, String pswd,String phone,int status) {
-		this.name = name;
-		this.loginname = loginname;
-		this.pswd = pswd;
-		this.phone = phone;
-		this.status = status;
+	public Account() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
-	
-	public Account(int id, String name, String loginname, String pswd,String phone,String createTime,String lastLoginTime,int status) {
+
+	public Account(String id, String name, String loginname, String phone, String pswd, String createTime,
+			String lastLoginTime, String userGroup, String status) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.loginname = loginname;
-		this.pswd = pswd;
 		this.phone = phone;
+		this.pswd = pswd;
 		this.createTime = createTime;
 		this.lastLoginTime = lastLoginTime;
+		this.userGroup = userGroup;
 		this.status = status;
 	}
-	
-	public Account(ResultSet rs) throws SQLException {
-		this.id = rs.getInt("id");
-		this.name = rs.getString("name");
-		this.loginname = rs.getString("login_name");
-		this.pswd = rs.getString("pswd");
-		this.phone = rs.getString("phone");
-		this.createTime = rs.getString("create_time");
-		this.lastLoginTime = rs.getString("last_login_time");
-		this.status = rs.getInt("status");
-	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -105,12 +92,27 @@ public class Account implements Serializable {
 		this.lastLoginTime = lastLoginTime;
 	}
 
-	public int getStatus() {
+	public String getUserGroup() {
+		return userGroup;
+	}
+
+	public void setUserGroup(String userGroup) {
+		this.userGroup = userGroup;
+	}
+
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "Account [id=" + id + ", name=" + name + ", loginname=" + loginname + ", pswd=" + pswd + ", phone="
+				+ phone + ", createTime=" + createTime + ", lastLoginTime=" + lastLoginTime + ", userGroup=" + userGroup
+				+ ", status=" + status + "]";
 	}
 	
 }

@@ -5,6 +5,7 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc
            http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
            http://www.springframework.org/schema/beans
@@ -13,6 +14,8 @@
            http://www.springframework.org/schema/context/spring-context-3.1.xsd
            http://www.springframework.org/schema/tx
            http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd">
       
@@ -20,12 +23,32 @@
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/login.jsp"/>
         <property name="successUrl" value="/index.jsp"/>
-        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <property name="unauthorizedUrl" value="/dashboard/unauthorized.jsp"/>
+        <property name="filters">
+            <util:map>
+                <entry key="authc">
+                    <bean class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter"/>
+                </entry>
+            </util:map>
+        </property>
         <property name="filterChainDefinitions">
             <value>
-                /user/** = authc, roles[888888]
-                /role/** = authc, roles[888888]
-                /permission/** = authc, roles[888888]
+                <!-- Noted: some issues unresolved, that failed to start application if specifying 
+                     multiple roles like "roles[admin,user]". Actually this is supported at least
+                     in shiro.ini. To work around this, only using single roles or single permissions.
+                -->
+                /school/view/** = authc, perms[school:view]
+                /school/list/** = authc, perms[school:view]
+                /school/add = authc, perms[school:update]
+                /school/update = authc, perms[school:update]
+                /school/delete = authc, perms[school:delete]
+                /school/delete/** = authc, perms[school:delete]
+                /user/list/** = authc, perms[user:view]
+                /user/view/** = authc, perms[user:view]
+                /user/delete = authc, perms[user:delete]
+                /user/delete/** = authc, perms[user:delete]
+                
+                /** = anon
             </value>
         </property>
     </bean>
@@ -73,12 +96,12 @@
     <bean id="adminRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
         <property name="dataSource" ref="adminboard" />
         <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select pswd from sec_users where login_name = ?" />
-        <property name="userRolesQuery" value="SELECT r.type FROM sec_role r where r.id in (SELECT DISTINCT ur.rid from sec_users u LEFT JOIN sec_user_role ur on u.id=ur.uid where u.name = ?)" />
-        <property name="permissionsQuery" value="SELECT p.url FROM sec_permission p where p.id in (SELECT DISTINCT rp.pid from sec_role r LEFT JOIN sec_role_permission rp on r.id=rp.rid where r.type = ?)" />
+        <property name="authenticationQuery" value="select passwd from dashboard.users where loginname = ?" />
+        <property name="userRolesQuery" value="select role_name from dashboard.roles where user_name = ?" />
+        <property name="permissionsQuery" value="select permissions from dashboard.perms where role_name = ?" />
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
-    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager"/>
     </bean>
     

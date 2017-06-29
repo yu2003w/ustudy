@@ -6,22 +6,14 @@ import com.ustudy.dashboard.model.Account;
 
 public interface AccountService {
 
-	public List<Account> list(Account account, String startTime, String endTime) ;
+	public List<Account> getList(int id) ;
 	
-	public Account findUserByLoginName(String username) ;
+	public Account findUserByLoginName(String login) ;
 	
 	public Account findUserById(int id) ;
 	
-	public boolean deleteUserById(int id) ;
+	public int delItem(int id) ;
 	
-	public boolean deleteUserByIds(String ids) ;
-	
-	public boolean insertUser(Account account) ;
-	
-	public boolean updateUser(Account account) ;
-	
-	public boolean addRoles(int userId,String roleId) ;
-	
-	public boolean deleteRoles(int userId,String roleId) ;
+	public int delItemSet(String ids) ;
 	
 }
