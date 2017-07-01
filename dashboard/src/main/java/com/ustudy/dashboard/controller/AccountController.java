@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ustudy.dashboard.model.Account;
 import com.ustudy.dashboard.services.AccountService;
@@ -115,20 +116,54 @@ public class AccountController {
 		return result;
 	}
 	
-	/*
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public boolean insert(Account account,HttpServletRequest request,HttpServletResponse response) {
-		return accountService.insertUser(account);
+	@RequestMapping(value="/add", method = RequestMethod.POST)
+	public String createItem(@RequestBody @Valid Account item, HttpServletResponse resp, UriComponentsBuilder builder) {
+		logger.debug("endpoint /user/add is visited.");
+		logger.debug(item.toString());
+		String result = null;
+		try {
+		    int index = accS.createItem(item);
+		    logger.debug("createItem(), item created successfully with id " + index);
+		    //set header location
+		    resp.setHeader("Location", 
+		    	builder.path("/user/view/{index}").buildAndExpand(index).toString());
+		    result = "create item successfully";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			result = "create item failed";
+			resp.setStatus(500);
+		}
+		
+		return result;
 	}
 	
+	@RequestMapping(value="/update/{id}", method = RequestMethod.POST)
+	public String updateItem(@RequestBody @Valid Account data, @PathVariable int id, HttpServletResponse resp) {
+		logger.debug("endpoint /user/update/" + id + " is visited.");
+		String result = null;
+		try {
+			int numOfRows = accS.updateItem(data, id);
+			if (numOfRows == 1)
+				logger.debug("updateItem(), update item successfully");
+			else {
+				String msg = numOfRows + " items are updated, maybe something goes wrong";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			result = "update item successfully";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			result = "update item failed";
+			resp.setStatus(500);
+		}
+		return result;
+	}
+	
+	/*
+		
 	@RequestMapping(value = "/detailByName/{username}", method = RequestMethod.GET)
 	public Account detailByName(@PathVariable("username")String username,HttpServletRequest request,HttpServletResponse response) {
 		return accountService.findUserByLoginName(username);
-	}
-	
-	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	public boolean update(Account account,HttpServletRequest request,HttpServletResponse response) {
-		return accountService.updateUser(account);
 	}
 	
 	@RequestMapping(value = "/addRole/{id}/{roleId}", method = RequestMethod.GET)

@@ -1,40 +1,43 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = -5386334949501785419L;
 	
-	private String id;
-	private String name = null;
+	private String id = null;
 	private String loginname = null;
+	private String fullname = null;
 	private String phone = null;
-	private String pswd = null;
+	private String passwd = null;
+	private String userGroup = null;
 	private String createTime = null;
 	private String lastLoginTime = null;
-	private String userGroup = null;
 	private String status = null;
-	
+	private List<Role> roles = null;
 	
 	public Account() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Account(String id, String name, String loginname, String phone, String pswd, String createTime,
-			String lastLoginTime, String userGroup, String status) {
+
+	public Account(String id, String loginname, String fullname, String phone, String pswd, String userGroup,
+			String createTime, String lastLoginTime, String status) {
 		super();
 		this.id = id;
-		this.name = name;
 		this.loginname = loginname;
+		this.fullname = fullname;
 		this.phone = phone;
-		this.pswd = pswd;
+		this.passwd = pswd;
+		this.userGroup = userGroup;
 		this.createTime = createTime;
 		this.lastLoginTime = lastLoginTime;
-		this.userGroup = userGroup;
 		this.status = status;
 	}
+
 
 	public String getId() {
 		return id;
@@ -42,14 +45,6 @@ public class Account implements Serializable {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getLoginname() {
@@ -60,12 +55,12 @@ public class Account implements Serializable {
 		this.loginname = loginname;
 	}
 
-	public String getPswd() {
-		return pswd;
+	public String getFullname() {
+		return fullname;
 	}
 
-	public void setPswd(String pswd) {
-		this.pswd = pswd;
+	public void setFullname(String fullname) {
+		this.fullname = fullname;
 	}
 
 	public String getPhone() {
@@ -75,11 +70,27 @@ public class Account implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+	
+	public String getPasswd() {
+		return passwd;
+	}
+
+	public void setPasswd(String passwd) {
+		this.passwd = passwd;
+	}
+
+	public String getUserGroup() {
+		return userGroup;
+	}
+
+	public void setUserGroup(String userGroup) {
+		this.userGroup = userGroup;
+	}
 
 	public String getCreateTime() {
 		return createTime;
 	}
-
+	
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
@@ -92,14 +103,6 @@ public class Account implements Serializable {
 		this.lastLoginTime = lastLoginTime;
 	}
 
-	public String getUserGroup() {
-		return userGroup;
-	}
-
-	public void setUserGroup(String userGroup) {
-		this.userGroup = userGroup;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -107,12 +110,20 @@ public class Account implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
 
 	@Override
 	public String toString() {
-		return "Account [id=" + id + ", name=" + name + ", loginname=" + loginname + ", pswd=" + pswd + ", phone="
-				+ phone + ", createTime=" + createTime + ", lastLoginTime=" + lastLoginTime + ", userGroup=" + userGroup
-				+ ", status=" + status + "]";
+		return "Account [id=" + id + ", loginname=" + loginname + ", fullname=" + fullname + ", phone=" + phone
+				+ ", pswd=" + passwd + ", userGroup=" + userGroup + ", createTime=" + createTime + ", lastLoginTime="
+				+ lastLoginTime + ", status=" + status + "]";
 	}
-	
+
 }
