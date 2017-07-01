@@ -43,11 +43,12 @@
                 /school/update = authc, perms[school:update]
                 /school/delete = authc, perms[school:delete]
                 /school/delete/** = authc, perms[school:delete]
+                /schoolList = authc, perms[school:view]
+ 
                 /user/list/** = authc, perms[user:view]
                 /user/view/** = authc, perms[user:view]
                 /user/delete = authc, perms[user:delete]
                 /user/delete/** = authc, perms[user:delete]
-                
                 /** = anon
             </value>
         </property>
