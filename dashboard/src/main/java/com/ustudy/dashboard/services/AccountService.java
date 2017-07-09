@@ -16,4 +16,8 @@ public interface AccountService {
 	
 	public int delItemSet(String ids) ;
 	
+	public int createItem(Account item);
+	
+	public int updateItem(Account item, int id);
+	
 }

@@ -1,5 +1,8 @@
 package com.ustudy.dashboard.services.imp;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -8,9 +11,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.dashboard.model.Account;
 import com.ustudy.dashboard.services.AccountService;
 import com.ustudy.dashboard.util.AccountRowMapper;
@@ -95,4 +102,62 @@ public class AccountServiceImp implements AccountService {
 		logger.debug("Assembled sql for batch deletion --> " + sqlDel);
 		return jdbcT.update(sqlDel);
 	}
+	
+	@Override
+	@Transactional
+	public int createItem(Account item) {
+		
+		// Noted: Schema for table dashboard.user is as below,
+		// id, loginname, fullname, passwd, ugroup, ctime, ll_time,
+		// status, province, city, district
+		String genAcc = "insert into dashboard.users values(?,?,?,?,?,?,?,?,?,?,?);";
+
+		// insert record into dashoboard.users firstly, also auto generated keys is required.
+		KeyHolder keyH = new GeneratedKeyHolder();
+		int id = -1;    // auto generated id
+	
+		// need to retrieve auto id of school item which is returned back in header location
+		int num = jdbcT.update(new PreparedStatementCreator(){
+			@Override
+			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+				PreparedStatement psmt = conn.prepareStatement(genAcc, Statement.RETURN_GENERATED_KEYS);
+				psmt.setNull(1, java.sql.Types.INTEGER);
+				psmt.setString(2, item.getLoginname());
+				psmt.setString(3, item.getFullname());
+				psmt.setString(4, item.getPasswd());
+				psmt.setString(5, item.getUserGroup());
+				psmt.setString(6, item.getCreateTime());
+				psmt.setString(7, item.getLastLoginTime());
+				psmt.setString(8, item.getStatus());
+				psmt.setString(9, item.getProvince());
+				psmt.setString(10, item.getCity());
+				psmt.setString(11, item.getDistrict());
+				// logger.debug("createItem(), account creation sql --> " + psmt.toString());
+				return psmt;
+			}
+		}, keyH);
+		if (num != 1) {
+			String msg = "createItem(), return value for insert is " + num;
+			logger.warn(msg);
+			throw new RuntimeException(msg);
+		}
+	
+		id = keyH.getKey().intValue();
+		if (id < 0) {
+			String msg = "createItem() failed with invalid id " + id;
+			logger.warn(msg);
+			throw new RuntimeException(msg);
+		}
+
+		// TODO: also need to populate roles, permissions for the user
+		
+		return id;
+	}
+	
+	@Override
+	@Transactional
+	public int updateItem(Account item, int id) {
+		return 0;
+	}
 }
+

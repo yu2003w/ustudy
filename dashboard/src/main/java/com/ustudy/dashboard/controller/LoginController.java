@@ -27,45 +27,62 @@ public class LoginController {
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public void login(HttpServletRequest request, HttpServletResponse response) {
 				
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
+		logger.debug("endpoint /login is visited");
 		String msg = null;
+		boolean status = true;
 		
-		logger.debug("login() is invoked with username->" + username + 
-				";password->" + password);
-		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-		token.setRememberMe(true);
-		logger.debug("Token retrieved -> " + token.toString());
 		Subject currentUser = SecurityUtils.getSubject();
-		try {
-			currentUser.login(token);
-			if (currentUser.isAuthenticated()) {
-				msg = "Authentication successful";
-				
-				SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
-				//WebUtils.redirectToSavedRequest(request, response, null);
-				//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
-				logger.debug("redirect to " + sr.getRequestUrl());
-				response.sendRedirect(sr.getRequestUrl());
-			}
-			else {
-				token.clear();
-				msg = "Authentication failure";
+		
+		if (!currentUser.isAuthenticated()) {
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+			
+			logger.debug("login() is invoked with username->" + username + 
+					";password->" + password);
+			
+			try {
+				UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+				token.setRememberMe(true);
+				currentUser.login(token);
+				logger.debug("Token retrieved -> " + token.toString());
+			} catch (UnknownAccountException | IncorrectCredentialsException uae) {
+				msg = "Attempt to access with invalid account -> username:" + username;
+				status = false;
+			} catch (LockedAccountException lae) {
+				msg = "Account is locked, username:" + username;
+				status = false;
+			} catch (AuthenticationException ae) {
+				logger.warn(ae.getMessage());
+				status = false;
+			} catch (Exception e) {
+				logger.warn(e.getMessage());
+				status = false;
 			}
 			
-		} catch (UnknownAccountException | IncorrectCredentialsException uae) {
-			msg = "Attempt to access with invalid account -> username:" + username;
+		} 
+		
+		String redirectUrl = null;
+		
+		if (status) {
+			logger.debug("user [" + currentUser.getPrincipal() + "] loggined successfully");
+			// login successful, redirect to original request
+			msg = "Authentication successful";
+			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
+			//WebUtils.redirectToSavedRequest(request, response, null);
+			//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
+			redirectUrl = sr.getRequestUrl();
+		} else {
 			logger.warn(msg);
-		} catch (LockedAccountException lae) {
-			msg = "Account is locked, username:" + username;
-			logger.warn(msg);
-		} catch (AuthenticationException ae) {
-			logger.warn(ae.getMessage());
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			redirectUrl = "/dashboard/login.jsp";
+			// login failed here, need to redirect to login pages
 		}
-
-		logger.warn(msg);
+		
+		try {
+			logger.debug("redirect to " + redirectUrl);
+			response.sendRedirect(redirectUrl);
+		} catch (Exception re) {
+			logger.warn("Failed to redirect to login pages --> " + re.getMessage());
+		}
 		
 	}
 	
@@ -78,4 +95,21 @@ public class LoginController {
 		currentUser.logout();
 		
 	}
+	
+	
+	@RequestMapping(value="/loginId", method = RequestMethod.GET)
+	public String getLoginName(HttpServletResponse resp) {
+		logger.debug("endpoint /loginId is visited");
+		Subject cUser = null;
+		try {
+			cUser = SecurityUtils.getSubject();
+		} catch (Exception e) {
+			logger.warn("Failed to get subject --> " + e.getMessage());
+		}
+		
+		logger.debug(cUser.getPrincipal().toString());
+		return cUser.getPrincipal().toString();
+		
+	}
+	
 }

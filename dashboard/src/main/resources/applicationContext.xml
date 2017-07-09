@@ -23,7 +23,7 @@
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/login.jsp"/>
         <property name="successUrl" value="/index.jsp"/>
-        <property name="unauthorizedUrl" value="/dashboard/unauthorized.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
         <property name="filters">
             <util:map>
                 <entry key="authc">
@@ -37,18 +37,21 @@
                      multiple roles like "roles[admin,user]". Actually this is supported at least
                      in shiro.ini. To work around this, only using single roles or single permissions.
                 -->
+                <!-- school filter chain -->
                 /school/view/** = authc, perms[school:view]
                 /school/list/** = authc, perms[school:view]
-                /school/add = authc, perms[school:update]
-                /school/update = authc, perms[school:update]
-                /school/delete = authc, perms[school:delete]
-                /school/delete/** = authc, perms[school:delete]
-                /schoolList = authc, perms[school:view]
- 
+                /school/add = authc, perms[school:edit]
+                /school/update = authc, perms[school:edit]
+                /school/delete = authc, perms[school:edit]
+                /school/delete/** = authc, perms[school:edit]
+                
+                <!-- user filter chain -->
                 /user/list/** = authc, perms[user:view]
                 /user/view/** = authc, perms[user:view]
-                /user/delete = authc, perms[user:delete]
-                /user/delete/** = authc, perms[user:delete]
+                /user/delete = authc, perms[user:edit]
+                /user/delete/** = authc, perms[user:edit]
+                /user/add = authc, perms[user:edit]
+                
                 /** = anon
             </value>
         </property>
@@ -57,8 +60,7 @@
     <bean id="adminboard" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://192.168.0.107:13306/dashboard?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
-                <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/dashboard?characterEncoding=UTF-8"/> -->
+                <property name="url" value="jdbc:mysql://172.26.58.15:13306/dashboard?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
@@ -99,7 +101,8 @@
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select passwd from dashboard.users where loginname = ?" />
         <property name="userRolesQuery" value="select role_name from dashboard.roles where user_name = ?" />
-        <property name="permissionsQuery" value="select permissions from dashboard.perms where role_name = ?" />
+        <property name="permissionsQuery" value="select permissions from dashboard.perms where role_id = 
+            (select id from roles where role_name = ?)" />
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
         <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">

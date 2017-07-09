@@ -5,21 +5,24 @@ create table if not exists dashboard.users (
 id INT NOT NULL AUTO_INCREMENT,
 loginname varchar(32) NOT NULL,
 fullname varchar(32) NOT NULL,
-phone varchar(20) NOT NULL,
 passwd varchar(32) NOT NULL,
-ugroup ENUM ('管理员', '运营', '市场') NOT NULL,
+ugroup ENUM ('管理员', '运维', '市场', '代理商', '临时') NOT NULL,
 ctime datetime DEFAULT NULL,
 ll_time datetime DEFAULT NULL,
-status ENUM ('正常', '锁定', '未激活'),
+status ENUM ('在线', '离线'),
+province varchar(32) NOT NULL,
+city varchar(32) NOT NULL,
+district varchar(32) NOT NULL,
 UNIQUE KEY (loginname),
 PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
 create table if not exists dashboard.roles (
+id INT NOT NULL AUTO_INCREMENT,
 role_name varchar(32) NOT NULL,
 user_name varchar(32) NOT NULL,
-INDEX(user_name,role_name),
-PRIMARY KEY (role_name),
+INDEX(user_name),
+PRIMARY KEY (id),
 FOREIGN KEY (user_name)
     REFERENCES dashboard.users(loginname)
     ON DELETE CASCADE ON UPDATE CASCADE
@@ -28,11 +31,11 @@ FOREIGN KEY (user_name)
 create table if not exists dashboard.perms (
 id INT NOT NULL AUTO_INCREMENT,
 permissions varchar(64) NOT NULL,
-role_name varchar(32) NOT NULL,
-INDEX (role_name),
+role_id INT NOT NULL,
+INDEX (role_id),
 PRIMARY KEY (id),
-FOREIGN KEY (role_name)
-    REFERENCES dashboard.roles(role_name)
+FOREIGN KEY (role_id)
+    REFERENCES dashboard.roles(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
