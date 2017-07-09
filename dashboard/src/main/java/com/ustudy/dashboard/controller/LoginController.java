@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value="/")
 public class LoginController {
 
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
@@ -73,8 +72,8 @@ public class LoginController {
 			redirectUrl = sr.getRequestUrl();
 		} else {
 			logger.warn(msg);
-			redirectUrl = "/dashboard/login.jsp";
-			// login failed here, need to redirect to login pages
+			// login failed here, need to redirect to error pages
+			redirectUrl = "/dashboard/error.jsp";
 		}
 		
 		try {
