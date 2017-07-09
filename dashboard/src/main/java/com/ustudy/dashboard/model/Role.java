@@ -3,13 +3,20 @@ package com.ustudy.dashboard.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Role implements Serializable {
 
 	private static final long serialVersionUID = -7055935870910488212L;
 	
+	@JsonIgnore
 	private String id = null;
+	
 	private String role_name = null;
+	
+	@JsonIgnore
 	private String user_name = null;
+	
 	private List<String> perms = null;
 	
 	public Role() {

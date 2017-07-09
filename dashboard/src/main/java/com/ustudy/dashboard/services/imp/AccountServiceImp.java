@@ -108,8 +108,9 @@ public class AccountServiceImp implements AccountService {
 	public int createItem(Account item) {
 		
 		// Noted: Schema for table dashboard.user is as below,
-		// id, loginname, fullname, phone, passwd, ugroup, ctime, ll_time, status
-		String genAcc = "insert into dashboard.school values(?,?,?,?,?,?,?);";
+		// id, loginname, fullname, passwd, ugroup, ctime, ll_time,
+		// status, province, city, district
+		String genAcc = "insert into dashboard.users values(?,?,?,?,?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.users firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -123,12 +124,15 @@ public class AccountServiceImp implements AccountService {
 				psmt.setNull(1, java.sql.Types.INTEGER);
 				psmt.setString(2, item.getLoginname());
 				psmt.setString(3, item.getFullname());
-				psmt.setString(4, item.getPhone());
-				psmt.setString(5, item.getPasswd());
-				psmt.setString(6, item.getUserGroup());
-				psmt.setString(7, item.getCreateTime());
-				psmt.setString(8, item.getLastLoginTime());
-				psmt.setString(9, item.getStatus());
+				psmt.setString(4, item.getPasswd());
+				psmt.setString(5, item.getUserGroup());
+				psmt.setString(6, item.getCreateTime());
+				psmt.setString(7, item.getLastLoginTime());
+				psmt.setString(8, item.getStatus());
+				psmt.setString(9, item.getProvince());
+				psmt.setString(10, item.getCity());
+				psmt.setString(11, item.getDistrict());
+				// logger.debug("createItem(), account creation sql --> " + psmt.toString());
 				return psmt;
 			}
 		}, keyH);
@@ -156,3 +160,4 @@ public class AccountServiceImp implements AccountService {
 		return 0;
 	}
 }
+

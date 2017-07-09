@@ -1,4 +1,4 @@
-id,loginname,fullname,phone,passwd,group,create_time,last_login_time,status
-null,admin,admin,null,admin123,管理员,2016-06-16 11:15:33,2017-06-09 22:52:04,正常
-null,test,test,null,test123,运营,2017-06-12 22:05:36,null,正常
-null,li,jared,null,seller,市场,null,null,未激活
+id,loginname,fullname,passwd,ugroup,ctime,ll_time,status,province,city,district
+null,admin,admin,admin123,管理员,2016-06-16 11:15:33,2017-06-09 22:52:04,在线,陕西省,西安市,雁塔区
+null,test,test,test123,运维,2017-06-12 22:05:36,null,在线,山西省,太原市,小店区
+null,li,jared,seller,市场,null,null,离线,北京市,北京市,丰台区

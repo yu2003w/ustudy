@@ -27,7 +27,7 @@ public class LoginController {
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public void login(HttpServletRequest request, HttpServletResponse response) {
 				
-		logger.debug("endpoint /login is hitted");
+		logger.debug("endpoint /login is visited");
 		String msg = null;
 		boolean status = true;
 		
@@ -73,7 +73,7 @@ public class LoginController {
 			redirectUrl = sr.getRequestUrl();
 		} else {
 			logger.warn(msg);
-			redirectUrl = "/login.jsp";
+			redirectUrl = "/dashboard/login.jsp";
 			// login failed here, need to redirect to login pages
 		}
 		
@@ -97,8 +97,9 @@ public class LoginController {
 	}
 	
 	
-	@RequestMapping(value="/user/loginname", method = RequestMethod.GET)
+	@RequestMapping(value="/loginId", method = RequestMethod.GET)
 	public String getLoginName(HttpServletResponse resp) {
+		logger.debug("endpoint /loginId is visited");
 		Subject cUser = null;
 		try {
 			cUser = SecurityUtils.getSubject();
@@ -106,6 +107,7 @@ public class LoginController {
 			logger.warn("Failed to get subject --> " + e.getMessage());
 		}
 		
+		logger.debug(cUser.getPrincipal().toString());
 		return cUser.getPrincipal().toString();
 		
 	}

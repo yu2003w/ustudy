@@ -2,12 +2,18 @@ package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Permission implements Serializable {
 
 	private static final long serialVersionUID = -7055935870910488212L;
 	
+	@JsonIgnore
 	private int id;
+	
 	private String permissions = null;
+	
+	@JsonIgnore
 	private String role_id = null;
 	
 	public Permission() {

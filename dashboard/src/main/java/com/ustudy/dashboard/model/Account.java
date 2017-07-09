@@ -3,41 +3,78 @@ package com.ustudy.dashboard.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = -5386334949501785419L;
 	
 	private String id = null;
+	
+	// Noted: login name is the phone number
+	@JsonProperty("userId")
 	private String loginname = null;
+	
+	@JsonProperty("userName")
 	private String fullname = null;
-	private String phone = null;
+	
+	@JsonProperty("password")
 	private String passwd = null;
+	
+	@JsonProperty("userType")
 	private String userGroup = null;
+	
+	@JsonIgnore
 	private String createTime = null;
 	private String lastLoginTime = null;
+	
+	@JsonProperty("userStatus")
 	private String status = null;
+	
+	private String province = null;
+	private String city = null;
+	private String district = null;
+	
+	@JsonIgnore
 	private List<Role> roles = null;
 	
 	public Account() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-
-	public Account(String id, String loginname, String fullname, String phone, String pswd, String userGroup,
-			String createTime, String lastLoginTime, String status) {
+	
+	public Account(String id, String loginname, String fullname, String passwd, String userGroup, String createTime,
+			String lastLoginTime, String status, String province, String city, String district) {
 		super();
 		this.id = id;
 		this.loginname = loginname;
 		this.fullname = fullname;
-		this.phone = phone;
-		this.passwd = pswd;
+		this.passwd = passwd;
 		this.userGroup = userGroup;
 		this.createTime = createTime;
 		this.lastLoginTime = lastLoginTime;
 		this.status = status;
+		this.province = province;
+		this.city = city;
+		this.district = district;
 	}
 
+	// constructor without field of password
+	public Account(String id, String loginname, String fullname, String userGroup, String createTime,
+			String lastLoginTime, String status, String province, String city, String district) {
+		super();
+		this.id = id;
+		this.loginname = loginname;
+		this.fullname = fullname;
+		this.userGroup = userGroup;
+		this.createTime = createTime;
+		this.lastLoginTime = lastLoginTime;
+		this.status = status;
+		this.province = province;
+		this.city = city;
+		this.district = district;
+	}
 
 	public String getId() {
 		return id;
@@ -61,14 +98,6 @@ public class Account implements Serializable {
 
 	public void setFullname(String fullname) {
 		this.fullname = fullname;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 	
 	public String getPasswd() {
@@ -119,11 +148,38 @@ public class Account implements Serializable {
 		this.roles = roles;
 	}
 
-	@Override
-	public String toString() {
-		return "Account [id=" + id + ", loginname=" + loginname + ", fullname=" + fullname + ", phone=" + phone
-				+ ", pswd=" + passwd + ", userGroup=" + userGroup + ", createTime=" + createTime + ", lastLoginTime="
-				+ lastLoginTime + ", status=" + status + "]";
+	public String getProvince() {
+		return province;
 	}
 
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	@Override
+	public String toString() {
+		return "Account [id=" + id + ", loginname=" + loginname + ", fullname=" + fullname + ", passwd=" + passwd
+				+ ", userGroup=" + userGroup + ", createTime=" + createTime + ", lastLoginTime=" + lastLoginTime
+				+ ", status=" + status + ", province=" + province + ", city=" + city + ", district=" + district
+				+ ", roles=" + roles + "]";
+	}
+	
+
 }
+

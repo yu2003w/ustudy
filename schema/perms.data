@@ -1,13 +1,10 @@
 id,permissions,role_id
 null,school:view,1
-null,school:update,1
-null,school:delete,1
+null,school:edit,1
 null,user:view,1
-null,user:update,1
-null,user:delete,1
+null,user:edit,1
 null,school:view,2
-null,school:update,2
-null,school:delete,2
+null,school:edit,2
 null,user:view,2
 null,school:view,3
 null,school:view,4
