@@ -1,4 +1,4 @@
 id,loginname,fullname,passwd,ugroup,ctime,ll_time,status,province,city,district
-null,admin,admin,admin123,管理员,2016-06-16 11:15:33,2017-06-09 22:52:04,在线,陕西省,西安市,雁塔区
-null,test,test,test123,运维,2017-06-12 22:05:36,null,在线,山西省,太原市,小店区
-null,li,jared,seller,市场,null,null,离线,北京市,北京市,丰台区
+null,admin,admin,admin123,运维,2016-06-16 11:15:33,2017-06-09 22:52:04,在线,陕西省,西安市,雁塔区
+null,test,test,test123,市场,2017-06-12 22:05:36,null,在线,山西省,太原市,小店区
+null,li,jared,seller,代理商,null,null,离线,北京市,北京市,丰台区

@@ -23,7 +23,7 @@ import com.ustudy.dashboard.services.AccountService;
 @RequestMapping(value="/user/")
 public class AccountController {
 
-	private static final Logger logger = LogManager.getLogger(LoginController.class);
+	private static final Logger logger = LogManager.getLogger(AccountController.class);
 	
 	@Autowired
 	private AccountService accS;
@@ -55,18 +55,16 @@ public class AccountController {
 			item = accS.findUserById(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
 			logger.warn("displayItem(), " + ie.getLocalizedMessage());
-			msg = "No items found for specified id = " + id;
+			msg = "No items found for specified id " + id;
 		} catch (Exception e) {
 			logger.warn("displayItem(), " + e.getMessage());
 			msg = "Failed to retrieve item " + id;
 		}
 		
 		if (item == null) {
-			try {
-				resp.sendError(500, msg);
-			} catch (Exception re) {
-				logger.warn("displayItem(), Failed to set error status in response");
-			}
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
 		}
 				
 		return item;

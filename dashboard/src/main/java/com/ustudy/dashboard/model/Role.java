@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Role implements Serializable {
 
@@ -12,6 +13,7 @@ public class Role implements Serializable {
 	@JsonIgnore
 	private String id = null;
 	
+	@JsonProperty("roleName")
 	private String role_name = null;
 	
 	@JsonIgnore
@@ -65,7 +67,9 @@ public class Role implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Role [id=" + id + ", role_name=" + role_name + ", user_name=" + user_name + "]";
+		return "Role [id=" + id + ", role_name=" + role_name + ", user_name=" +
+	        user_name + ", perms=" + perms + "]";
 	}
+	
 	
 }
