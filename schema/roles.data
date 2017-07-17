@@ -1,5 +1,6 @@
 id,role_name,user_name
 null,admin,admin
-null,operator,test
-null,seller,test
-null,seller,li
+null,market,test
+null,reseller,test
+null,reseller,li
+null,addi_li,li

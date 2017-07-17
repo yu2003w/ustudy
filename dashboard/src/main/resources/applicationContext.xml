@@ -48,10 +48,11 @@
                 <!-- user filter chain -->
                 /user/list/** = authc, perms[user:view]
                 /user/view/** = authc, perms[user:view]
+                /user/add = authc, perms[user:edit]
+                /user/update/** = authc, perms[user:edit]
                 /user/delete = authc, perms[user:edit]
                 /user/delete/** = authc, perms[user:edit]
-                /user/add = authc, perms[user:edit]
-                
+                             
                 /** = anon
             </value>
         </property>
@@ -101,12 +102,17 @@
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select passwd from dashboard.users where loginname = ?" />
         <property name="userRolesQuery" value="select role_name from dashboard.roles where user_name = ?" />
-        <property name="permissionsQuery" value="select permissions from dashboard.perms where role_id = 
-            (select id from roles where role_name = ?)" />
+        <property name="permissionsQuery" value="select permissions from dashboard.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
         <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager"/>
+    </bean>
+    
+    <!-- Secure Spring remoting:  Ensure any Spring Remoting method invocations
+         can be associated with a Subject for security checks. -->
+    <bean id="secureRemoteInvocationExecutor" class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
+         <property name="securityManager" ref="securityManager"/>
     </bean>
     
     <!-- 

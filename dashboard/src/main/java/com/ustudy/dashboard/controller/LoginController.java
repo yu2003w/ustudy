@@ -105,9 +105,15 @@ public class LoginController {
 		} catch (Exception e) {
 			logger.warn("Failed to get subject --> " + e.getMessage());
 		}
-		
-		logger.debug(cUser.getPrincipal().toString());
-		return cUser.getPrincipal().toString();
+		if (cUser.getPrincipal() == null) {
+			logger.warn("User didn't log in");
+			resp.setStatus(404);
+			return "No User logged in";
+		}
+		else {
+			logger.debug(cUser.getPrincipal().toString());
+			return cUser.getPrincipal().toString();
+		}
 		
 	}
 	

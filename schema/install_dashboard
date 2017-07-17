@@ -6,7 +6,7 @@ id INT NOT NULL AUTO_INCREMENT,
 loginname varchar(32) NOT NULL,
 fullname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
-ugroup ENUM ('管理员', '运维', '市场', '代理商', '临时') NOT NULL,
+ugroup ENUM ('运维', '市场', '代理商', '临时') NOT NULL,
 ctime datetime DEFAULT NULL,
 ll_time datetime DEFAULT NULL,
 status ENUM ('在线', '离线'),
@@ -31,12 +31,9 @@ FOREIGN KEY (user_name)
 create table if not exists dashboard.perms (
 id INT NOT NULL AUTO_INCREMENT,
 permissions varchar(64) NOT NULL,
-role_id INT NOT NULL,
-INDEX (role_id),
-PRIMARY KEY (id),
-FOREIGN KEY (role_id)
-    REFERENCES dashboard.roles(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+role_name varchar(32) NOT NULL,
+INDEX (role_name),
+PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
 create table if not exists dashboard.school (
