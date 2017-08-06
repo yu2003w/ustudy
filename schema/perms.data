@@ -3,9 +3,15 @@ null,school:view,admin
 null,school:edit,admin
 null,user:view,admin
 null,user:edit,admin
+null,orgowner:view,admin
+null,orgowner:edit,admin
 null,school:view,market
 null,school:edit,market
 null,user:view,market
+null,orgowner:view,market
+null,orgowner:edit,market
 null,school:view,reseller
 null,school:edit,reseller
+null,orgowner:view,reseller
+null,orgowner:edit,reseller
 null,user:view,addi_li
