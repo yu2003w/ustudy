@@ -33,4 +33,9 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE dashboard.perm
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/orgowner.data' INTO TABLE dashboard.orgowner
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 

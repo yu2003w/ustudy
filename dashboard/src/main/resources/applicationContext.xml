@@ -52,6 +52,14 @@
                 /user/update/** = authc, perms[user:edit]
                 /user/delete = authc, perms[user:edit]
                 /user/delete/** = authc, perms[user:edit]
+                
+                <!-- OrgOwner filter chain -->
+                /owner/list/** = authc, perms[orgowner:view]
+                /owner/view/** = authc, perms[orgowner:view]
+                /owner/add = authc, perms[orgowner:edit]
+                /owner/update/** = authc, perms[orgowner:edit]
+                /owner/delete = authc, perms[orgowner:edit]
+                /owner/delete/** = authc, perms[orgowner:edit]
                              
                 /** = anon
             </value>
