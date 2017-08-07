@@ -40,7 +40,7 @@ public class AccountServiceImp implements AccountService {
 	@Override
 	public List<Account> getList(int id) {
 		List<Account> accL = null;
-		String sqlAcc = "select * from dashboard.users where id > ? limit 10000";
+		String sqlAcc = "select * from ustudy.users where id > ? limit 10000";
 		try {
 			if (id < 0)
 				id = 0;
@@ -61,14 +61,14 @@ public class AccountServiceImp implements AccountService {
 	}
 
 	public Account findUserByLoginName(String login) {
-		String sqlDis = "SELECT * from dashboard.users where loginname = ?";
+		String sqlDis = "SELECT * from ustudy.users where loginname = ?";
 		Account item = jdbcT.queryForObject(sqlDis, new AccountRowMapper(), login);
 		return item;
 	}
 
 	@Override
 	public Account findUserById(int id) {
-		String sqlDis = "select * from dashboard.users where id = ?";
+		String sqlDis = "select * from ustudy.users where id = ?";
 		Account item = jdbcT.queryForObject(sqlDis, new AccountRowMapper(), id);
 
 		// TODO: whether need to get permissions information.
@@ -78,7 +78,7 @@ public class AccountServiceImp implements AccountService {
 	@Override
 	@Transactional
 	public int delItem(int id) {
-		String sqlDel = "delete from dashboard.users where id = ?";
+		String sqlDel = "delete from ustudy.users where id = ?";
 		return jdbcT.update(sqlDel, id);
 	}
 
@@ -90,7 +90,7 @@ public class AccountServiceImp implements AccountService {
 		if (len == 0)
 			return 0;
 
-		String sqlDel = "delete from dashboard.users where ";
+		String sqlDel = "delete from ustudy.users where ";
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				sqlDel += "id = '" + idsList.get(0) + "'";
@@ -105,10 +105,10 @@ public class AccountServiceImp implements AccountService {
 	@Transactional
 	public int createItem(Account item) {
 
-		// Noted: Schema for table dashboard.user is as below,
+		// Noted: Schema for table ustudy.user is as below,
 		// id, loginname, fullname, passwd, ugroup, ctime, ll_time,
 		// status, province, city, district
-		String genAcc = "insert into dashboard.users values(?,?,?,?,?,?,?,?,?,?,?);";
+		String genAcc = "insert into ustudy.users values(?,?,?,?,?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.users firstly, also auto generated keys
 		// is required.
@@ -160,7 +160,7 @@ public class AccountServiceImp implements AccountService {
 		// TODO: for regular roles, equivalent permissions are already populated
 		// into database,
 		// only need to populate related roles
-		String roleSql = "insert into dashboard.roles values (?,?,?);";
+		String roleSql = "insert into ustudy.roles values (?,?,?);";
 		num = jdbcT.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
@@ -186,7 +186,7 @@ public class AccountServiceImp implements AccountService {
 
 		// for additional permissions, need to add a new role named
 		// "addi_role_username" for the user.
-		// Then populate related permissions into dashboard.perms.
+		// Then populate related permissions into ustudy.perms.
 		// This is to fit for shiro JDBC realm implementations.
 
 		return id;
@@ -210,7 +210,7 @@ public class AccountServiceImp implements AccountService {
 	@Override
 	@Transactional
 	public int updateItem(Account item, int id) {
-		String updateAcc = "update dashboard.users set ";
+		String updateAcc = "update ustudy.users set ";
 		Account ori = findUserById(id);
 		Set<Map.Entry<String, String>> fields = null;
 		Map<String, String> accDiff = item.compare(ori);
@@ -239,7 +239,7 @@ public class AccountServiceImp implements AccountService {
 		// if role_name changed, need to populate here
 		String roleN = accDiff.get("ugroup");
 		if (roleN != null) {
-			String updateRole = "update dashboard.roles set role_name = ? where user_name = ?";
+			String updateRole = "update ustudy.roles set role_name = ? where user_name = ?";
 			num = jdbcT.update(updateRole, this.getRealRole(roleN), item.getLoginname());
 			if (num != 1) {
 				logger.warn("updateItem(), returned value for roles update is " + num);

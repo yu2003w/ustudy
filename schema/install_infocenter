@@ -1,6 +1,6 @@
 set names "utf8";
-create database if not exists infocenter character set utf8;
-create table if not exists infocenter.student (
+create database if not exists ustudy character set utf8;
+create table if not exists ustudy.student (
 id INT NOT NULL AUTO_INCREMENT,
 name VARCHAR(100) NOT NULL,
 stuno CHAR(20) NOT NULL,

@@ -1,39 +1,39 @@
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE infocenter.student
+LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE ustudy.student
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE dashboard.school
+LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE ustudy.school
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/grade.data' INTO TABLE dashboard.grade
+LOAD DATA LOCAL INFILE '/root/mysql/schema/grade.data' INTO TABLE ustudy.grade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/course.data' INTO TABLE dashboard.course
+LOAD DATA LOCAL INFILE '/root/mysql/schema/course.data' INTO TABLE ustudy.course
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE dashboard.users
+LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE ustudy.users
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/roles.data' INTO TABLE dashboard.roles
+LOAD DATA LOCAL INFILE '/root/mysql/schema/roles.data' INTO TABLE ustudy.roles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE dashboard.perms
+LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE ustudy.perms
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/orgowner.data' INTO TABLE dashboard.orgowner
+LOAD DATA LOCAL INFILE '/root/mysql/schema/orgowner.data' INTO TABLE ustudy.orgowner
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
