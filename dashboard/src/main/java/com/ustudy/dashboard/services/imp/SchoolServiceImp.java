@@ -45,7 +45,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public List<School> getList(int id) {
 		List<School> schs = null;
-		String sqlSch = "select * from dashboard.school where id > ? limit 10000";
+		String sqlSch = "select * from ustudy.school where id > ? limit 10000";
 		try {
 			if (id < 0)
 				id = 0;
@@ -76,9 +76,9 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public int createItem(School data) {
 			
-		// Noted: Schema for table dashboard.school is as below,
+		// Noted: Schema for table ustudy.school is as below,
 		// id, school_id, school_name, school_type, province, city, district
-		String sqlSch = "insert into dashboard.school values(?,?,?,?,?,?,?);";
+		String sqlSch = "insert into ustudy.school values(?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -121,7 +121,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	@Override
 	public int updateItem(School data, int id) {
-		String updateSch = "update dashboard.school set ";
+		String updateSch = "update ustudy.school set ";
 		School origin = displayItem(id);
 		Map<String, String> schDiff = data.compare(origin);
 		if (schDiff.size() == 0) {
@@ -146,7 +146,7 @@ public class SchoolServiceImp implements SchoolService {
 		
 		// for grades related information, need to replace previous information
 		// delete origin grades information firstly, then insert new values
-		String sqlDelGr = "delete from dashboard.grade where school_id = ?";
+		String sqlDelGr = "delete from ustudy.grade where school_id = ?";
 		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
 		logger.info(numOfGr + " grade items deleted for update.");
 		
@@ -160,7 +160,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public int deleteItem(int id) {
 		
-		String sqlDel = "delete from dashboard.school where id = ?";
+		String sqlDel = "delete from ustudy.school where id = ?";
 		return jdbcT.update(sqlDel, id);
 	}
 	
@@ -173,7 +173,7 @@ public class SchoolServiceImp implements SchoolService {
 		if (len == 0)
 			return 0;
 		
-		String sqlDel = "delete from dashboard.school where ";
+		String sqlDel = "delete from ustudy.school where ";
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				sqlDel += "id = '" + idsList.get(0) + "'";
@@ -187,7 +187,7 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Override
 	public School displayItem(int id) {
-		String sqlDis = "select * from dashboard.school where id = ?";
+		String sqlDis = "select * from ustudy.school where id = ?";
 		
 		School item = jdbcT.queryForObject(sqlDis, new SchoolRowMapper(), id);
 		// need to query and assemble grade/course information
@@ -199,12 +199,12 @@ public class SchoolServiceImp implements SchoolService {
 	
 	private void assembleGrades(School sch) {
 		List<Grade> gNames = null;
-		String sqlGra = "select id, grade_name, classes_num from dashboard.grade where school_id = ?;";
+		String sqlGra = "select id, grade_name, classes_num from ustudy.grade where school_id = ?;";
 		gNames = jdbcT.query(sqlGra, new GradeRowMapper(), sch.getSchoolId());
 		
 		for (Grade gn : gNames) {
 			List<Subject> cs = null;
-			String sqlCs = "select course_name from dashboard.course where grade_id = ?;";
+			String sqlCs = "select course_name from ustudy.course where grade_id = ?;";
 			cs = jdbcT.query(sqlCs, new SubjectRowMapper(), gn.getId());
 			gn.setSubjects(cs);
 			// logger.debug(gn.toString());
@@ -219,11 +219,11 @@ public class SchoolServiceImp implements SchoolService {
 		String msg = null;
 		// grade schema is as below,
 		// id, grade_name, classes_num, school_id
-		String sqlGr = "insert into dashboard.grade values(?,?,?,?)";
-		String sqlCla = "insert into dashboard.course values(?,?,?);";
+		String sqlGr = "insert into ustudy.grade values(?,?,?,?)";
+		String sqlCla = "insert into ustudy.course values(?,?,?);";
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
-			// insert grade related information into dashboard.grade firstly
+			// insert grade related information into ustudy.grade firstly
 			// need to retrieve auto generated key
 			int id = -1;
 			KeyHolder keyH = new GeneratedKeyHolder();

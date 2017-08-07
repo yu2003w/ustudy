@@ -31,19 +31,8 @@ public class OrgOwner implements Serializable {
 	@JsonProperty("orgId")
 	private String orgId = null;
 	
-	private String province = null;
-	
-	private String city = null;
-	
-	private String district = null;
-	
 	@JsonProperty("creationTime")
 	private String createTime = null;
-	
-	private String lastLoginTime = null;
-
-	@JsonProperty("status")
-	private String status = null;
 	
 	public OrgOwner() {
 		super();
@@ -51,7 +40,7 @@ public class OrgOwner implements Serializable {
 	}
 	
 	public OrgOwner(String id, String name, String loginname, String passwd, String orgType, String orgId,
-			String province, String city, String district, String createTime, String lastLoginTime, String status) {
+			String createTime) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -59,29 +48,18 @@ public class OrgOwner implements Serializable {
 		this.passwd = passwd;
 		this.orgType = orgType;
 		this.orgId = orgId;
-		this.province = province;
-		this.city = city;
-		this.district = district;
 		this.createTime = createTime;
-		this.lastLoginTime = lastLoginTime;
-		this.status = status;
 	}
 
 	// construct without the field of password
-	public OrgOwner(String id, String name, String loginname, String orgType, String orgId, String province,
-			String city, String district, String createTime, String lastLoginTime, String status) {
+	public OrgOwner(String id, String name, String loginname, String orgType, String orgId, String createTime) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.loginname = loginname;
 		this.orgType = orgType;
 		this.orgId = orgId;
-		this.province = province;
-		this.city = city;
-		this.district = district;
 		this.createTime = createTime;
-		this.lastLoginTime = lastLoginTime;
-		this.status = status;
 	}
 
 	public String getId() {
@@ -132,38 +110,6 @@ public class OrgOwner implements Serializable {
 		this.orgId = orgId;
 	}
 
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public String getProvince() {
-		return province;
-	}
-
-	public void setProvince(String province) {
-		this.province = province;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getDistrict() {
-		return district;
-	}
-
-	public void setDistrict(String district) {
-		this.district = district;
-	}
-
 	public String getCreateTime() {
 		return createTime;
 	}
@@ -171,23 +117,13 @@ public class OrgOwner implements Serializable {
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
-
-	public String getLastLoginTime() {
-		return lastLoginTime;
-	}
-
-	public void setLastLoginTime(String lastLoginTime) {
-		this.lastLoginTime = lastLoginTime;
-	}
-
+	
 	@Override
 	public String toString() {
-		return "OrgOwner [id=" + id + ", loginname=" + loginname + ", name=" + name + ", passwd=" + passwd
-				+ ", orgType=" + orgType + ", orgId=" + orgId + ", status=" + status + ", province=" + province
-				+ ", city=" + city + ", district=" + district + ", createTime=" + createTime + ", lastLoginTime="
-				+ lastLoginTime + "]";
+		return "OrgOwner [id=" + id + ", name=" + name + ", loginname=" + loginname + ", passwd=" + passwd
+				+ ", orgType=" + orgType + ", orgId=" + orgId + ", createTime=" + createTime + "]";
 	}
-	
+
 	public Map<String, String> compare(OrgOwner item) {
 		if (item == this)
 			return null;
@@ -202,12 +138,6 @@ public class OrgOwner implements Serializable {
 			ret.put("orgtype", this.getOrgType());
 		if (this.getOrgId().compareTo(item.getOrgId()) != 0)
 			ret.put("orgid", this.getOrgId());
-		if (this.getProvince().compareTo(item.getProvince()) != 0)
-			ret.put("province", this.getProvince());
-		if (this.getCity().compareTo(item.getCity()) != 0)
-			ret.put("city", this.getCity());
-		if (this.getDistrict().compareTo(item.getDistrict()) != 0)
-			ret.put("district", this.getDistrict());
 		return ret;
 	}
 	

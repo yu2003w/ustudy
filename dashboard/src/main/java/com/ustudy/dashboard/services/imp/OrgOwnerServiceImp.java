@@ -37,7 +37,7 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Override
 	public List<OrgOwner> getList(int id) {
 		List<OrgOwner> ooL = null;
-		String sqlOrg = "select * from dashboard.orgowner where id > ? limit 10000";
+		String sqlOrg = "select * from ustudy.orgowner where id > ? limit 10000";
 		try {
 			if (id < 0)
 				id = 0;
@@ -60,10 +60,9 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Override
 	@Transactional
 	public int createItem(OrgOwner item) {
-		// Noted: Schema for table dashboard.orgowner is as below,
-		// id, name, loginname, passwd, orgtype, orgid, province, city, district
-		// ctime, ll_time, status
-		String sqlOwner = "insert into dashboard.orgowner values(?,?,?,?,?,?,?,?,?,?,?,?);";
+		// Noted: Schema for table ustudy.orgowner is as below,
+		// id, name, loginname, passwd, orgtype, orgid, ctime
+		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -83,14 +82,9 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 				psmt.setString(5, item.getOrgType());
 				psmt.setString(6, item.getOrgId());
 				
-				psmt.setString(7, item.getProvince());
-				psmt.setString(8, item.getCity());
-				psmt.setString(9, item.getDistrict());
-				
 				// account creation time should be set to current time
-				psmt.setString(10, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-				psmt.setNull(11, java.sql.Types.VARCHAR);
-				psmt.setString(12, item.getStatus());
+				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+				
 				return psmt;
 			}
 		}, keyH);
@@ -113,7 +107,7 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Transactional
 	@Override
 	public int updateItem(OrgOwner item, int id) {
-		String updateOrg = "update dashboard.orgowner set ";
+		String updateOrg = "update ustudy.orgowner set ";
 		OrgOwner origin = displayItem(id);
 		Map<String, String> orgDiff = item.compare(origin);
 		if (orgDiff.size() == 0) {
@@ -146,7 +140,7 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 		if (len == 0)
 			return 0;
 		
-		String sqlDel = "delete from dashboard.orgowner where ";
+		String sqlDel = "delete from ustudy.orgowner where ";
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				sqlDel += "id = '" + idsList.get(0) + "'";
@@ -160,14 +154,14 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 
 	@Override
 	public int deleteItem(int id) {
-		String sqlDel = "delete from dashboard.orgowner where id = ?";
+		String sqlDel = "delete from ustudy.orgowner where id = ?";
 		return jdbcT.update(sqlDel, id);
 	}
 	
 	@Override
 	public OrgOwner displayItem(int id) {
 		
-		String sqlDis = "select * from dashboard.orgowner where id = ?";
+		String sqlDis = "select * from ustudy.orgowner where id = ?";
 		OrgOwner item = jdbcT.queryForObject(sqlDis, new OrgOwnerRowMapper(), id);
 				
 		return item;

@@ -1,7 +1,7 @@
 set names utf8;
-create database if not exists dashboard character set utf8;
+create database if not exists ustudy character set utf8;
 
-create table if not exists dashboard.users (
+create table if not exists ustudy.users (
 id INT NOT NULL AUTO_INCREMENT,
 loginname varchar(32) NOT NULL,
 fullname varchar(32) NOT NULL,
@@ -17,18 +17,18 @@ UNIQUE KEY (loginname),
 PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.roles (
+create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
 role_name varchar(32) NOT NULL,
 user_name varchar(32) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
 FOREIGN KEY (user_name)
-    REFERENCES dashboard.users(loginname)
+    REFERENCES ustudy.users(loginname)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.perms (
+create table if not exists ustudy.perms (
 id INT NOT NULL AUTO_INCREMENT,
 permissions varchar(64) NOT NULL,
 role_name varchar(32) NOT NULL,
@@ -36,24 +36,19 @@ INDEX (role_name),
 PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.orgowner (
+create table if not exists ustudy.orgowner (
 id INT NOT NULL AUTO_INCREMENT,
 name varchar(32) NOT NULL,
 loginname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
-orgtype ENUM ('school','office') NOT NULL,
+orgtype ENUM ('学校','教研室') NOT NULL,
 orgid varchar(32) NOT NULL,
-province varchar(32) NOT NULL,
-city varchar(32) NOT NULL,
-district varchar(32) NOT NULL,
 ctime datetime DEFAULT NULL,
-ll_time datetime DEFAULT NULL,
-status ENUM ('离线', '在线') NOT NULL ,
 PRIMARY KEY(id),
 INDEX(name,loginname)
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.school (
+create table if not exists ustudy.school (
 id INT NOT NULL AUTO_INCREMENT,
 school_id  VARCHAR(32) NOT NULL,
 school_name VARCHAR(128) NOT NULL,
@@ -66,7 +61,7 @@ INDEX(school_name),
 UNIQUE KEY (school_id)
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.grade (
+create table if not exists ustudy.grade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
@@ -74,17 +69,17 @@ school_id VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
 INDEX(school_id, grade_name),
 FOREIGN KEY (school_id)
-    REFERENCES dashboard.school(school_id)
+    REFERENCES ustudy.school(school_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-create table if not exists dashboard.course (
+create table if not exists ustudy.course (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id INT NOT NULL,
 course_name VARCHAR(32) NOT NULL,
 PRIMARY KEY (id),
 INDEX(grade_id),
 FOREIGN KEY (grade_id)
-    REFERENCES dashboard.grade(id)
+    REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
