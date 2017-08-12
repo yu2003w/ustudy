@@ -136,7 +136,7 @@ public class OrgOwnerController {
 		return result;
 	}
 	
-	@RequestMapping(value="/update/", method = RequestMethod.POST)
+	@RequestMapping(value="/update", method = RequestMethod.POST)
 	public String updateItem(@RequestBody @Valid OrgOwner data, HttpServletResponse resp) {
 		logger.debug("endpoint /owner/update/" + data.getId() + " is visited.");
 		String result = null;
