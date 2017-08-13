@@ -5,6 +5,7 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc
            http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
            http://www.springframework.org/schema/beans
@@ -13,29 +14,42 @@
            http://www.springframework.org/schema/context/spring-context-3.1.xsd
            http://www.springframework.org/schema/tx
            http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd">
       
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login.html"/>
-        <property name="successUrl" value="index"/>
-        <property name="unauthorizedUrl" value="unauthorized"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <property name="filters">
+            <util:map>
+                <entry key="authc">
+                    <bean class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter"/>
+                </entry>
+            </util:map>
+        </property>
         <property name="filterChainDefinitions">
             <value>
-                /dashboard/users/list = authc, roles[admin]
-                /dashboard/users/view/* = authc, roles[admin]
-                /dashboard/users/update/* = authc, roles[super]
-                /dashboard/users/delete/* = authc, roles[super]
-                /dashboard/users/** = authc, roles[admin]
+                <!-- teacher filter chain -->
+                /teacher/list/** = authc, perms[teacher:view]
+                /teacher/view/** = authc, perms[teacher:view]
+                /teacher/add = authc, perms[teacher:edit]
+                /owner/update/** = authc, perms[teacher:edit]
+                /owner/delete = authc, perms[teacher:edit]
+                /owner/delete/** = authc, perms[teacher:edit]
+                             
+                /** = anon
             </value>
         </property>
     </bean>
-
+    
     <bean id="infoCenter" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://172.26.58.15:13306/infocenter?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
@@ -62,7 +76,7 @@
     
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
-        <property name="realm" ref="infoRealm"/>
+        <property name="realm" ref="authRealm"/>
         <!-- By default the servlet container sessions will be used.  Uncomment this line
            to use shiro's native sessions (see the JavaDoc for more): -->
         <!-- <property name="sessionMode" value="native"/> -->
@@ -71,18 +85,24 @@
 
     <!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
     <!-- security datasource: -->
-    <bean id="infoRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+    <bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
         <property name="dataSource" ref="infoCenter" />
         <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select usr_passwd from users where loginname = ?" />
-        <property name="userRolesQuery" value="select role_name from roles where user_id = (select id from users where loginname = ? )" />
-        <property name="permissionsQuery" value="select perm_name from permissions where role_id = (select id from roles where role_name = ?)" />
+        <property name="authenticationQuery" value="select passwd from ustudy.teacher where teachid = ?" />
+        <property name="userRolesQuery" value="select role_name from ustudy.teacherroles where user_name = ?" />
+        <property name="permissionsQuery" value="select permissions from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
-    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager"/>
     </bean>
        
+    <!-- Secure Spring remoting:  Ensure any Spring Remoting method invocations
+         can be associated with a Subject for security checks. -->
+    <bean id="secureRemoteInvocationExecutor" class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
+         <property name="securityManager" ref="securityManager"/>
+    </bean>
+    
     <!-- Noted: Two methods for enabling spring transaction managent with jdbc.
          Above is XML based configuration. Declaring with @Transactional in java
          source code is also very flexible. -->

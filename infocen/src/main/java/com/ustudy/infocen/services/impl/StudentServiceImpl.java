@@ -1,4 +1,4 @@
-package com.ustudy.infocen.services;
+package com.ustudy.infocen.services.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.infocen.model.Student;
+import com.ustudy.infocen.services.StudentService;
 import com.ustudy.infocen.util.InfocenUtil;
 import com.ustudy.infocen.util.StudentRowMapper;
 

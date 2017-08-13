@@ -11,5 +11,28 @@ transient boolean default false,
 PRIMARY KEY(id),
 INDEX (name, stuno),
 UNIQUE KEY (stuno)
-);
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.teacher (
+id INT NOT NULL AUTO_INCREMENT,
+teacid VARCHAR(32) NOT NULL,
+teacname VARCHAR(32) NOT NULL,
+passwd VARCHAR(32) NOT NULL,
+ctime datetime DEFAULT NULL,
+ll_time datetime DEFAULT NULL,
+PRIMARY KEY(id),
+INDEX (teacid),
+UNIQUE KEY(teacid)
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.teacherroles (
+id INT NOT NULL AUTO_INCREMENT,
+role_name varchar(32) NOT NULL,
+teac_id varchar(32) NOT NULL,
+INDEX(teac_id),
+PRIMARY KEY (id),
+FOREIGN KEY (teac_id)
+    REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
