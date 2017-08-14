@@ -1,0 +1,129 @@
+* {
+  outline: none !important;
+}
+.container-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  background-color: #fff;
+}
+.container-footer-margin {
+  margin-bottom: 50px;
+}
+.clear-margin-bottom {
+  margin-bottom: 0;
+}
+.margin-bottom-lg {
+  margin-bottom: 20px;
+}
+.padding-vertical {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.padding-horizontal {
+  padding-right: 0;
+  padding-left: 0;
+}
+.clear-padding {
+  padding: 0;
+}
+.clear-padding-vertical {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.clear-padding-horizontal {
+  padding-right: 0;
+  padding-left: 0;
+}
+.clear-padding-bottom {
+  padding-bottom: 0;
+}
+.text-gray,
+.text-gray a {
+  color: #999;
+}
+.text-gray a:hover,
+.text-gray a:focus,
+.text-gray a:active,
+.text-gray a.active {
+  color: #808080;
+}
+.text-gray-light {
+  color: #999;
+}
+.text-gray-light {
+  color: #f2f2f2;
+}
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+}
+.btn-primary-outline {
+  color: #189fd9;
+  background-color: transparent;
+  border-color: #189fd9;
+}
+.btn-primary-outline:hover,
+.btn-primary-outline:focus,
+.btn-primary-outline:active,
+.btn-primary-outline.active {
+  color: #fff;
+}
+.extra[data-toggle="buttons"] > .btn.btn-default.active {
+  color: #fff !important;
+  background-color: #137dab !important;
+  border-color: #0e5c7d !important;
+  text-shadow: none !important;
+}
+@media (min-width: 769px) {
+  .navbar-header {
+    margin-right: 90px;
+  }
+  .navbar-nav > li > a {
+    margin-right: 30px;
+  }
+  .navbar-right-box.navbar-nav > li > a {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+.checkbox-first .table > thead > tr > th:first-child,
+.checkbox-first .table > tbody > tr > td:first-child {
+  width: 43px;
+  text-align: center;
+}
+.search-wrap,
+.search-wrap [class^="col-"] {
+  margin-bottom: 10px;
+}
+.search-wrap .form-inline {
+  margin-left: -10px;
+}
+.search-wrap .form-inline .input-group {
+  margin-left: 10px;
+}
+.form-control-feedback {
+  right: 15px;
+}
+.bootbox .bootbox-body .alert-msg-wrap {
+  margin: 20px 0 20px;
+}
+.bootbox .bootbox-body .alert-msg-wrap i.iconfont,
+.bootbox .bootbox-body .alert-msg-wrap i.glyphicon {
+  display: block;
+  margin-bottom: 30px;
+  font-size: 54px;
+}
