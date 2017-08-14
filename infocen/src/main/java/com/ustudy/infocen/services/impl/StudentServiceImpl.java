@@ -36,7 +36,7 @@ public class StudentServiceImpl implements StudentService{
 	public List<Student> getList(int id) {
 
 		List<Student> stuL = null;
-		String sqlList = "select * from infocenter.student where id > ? limit 10000";
+		String sqlList = "select * from ustudy.student where id > ? limit 10000";
 		try {
 			stuL = jdbcT.query(sqlList, new StudentRowMapper(), id);
 			logger.debug("Fetched " + stuL.size() + " student items");
@@ -51,9 +51,9 @@ public class StudentServiceImpl implements StudentService{
 	@Transactional
 	public int createItem(Student data) {
 		
-		// Noted: schema for table infocenter.student is as below,
+		// Noted: schema for table ustudy.student is as below,
 		// id, name, grade, class, stuno, category, transient
-		String sqlCr = "insert into infocenter.student values (?,?,?,?,?,?,?)";
+		String sqlCr = "insert into ustudy.student values (?,?,?,?,?,?,?)";
 		
 		// keyholder is required for generating auto id
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -92,7 +92,7 @@ public class StudentServiceImpl implements StudentService{
 	@Override
 	@Transactional
 	public int deleteItem(int id) {
-		String sqlDel = "delete from infocenter.student where id = ?";
+		String sqlDel = "delete from ustudy.student where id = ?";
 		return jdbcT.update(sqlDel, id);
 	}
 	
@@ -107,7 +107,7 @@ public class StudentServiceImpl implements StudentService{
 		if (len == 0)
 			return 0;
 		
-		String sqlDel = "delete from infocenter.student where ";
+		String sqlDel = "delete from ustudy.student where ";
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				sqlDel += "id = '" + idL.get(0) + "'";
@@ -122,7 +122,7 @@ public class StudentServiceImpl implements StudentService{
 	
 	@Override
 	public Student displayItem(int id) {
-		String sqlDis = "select * from infocenter.student where id = ?";
+		String sqlDis = "select * from ustudy.student where id = ?";
 		Student item = jdbcT.queryForObject(sqlDis, new StudentRowMapper(), id);
 		return item;
 	}
@@ -130,7 +130,7 @@ public class StudentServiceImpl implements StudentService{
 	@Override
 	@Transactional
 	public int updateItem(Student data) {
-		String sqlUp = "update infocenter.student set name = ?, grade = ?,"
+		String sqlUp = "update ustudy.student set name = ?, grade = ?,"
 				+ " class = ?, stuno = ?, category = ?, transient = ? where id = ?";
 		int num = jdbcT.update(sqlUp, new PreparedStatementSetter() {
 			@Override

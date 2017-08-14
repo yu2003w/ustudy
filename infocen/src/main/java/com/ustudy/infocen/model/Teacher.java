@@ -2,6 +2,7 @@ package com.ustudy.infocen.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,6 +31,12 @@ public class Teacher implements Serializable {
 	@JsonProperty("lastLoginTime")
 	private String llTime = null;
 
+	private List<UElem> roles = null;
+	private List<UElem> subjects = null;
+	private List<UElem> grades = null;
+	private List<UElem> classes = null;
+	private List<UElem> addiPerms = null;
+	
 	public Teacher() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -93,13 +100,54 @@ public class Teacher implements Serializable {
 	public void setLlTime(String llTime) {
 		this.llTime = llTime;
 	}
+	
+	public List<UElem> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<UElem> roles) {
+		this.roles = roles;
+	}
+
+	public List<UElem> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(List<UElem> subjects) {
+		this.subjects = subjects;
+	}
+
+	public List<UElem> getGrades() {
+		return grades;
+	}
+
+	public void setGrades(List<UElem> grades) {
+		this.grades = grades;
+	}
+
+	public List<UElem> getClasses() {
+		return classes;
+	}
+
+	public void setClasses(List<UElem> classes) {
+		this.classes = classes;
+	}
+
+	public List<UElem> getAddiPerms() {
+		return addiPerms;
+	}
+
+	public void setAddiPerms(List<UElem> addiPerms) {
+		this.addiPerms = addiPerms;
+	}
 
 	@Override
 	public String toString() {
-		return "teacher [id=" + id + ", teacId=" + teacId + ", teacName=" + teacName + ", passwd=" + passwd
-				+ ", cTime=" + cTime + ", llTime=" + llTime + "]";
+		return "Teacher [id=" + id + ", teacId=" + teacId + ", teacName=" + teacName + ", passwd=" + passwd + ", cTime="
+				+ cTime + ", llTime=" + llTime + ", roles=" + roles + ", subjects=" + subjects + ", grades=" + grades
+				+ ", classes=" + classes + ", addiPerms=" + addiPerms + "]";
 	}
-	
+
 	public Map<String, String> compare(Teacher item) {
 		if (item == this)
 			return null;
