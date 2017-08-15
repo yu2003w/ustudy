@@ -1,4 +1,4 @@
-package com.ustudy.infocen.model;
+package com.ustudy.infocenter.model;
 
 import java.io.Serializable;
 import java.util.HashMap;

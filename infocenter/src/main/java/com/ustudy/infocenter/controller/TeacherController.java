@@ -1,4 +1,4 @@
-package com.ustudy.infocen.controller;
+package com.ustudy.infocenter.controller;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.ustudy.infocen.model.Teacher;
-import com.ustudy.infocen.services.TeacherService;
+import com.ustudy.infocenter.model.Teacher;
+import com.ustudy.infocenter.services.TeacherService;
 
 @RestController
 @RequestMapping(value = "teacher/")

@@ -36,3 +36,36 @@ FOREIGN KEY (teac_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+create table if not exists ustudy.teachersub (
+id INT NOT NULL AUTO_INCREMENT,
+subject varchar(32) NOT NULL,
+teac_id varchar(32) NOT NULL,
+INDEX(teac_id),
+PRIMARY KEY (id),
+FOREIGN KEY (teac_id)
+    REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.teachergrade (
+id INT NOT NULL AUTO_INCREMENT,
+grade varchar(32) NOT NULL,
+teac_id varchar(32) NOT NULL,
+INDEX(teac_id),
+PRIMARY KEY (id),
+FOREIGN KEY (teac_id)
+    REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.teacherclass (
+id INT NOT NULL AUTO_INCREMENT,
+class varchar(32) NOT NULL,
+teac_id varchar(32) NOT NULL,
+INDEX(teac_id),
+PRIMARY KEY (id),
+FOREIGN KEY (teac_id)
+    REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+

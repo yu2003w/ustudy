@@ -1,4 +1,4 @@
-package com.ustudy.infocen.services.impl;
+package com.ustudy.infocenter.services.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,10 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
-import com.ustudy.infocen.model.Student;
-import com.ustudy.infocen.services.StudentService;
-import com.ustudy.infocen.util.InfocenUtil;
-import com.ustudy.infocen.util.StudentRowMapper;
+import com.ustudy.infocenter.model.Student;
+import com.ustudy.infocenter.services.StudentService;
+import com.ustudy.infocenter.util.InfocenUtil;
+import com.ustudy.infocenter.util.StudentRowMapper;
 
 @Service
 public class StudentServiceImpl implements StudentService{

@@ -1,4 +1,4 @@
-package com.ustudy.infocen;
+package com.ustudy.infocenter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

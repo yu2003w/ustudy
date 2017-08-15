@@ -1,4 +1,4 @@
-package com.ustudy.infocen.util;
+package com.ustudy.infocenter.util;
 
 import java.io.StringReader;
 import java.util.ArrayList;

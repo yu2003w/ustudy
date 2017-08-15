@@ -1,11 +1,11 @@
-package com.ustudy.infocen.util;
+package com.ustudy.infocenter.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import com.ustudy.infocen.model.Student;
+import com.ustudy.infocenter.model.Student;
 
 public class StudentRowMapper implements RowMapper<Student> {
 

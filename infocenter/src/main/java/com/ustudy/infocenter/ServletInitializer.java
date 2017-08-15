@@ -1,4 +1,4 @@
-package com.ustudy.infocen;
+package com.ustudy.infocenter;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;

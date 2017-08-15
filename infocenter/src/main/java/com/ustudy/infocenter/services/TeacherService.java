@@ -1,8 +1,8 @@
-package com.ustudy.infocen.services;
+package com.ustudy.infocenter.services;
 
 import java.util.List;
 
-import com.ustudy.infocen.model.Teacher;
+import com.ustudy.infocenter.model.Teacher;
 
 public interface TeacherService {
 	

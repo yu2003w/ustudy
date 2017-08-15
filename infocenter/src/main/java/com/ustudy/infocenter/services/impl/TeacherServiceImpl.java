@@ -1,4 +1,4 @@
-package com.ustudy.infocen.services.impl;
+package com.ustudy.infocenter.services.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,10 +21,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
-import com.ustudy.infocen.model.Teacher;
-import com.ustudy.infocen.services.TeacherService;
-import com.ustudy.infocen.util.InfocenUtil;
-import com.ustudy.infocen.util.TeacherRowMapper;
+import com.ustudy.infocenter.model.Teacher;
+import com.ustudy.infocenter.model.UElem;
+import com.ustudy.infocenter.services.TeacherService;
+import com.ustudy.infocenter.util.InfocenUtil;
+import com.ustudy.infocenter.util.TeacherRowMapper;
+
+/**
+ * @author jared
+ *
+ * Service module for teacher related db operations
+ */
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -105,7 +112,14 @@ public class TeacherServiceImpl implements TeacherService {
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
-
+		
+		// save roles
+		num = saveRoles(item.getRoles(), item.getTeacId());
+		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
+		
+		// save additional permissions, 
+		num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
 		return id;
 	}
 
@@ -162,4 +176,75 @@ public class TeacherServiceImpl implements TeacherService {
 		return jTea.update(sqlDel, id);
 	}
 
+	private int saveRoles(List<UElem> roles, String teachid) {
+		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
+		String msg = null;
+		
+		for (UElem u:roles) {
+			int num = jTea.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, u.getValue());
+					psmt.setString(3, teachid);
+					return psmt;
+				}
+			});
+			if (num != 1) {
+				msg = "saveRoles(), return value from role insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + teachid);
+		}
+		
+		// Noted: a little tricky here, to populate additional permissions for the teacher,
+		// need to populate role as "addi_teachid" for the teacher
+		int num = jTea.update(new PreparedStatementCreator(){
+			@Override
+			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
+				psmt.setNull(1, java.sql.Types.NULL);
+				psmt.setString(2, "addi_" + teachid);
+				psmt.setString(3, teachid);
+				return psmt;
+			}
+		});
+		if (num != 1) {
+			msg = "saveRoles(), return value from additional role insert is " + num;
+			logger.warn(msg);
+			throw new RuntimeException(msg);
+		}
+		
+		logger.debug("saveRoles(), populated additional roles for " + teachid);
+		return (roles.size() + 1);
+	}
+	
+	private int saveAddiPerms(List<UElem> perms, String teachid) {
+		String sqlPerms = "insert into ustudy.perms values(?,?,?)";
+		String msg = null;
+		for (UElem u: perms) {
+			int num = jTea.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlPerms, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, u.getValue());
+					psmt.setString(3, "addi_" + teachid);
+					return psmt;
+				}
+			});
+			if (num != 1) {
+				msg = "saveAddiPerms(), return value from additional permissions insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("saveAddiPerms(), Additional permissions saved -> " + u.getValue() + ": addi_" + teachid);
+		}
+		return perms.size();
+	}
+	
 }

@@ -1,4 +1,4 @@
-package com.ustudy.infocen.model;
+package com.ustudy.infocenter.model;
 
 import java.io.Serializable;
 
@@ -21,6 +21,14 @@ public class UElem implements Serializable {
 
 	public UElem(String value) {
 		super();
+		this.value = value;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
 		this.value = value;
 	}
 

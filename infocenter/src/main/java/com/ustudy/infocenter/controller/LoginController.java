@@ -1,4 +1,4 @@
-package com.ustudy.infocen.controller;
+package com.ustudy.infocenter.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +16,7 @@ import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 
  *
  */
+@RestController
 public class LoginController {
 
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
@@ -78,7 +80,7 @@ public class LoginController {
 		} else {
 			logger.warn(msg);
 			// login failed here, need to redirect to error pages
-			redirectUrl = "/infocen/error.jsp";
+			redirectUrl = "/info/error.jsp";
 		}
 		
 		try {
