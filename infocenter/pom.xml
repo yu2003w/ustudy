@@ -112,7 +112,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>infocen</finalName>
+		<finalName>info</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

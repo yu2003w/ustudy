@@ -5,12 +5,12 @@
 # log on mysql, set names "utf8"
 
 #endpoints availabe for use
-/infocen/student/list/0/
-/infocen/student/view/{id}
-/infocen/student/delete/{id}
-/infocen/student/delete
-/infocen/student/update
-/infocen/student/add
+/info/student/list/0/
+/info/student/view/{id}
+/info/student/delete/{id}
+/info/student/delete
+/info/student/update
+/info/student/add
 # create new item with curl
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"studentName":"韦小宝", "studentId": "10011", "grade": "高三", "class": "5班", "type":"普通", "isTemp":false}' http://192.168.0.107:8080/infocen/student/add
 # update item with curl

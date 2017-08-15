@@ -33,10 +33,10 @@
         </property>
         <property name="filterChainDefinitions">
             <value>
-                <!-- teacher filter chain -->
+                <!-- teacher filter chain /teacher/add = authc, perms[teacher:edit] -->
                 /teacher/list/** = authc, perms[teacher:view]
                 /teacher/view/** = authc, perms[teacher:view]
-                /teacher/add = authc, perms[teacher:edit]
+                
                 /owner/update/** = authc, perms[teacher:edit]
                 /owner/delete = authc, perms[teacher:edit]
                 /owner/delete/** = authc, perms[teacher:edit]
@@ -49,7 +49,8 @@
     <bean id="infoCenter" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>  -->
+                <property name="url" value="jdbc:mysql://192.168.0.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
