@@ -50,7 +50,7 @@
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
                 <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>  -->
-                <property name="url" value="jdbc:mysql://192.168.0.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <property name="url" value="jdbc:mysql://192.168.1.113:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>

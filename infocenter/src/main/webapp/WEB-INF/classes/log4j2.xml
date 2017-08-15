@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
   <Properties>
-    <Property name="logfilename">logs/infocen.log</Property>
+    <Property name="logfilename">logs/infocenter.log</Property>
   </Properties>
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">

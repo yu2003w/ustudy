@@ -21,4 +21,4 @@ curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X
 curl -v -X DELETE http://192.168.0.107:8080/infocen/student/delete/18
 
 # create new item for teacher
-curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"teacherName":"韦小宝", "teacherId": "138", "password":"hello", "roles":[{"n":"任课老师"},{"n":"班主任"}],"subjects":[{"n":"数学"},{"n":"英语"}], "grades":[{"n":"高二"},{"n":"高三"}],"classes":[{"n":"高二（1）班"},{"n":"高三（1）班"}], "addiPerms":[{"n":"扫描答题卡"},{"n":"制作模板"}]}' http://192.168.0.15:8080/infocen/teacher/add
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"teacherName":"韦小宝", "teacherId": "138", "password":"hello", "roles":[{"n":"任课老师"},{"n":"班主任"}],"subjects":[{"n":"数学"},{"n":"英语"}], "grades":[{"n":"高二"},{"n":"高三"}],"classes":[{"n":"高二（1）班"},{"n":"高三（1）班"}], "addiPerms":[{"n":"扫描答题卡"},{"n":"制作模板"}]}' http://192.168.0.15:8080/info/teacher/add
