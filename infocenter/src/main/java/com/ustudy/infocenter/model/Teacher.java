@@ -37,13 +37,18 @@ public class Teacher implements Serializable {
 	private List<UElem> classes = null;
 	private List<UElem> addiPerms = null;
 	
+	private String orgid = null;
+
+	private String orgtype = null;
+	
 	public Teacher() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Teacher(String id, String teacId, String teacName, String passwd, String cTime,
-			String llTime) {
+	public Teacher(String id, String teacId, String teacName, String passwd, String cTime, String llTime,
+			List<UElem> roles, List<UElem> subjects, List<UElem> grades, List<UElem> classes, List<UElem> addiPerms,
+			String orgid, String orgtype) {
 		super();
 		this.id = id;
 		this.teacId = teacId;
@@ -51,6 +56,27 @@ public class Teacher implements Serializable {
 		this.passwd = passwd;
 		this.cTime = cTime;
 		this.llTime = llTime;
+		this.roles = roles;
+		this.subjects = subjects;
+		this.grades = grades;
+		this.classes = classes;
+		this.addiPerms = addiPerms;
+		this.orgid = orgid;
+		this.orgtype = orgtype;
+	}
+
+
+	public Teacher(String id, String teacId, String teacName, String passwd, String cTime, String llTime, String orgid,
+			String orgtype) {
+		super();
+		this.id = id;
+		this.teacId = teacId;
+		this.teacName = teacName;
+		this.passwd = passwd;
+		this.cTime = cTime;
+		this.llTime = llTime;
+		this.orgid = orgid;
+		this.orgtype = orgtype;
 	}
 
 	public String getId() {
@@ -83,6 +109,22 @@ public class Teacher implements Serializable {
 
 	public void setPasswd(String passwd) {
 		this.passwd = passwd;
+	}
+
+	public String getOrgid() {
+		return orgid;
+	}
+
+	public void setOrgid(String orgid) {
+		this.orgid = orgid;
+	}
+
+	public String getOrgtype() {
+		return orgtype;
+	}
+
+	public void setOrgtype(String orgtype) {
+		this.orgtype = orgtype;
 	}
 
 	public String getcTime() {

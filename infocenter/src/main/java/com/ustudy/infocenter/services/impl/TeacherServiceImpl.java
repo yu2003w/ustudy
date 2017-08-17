@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -44,11 +46,12 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public List<Teacher> getList(int id) {
 		List<Teacher> teaL = null;
-		String sqlOrg = "select * from ustudy.teacher where id > ? limit 10000";
+		
+		String sqlOrg = "select * from ustudy.teacher where id > ? and orgid = ? and orgtype = ? limit 10000";
 		try {
 			if (id < 0)
 				id = 0;
-			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id);
+			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, getOrgId(), getOrgType());
 			logger.debug("Fetched " + teaL.size() + " items of user");
 
 			for (Teacher tea : teaL) {
@@ -71,13 +74,20 @@ public class TeacherServiceImpl implements TeacherService {
 				
 		return item;
 	}
+	
+	@Override
+	public Teacher findTeacherById(String teaid) {
+		String sqlT = "select * from ustudy.teacher where teacid = ?";
+		Teacher item = jTea.queryForObject(sqlT, new TeacherRowMapper(), teaid);
+		return item;
+	}
 
 	@Override
 	@Transactional
 	public int createItem(Teacher item) {
 		// Noted: Schema for table ustudy.teacher is as below,
 		// id, teacid, teacname, passwd, ctime, lltime
-		String sqlOwner = "insert into ustudy.teacher values(?,?,?,?,?,?);";
+		String sqlOwner = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?);";
 
 		// insert record into ustudy.teacher firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -93,9 +103,13 @@ public class TeacherServiceImpl implements TeacherService {
 				psmt.setString(3, item.getTeacName());
 				psmt.setString(4, item.getPasswd());
 				
+				// Noted: need to populate current user's orgtype, orgid
+				psmt.setString(5, getOrgType());
+				psmt.setString(6, getOrgId());
+				
 				// teacher creation time should be set to current time
-				psmt.setString(5, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-				psmt.setNull(6, java.sql.Types.DATE);
+				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+				psmt.setNull(8, java.sql.Types.DATE);
 				
 				return psmt;
 			}
@@ -120,6 +134,19 @@ public class TeacherServiceImpl implements TeacherService {
 		// save additional permissions, 
 		num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
 		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
+		
+		// save subjects
+		num = saveSubjects(item.getSubjects(), item.getTeacId());
+		logger.debug("createItem()," + num + " subjects populated for " + item.getTeacId());
+		
+		// save grades
+		num = saveGrades(item.getGrades(), item.getTeacId());
+		logger.debug("createItem()," + num + " grades populated for " + item.getTeacId());
+				
+		// save classes
+		num = saveClasses(item.getClasses(), item.getTeacId());
+		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
+		
 		return id;
 	}
 
@@ -245,6 +272,91 @@ public class TeacherServiceImpl implements TeacherService {
 			logger.debug("saveAddiPerms(), Additional permissions saved -> " + u.getValue() + ": addi_" + teachid);
 		}
 		return perms.size();
+	}
+	
+	private int saveSubjects(List<UElem> subs, String teachid) {
+		String sqlSub = "insert into ustudy.teachersub values(?,?,?)";
+		String msg = null;
+		for (UElem u: subs) {
+			int num = jTea.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlSub, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, u.getValue());
+					psmt.setString(3, teachid);
+					return psmt;
+				}
+			});
+			if (num != 1) {
+				msg = "saveSubjects(), return value from subject insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teachid);
+		}
+		return subs.size();
+	}
+	
+	private int saveGrades(List<UElem> grades, String teachid) {
+		String sqlG = "insert into ustudy.teachergrade values(?,?,?)";
+		String msg = null;
+		for (UElem u: grades) {
+			int num = jTea.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlG, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, u.getValue());
+					psmt.setString(3, teachid);
+					return psmt;
+				}
+			});
+			if (num != 1) {
+				msg = "saveGrades(), return value from grade insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("saveGrades(), grades saved -> " + u.getValue() + ":" + teachid);
+		}
+		return grades.size();
+	}
+	
+	private int saveClasses(List<UElem> clss, String teachid) {
+		String sqlCls = "insert into ustudy.teacherclass values(?,?,?)";
+		String msg = null;
+		for (UElem u: clss) {
+			int num = jTea.update(new PreparedStatementCreator(){
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement psmt = conn.prepareStatement(sqlCls, Statement.RETURN_GENERATED_KEYS);
+					psmt.setNull(1, java.sql.Types.NULL);
+					psmt.setString(2, u.getValue());
+					psmt.setString(3, teachid);
+					return psmt;
+				}
+			});
+			if (num != 1) {
+				msg = "saveClasses(), return value from class insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("saveClasses(), classes saved -> " + u.getValue() + ":" + teachid);
+		}
+		return clss.size();
+	}
+	
+	private String getOrgId() {
+		Session ses = SecurityUtils.getSubject().getSession();
+		return ses.getAttribute("orgid").toString();
+	}
+	
+	private String getOrgType() {
+		Session ses = SecurityUtils.getSubject().getSession();
+		return ses.getAttribute("orgtype").toString();
 	}
 	
 }

@@ -11,12 +11,17 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ustudy.infocenter.model.Teacher;
+import com.ustudy.infocenter.services.TeacherService;
 
 
 /**
@@ -29,6 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
+	
+	// for each login user, need to retrieve some meta information such as orgtype, orgid,
+	// orgname and so on.
+	@Autowired
+	private TeacherService teaS;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public void login(HttpServletRequest request, HttpServletResponse response) {
@@ -77,6 +87,13 @@ public class LoginController {
 			//WebUtils.redirectToSavedRequest(request, response, null);
 			//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
 			redirectUrl = sr.getRequestUrl();
+			
+			// need to populate current user's orgtype, orgid information
+			Session ses = currentUser.getSession();
+			Teacher tea = teaS.findTeacherById(currentUser.getPrincipal().toString());
+			ses.setAttribute("orgtype", tea.getOrgtype());
+			ses.setAttribute("orgid", tea.getOrgid());
+			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid()); 
 		} else {
 			logger.warn(msg);
 			// login failed here, need to redirect to error pages

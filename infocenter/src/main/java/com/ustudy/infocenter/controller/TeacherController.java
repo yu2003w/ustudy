@@ -19,6 +19,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.ustudy.infocenter.model.Teacher;
 import com.ustudy.infocenter.services.TeacherService;
 
+/**
+ * @author jared
+ *
+ */
 @RestController
 @RequestMapping(value = "teacher/")
 public class TeacherController {
@@ -157,4 +161,5 @@ public class TeacherController {
 		}
 		return result;
 	}
+	
 }
