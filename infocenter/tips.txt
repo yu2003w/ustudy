@@ -1,0 +1,24 @@
+# some tips for configuration and deployment
+# when deploy on cloud platform, jdbc driver url should use internal IP address.
+
+# To display chinese character via mysql command line, need to run following command after
+# log on mysql, set names "utf8"
+
+#endpoints availabe for use
+/info/student/list/0/
+/info/student/view/{id}
+/info/student/delete/{id}
+/info/student/delete
+/info/student/update
+/info/student/add
+# create new item with curl
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"studentName":"韦小宝", "studentId": "10011", "grade": "高三", "class": "5班", "type":"普通", "isTemp":false}' http://192.168.0.107:8080/infocen/student/add
+# update item with curl
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"id":19, "studentName":"任我行", "studentId": "100030", "grade": "高三", "class": "5班", "type":"普通", "isTemp":false}' http://192.168.0.107:8080/infocent/student/update/
+# delete items
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '[{"id": "124"},{"id": "19"}]' http://192.168.0.107:8080/infocen/student/delete
+
+curl -v -X DELETE http://192.168.0.107:8080/infocen/student/delete/18
+
+# create new item for teacher
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"teacherName":"韦小宝", "teacherId": "138", "password":"hello", "roles":[{"n":"任课老师"},{"n":"班主任"}],"subjects":[{"n":"数学"},{"n":"英语"}], "grades":[{"n":"高二"},{"n":"高三"}],"classes":[{"n":"高二（1）班"},{"n":"高三（1）班"}], "addiPerms":[{"n":"扫描答题卡"},{"n":"制作模板"}]}' http://192.168.0.15:8080/info/teacher/add

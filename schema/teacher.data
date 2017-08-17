@@ -1,0 +1,3 @@
+id,teacid,teacname,passwd,orgtype,orgid,ctime,lltime
+null,139345,王校长,hello,学校,001,null,null
+null,139346,李校长,hello,学校,002,null,null
