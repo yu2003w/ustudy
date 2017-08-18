@@ -140,9 +140,9 @@ public class TeacherController {
 		return result;
 	}
 	
-	@RequestMapping(value="/update/", method = RequestMethod.POST)
+	@RequestMapping(value="/update", method = RequestMethod.POST)
 	public String updateItem(@RequestBody @Valid Teacher data, HttpServletResponse resp) {
-		logger.debug("endpoint /teacher/update/" + data.getId() + " is visited.");
+		logger.debug("endpoint /teacher/update" + data.getId() + " is visited.");
 		String result = null;
 		try {
 			int numOfRows = teaS.updateItem(data, Integer.parseInt(data.getId()));
