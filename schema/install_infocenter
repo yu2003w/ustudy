@@ -8,9 +8,11 @@ grade ENUM('七年级', '八年级', '九年级', '高一','高二','高三'),
 class CHAR(10),
 category ENUM('普通', '体育', '艺术'),
 transient boolean default false,
+orgtype ENUM ('学校','教研室') NOT NULL,
+orgid VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
 INDEX (name, stuno),
-UNIQUE KEY (stuno)
+UNIQUE KEY (stuno, orgtype, orgid)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teacher (
@@ -40,7 +42,7 @@ FOREIGN KEY (teac_id)
 
 create table if not exists ustudy.teachersub (
 id INT NOT NULL AUTO_INCREMENT,
-subject varchar(32) NOT NULL,
+value varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
@@ -51,7 +53,7 @@ FOREIGN KEY (teac_id)
 
 create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
-grade varchar(32) NOT NULL,
+value varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
@@ -62,7 +64,7 @@ FOREIGN KEY (teac_id)
 
 create table if not exists ustudy.teacherclass (
 id INT NOT NULL AUTO_INCREMENT,
-class varchar(32) NOT NULL,
+value varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),

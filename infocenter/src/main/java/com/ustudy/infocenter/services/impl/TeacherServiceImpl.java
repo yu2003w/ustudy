@@ -28,6 +28,7 @@ import com.ustudy.infocenter.model.UElem;
 import com.ustudy.infocenter.services.TeacherService;
 import com.ustudy.infocenter.util.InfocenUtil;
 import com.ustudy.infocenter.util.TeacherRowMapper;
+import com.ustudy.infocenter.util.UElemRowMapper;
 
 /**
  * @author jared
@@ -51,7 +52,13 @@ public class TeacherServiceImpl implements TeacherService {
 		try {
 			if (id < 0)
 				id = 0;
-			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, getOrgId(), getOrgType());
+			if (getOrgId() == null || getOrgId().isEmpty() ||
+					getOrgType() == null || getOrgType().isEmpty()) {
+				logger.warn("getList(), it seemed that user not logged in");
+				return teaL;
+			}
+			else
+			    teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, getOrgId(), getOrgType());
 			logger.debug("Fetched " + teaL.size() + " items of user");
 
 			for (Teacher tea : teaL) {
@@ -68,10 +75,26 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
+	@Transactional
 	public Teacher displayItem(int id) {
-		String sqlDis = "select * from ustudy.teacher where id = ?";
-		Teacher item = jTea.queryForObject(sqlDis, new TeacherRowMapper(), id);
-				
+		String sqlD = "select * from ustudy.teacher where id = ?";
+		Teacher item = jTea.queryForObject(sqlD, new TeacherRowMapper(), id);
+		
+		// retrieve subjects
+		sqlD = "select * from ustudy.teachersub where teacid = ?";
+		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
+		item.setSubjects(subs);
+		
+		// retrieve subjects
+		sqlD = "select * from ustudy.teacherclass where teacid = ?";
+		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
+		item.setClasses(cls);
+		
+		// retrieve subjects
+		sqlD = "select * from ustudy.teachergrade where teacid = ?";
+		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
+		item.setGrades(gs);
+		
 		return item;
 	}
 	
@@ -93,6 +116,11 @@ public class TeacherServiceImpl implements TeacherService {
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
 	
+		if (getOrgId() == null || getOrgId().isEmpty() ||
+				getOrgType() == null || getOrgType().isEmpty()) {
+			throw new RuntimeException("createItem(), it seemed user not logged in");
+		}
+		
 		// need to retrieve auto id of teacher item which is returned back in header location
 		int num = jTea.update(new PreparedStatementCreator(){
 			@Override

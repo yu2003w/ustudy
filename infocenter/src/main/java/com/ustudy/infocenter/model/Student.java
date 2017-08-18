@@ -1,7 +1,6 @@
 package com.ustudy.infocenter.model;
 
 import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Student implements Serializable {
