@@ -138,7 +138,7 @@ public class OrgOwnerController {
 	
 	@RequestMapping(value="/update", method = RequestMethod.POST)
 	public String updateItem(@RequestBody @Valid OrgOwner data, HttpServletResponse resp) {
-		logger.debug("endpoint /owner/update/" + data.getId() + " is visited.");
+		logger.debug("endpoint /owner/update" + data.getId() + " is visited.");
 		String result = null;
 		try {
 			// TODO: if orgid is changed, whether or not need to validate it.
