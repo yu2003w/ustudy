@@ -33,13 +33,20 @@
         </property>
         <property name="filterChainDefinitions">
             <value>
-                <!-- teacher filter chain /teacher/add = authc, perms[teacher:edit] -->
+                <!-- teacher filter chain -->
+                /student/list/** = authc, perms[student:view]
+                /student/view/** = authc, perms[student:view]
+                /student/add = authc, perms[student:edit]
+                /student/update/** = authc, perms[student:edit]
+                /student/delete = authc, perms[student:edit]
+                /student/delete/** = authc, perms[student:edit]
+                
                 /teacher/list/** = authc, perms[teacher:view]
                 /teacher/view/** = authc, perms[teacher:view]
-                
-                /owner/update/** = authc, perms[teacher:edit]
-                /owner/delete = authc, perms[teacher:edit]
-                /owner/delete/** = authc, perms[teacher:edit]
+                /teacher/add = authc, perms[teacher:edit]
+                /teacher/update/** = authc, perms[teacher:edit]
+                /teacher/delete = authc, perms[teacher:edit]
+                /teacher/delete/** = authc, perms[teacher:edit]
                              
                 /** = anon
             </value>
@@ -49,8 +56,7 @@
     <bean id="infoCenter" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>  -->
-                <property name="url" value="jdbc:mysql://192.168.1.113:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
@@ -89,8 +95,8 @@
     <bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
         <property name="dataSource" ref="infoCenter" />
         <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select passwd from ustudy.teacher where teachid = ?" />
-        <property name="userRolesQuery" value="select role_name from ustudy.teacherroles where user_name = ?" />
+        <property name="authenticationQuery" value="select passwd from ustudy.teacher where teacid = ?" />
+        <property name="userRolesQuery" value="select role_name from ustudy.teacherroles where teac_id = ?" />
         <property name="permissionsQuery" value="select permissions from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>

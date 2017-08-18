@@ -15,6 +15,9 @@ null,school:edit,reseller
 null,orgowner:view,reseller
 null,orgowner:edit,reseller
 null,user:view,addi_li
-null,teacher:edit,sch_owner
-null,teacher:view,sch_owner
-null,teacher:view,sch_admin
+null,teacher:edit,org_owner
+null,teacher:view,org_owner
+null,teacher:view,org_admin
+null,student:edit,org_owner
+null,student:view,org_owner
+null,student:view,org_admin

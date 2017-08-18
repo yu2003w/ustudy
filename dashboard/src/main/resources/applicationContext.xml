@@ -44,6 +44,7 @@
                 /school/update = authc, perms[school:edit]
                 /school/delete = authc, perms[school:edit]
                 /school/delete/** = authc, perms[school:edit]
+                
                 <!-- shool web page filter chain -->
                 /schoolList = authc, perms[school:view]
  
@@ -54,6 +55,7 @@
                 /user/update/** = authc, perms[user:edit]
                 /user/delete = authc, perms[user:edit]
                 /user/delete/** = authc, perms[user:edit]
+                
                 <!-- user web page filter chain -->
                 /userList = authc, perms[user:view]
 
@@ -64,6 +66,7 @@
                 /owner/update/** = authc, perms[orgowner:edit]
                 /owner/delete = authc, perms[orgowner:edit]
                 /owner/delete/** = authc, perms[orgowner:edit]
+                
                 <!-- OrgOwner web page filter chain -->
                 /ownerList = authc, perms[orgowner:view]
              
