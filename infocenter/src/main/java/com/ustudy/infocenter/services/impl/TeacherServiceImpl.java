@@ -88,17 +88,17 @@ public class TeacherServiceImpl implements TeacherService {
 	
 	private void retrieveProp(Teacher item) {
 		// retrieve subjects
-		String sqlD = "select * from ustudy.teachersub where teacid = ?";
+		String sqlD = "select * from ustudy.teachersub where teac_id = ?";
 		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setSubjects(subs);
 				
 		// retrieve classes
-		sqlD = "select * from ustudy.teacherclass where teacid = ?";
+		sqlD = "select * from ustudy.teacherclass where teac_id = ?";
 		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setClasses(cls);
 				
 		// retrieve grades
-		sqlD = "select * from ustudy.teachergrade where teacid = ?";
+		sqlD = "select * from ustudy.teachergrade where teac_id = ?";
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
 		
