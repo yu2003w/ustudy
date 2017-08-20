@@ -40,6 +40,7 @@
                 /student/update/** = authc, perms[student:edit]
                 /student/delete = authc, perms[student:edit]
                 /student/delete/** = authc, perms[student:edit]
+                /studentList = authc, perms[student:view]
                 
                 /teacher/list/** = authc, perms[teacher:view]
                 /teacher/view/** = authc, perms[teacher:view]
@@ -47,6 +48,7 @@
                 /teacher/update/** = authc, perms[teacher:edit]
                 /teacher/delete = authc, perms[teacher:edit]
                 /teacher/delete/** = authc, perms[teacher:edit]
+                /teacherList = authc, perms[teacher:view]
                              
                 /** = anon
             </value>
