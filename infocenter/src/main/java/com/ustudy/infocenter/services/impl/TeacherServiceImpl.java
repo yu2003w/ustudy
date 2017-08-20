@@ -64,6 +64,7 @@ public class TeacherServiceImpl implements TeacherService {
 			for (Teacher tea : teaL) {
 				// Noted: for getList() service, front end doesn't need additional
 				// permissions related information
+				retrieveProp(tea);
 				logger.debug(tea.toString());
 			}
 
@@ -80,22 +81,27 @@ public class TeacherServiceImpl implements TeacherService {
 		String sqlD = "select * from ustudy.teacher where id = ?";
 		Teacher item = jTea.queryForObject(sqlD, new TeacherRowMapper(), id);
 		
+		retrieveProp(item);
+		
+		return item;
+	}
+	
+	private void retrieveProp(Teacher item) {
 		// retrieve subjects
-		sqlD = "select * from ustudy.teachersub where teacid = ?";
+		String sqlD = "select * from ustudy.teachersub where teacid = ?";
 		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setSubjects(subs);
-		
-		// retrieve subjects
+				
+		// retrieve classes
 		sqlD = "select * from ustudy.teacherclass where teacid = ?";
 		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setClasses(cls);
-		
-		// retrieve subjects
+				
+		// retrieve grades
 		sqlD = "select * from ustudy.teachergrade where teacid = ?";
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
 		
-		return item;
 	}
 	
 	@Override
