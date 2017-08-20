@@ -159,20 +159,28 @@ public class TeacherServiceImpl implements TeacherService {
 		num = saveRoles(item.getRoles(), item.getTeacId());
 		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
 		
-		// save additional permissions, 
-		num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+		// save additional permissions
+		num = 0;
+		if (item.getAddiPerms() != null)
+			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
 		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
 		
 		// save subjects
-		num = saveSubjects(item.getSubjects(), item.getTeacId());
+		num = 0;
+		if (item.getSubjects() != null)
+		    num = saveSubjects(item.getSubjects(), item.getTeacId());
 		logger.debug("createItem()," + num + " subjects populated for " + item.getTeacId());
 		
 		// save grades
-		num = saveGrades(item.getGrades(), item.getTeacId());
+		num = 0;
+		if (item.getGrades() != null)
+		    num = saveGrades(item.getGrades(), item.getTeacId());
 		logger.debug("createItem()," + num + " grades populated for " + item.getTeacId());
 				
 		// save classes
-		num = saveClasses(item.getClasses(), item.getTeacId());
+		num = 0;
+		if (item.getClasses() != null)
+		    num = saveClasses(item.getClasses(), item.getTeacId());
 		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
 		
 		return id;
@@ -234,30 +242,34 @@ public class TeacherServiceImpl implements TeacherService {
 	private int saveRoles(List<UElem> roles, String teachid) {
 		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
 		String msg = null;
+		int num = 0;
 		
-		for (UElem u:roles) {
-			int num = jTea.update(new PreparedStatementCreator(){
-				@Override
-				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-					PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-					psmt.setNull(1, java.sql.Types.NULL);
-					psmt.setString(2, u.getValue());
-					psmt.setString(3, teachid);
-					return psmt;
+		if (roles != null) {
+			for (UElem u:roles) {
+				num = jTea.update(new PreparedStatementCreator(){
+					@Override
+					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
+						psmt.setNull(1, java.sql.Types.NULL);
+						psmt.setString(2, u.getValue());
+						psmt.setString(3, teachid);
+						return psmt;
+					}
+				});
+				if (num != 1) {
+					msg = "saveRoles(), return value from role insert is " + num;
+					logger.warn(msg);
+					throw new RuntimeException(msg);
 				}
-			});
-			if (num != 1) {
-				msg = "saveRoles(), return value from role insert is " + num;
-				logger.warn(msg);
-				throw new RuntimeException(msg);
+				
+				logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + teachid);
 			}
-			
-			logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + teachid);
 		}
+		
 		
 		// Noted: a little tricky here, to populate additional permissions for the teacher,
 		// need to populate role as "addi_teachid" for the teacher
-		int num = jTea.update(new PreparedStatementCreator(){
+		num = jTea.update(new PreparedStatementCreator(){
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
@@ -274,9 +286,13 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 		
 		logger.debug("saveRoles(), populated additional roles for " + teachid);
+		
 		if (roles != null)
-		    return (roles.size() + 1);
-		return 1;
+			num = roles.size() + 1;
+		else
+			num = 1;
+		return num;
+		
 	}
 	
 	private int saveAddiPerms(List<UElem> perms, String teachid) {
@@ -301,9 +317,9 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveAddiPerms(), Additional permissions saved -> " + u.getValue() + ": addi_" + teachid);
 		}
-		if (perms != null)
-		    return perms.size();
-		return 0;
+
+		return perms.size();
+		
 	}
 	
 	private int saveSubjects(List<UElem> subs, String teachid) {
@@ -329,9 +345,7 @@ public class TeacherServiceImpl implements TeacherService {
 			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teachid);
 		}
 		
-		if (subs != null)
-		    return subs.size();
-		return 0;
+	    return subs.size();
 	}
 	
 	private int saveGrades(List<UElem> grades, String teachid) {
@@ -356,10 +370,8 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveGrades(), grades saved -> " + u.getValue() + ":" + teachid);
 		}
-		if (grades != null)
-			return grades.size();
-		
-		return 0;
+
+		return grades.size();
 	}
 	
 	private int saveClasses(List<UElem> clss, String teachid) {
@@ -385,10 +397,9 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveClasses(), classes saved -> " + u.getValue() + ":" + teachid);
 		}
-		if (clss != null)
-		    return clss.size();
-		else 
-			return 0;
+
+	    return clss.size();
+
 	}
 	
 	private String getOrgId() {
