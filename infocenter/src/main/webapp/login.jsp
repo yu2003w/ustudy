@@ -15,11 +15,25 @@
 	<link href="resources/css/bootstrap-theme.min.css" rel="stylesheet">
 	<link href="resources/css/style.css" rel="stylesheet">
 	<link href="resources/css/bootstrapValidator.min.css" rel="stylesheet">
+    <script src="js/md5.min.js"></script>
 	<title>login</title>
+    <script type="text/javascript"> 
+        function giveFocus(){ 
+            document.login.username.focus() 
+        } 
+        function submitForm(){
+            document.login.password.value = md5(document.login.password.value);
+            document.login.submit();
+        } 
+        function resetForm(){ 
+            document.login.reset();
+            document.login.username.focus();
+        }
+</script>
 </head>
-<body>
+<body onload="giveFocus()">
         <div id="loginModal" class="panel panel-default">
-            <form id="loginForm" method="post" class="form-horizontal" action="${ctx}/login"
+            <form id="login" name="login" method="post" class="form-horizontal" action="${ctx}/login"
 				data-bv-message="输入错误"
 				data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
 				data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
@@ -42,8 +56,8 @@
                         </div>
                  </div>
                  <div class="panel-footer text-center">
-                     <button type="reset" class="btn btn-default" data-dismiss="modal">取消</button>
-                     <button type="submit" class="btn btn-primary">确定</button>
+                     <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetForm()">取消</button>
+                     <button type="button" class="btn btn-primary" onclick="submitForm()">确定</button>
                  </div>
             </form>
         </div>
