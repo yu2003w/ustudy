@@ -80,7 +80,7 @@ public class LoginController {
 		String redirectUrl = null;
 		
 		if (status) {
-			logger.debug("user [" + currentUser.getPrincipal() + "] loggined successfully");
+			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
 			// login successful, redirect to original request
 			msg = "Authentication successful";
 			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);

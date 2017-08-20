@@ -274,7 +274,9 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 		
 		logger.debug("saveRoles(), populated additional roles for " + teachid);
-		return (roles.size() + 1);
+		if (roles != null)
+		    return (roles.size() + 1);
+		return 1;
 	}
 	
 	private int saveAddiPerms(List<UElem> perms, String teachid) {
@@ -299,7 +301,9 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveAddiPerms(), Additional permissions saved -> " + u.getValue() + ": addi_" + teachid);
 		}
-		return perms.size();
+		if (perms != null)
+		    return perms.size();
+		return 0;
 	}
 	
 	private int saveSubjects(List<UElem> subs, String teachid) {
@@ -324,7 +328,10 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teachid);
 		}
-		return subs.size();
+		
+		if (subs != null)
+		    return subs.size();
+		return 0;
 	}
 	
 	private int saveGrades(List<UElem> grades, String teachid) {
@@ -349,14 +356,18 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveGrades(), grades saved -> " + u.getValue() + ":" + teachid);
 		}
-		return grades.size();
+		if (grades != null)
+			return grades.size();
+		
+		return 0;
 	}
 	
 	private int saveClasses(List<UElem> clss, String teachid) {
 		String sqlCls = "insert into ustudy.teacherclass values(?,?,?)";
 		String msg = null;
+		int num = 0;
 		for (UElem u: clss) {
-			int num = jTea.update(new PreparedStatementCreator(){
+			num = jTea.update(new PreparedStatementCreator(){
 				@Override
 				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 					PreparedStatement psmt = conn.prepareStatement(sqlCls, Statement.RETURN_GENERATED_KEYS);
@@ -374,7 +385,10 @@ public class TeacherServiceImpl implements TeacherService {
 			
 			logger.debug("saveClasses(), classes saved -> " + u.getValue() + ":" + teachid);
 		}
-		return clss.size();
+		if (clss != null)
+		    return clss.size();
+		else 
+			return 0;
 	}
 	
 	private String getOrgId() {
