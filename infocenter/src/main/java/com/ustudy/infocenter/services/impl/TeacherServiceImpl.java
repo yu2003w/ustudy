@@ -26,7 +26,7 @@ import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.infocenter.model.Teacher;
 import com.ustudy.infocenter.model.UElem;
 import com.ustudy.infocenter.services.TeacherService;
-import com.ustudy.infocenter.util.InfocenUtil;
+import com.ustudy.infocenter.util.InfoUtil;
 import com.ustudy.infocenter.util.TeacherRowMapper;
 import com.ustudy.infocenter.util.UElemRowMapper;
 
@@ -101,6 +101,19 @@ public class TeacherServiceImpl implements TeacherService {
 		sqlD = "select * from ustudy.teachergrade where teac_id = ?";
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
+		
+		// retrieve roles and excluter addi_{teac_id}
+		String aRole = "addi_" + item.getTeacId();
+		sqlD = "select * from ustudy.teacherroles where teac_id = ?";
+		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
+		rs.remove(aRole);
+		item.setRoles(rs);
+		
+		// retrieve additional permissions
+		sqlD = "select * from ustudy.perms where role_name = ?";
+		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
+		rs.remove(aRole);
+		item.setAddiPerms(ps);
 		
 	}
 	
@@ -222,7 +235,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	public int delItemSet(String ids) {
-		List<String> idsList = InfocenUtil.parseIds(ids);
+		List<String> idsList = InfoUtil.parseIds(ids);
 		int len = idsList.size();
 		if (len == 0)
 			return 0;
@@ -257,7 +270,7 @@ public class TeacherServiceImpl implements TeacherService {
 					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
 						psmt.setNull(1, java.sql.Types.NULL);
-						psmt.setString(2, u.getValue());
+						psmt.setString(2, InfoUtil.getRolemapping().get(u.getValue()));
 						psmt.setString(3, teachid);
 						return psmt;
 					}

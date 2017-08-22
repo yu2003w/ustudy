@@ -3,6 +3,7 @@ package com.ustudy.infocenter.util;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -13,9 +14,9 @@ import javax.json.JsonReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class InfocenUtil {
+public class InfoUtil {
 
-	private static final Logger logger = LogManager.getLogger(InfocenUtil.class);
+	private static final Logger logger = LogManager.getLogger(InfoUtil.class);
 
 	/**
 	 * Json String should be in the format as below,
@@ -44,5 +45,31 @@ public class InfocenUtil {
 		}
 		
 		return ret;
+	}
+	
+	private static ConcurrentHashMap<String, String> rolemapping = 
+			new ConcurrentHashMap<String, String>();
+
+	public static ConcurrentHashMap<String, String> getRolemapping() {
+		return rolemapping;
+	}
+
+	// this method is for role mapping between frontend input and backend logic
+	public static void initRoleMapping() {
+		rolemapping.put("任课老师", "teacher");
+		rolemapping.put("班主任", "cteacher");
+		rolemapping.put("备课组长", "pleader");
+		rolemapping.put("学科组长", "sleader");
+		rolemapping.put("年级组长", "gleader");
+		rolemapping.put("校长", "org_owner");
+		rolemapping.put("考务老师", "leader");
+		
+		rolemapping.put("teacher", "任课老师");
+		rolemapping.put("cteacher", "班主任");
+		rolemapping.put("pleader", "备课组长");
+		rolemapping.put("sleader", "学科组长");
+		rolemapping.put("gleader", "年级组长");
+		rolemapping.put("org_owner", "校长");
+		rolemapping.put("leader", "考务老师");
 	}
 }
