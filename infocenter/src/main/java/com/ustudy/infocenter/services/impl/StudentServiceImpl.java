@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.infocenter.model.Student;
 import com.ustudy.infocenter.services.StudentService;
-import com.ustudy.infocenter.util.InfocenUtil;
+import com.ustudy.infocenter.util.InfoUtil;
 import com.ustudy.infocenter.util.StudentRowMapper;
 
 @Service
@@ -116,7 +116,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public int delItemSet(String ids) {
-		List<String> idL = InfocenUtil.parseIds(ids);
+		List<String> idL = InfoUtil.parseIds(ids);
 		logger.debug(ids + idL.size());
 		for (String s : idL)
 			logger.debug(s);

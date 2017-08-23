@@ -31,7 +31,7 @@ UNIQUE KEY(teacid)
 
 create table if not exists ustudy.teacherroles (
 id INT NOT NULL AUTO_INCREMENT,
-role_name varchar(32) NOT NULL,
+value varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),

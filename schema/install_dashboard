@@ -19,7 +19,7 @@ PRIMARY KEY (id)
 
 create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
-role_name varchar(32) NOT NULL,
+value varchar(32) NOT NULL,
 user_name varchar(32) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
@@ -30,7 +30,7 @@ FOREIGN KEY (user_name)
 
 create table if not exists ustudy.perms (
 id INT NOT NULL AUTO_INCREMENT,
-permissions varchar(64) NOT NULL,
+value varchar(64) NOT NULL,
 role_name varchar(32) NOT NULL,
 INDEX (role_name),
 PRIMARY KEY(id)
