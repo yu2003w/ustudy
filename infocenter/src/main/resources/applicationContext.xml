@@ -98,8 +98,8 @@
         <property name="dataSource" ref="infoCenter" />
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select passwd from ustudy.teacher where teacid = ?" />
-        <property name="userRolesQuery" value="select role_name from ustudy.teacherroles where teac_id = ?" />
-        <property name="permissionsQuery" value="select permissions from ustudy.perms where role_name = ?"/>
+        <property name="userRolesQuery" value="select value from ustudy.teacherroles where teac_id = ?" />
+        <property name="permissionsQuery" value="select value from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
         <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
