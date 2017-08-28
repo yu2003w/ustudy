@@ -13,7 +13,13 @@ import javax.json.JsonReader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 
+/**
+ * @author jared
+ *
+ */
 public class InfoUtil {
 
 	private static final Logger logger = LogManager.getLogger(InfoUtil.class);
@@ -72,4 +78,17 @@ public class InfoUtil {
 		rolemapping.put("org_owner", "校长");
 		rolemapping.put("leader", "考务老师");
 	}
+	
+	/*
+	 * Calling this method should catch exceptions throws by shiro
+	 */
+	public static String retrieveSessAttr(final String key) {
+		Session ses = SecurityUtils.getSubject().getSession();
+		Object obj = ses.getAttribute(key);
+		if (obj != null)
+			return obj.toString();
+		else
+			return null;
+	}
+
 }

@@ -33,7 +33,7 @@
         </property>
         <property name="filterChainDefinitions">
             <value>
-                <!-- teacher filter chain -->
+                <!-- student filter chain -->
                 /student/list/** = authc, perms[student:view]
                 /student/view/** = authc, perms[student:view]
                 /student/add = authc, perms[student:edit]
@@ -42,6 +42,7 @@
                 /student/delete/** = authc, perms[student:edit]
                 /studentList = authc, perms[student:view]
                 
+                <!-- teacher filter chain -->
                 /teacher/list/** = authc, perms[teacher:view]
                 /teacher/view/** = authc, perms[teacher:view]
                 /teacher/add = authc, perms[teacher:edit]
@@ -49,7 +50,12 @@
                 /teacher/delete = authc, perms[teacher:edit]
                 /teacher/delete/** = authc, perms[teacher:edit]
                 /teacherList = authc, perms[teacher:view]
-                             
+                
+                <!-- school filter chain -->
+                /schoolDetails = authc, perms[school:view]
+                
+                /school/detail = authc, perms[school:view]
+                   
                 /** = anon
             </value>
         </property>

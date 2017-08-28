@@ -106,7 +106,7 @@ public class LoginController {
 			logger.warn("Failed to get subject --> " + e.getMessage());
 		}
 		if (cUser.getPrincipal() == null) {
-			logger.warn("User didn't log in");
+			logger.warn("/loginId, User didn't log in");
 			resp.setStatus(404);
 			return "No User logged in";
 		}

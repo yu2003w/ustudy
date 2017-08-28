@@ -47,6 +47,10 @@ fi
 # to create log files successfully
 chown 999:999 ${MYSQL_LOG_DIR}
 
+# before launching mysql service, clear mysql logs 
+echo "clear logs generated in ${MYSQL_LOG_DIR}"
+rm ${MYSQL_LOG_DIR}/*
+
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
 docker run --rm -it --name ustudy-dw -v ${WORK_DIR}/mysql/data:/var/lib/mysql \

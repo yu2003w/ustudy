@@ -11,8 +11,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,15 +48,18 @@ public class TeacherServiceImpl implements TeacherService {
 		
 		String sqlOrg = "select * from ustudy.teacher where id > ? and orgid = ? and orgtype = ? limit 10000";
 		try {
+
+			String orgT = InfoUtil.retrieveSessAttr("orgType");
+			String orgId = InfoUtil.retrieveSessAttr("orgId");
+			if ( orgT == null || orgT.isEmpty() ||
+					orgId == null || orgId.isEmpty()) {
+				throw new RuntimeException("createItem(), it seemed user not logged in");
+			}
+			
 			if (id < 0)
 				id = 0;
-			if (getOrgId() == null || getOrgId().isEmpty() ||
-					getOrgType() == null || getOrgType().isEmpty()) {
-				logger.warn("getList(), it seemed that user not logged in");
-				return teaL;
-			}
-			else
-			    teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, getOrgId(), getOrgType());
+			
+			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, orgId, orgT);
 			logger.debug("Fetched " + teaL.size() + " items of user");
 
 			for (Teacher tea : teaL) {
@@ -135,8 +136,10 @@ public class TeacherServiceImpl implements TeacherService {
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
 	
-		if (getOrgId() == null || getOrgId().isEmpty() ||
-				getOrgType() == null || getOrgType().isEmpty()) {
+		String orgT = InfoUtil.retrieveSessAttr("orgType");
+		String orgId = InfoUtil.retrieveSessAttr("orgId");
+		if ( orgT == null || orgT.isEmpty() ||
+				orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("createItem(), it seemed user not logged in");
 		}
 		
@@ -151,8 +154,8 @@ public class TeacherServiceImpl implements TeacherService {
 				psmt.setString(4, item.getPasswd());
 				
 				// Noted: need to populate current user's orgtype, orgid
-				psmt.setString(5, getOrgType());
-				psmt.setString(6, getOrgId());
+				psmt.setString(5, orgT);
+				psmt.setString(6, orgId);
 				
 				// teacher creation time should be set to current time
 				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -419,16 +422,6 @@ public class TeacherServiceImpl implements TeacherService {
 
 	    return clss.size();
 
-	}
-	
-	private String getOrgId() {
-		Session ses = SecurityUtils.getSubject().getSession();
-		return ses.getAttribute("orgid").toString();
-	}
-	
-	private String getOrgType() {
-		Session ses = SecurityUtils.getSubject().getSession();
-		return ses.getAttribute("orgtype").toString();
 	}
 	
 }

@@ -93,6 +93,9 @@ public class LoginController {
 			Teacher tea = teaS.findTeacherById(currentUser.getPrincipal().toString());
 			ses.setAttribute("orgtype", tea.getOrgtype());
 			ses.setAttribute("orgid", tea.getOrgid());
+			
+			// TODO: need to redirect user to proper pages based on organization type
+			
 			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid()); 
 		} else {
 			logger.warn(msg);

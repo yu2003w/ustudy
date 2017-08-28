@@ -43,6 +43,7 @@ loginname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
 orgtype ENUM ('学校','教研室') NOT NULL,
 orgid varchar(32) NOT NULL,
+role varchar(32) NOT NULL,
 ctime datetime DEFAULT NULL,
 PRIMARY KEY(id),
 INDEX(name,loginname)
@@ -61,25 +62,47 @@ INDEX(school_name),
 UNIQUE KEY (school_id)
 ) ENGINE=InnoDB;
 
+create table if not exists ustudy.teacher (
+id INT NOT NULL AUTO_INCREMENT,
+teacid VARCHAR(32) NOT NULL,
+teacname VARCHAR(32) NOT NULL,
+passwd VARCHAR(32) NOT NULL,
+orgtype ENUM ('学校','教研室') NOT NULL,
+orgid VARCHAR(32) NOT NULL,
+ctime datetime DEFAULT NULL,
+ll_time datetime DEFAULT NULL,
+PRIMARY KEY(id),
+INDEX (teacid, orgid),
+UNIQUE KEY(teacid)
+) ENGINE=InnoDB;
+
 create table if not exists ustudy.grade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
+grade_owner VARCHAR(32),
 school_id VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
 INDEX(school_id, grade_name),
 FOREIGN KEY (school_id)
     REFERENCES ustudy.school(school_id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (grade_owner)
+    REFERENCES ustudy.teacher(teacid)
+    ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.course (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id INT NOT NULL,
 course_name VARCHAR(32) NOT NULL,
+preleader VARCHAR(32),
 PRIMARY KEY (id),
 INDEX(grade_id),
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (preleader)
+    REFERENCES ustudy.teacher(teacid)
+    ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;

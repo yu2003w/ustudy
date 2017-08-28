@@ -54,6 +54,9 @@ if [ $? != 0 ]; then
 fi
 echo "Deploying info.war successfully"
 
+# before launching tomcat, clear logs generated last time
+echo "clear logs generated in ${WORK_DIR}/logs/ustudy/"
+rm ${WORK_DIR}/logs/ustudy/*
 
 docker run --rm --name ustudy -p 8080:8080 -v ${WORK_DIR}/webapps/:/usr/local/tomcat/webapps \
     -v ${WORK_DIR}/logs/ustudy:/usr/local/tomcat/logs/ -d tomcat:9.0
