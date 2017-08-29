@@ -1,5 +1,8 @@
 package com.ustudy.infocenter.services.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +20,7 @@ import com.ustudy.infocenter.model.Department;
 import com.ustudy.infocenter.model.Grade;
 import com.ustudy.infocenter.model.OwnerBrife;
 import com.ustudy.infocenter.model.School;
-import com.ustudy.infocenter.model.SubjectOwner;
+import com.ustudy.infocenter.model.SubjectLeader;
 import com.ustudy.infocenter.model.SubjectTeac;
 import com.ustudy.infocenter.model.TeacherBrife;
 import com.ustudy.infocenter.services.SchoolService;
@@ -38,20 +42,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public School getSchool() {
 		String orgT = null, orgId = null;
-		try {
-			orgT = InfoUtil.retrieveSessAttr("orgType");
-			orgId = InfoUtil.retrieveSessAttr("orgId");
-			if (orgT == null || orgId == null || orgT.isEmpty() || orgId.isEmpty()) {
-				logger.warn("getSchool(), it seemed that user did not log in");
-				throw new RuntimeException("getSchool(), orgType or orgId is not proper");
-			}
-				
-		} catch (Exception e) {
-			String msg = "getSchool(), failed to retrieve proper orgType or orgId";
-			logger.warn(msg);
-			throw new RuntimeException(msg);
-		}
-		logger.debug("getSchool(), retrieve information for " + orgT + ":" + orgId);
+		getOrgInfo(orgT, orgId);
 		
 		String sqlSch = "select * from ustudy.school where school_id = ?";
 		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
@@ -60,8 +51,7 @@ public class SchoolServiceImp implements SchoolService {
 		if (!populateOwner(item, orgT, orgId))
 			logger.info("getSchool(), failed to populate school/exam owner, maybe not set yet");
 		
-		populateSchoolSub(item, orgId);
-		
+		populateDeparts(item, orgId);
 		return item;
 	}
 	
@@ -85,10 +75,11 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Transactional
-	private boolean populateSchoolSub(School item, final String orgId) {
-		String sqlT = "select value, teacid, teacname from schoolsub JOIN teacher where "
-				+ "schoolsub.teac_id = teacher.teacid and schoolsub.school_id = ?";
-		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId);
+	private List<SubjectLeader> populateDepartSub(final String orgId, final String dType) {
+		String sqlT = "select value, teacid, teacname from ustudy.departsub JOIN ustudy.teacher where "
+				+ "ustudy.departsub.teac_id = ustudy.teacher.teacid and ustudy.departsub.school_id = ? "
+				+ "and ustudy.departsub.type = ?";
+		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		ConcurrentHashMap<String, List<TeacherBrife>> ret = new ConcurrentHashMap<String, List<TeacherBrife>>();
 		for (SubjectTeac st: soL) {
 			if (!ret.contains(st.getSub())) {
@@ -97,16 +88,14 @@ public class SchoolServiceImp implements SchoolService {
 				ret.put(st.getSub(), tL);
 			}
 			else {
-				List<TeacherBrife> tL = ret.get(st.getSub());
-				tL.add(st.getTeac());
-				ret.put(st.getSub(), tL);
+				ret.get(st.getSub()).add(st.getTeac());
 			}
 		}
-		List<SubjectOwner> so = new ArrayList<SubjectOwner>();
-		ret.forEach((k, v) -> so.add(new SubjectOwner(k, v)));
-		item.setSubOs(so);
-		logger.debug("populateSchoolSub(), populate school subject owners successful for school -> " + orgId);
-		return true;
+		List<SubjectLeader> lead = new ArrayList<SubjectLeader>();
+		ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v)));
+		logger.debug("populateDepartSub(), populate department subject leaders successful for " +
+				dType + " in school -> " + orgId);
+		return lead;
 	}
 	
 	@Transactional
@@ -153,16 +142,132 @@ public class SchoolServiceImp implements SchoolService {
 		}
 		// populate department information
 		List<Department> departs = new ArrayList<Department>();
-		if (highL.size() > 0)
-			departs.add(new Department("高中部", highL));
-		if (junL.size() > 0)
-			departs.add(new Department("初中部", highL));
-		if (priL.size() > 0)
-			departs.add(new Department("小学部", highL));
-		if (othL.size() > 0)
-			departs.add(new Department("其他", highL));
+		if (highL.size() > 0) {
+			Department hd = new Department("高中部", highL);
+			hd.setSubLeader(populateDepartSub(orgId, "high"));
+			departs.add(hd);
+		}
+		if (junL.size() > 0) {
+			Department jd = new Department("初中部", junL);
+			jd.setSubLeader(populateDepartSub(orgId, "junior"));
+			departs.add(jd);
+		}
+			
+		if (priL.size() > 0) {
+			Department pd = new Department("小学部", highL);
+			pd.setSubLeader(populateDepartSub( orgId, "primary"));
+			departs.add(pd);
+		}
+
+		if (othL.size() > 0) {
+			Department od = new Department("其他", highL);
+			od.setSubLeader(populateDepartSub(orgId, "other"));
+			departs.add(od);
+		}
 		
 		return true;
 	}
 
+	@Override
+	@Transactional
+	public List<SubjectLeader> getDepSubs(String depName) {
+		String orgT = null, orgId = null;
+		getOrgInfo(orgT, orgId);
+		List<SubjectLeader> subL = populateDepartSub(orgId, depName);
+		return subL;
+	}
+
+	@Override
+	public int updateDepSubs(List<SubjectLeader> subs, String dType) {
+		String orgT = null, orgId = null, msg = null;
+		getOrgInfo(orgT, orgId);
+		int cnt = 0;
+		// table schema is id, value, teac_id, type, school_id
+		String sqlC = "insert into ustudy.departsub values(?,?,?,?,?)";
+		for (SubjectLeader sl:subs) {
+			// subject name
+			String sn = sl.getSubject();
+			for (TeacherBrife tea: sl.getOwners()) {
+				int num = schS.update(new PreparedStatementCreator() {
+					@Override
+					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+						PreparedStatement psmt = conn.prepareStatement(sqlC);
+						psmt.setNull(1, java.sql.Types.NULL);
+						psmt.setString(2, sn);
+						psmt.setString(3, tea.getTeacid());
+						psmt.setString(4, dType);
+						psmt.setString(5, orgId);
+						return psmt;
+					}
+				});
+				if (num != 1) {
+					msg = "updateDepSubs(), return value from insert is " + num;
+					logger.warn(msg);
+					throw new RuntimeException(msg);
+				}
+				cnt++;
+			}
+		}
+		logger.debug("updateDepSubs(), number of inserted records is " + cnt);
+		return cnt;
+	}
+
+	@Override
+	public List<TeacherBrife> getDepTeac(String depName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Grade getGradeInfo(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int updateGradeInfo(Grade item) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<TeacherBrife> getGradeTeac(String gradeId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ClassInfo getClassInfo(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int updateClassInfo(ClassInfo item) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<TeacherBrife> getClassTeac(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private void getOrgInfo(String orgT, String orgId) {
+		try {
+			orgT = InfoUtil.retrieveSessAttr("orgType");
+			orgId = InfoUtil.retrieveSessAttr("orgId");
+			if (orgT == null || orgId == null || orgT.isEmpty() || orgId.isEmpty()) {
+				logger.warn("getOrgInfo(), it seemed that user did not log in");
+				throw new RuntimeException("getOrgInfo(), orgType or orgId is not proper");
+			}
+				
+		} catch (Exception e) {
+			String msg = "getOrgInfo(), failed to retrieve proper orgType or orgId";
+			logger.warn(msg);
+			throw new RuntimeException(msg);
+		}
+		logger.debug("getOrgInfo(), retrieve information for " + orgT + ":" + orgId);
+	}
 }

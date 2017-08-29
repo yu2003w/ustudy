@@ -3,7 +3,7 @@ package com.ustudy.infocenter.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class SubjectOwner implements Serializable {
+public class SubjectLeader implements Serializable {
 
 	/**
 	 * 
@@ -14,12 +14,12 @@ public class SubjectOwner implements Serializable {
 	
 	private List<TeacherBrife> owners = null;
 
-	public SubjectOwner() {
+	public SubjectLeader() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectOwner(String subject, List<TeacherBrife> owners) {
+	public SubjectLeader(String subject, List<TeacherBrife> owners) {
 		super();
 		this.subject = subject;
 		this.owners = owners;

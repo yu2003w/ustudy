@@ -34,9 +34,6 @@ public class School implements Serializable {
 	
 	@JsonProperty("departments")
 	private List<Department> departs = null;
-	
-	@JsonProperty("subjects")
-	private List<SubjectOwner> subOs = null;
 
 	public School() {
 		super();
@@ -135,19 +132,11 @@ public class School implements Serializable {
 		this.departs = departs;
 	}
 
-	public List<SubjectOwner> getSubOs() {
-		return subOs;
-	}
-
-	public void setSubOs(List<SubjectOwner> subOs) {
-		this.subOs = subOs;
-	}
-
 	@Override
 	public String toString() {
 		return "School [id=" + id + ", owner=" + owner + ", exam=" + exam + ", schoolId=" + schoolId + ", schoolName="
-				+ schoolName + ", schoolType=" + schoolType + ", province=" + province + ", city=" + city + ", departs="
-				+ departs + ", subOs=" + subOs + "]";
+				+ schoolName + ", schoolType=" + schoolType + ", province=" + province + ", city=" + city
+				+ ", district=" + district + ", departs=" + departs + "]";
 	}
 
 }

@@ -17,6 +17,9 @@ public class Department implements Serializable {
 	
 	@JsonProperty("grades")
 	private List<Grade> grL = null;
+	
+	@JsonProperty("subjects")
+	private List<SubjectLeader> subLeader = null;
 
 	public Department() {
 		super();
@@ -45,9 +48,18 @@ public class Department implements Serializable {
 		this.grL = grL;
 	}
 
+	public List<SubjectLeader> getSubLeader() {
+		return subLeader;
+	}
+
+	public void setSubLeader(List<SubjectLeader> subLeader) {
+		this.subLeader = subLeader;
+	}
+
 	@Override
 	public String toString() {
-		return "Department [depName=" + depName + ", grL=" + grL + "]";
+		return "Department [depName=" + depName + ", grL=" + grL + ", subLeader=" + subLeader + "]";
 	}
+	
 	
 }

@@ -73,12 +73,14 @@ FOREIGN KEY (teac_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-create table if not exists ustudy.schoolsub (
+# subject leader at department level
+create table if not exists ustudy.departsub (
 id INT NOT NULL AUTO_INCREMENT,
 value varchar(32) NOT NULL,
 teac_id varchar(32),
+type ENUM('high','junior','primary','other'),
 school_id varchar(32) NOT NULL,
-INDEX(teac_id),
+INDEX(teac_id, school_id, type),
 PRIMARY KEY (id),
 FOREIGN KEY (school_id)
     REFERENCES ustudy.school(school_id)
