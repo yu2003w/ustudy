@@ -300,16 +300,27 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	public int updateGradeInfo(Grade item) {
-		// TODO Auto-generated method stub
-		return 0;
+		logger.debug("updateGradeInfo(), new grade ->" + item.toString());
+		String sqlG = "update ustudy.grade set grade_name = ?, classes_num = ?, "
+				+ "grade_owner = ? where id = ?";
+		int cnt = schS.update(sqlG, item.getName(), item.getClassNum(), 
+				item.getGradeO().getTeacid(), item.getId());
+		return cnt;
 	}
 
-	@Override
-	public List<SubjectTeac> getGradeTeac(String id) {
+	@Transactional
+	private List<SubjectTeac> getGradeSubs(String id) {
 		List<SubjectTeac> subL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), id);
 		return subL;
 	}
 
+	@Override
+	@Transactional
+	public List<TeacherBrife> getGradeTeac(String id) {
+		List<TeacherBrife> teaL = null;
+		return teaL;
+	}
+	
 	@Override
 	@Transactional
 	public ClassInfo getClassInfo(String id) {
@@ -324,14 +335,17 @@ public class SchoolServiceImp implements SchoolService {
 	}
 
 	@Override
+	@Transactional
 	public int updateClassInfo(ClassInfo item) {
-		// TODO Auto-generated method stub
-		return 0;
+		logger.debug("updateClassInfo(), new item->" + item.toString());
+		String sqlCls = "update class set cls_name = ?, cls_type = ?, cls_owner = ? where id =?";
+		int cnt = schS.update(sqlCls, item.getClassName(), item.getClassType(),
+				item.getClaOwner().getTeacid(), item.getId());
+		return cnt;
 	}
 
-	@Override
 	@Transactional
-	public List<SubjectTeac> getClassSubs(String id) {
+	private List<SubjectTeac> getClassSubs(String id) {
 		String orgT = null, orgId = null;
 		getOrgInfo(orgT, orgId);
 		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
@@ -340,7 +354,13 @@ public class SchoolServiceImp implements SchoolService {
 		
 		return stL;
 	}
-
+	
+	@Override
+	@Transactional
+	public List<TeacherBrife> getClassTeac(String id) {
+		List<TeacherBrife> teaL = null;
+		return teaL;
+	}
 	private void getOrgInfo(String orgT, String orgId) {
 		try {
 			orgT = InfoUtil.retrieveSessAttr("orgType");

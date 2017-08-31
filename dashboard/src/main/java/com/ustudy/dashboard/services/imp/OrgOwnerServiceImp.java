@@ -61,7 +61,7 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Transactional
 	public int createItem(OrgOwner item) {
 		// Noted: Schema for table ustudy.orgowner is as below,
-		// id, name, loginname, passwd, orgtype, orgid, ctime
+		// id, name, loginname, passwd, orgtype, orgid, role, ctime
 		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated keys is required.

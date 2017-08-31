@@ -6,7 +6,6 @@ import com.ustudy.infocenter.model.ClassInfo;
 import com.ustudy.infocenter.model.Grade;
 import com.ustudy.infocenter.model.School;
 import com.ustudy.infocenter.model.SubjectLeader;
-import com.ustudy.infocenter.model.SubjectTeac;
 import com.ustudy.infocenter.model.TeacherBrife;
 
 /**
@@ -30,12 +29,12 @@ public interface SchoolService {
 	
 	public int updateGradeInfo(Grade item);
 	
-	public List<SubjectTeac> getGradeTeac(String gradeId);
+	public List<TeacherBrife> getGradeTeac(String gradeId);
 	
 	public ClassInfo getClassInfo(String id);
 	
 	public int updateClassInfo(ClassInfo item);
 	
-	public List<SubjectTeac> getClassSubs(String id);
+	public List<TeacherBrife> getClassTeac(String id);
 	
 }

@@ -19,7 +19,7 @@ import com.ustudy.infocenter.model.ClassInfo;
 import com.ustudy.infocenter.model.Grade;
 import com.ustudy.infocenter.model.School;
 import com.ustudy.infocenter.model.SubjectLeader;
-import com.ustudy.infocenter.model.SubjectTeac;
+import com.ustudy.infocenter.model.TeacherBrife;
 import com.ustudy.infocenter.services.SchoolService;
 
 @RestController
@@ -130,11 +130,29 @@ public class SchoolController {
 	
 	@RequestMapping(value = "/grade/update/", method = RequestMethod.POST)
 	public String updateGrade(@RequestBody @Valid Grade g, HttpServletResponse resp) {
-		return null;
+		logger.debug("endpoint /grade/update is to update " + g.getId());
+		String result = null;
+		try {
+			int numOfRows = schS.updateGradeInfo(g);
+			if (numOfRows == 1)
+				logger.debug("updateGrade(), update item successfully");
+			else {
+				String msg = numOfRows + " items are updated, maybe something goes wrong";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			result = "update item successfully";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			result = "update item failed";
+			resp.setStatus(500);
+		}
+		return result;
 	}
 	
-	@RequestMapping(value = "/gradesub/{id}", method = RequestMethod.GET)
-	public List<SubjectTeac> getGradeSub(@PathVariable String id, HttpServletResponse resp) {
+	@RequestMapping(value = "/gradeteac/{id}", method = RequestMethod.GET)
+	public List<TeacherBrife> getGradeTeac(@PathVariable String id, HttpServletResponse resp) {
+		logger.debug("getGradeTeac(), endpoint /school/gradeteac/" + id + " is visited.");
 		return null;
 	}
 	
@@ -166,22 +184,38 @@ public class SchoolController {
 	
 	@RequestMapping(value = "/class/update/", method = RequestMethod.POST)
 	public String updateClassInfo(@RequestBody @Valid ClassInfo cls, HttpServletResponse resp) {
-		logger.debug("getClassInfo(), endpoint /school/class/update is visited.");
-		return null;
+		logger.debug("endpoint /class/update is to update " + cls.getId());
+		String result = null;
+		try {
+			int numOfRows = schS.updateClassInfo(cls);
+			if (numOfRows == 1)
+				logger.debug("updateClassInfo(), update item successfully");
+			else {
+				String msg = numOfRows + " items are updated, maybe something goes wrong";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			result = "update item successfully";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			result = "update item failed";
+			resp.setStatus(500);
+		}
+		return result;
 	}
 	
-	@RequestMapping(value = "/classsub/{id}", method = RequestMethod.GET)
-	public List<SubjectTeac> getClassSub(@PathVariable String id, HttpServletResponse resp) {
-		logger.debug("getClassInfo(), endpoint /school/classsub/" + id + " is visited.");
-		List<SubjectTeac> itemL = null;
+	@RequestMapping(value = "/classteac/{id}", method = RequestMethod.GET)
+	public List<TeacherBrife> getClassSub(@PathVariable String id, HttpServletResponse resp) {
+		logger.debug("getClassInfo(), endpoint /school/classteac/" + id + " is visited.");
+		List<TeacherBrife> itemL = null;
 		String msg = null;
 		try {
-			itemL = schS.getClassSubs(id);
+			itemL = schS.getClassTeac(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
 			msg = "getClassSub()" + ie.getMessage();
 			logger.warn(msg);
 		} catch (Exception e) {
-			msg = "getClassSub(),  failed to retrieve subject related information for class " + id + "\n"
+			msg = "getClassSub(), failed to retrieve teacher information for class " + id + "\n"
 					+ e.getMessage();
 			logger.warn(msg);
 			resp.setStatus(500);
