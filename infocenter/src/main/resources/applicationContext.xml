@@ -57,12 +57,13 @@
                 /school/detail = authc, perms[school:view]
                 /school/departsubs/** = authc, perms[school:view]
                 /school/departsubs/update/** = authc, perms[school:edit]
+                /school/departteac/** = authc,perms[school:view]
                 /school/grade/** = authc, perms[school:view]
                 /school/grade/update = authc, perms[school:edit]
-                /school/gradesubs/** = authc, perms[school:view]
+                /school/gradeteac/** = authc, perms[school:view]
                 /school/class/** = authc, perms[school:view]
                 /school/class/update = authc, perms[school:edit]
-                /school/classsub/** = authc, perms[school:view]
+                /school/classteac/** = authc, perms[school:view]
                    
                 /** = anon
             </value>

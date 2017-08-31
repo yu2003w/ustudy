@@ -39,7 +39,7 @@ public class SchoolController {
 		try {
 			item = schS.getSchool();
 		} catch (IncorrectResultSizeDataAccessException ie) {
-			msg = "getSchool()" + ie.getLocalizedMessage();
+			msg = "getSchool()" + ie.getMessage();
 			logger.warn(msg);
 		} catch (Exception e) {
 			msg = "getSchool(),  failed to retrieve school information --> \n" + e.getMessage();
@@ -105,7 +105,27 @@ public class SchoolController {
 	@RequestMapping(value = "/grade/{id}", method = RequestMethod.GET)
 	public Grade getGrade(@PathVariable String id, HttpServletResponse resp) {
 		logger.debug("getGrade(), endpoint /school/grade/" + id + " is visited.");
-		return null;
+		Grade item = null;
+		String msg = null;
+		try {
+			item = schS.getGradeInfo(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			msg = "getGrade()" + ie.getMessage();
+			logger.warn(msg);
+		} catch (Exception e) {
+			msg = "getGrade(),  failed to retrieve grade information --> \n" + e.getMessage();
+			logger.warn(msg);
+			resp.setStatus(500);
+			resp.setHeader("reason", msg);
+			return null;
+		}
+		
+		if (item == null) {
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
+		}
+		return item;
 	}
 	
 	@RequestMapping(value = "/grade/update/", method = RequestMethod.POST)
@@ -120,16 +140,60 @@ public class SchoolController {
 	
 	@RequestMapping(value = "/class/{id}", method = RequestMethod.GET)
 	public ClassInfo getClassInfo(@PathVariable String id, HttpServletResponse resp) {
-		return null;
+		logger.debug("getClassInfo(), endpoint /school/class/" + id + " is visited.");
+		ClassInfo item = null;
+		String msg = null;
+		try {
+			item = schS.getClassInfo(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			msg = "getClassInfo()" + ie.getMessage();
+			logger.warn(msg);
+		} catch (Exception e) {
+			msg = "getClassInfo(),  failed to retrieve class information --> \n" + e.getMessage();
+			logger.warn(msg);
+			resp.setStatus(500);
+			resp.setHeader("reason", msg);
+			return null;
+		}
+		
+		if (item == null) {
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
+		}
+		return item;
 	}
 	
 	@RequestMapping(value = "/class/update/", method = RequestMethod.POST)
 	public String updateClassInfo(@RequestBody @Valid ClassInfo cls, HttpServletResponse resp) {
+		logger.debug("getClassInfo(), endpoint /school/class/update is visited.");
 		return null;
 	}
 	
 	@RequestMapping(value = "/classsub/{id}", method = RequestMethod.GET)
 	public List<SubjectTeac> getClassSub(@PathVariable String id, HttpServletResponse resp) {
-		return null;
+		logger.debug("getClassInfo(), endpoint /school/classsub/" + id + " is visited.");
+		List<SubjectTeac> itemL = null;
+		String msg = null;
+		try {
+			itemL = schS.getClassSubs(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			msg = "getClassSub()" + ie.getMessage();
+			logger.warn(msg);
+		} catch (Exception e) {
+			msg = "getClassSub(),  failed to retrieve subject related information for class " + id + "\n"
+					+ e.getMessage();
+			logger.warn(msg);
+			resp.setStatus(500);
+			resp.setHeader("reason", msg);
+			return null;
+		}
+		
+		if (itemL == null) {
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
+		}
+		return itemL;
 	}
 }

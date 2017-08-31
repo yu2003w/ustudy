@@ -38,7 +38,7 @@ sub_name VARCHAR(32) NOT NULL,
 grade_id INT NOT NULL,
 sub_owner VARCHAR(32),
 PRIMARY KEY(id),
-INDEX(grade_id, sub_owner),
+INDEX(grade_id, sub_name),
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE,

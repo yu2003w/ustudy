@@ -2,6 +2,7 @@ package com.ustudy.infocenter.services.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,9 @@ import com.ustudy.infocenter.util.SubjectTeacRowMapper;
 @Service
 public class SchoolServiceImp implements SchoolService {
 
+	private static final String SQL_GRADE_SUB = "select sub_name, sub_owner, teacname "
+			+ "from gradesub join teacher on teacher.teacid = gradesub.sub_owner where grade_id = ?";
+	
 	private static final Logger logger = LogManager.getLogger(SchoolServiceImp.class);
 	
 	@Autowired
@@ -76,39 +81,117 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Transactional
 	private List<SubjectLeader> populateDepartSub(final String orgId, final String dType) {
-		String sqlT = "select value, teacid, teacname from ustudy.departsub JOIN ustudy.teacher where "
-				+ "ustudy.departsub.teac_id = ustudy.teacher.teacid and ustudy.departsub.school_id = ? "
-				+ "and ustudy.departsub.type = ?";
-		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
-		ConcurrentHashMap<String, List<TeacherBrife>> ret = new ConcurrentHashMap<String, List<TeacherBrife>>();
-		for (SubjectTeac st: soL) {
-			if (!ret.contains(st.getSub())) {
-				List<TeacherBrife> tL = new ArrayList<TeacherBrife>();
-				tL.add(st.getTeac());
-				ret.put(st.getSub(), tL);
+		String sqlG = null; 
+		if (dType.compareTo("high") == 0) {
+			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name"
+				+ "= '高一' or grade.grade_name = '高二' or grade.grade_name= '高三')";
+		} else if (dType.compareTo("junior") == 0) {
+			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name"
+					+ "= '七年级' or grade.grade_name = '八年级' or grade.grade_name= '九年级')";
+		} else if (dType.compareTo("primary") == 0) {
+			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name = '六年级'"
+					+ "or grade.grade_name = '五年级' or grade.grade_name = '四年级' or grade.grade_name= '三年级'"
+					+ "or grade.grade_name = '二年级' or grade.grade_name = '一年级')";
+		}
+		
+		// get Grade Ids for specified department
+		List<String> gIds = schS.query(sqlG, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet rs, int row) throws SQLException {
+				String id = new String(rs.getString("id"));
+				return id;
+			}
+		}, orgId);
+		
+		if (gIds == null || gIds.isEmpty()) {
+			logger.warn("populateDepartSub(), no grade id found for " + orgId + " " + dType);
+			throw new RuntimeException("No grade id found");
+		}
+		
+		// get subject name list for specified grades
+		String sqlSub = "select sub_name from gradesub where grade_id = ";
+		boolean first = true;
+		for (String id: gIds) {
+			if (first) {
+				sqlSub += id;
+				first = false;
 			}
 			else {
-				ret.get(st.getSub()).add(st.getTeac());
+				sqlSub += " or grade_id = " + id;
 			}
 		}
+		
+		List<String> subL = schS.query(sqlSub, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet rs, int row) throws SQLException {
+				String id = new String(rs.getString("sub_name"));
+				return id;
+			}
+		});
+		
+		String sqlT = "select value, teacid, teacname from departsub JOIN teacher on "
+				+ "departsub.teac_id = teacher.teacid where departsub.school_id = ? and departsub.type = ?";
+		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
+		
+		ConcurrentHashMap<String, List<TeacherBrife>> ret = null;
+		if (soL != null && !soL.isEmpty()) {
+			ret = new ConcurrentHashMap<String, List<TeacherBrife>>();
+			for (SubjectTeac st: soL) {
+				if (!ret.contains(st.getSub())) {
+					List<TeacherBrife> tL = new ArrayList<TeacherBrife>();
+					tL.add(st.getTeac());
+					ret.put(st.getSub(), tL);
+				}
+				else {
+					ret.get(st.getSub()).add(st.getTeac());
+				}
+			}
+			
+			// subjects for which leader is not assigned, need to populate here
+			// populate department subject leaders, set teacher list as empty
+			for (String s: subL) {
+				if (!ret.contains(s))
+					ret.put(s, null);
+			}
+		}
+
 		List<SubjectLeader> lead = new ArrayList<SubjectLeader>();
-		ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v)));
+		if (ret != null && !ret.isEmpty())
+			ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v))); 
+		
 		logger.debug("populateDepartSub(), populate department subject leaders successful for " +
 				dType + " in school -> " + orgId);
 		return lead;
 	}
 	
+	private boolean populateGrade(Grade gr) {
+		
+		String sqlCls = "select class.id, cls_name, cls_type, cls_owner, teacname from class join teacher on "
+				+ "teacher.teacid = class.cls_owner where grade_id = ?";
+		String sqlClsSub = "select sub_name, sub_owner, teacname from classsub join teacher on "
+				+ "teacher.teacid = classsub.sub_owner where cls_id = ?";
+		
+		// populate <subject> + <prepare lesson teacher>
+		List<SubjectTeac> grsubL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), gr.getId());
+		gr.setSubs(grsubL);
+		// populate class information
+		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
+		for (ClassInfo cls : grclsL) {
+			if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
+				gr.setType(true);
+			}
+			List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
+			cls.setSubs(cSub);
+		}
+		gr.setcInfo(grclsL);
+		
+		return true;
+	}
+	
 	@Transactional
 	private boolean populateDeparts(School item, String orgId) {
-		String sqlGr = "select ustudy.grade.id, grade_name, classes_num, grade_owner, "
-				+ "teacname from ustudy.grade join ustudy.teacher where "
-				+ "ustudy.grade.grade_owner = ustudy.teacher.teacid and school_id = ?";
-		String sqlGrSub = "select sub_name, sub_owner, teacname from ustudy.gradesub join ustudy.teacher where "
-				+ "ustudy.teacher.teacid = ustudy.gradesub.sub_owner and grade_id = ?";
-		String sqlCls = "select ustudy.class.id, cls_name, cls_type, cls_owner, teacname from ustudy.class join ustudy.teacher where "
-				+ "ustudy.teacher.teacid = ustudy.class.cls_owner and grade_id = ?";
-		String sqlClsSub = "select sub_name, sub_owner, teacname from ustudy.classsub join ustudy.teacher where "
-				+ "ustudy.teacher.teacid = ustudy.classsub.sub_owner and cls_id = ?";
+		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from "
+				+ "grade join teacher on grade.grade_owner = teacher.teacid where school_id = ?";
 		
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
@@ -117,19 +200,7 @@ public class SchoolServiceImp implements SchoolService {
 		List<Grade> othL = new ArrayList<Grade>();
 		
 		for (Grade gr: grL) {
-			// populate <subject> + <prepare lesson teacher>
-			List<SubjectTeac> grsubL = schS.query(sqlGrSub, new SubjectTeacRowMapper(), gr.getId());
-			gr.setSubs(grsubL);
-			// populate class information
-			List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
-			for (ClassInfo cls: grclsL) {
-				if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
-					gr.setType(true);
-				}
-				List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
-				cls.setSubs(cSub);
-			}
-			gr.setcInfo(grclsL);
+			populateGrade(gr);
 			if (gr.isHigh())
 				highL.add(gr);
 			else if(gr.isJunior())
@@ -179,6 +250,7 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	public int updateDepSubs(List<SubjectLeader> subs, String dType) {
+		logger.debug("updateDepSubs()");
 		String orgT = null, orgId = null, msg = null;
 		getOrgInfo(orgT, orgId);
 		int cnt = 0;
@@ -220,8 +292,10 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	public Grade getGradeInfo(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		String sqlGr = "select * from ustudy.grade where id = ?";
+		Grade info = schS.queryForObject(sqlGr, new GradeRowMapper(), id);
+		populateGrade(info);
+		return info;
 	}
 
 	@Override
@@ -231,15 +305,22 @@ public class SchoolServiceImp implements SchoolService {
 	}
 
 	@Override
-	public List<TeacherBrife> getGradeTeac(String gradeId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<SubjectTeac> getGradeTeac(String id) {
+		List<SubjectTeac> subL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), id);
+		return subL;
 	}
 
 	@Override
+	@Transactional
 	public ClassInfo getClassInfo(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		String orgT = null, orgId = null;
+		getOrgInfo(orgT, orgId);
+		String sqlC = "select * from ustudy.class where id = ?";
+		ClassInfo info = schS.queryForObject(sqlC, new ClassInfoRowMapper(), id);
+		
+		// need to populate class subjects information
+		info.setSubs(getClassSubs(id));
+		return info;
 	}
 
 	@Override
@@ -249,9 +330,15 @@ public class SchoolServiceImp implements SchoolService {
 	}
 
 	@Override
-	public List<TeacherBrife> getClassTeac(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+	public List<SubjectTeac> getClassSubs(String id) {
+		String orgT = null, orgId = null;
+		getOrgInfo(orgT, orgId);
+		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
+				+ "classsub.sub_owner = teacher.teacid where class.cls_id = ?";
+		List<SubjectTeac> stL = schS.query(sqlT, new SubjectTeacRowMapper(), id);
+		
+		return stL;
 	}
 
 	private void getOrgInfo(String orgT, String orgId) {

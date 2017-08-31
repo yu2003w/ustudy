@@ -1,5 +1,7 @@
 package com.ustudy.infocenter.services.impl;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -135,6 +137,7 @@ public class TeacherServiceImpl implements TeacherService {
 		// insert record into ustudy.teacher firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
+		String msg = null;
 	
 		String orgT = InfoUtil.retrieveSessAttr("orgType");
 		String orgId = InfoUtil.retrieveSessAttr("orgId");
@@ -151,6 +154,19 @@ public class TeacherServiceImpl implements TeacherService {
 				psmt.setNull(1, java.sql.Types.INTEGER);
 				psmt.setString(2, item.getTeacId());
 				psmt.setString(3, item.getTeacName());
+				
+				//Noted: password should be set as last 6 digits of teacher id which is phone number
+				try {
+					MessageDigest md = MessageDigest.getInstance("MD5");
+					md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+					item.setPasswd((md.digest()).toString());
+				} catch (NoSuchAlgorithmException ne) {
+					String emsg = "createItem(), failed to initialize MD5 algorithm.";
+					logger.warn(emsg);
+					throw new RuntimeException(emsg);
+				}
+				
+				
 				psmt.setString(4, item.getPasswd());
 				
 				// Noted: need to populate current user's orgtype, orgid
@@ -165,14 +181,14 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 		}, keyH);
 		if (num != 1) {
-			String msg = "createItem(), return value for teacher insert is " + num;
+			msg = "createItem(), return value for teacher insert is " + num;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
 	
 		id = keyH.getKey().intValue();
 		if (id < 0) {
-			String msg = "createItem() failed with invalid id " + id;
+			msg = "createItem() failed with invalid id " + id;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}

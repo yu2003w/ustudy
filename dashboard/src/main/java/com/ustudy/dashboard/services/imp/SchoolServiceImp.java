@@ -218,9 +218,11 @@ public class SchoolServiceImp implements SchoolService {
 		int num = 0;
 		String msg = null;
 		// grade schema is as below,
-		// id, grade_name, classes_num, school_id
-		String sqlGr = "insert into ustudy.grade values(?,?,?,?)";
-		String sqlCla = "insert into ustudy.course values(?,?,?);";
+		// id, grade_name, classes_num, grade_owner, school_id
+		// Noted: grade_owner is not used in dashboard, it's used by info center
+		String sqlGr = "insert into ustudy.grade values(?,?,?,?,?)";
+		
+		String sqlCla = "insert into ustudy.course values(?,?,?,?);";
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
 			// insert grade related information into ustudy.grade firstly
@@ -234,7 +236,8 @@ public class SchoolServiceImp implements SchoolService {
 					psmt.setNull(1, java.sql.Types.NULL);
 					psmt.setString(2, gr.getGradeName());
 					psmt.setInt(3, gr.getNum());
-					psmt.setString(4, schId);
+					psmt.setNull(4, java.sql.Types.VARCHAR);
+					psmt.setString(5, schId);
 					return psmt;
 				}
 			}, keyH);
@@ -251,8 +254,9 @@ public class SchoolServiceImp implements SchoolService {
 			}
 			for (Subject sub : subs) {
 				// course schema is as below,
-				// id, grade_id, course_name
-				num = jdbcT.update(sqlCla, null, id, sub.getCourseName());
+				// id, grade_id, course_name, preleader
+				// preleader is not used by dashboard, it's used by info center
+				num = jdbcT.update(sqlCla, null, id, sub.getCourseName(), null);
 				if (num != 1) {
 					msg = "saveGrades(), return value for course insert is " + num;
 					logger.warn(msg);
