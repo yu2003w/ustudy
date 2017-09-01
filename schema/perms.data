@@ -18,3 +18,11 @@ null,teacher:edit,org_owner
 null,teacher:view,org_owner
 null,student:edit,org_owner
 null,student:view,org_owner
+null,infoschool:view,org_owner
+null,infoschool:edit,org_owner
+null,teacher:edit,leader
+null,teacher:view,leader
+null,student:edit,leader
+null,student:view,leader
+null,infoschool:view,leader
+null,infoschool:edit,leader
