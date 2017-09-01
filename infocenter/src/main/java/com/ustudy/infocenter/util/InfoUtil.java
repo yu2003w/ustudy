@@ -82,7 +82,7 @@ public class InfoUtil {
 	/*
 	 * Calling this method should catch exceptions throws by shiro
 	 */
-	public static String retrieveSessAttr(final String key) {
+	public static String retrieveSessAttr(String key) {
 		Session ses = SecurityUtils.getSubject().getSession();
 		Object obj = ses.getAttribute(key);
 		if (obj != null)

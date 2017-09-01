@@ -46,11 +46,10 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Override
 	public School getSchool() {
-		String orgT = null, orgId = null;
-		getOrgInfo(orgT, orgId);
+		String orgT = getOrgInfo("orgType"), orgId = getOrgInfo("orgId");
 		
 		String sqlSch = "select * from ustudy.school where school_id = ?";
-		logger.debug("getSchool(), school_id->" + orgId);
+		
 		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
 		
 		// populate school owner and exam owner
@@ -243,17 +242,15 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	@Transactional
 	public List<SubjectLeader> getDepSubs(String depName) {
-		String orgT = null, orgId = null;
-		getOrgInfo(orgT, orgId);
-		List<SubjectLeader> subL = populateDepartSub(orgId, depName);
+		List<SubjectLeader> subL = populateDepartSub(getOrgInfo("orgId"), depName);
 		return subL;
 	}
 
 	@Override
 	public int updateDepSubs(List<SubjectLeader> subs, String dType) {
-		logger.debug("updateDepSubs()");
-		String orgT = null, orgId = null, msg = null;
-		getOrgInfo(orgT, orgId);
+		logger.debug("updateDepSubs(), updateDepSubs ->" + subs.toString());
+		String orgId = getOrgInfo("orgId"), msg = null;
+
 		int cnt = 0;
 		// table schema is id, value, teac_id, type, school_id
 		String sqlC = "insert into ustudy.departsub values(?,?,?,?,?)";
@@ -325,8 +322,6 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	@Transactional
 	public ClassInfo getClassInfo(String id) {
-		String orgT = null, orgId = null;
-		getOrgInfo(orgT, orgId);
 		String sqlC = "select * from ustudy.class where id = ?";
 		ClassInfo info = schS.queryForObject(sqlC, new ClassInfoRowMapper(), id);
 		
@@ -347,8 +342,6 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Transactional
 	private List<SubjectTeac> getClassSubs(String id) {
-		String orgT = null, orgId = null;
-		getOrgInfo(orgT, orgId);
 		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
 				+ "classsub.sub_owner = teacher.teacid where class.cls_id = ?";
 		List<SubjectTeac> stL = schS.query(sqlT, new SubjectTeacRowMapper(), id);
@@ -363,20 +356,20 @@ public class SchoolServiceImp implements SchoolService {
 		return teaL;
 	}
 	
-	private void getOrgInfo(String orgT, String orgId) {
+	private String getOrgInfo(String key) {
+		String orgV = null;
 		try {
-			orgT = InfoUtil.retrieveSessAttr("orgType");
-			orgId = InfoUtil.retrieveSessAttr("orgId");
-			if (orgT == null || orgId == null || orgT.isEmpty() || orgId.isEmpty()) {
+			orgV = InfoUtil.retrieveSessAttr(key);
+			if (orgV == null || orgV.isEmpty()) {
 				logger.warn("getOrgInfo(), it seemed that user did not log in");
-				throw new RuntimeException("getOrgInfo(), orgType or orgId is not proper");
+				throw new RuntimeException("getOrgInfo(), orgValue is not proper for " + key);
 			}
-				
 		} catch (Exception e) {
-			String msg = "getOrgInfo(), failed to retrieve proper orgType or orgId";
+			String msg = "getOrgInfo(), failed to retrieve org value for " + key;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
-		logger.debug("getOrgInfo(), retrieve information for " + orgT + ":" + orgId);
+		logger.debug("getOrgInfo(), " + key + "->" + orgV);
+		return orgV;
 	}
 }
