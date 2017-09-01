@@ -50,6 +50,7 @@ public class SchoolServiceImp implements SchoolService {
 		getOrgInfo(orgT, orgId);
 		
 		String sqlSch = "select * from ustudy.school where school_id = ?";
+		logger.debug("getSchool(), school_id->" + orgId);
 		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
 		
 		// populate school owner and exam owner
@@ -361,6 +362,7 @@ public class SchoolServiceImp implements SchoolService {
 		List<TeacherBrife> teaL = null;
 		return teaL;
 	}
+	
 	private void getOrgInfo(String orgT, String orgId) {
 		try {
 			orgT = InfoUtil.retrieveSessAttr("orgType");

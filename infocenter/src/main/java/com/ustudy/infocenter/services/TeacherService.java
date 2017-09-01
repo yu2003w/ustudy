@@ -19,5 +19,7 @@ public interface TeacherService {
 	public int deleteItem(int id);
 
 	public Teacher findTeacherById(String teaid);
+	
+	public boolean updateLLTime(String teaid);
 
 }

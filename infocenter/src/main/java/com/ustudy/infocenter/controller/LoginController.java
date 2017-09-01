@@ -94,6 +94,10 @@ public class LoginController {
 			ses.setAttribute("orgType", tea.getOrgtype());
 			ses.setAttribute("orgId", tea.getOrgid());
 			
+			// update last login time for logged teacher
+			if (!teaS.updateLLTime(tea.getId()))
+				logger.warn("login(), failed to set last login time for user " + currentUser.getPrincipal().toString());
+			
 			// TODO: need to redirect user to proper pages based on organization type
 			
 			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid()); 

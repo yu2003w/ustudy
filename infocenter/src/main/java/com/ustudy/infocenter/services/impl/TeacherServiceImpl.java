@@ -129,6 +129,18 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	@Transactional
+	public boolean updateLLTime(final String id) {
+		String sqlLL = "update teacher set ll_time = ? where id = ?";
+		int num = jTea.update(sqlLL, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), id);
+		if (num != 1) {
+			logger.debug("updateLLTime(), set last login time failed for teacher " + id);
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	@Transactional
 	public int createItem(Teacher item) {
 		// Noted: Schema for table ustudy.teacher is as below,
 		// id, teacid, teacname, passwd, ctime, lltime
