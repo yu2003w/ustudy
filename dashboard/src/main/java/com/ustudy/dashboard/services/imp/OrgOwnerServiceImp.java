@@ -62,7 +62,8 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	public int createItem(OrgOwner item) {
 		// Noted: Schema for table ustudy.orgowner is as below,
 		// id, name, loginname, passwd, orgtype, orgid, role, ctime
-		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?);";
+		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?,?);";
+
 		if (item.getRole() == null || !((item.getRole().compareTo("校长") == 0) ||
 				item.getRole().compareTo("考务老师") == 0))
 			throw new RuntimeException("createItem(), unsupported role type " + item.getRole());

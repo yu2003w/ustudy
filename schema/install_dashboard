@@ -43,7 +43,7 @@ loginname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
 orgtype ENUM ('学校','教研室') NOT NULL,
 orgid varchar(32) NOT NULL,
-role ENUM('校长','考务') NOT NULL,
+role ENUM('校长','考务老师','教研主任') NOT NULL,
 ctime datetime DEFAULT NULL,
 PRIMARY KEY(id),
 INDEX(name,loginname)
