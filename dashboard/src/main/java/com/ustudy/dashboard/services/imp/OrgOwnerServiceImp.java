@@ -63,8 +63,8 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 		// Noted: Schema for table ustudy.orgowner is as below,
 		// id, name, loginname, passwd, orgtype, orgid, role, ctime
 		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?);";
-		if (item.getRole() == null || (item.getRole().compareTo("校长") != 0) ||
-				item.getRole().compareTo("考务") != 0)
+		if (item.getRole() == null || !((item.getRole().compareTo("校长") == 0) ||
+				item.getRole().compareTo("考务老师") == 0))
 			throw new RuntimeException("createItem(), unsupported role type " + item.getRole());
 		
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
@@ -235,7 +235,7 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 				psmt.setNull(1, java.sql.Types.NULL);
 				if (item.getRole().compareTo("校长") == 0) {
 					psmt.setString(2, "org_owner");
-				} else if (item.getRole().compareTo("考务") == 0) {
+				} else if (item.getRole().compareTo("考务老师") == 0) {
 					psmt.setString(2, "leader");
 				} else {
 					logger.warn("populateTeachers(), role is " + item.getRole() +
