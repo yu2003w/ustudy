@@ -55,7 +55,7 @@ public class TeacherServiceImpl implements TeacherService {
 			String orgId = InfoUtil.retrieveSessAttr("orgId");
 			if ( orgT == null || orgT.isEmpty() ||
 					orgId == null || orgId.isEmpty()) {
-				throw new RuntimeException("createItem(), it seemed user not logged in");
+				throw new RuntimeException("getList(), it seemed user not logged in");
 			}
 			
 			if (id < 0)

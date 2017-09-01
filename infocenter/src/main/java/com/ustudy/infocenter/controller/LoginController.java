@@ -91,8 +91,8 @@ public class LoginController {
 			// need to populate current user's orgtype, orgid information
 			Session ses = currentUser.getSession();
 			Teacher tea = teaS.findTeacherById(currentUser.getPrincipal().toString());
-			ses.setAttribute("orgtype", tea.getOrgtype());
-			ses.setAttribute("orgid", tea.getOrgid());
+			ses.setAttribute("orgType", tea.getOrgtype());
+			ses.setAttribute("orgId", tea.getOrgid());
 			
 			// TODO: need to redirect user to proper pages based on organization type
 			
