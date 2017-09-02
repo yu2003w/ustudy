@@ -190,15 +190,14 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Transactional
 	private boolean populateDeparts(School item, String orgId) {
-		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from "
-				+ "grade join teacher on grade.grade_owner = teacher.teacid where school_id = ?";
+		String sqlGr = "select id, grade_name, classes_num, grade_owner from grade where school_id = ?";
 		
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();
 		List<Grade> priL = new ArrayList<Grade>();
 		List<Grade> othL = new ArrayList<Grade>();
-		
+		logger.debug("populateDeparts(), departments for school " + orgId + "->\n" + grL.toString());
 		for (Grade gr: grL) {
 			populateGrade(gr);
 			if (gr.isHigh())

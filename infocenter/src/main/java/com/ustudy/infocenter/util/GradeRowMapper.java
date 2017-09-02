@@ -12,9 +12,13 @@ public class GradeRowMapper implements RowMapper<Grade> {
 
 	@Override
 	public Grade mapRow(ResultSet rs, int num) throws SQLException {
-		Grade item = new Grade(rs.getString("id"), rs.getString("grade_name"), 
-				new TeacherBrife(rs.getString("grade_owner"), rs.getString("teacname")),
-				rs.getString("classes_num"));
+		String tid = rs.getString("grade_owner");
+		TeacherBrife tea = null;
+		if (tid != null && !tid.isEmpty()) {
+			tea = new TeacherBrife(tid, null);
+		}
+		Grade item = new Grade(rs.getString("id"), 
+				rs.getString("grade_name"), tea, rs.getString("classes_num"));
 		return item;
 	}
 }
