@@ -146,6 +146,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public int createItem(Teacher item) {
+		logger.debug("createItem(), " + item);
 		// Noted: Schema for table ustudy.teacher is as below,
 		// id, teacid, teacname, passwd, orgType, orgId, ctime, lltime
 		String sqlTeac = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?)";
@@ -183,7 +184,7 @@ public class TeacherServiceImpl implements TeacherService {
 									+ "characters, failed to populate password");
 							throw new RuntimeException("createItem(), failed to set password.");
 						}
-						String pw = item.getPasswd().substring(item.getPasswd().length() - 6, item.getPasswd().length());
+						String pw = item.getTeacId().substring(item.getTeacId().length() - 6, item.getTeacId().length());
 						md.update(pw.getBytes(), 0, 6);
 							
 					}
