@@ -36,8 +36,7 @@ import com.ustudy.infocenter.util.SubjectTeacRowMapper;
 @Service
 public class SchoolServiceImp implements SchoolService {
 
-	private static final String SQL_GRADE_SUB = "select sub_name, sub_owner, teacname "
-			+ "from gradesub join teacher on teacher.teacid = gradesub.sub_owner where grade_id = ?";
+	private static final String SQL_GRADE_SUB = "select sub_name, sub_owner from gradesub where grade_id = ?";
 	
 	private static final Logger logger = LogManager.getLogger(SchoolServiceImp.class);
 	
@@ -49,7 +48,6 @@ public class SchoolServiceImp implements SchoolService {
 		String orgT = getOrgInfo("orgType"), orgId = getOrgInfo("orgId");
 		
 		String sqlSch = "select * from ustudy.school where school_id = ?";
-		
 		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
 		
 		// populate school owner and exam owner
@@ -80,18 +78,17 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Transactional
-	private List<SubjectLeader> populateDepartSub(final String orgId, final String dType) {
+	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
 		String sqlG = null; 
 		if (dType.compareTo("high") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name"
-				+ "= '高一' or grade.grade_name = '高二' or grade.grade_name= '高三')";
+			sqlG = "select id from grade where grade.school_id = ? and "
+					+ "grade.grade_name in ('高一', '高二', '高三')";
 		} else if (dType.compareTo("junior") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name"
-					+ "= '七年级' or grade.grade_name = '八年级' or grade.grade_name= '九年级')";
+			sqlG = "select id from grade where grade.school_id = ? and "
+					+ "grade.grade_name in('七年级', '八年级','九年级')";
 		} else if (dType.compareTo("primary") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and (grade.grade_name = '六年级'"
-					+ "or grade.grade_name = '五年级' or grade.grade_name = '四年级' or grade.grade_name= '三年级'"
-					+ "or grade.grade_name = '二年级' or grade.grade_name = '一年级')";
+			sqlG = "select id from grade where grade.school_id = ? and grade.grade_name "
+					+ "in('六年级','五年级','四年级','三年级','二年级','一年级')";
 		}
 		
 		// get Grade Ids for specified department
@@ -129,8 +126,8 @@ public class SchoolServiceImp implements SchoolService {
 			}
 		});
 		
-		String sqlT = "select value, teacid, teacname from departsub JOIN teacher on "
-				+ "departsub.teac_id = teacher.teacid where departsub.school_id = ? and departsub.type = ?";
+		String sqlT = "select value, teacid from departsub where "
+				+ "departsub.school_id = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
 		ConcurrentHashMap<String, List<TeacherBrife>> ret = null;
@@ -166,16 +163,16 @@ public class SchoolServiceImp implements SchoolService {
 	
 	private boolean populateGrade(Grade gr) {
 		
-		String sqlCls = "select class.id, cls_name, cls_type, cls_owner, teacname from class join teacher on "
-				+ "teacher.teacid = class.cls_owner where grade_id = ?";
-		String sqlClsSub = "select sub_name, sub_owner, teacname from classsub join teacher on "
-				+ "teacher.teacid = classsub.sub_owner where cls_id = ?";
+		String sqlCls = "select id, cls_name, cls_type, cls_owner from class where grade_id = ?";
+		String sqlClsSub = "select sub_name, sub_owner from classsub where cls_id = ?";
 		
 		// populate <subject> + <prepare lesson teacher>
 		List<SubjectTeac> grsubL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), gr.getId());
+		logger.debug("populateGrade(), grade subject ->" + grsubL.toString());
 		gr.setSubs(grsubL);
 		// populate class information
 		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
+		logger.debug("populateGrade(), class info ->" + grclsL.toString());
 		for (ClassInfo cls : grclsL) {
 			if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
 				gr.setType(true);
@@ -184,19 +181,18 @@ public class SchoolServiceImp implements SchoolService {
 			cls.setSubs(cSub);
 		}
 		gr.setcInfo(grclsL);
-		
 		return true;
 	}
 	
 	@Transactional
 	private boolean populateDeparts(School item, String orgId) {
 		String sqlGr = "select id, grade_name, classes_num, grade_owner from grade where school_id = ?";
-		
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();
 		List<Grade> priL = new ArrayList<Grade>();
 		List<Grade> othL = new ArrayList<Grade>();
+		
 		logger.debug("populateDeparts(), departments for school " + orgId + "->\n" + grL.toString());
 		for (Grade gr: grL) {
 			populateGrade(gr);

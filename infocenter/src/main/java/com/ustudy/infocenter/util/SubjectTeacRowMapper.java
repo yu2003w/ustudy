@@ -11,8 +11,12 @@ public class SubjectTeacRowMapper implements RowMapper<SubjectTeac> {
 
 	@Override
 	public SubjectTeac mapRow(ResultSet rs, int row) throws SQLException {
-		SubjectTeac item = new SubjectTeac(rs.getString("sub_name"), 
-				rs.getString("sub_owner"), rs.getString("teacname"));
+		String tid = rs.getString("sub_owner");
+		String tn = null;
+		if (tid != null && !tid.isEmpty()) {
+			tn = rs.getString("teacname");
+		}
+		SubjectTeac item = new SubjectTeac(rs.getString("sub_name"), tid, tn);
 		return item;
 	}
 }
