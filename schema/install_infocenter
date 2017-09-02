@@ -32,21 +32,6 @@ FOREIGN KEY (cls_owner)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-create table if not exists ustudy.gradesub (
-id INT NOT NULL AUTO_INCREMENT,
-sub_name VARCHAR(32) NOT NULL,
-grade_id INT NOT NULL,
-sub_owner VARCHAR(32),
-PRIMARY KEY(id),
-INDEX(grade_id, sub_name),
-FOREIGN KEY (grade_id)
-    REFERENCES ustudy.grade(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (sub_owner)
-    REFERENCES ustudy.teacher(teacid)
-    ON UPDATE CASCADE ON DELETE SET NULL
-) ENGINE=InnoDB;
-
 create table if not exists ustudy.classsub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_name VARCHAR(32) NOT NULL,

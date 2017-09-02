@@ -204,7 +204,7 @@ public class SchoolServiceImp implements SchoolService {
 		
 		for (Grade gn : gNames) {
 			List<Subject> cs = null;
-			String sqlCs = "select course_name from ustudy.course where grade_id = ?;";
+			String sqlCs = "select course_name from ustudy.gradesub where grade_id = ?;";
 			cs = jdbcT.query(sqlCs, new SubjectRowMapper(), gn.getId());
 			gn.setSubjects(cs);
 			// logger.debug(gn.toString());
@@ -222,7 +222,7 @@ public class SchoolServiceImp implements SchoolService {
 		// Noted: grade_owner is not used in dashboard, it's used by info center
 		String sqlGr = "insert into ustudy.grade values(?,?,?,?,?)";
 		
-		String sqlCla = "insert into ustudy.course values(?,?,?,?);";
+		String sqlCla = "insert into ustudy.gradesub values(?,?,?,?);";
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
 			// insert grade related information into ustudy.grade firstly
