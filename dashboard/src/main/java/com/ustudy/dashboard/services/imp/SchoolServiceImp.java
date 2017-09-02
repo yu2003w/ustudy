@@ -253,17 +253,17 @@ public class SchoolServiceImp implements SchoolService {
 				throw new RuntimeException(msg);
 			}
 			for (Subject sub : subs) {
-				// course schema is as below,
-				// id, grade_id, course_name, preleader
-				// preleader is not used by dashboard, it's used by info center
-				num = jdbcT.update(sqlCla, null, id, sub.getCourseName(), null);
+				// gradesub schema is as below,
+				// id, sub_name, grade_id, sub_owner
+				// sub_owner is not used by dashboard, it's used by info center
+				num = jdbcT.update(sqlCla, null, sub.getCourseName(), id, null);
 				if (num != 1) {
 					msg = "saveGrades(), return value for course insert is " + num;
 					logger.warn(msg);
 					throw new RuntimeException(msg);
 				}
 			}
-			logger.debug("Num of courses for " + schId + "," + gr.getGradeName() + " is " + subs.size());
+			logger.debug("Num of subjects for " + schId + "," + gr.getGradeName() + " is " + subs.size());
 			logger.debug(schId + " of " + gr.getGradeName() + " has " + gr.getNum() + " classes");
 		}
 		return grades.size();
