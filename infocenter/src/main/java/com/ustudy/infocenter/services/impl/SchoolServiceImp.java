@@ -208,29 +208,28 @@ public class SchoolServiceImp implements SchoolService {
 			else if (gr.isPrimary())
 				priL.add(gr);
 			else
-				othL.add(gr);
-				
+				othL.add(gr);	
 		}
 		// populate department information
 		List<Department> departs = new ArrayList<Department>();
-		if (highL.size() > 0) {
+		if (!highL.isEmpty()) {
 			Department hd = new Department("高中部", highL);
 			hd.setSubLeader(populateDepartSub(orgId, "high"));
 			departs.add(hd);
 		}
-		if (junL.size() > 0) {
+		if (!junL.isEmpty()) {
 			Department jd = new Department("初中部", junL);
 			jd.setSubLeader(populateDepartSub(orgId, "junior"));
 			departs.add(jd);
 		}
 			
-		if (priL.size() > 0) {
+		if (!priL.isEmpty()) {
 			Department pd = new Department("小学部", highL);
 			pd.setSubLeader(populateDepartSub( orgId, "primary"));
 			departs.add(pd);
 		}
 
-		if (othL.size() > 0) {
+		if (!othL.isEmpty()) {
 			Department od = new Department("其他", highL);
 			od.setSubLeader(populateDepartSub(orgId, "other"));
 			departs.add(od);

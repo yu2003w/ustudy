@@ -114,6 +114,7 @@ public class TeacherServiceImpl implements TeacherService {
 		for (UElem e: rs) {
 			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
 		}
+		logger.debug("retrieveProp(), roles -> " + rs.toString());
 		item.setRoles(rs);
 		
 		// retrieve additional permissions
