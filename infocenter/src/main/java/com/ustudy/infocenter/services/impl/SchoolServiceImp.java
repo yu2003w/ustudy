@@ -61,15 +61,15 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Transactional
-	private boolean populateOwner(School item, final String orgT, final String orgId) {
+	private boolean populateOwner(School item, String orgT, String orgId) {
 		// for school owner and examination owner, information could be retrieved from 
 		// ustudy.orgowner
-		String sqlS = "select loginname, name, role from ustudy.orgowner where orgtype = ？ and orgid = ?";
+		String sqlS = "select loginname, name, role from ustudy.orgowner where orgtype = ? and orgid = ?";
 		List<OwnerBrife> oL = schS.query(sqlS, new OwnerRowMapper(), orgT, orgId); 
 		for (OwnerBrife e: oL) {
-			if (e.getRole().compareTo("org_owner") == 0) {
+			if (e.getRole().compareTo("校长") == 0) {
 				item.setOwner(new TeacherBrife(e.getLoginname(), e.getName()));
-			} else if (e.getRole().compareTo("leader") == 0) {
+			} else if (e.getRole().compareTo("考务老师") == 0) {
 				item.setExam(new TeacherBrife(e.getLoginname(), e.getName()));
 			} else {
 				logger.warn("populateOwner(), unsupported role" + e.toString());

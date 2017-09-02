@@ -105,11 +105,15 @@ public class TeacherServiceImpl implements TeacherService {
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
 		
-		// retrieve roles and excluter addi_{teac_id}
+		// retrieve roles and exclude addi_{teac_id}
 		String aRole = "addi_" + item.getTeacId();
 		sqlD = "select * from ustudy.teacherroles where teac_id = ?";
 		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		rs.remove(aRole);
+		// convert internal role to user readable role name
+		for (UElem e: rs) {
+			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
+		}
 		item.setRoles(rs);
 		
 		// retrieve additional permissions
@@ -143,8 +147,8 @@ public class TeacherServiceImpl implements TeacherService {
 	@Transactional
 	public int createItem(Teacher item) {
 		// Noted: Schema for table ustudy.teacher is as below,
-		// id, teacid, teacname, passwd, ctime, lltime
-		String sqlOwner = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?);";
+		// id, teacid, teacname, passwd, orgType, orgId, ctime, lltime
+		String sqlTeac = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?)";
 
 		// insert record into ustudy.teacher firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
@@ -162,22 +166,34 @@ public class TeacherServiceImpl implements TeacherService {
 		int num = jTea.update(new PreparedStatementCreator(){
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlOwner, Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement psmt = conn.prepareStatement(sqlTeac, Statement.RETURN_GENERATED_KEYS);
 				psmt.setNull(1, java.sql.Types.INTEGER);
 				psmt.setString(2, item.getTeacId());
 				psmt.setString(3, item.getTeacName());
 				
-				//Noted: password should be set as last 6 digits of teacher id which is phone number
+				// Noted: password should be set as last 6 digits of teacher id which is phone number
 				try {
 					MessageDigest md = MessageDigest.getInstance("MD5");
-					md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+					if (item.getPasswd() != null) {
+						md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+					} else {
+						// if no passwd set for teacher, passwd should be last 6 characters in teacId
+						if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+							logger.warn("createItem(), teacher id contains less than 6 "
+									+ "characters, failed to populate password");
+							throw new RuntimeException("createItem(), failed to set password.");
+						}
+						String pw = item.getPasswd().substring(item.getPasswd().length() - 6, item.getPasswd().length());
+						md.update(pw.getBytes(), 0, 6);
+							
+					}
+					
 					item.setPasswd((md.digest()).toString());
 				} catch (NoSuchAlgorithmException ne) {
 					String emsg = "createItem(), failed to initialize MD5 algorithm.";
 					logger.warn(emsg);
 					throw new RuntimeException(emsg);
 				}
-				
 				
 				psmt.setString(4, item.getPasswd());
 				
