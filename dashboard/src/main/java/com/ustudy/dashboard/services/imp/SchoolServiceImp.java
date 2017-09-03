@@ -3,7 +3,7 @@ package com.ustudy.dashboard.services.imp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -214,7 +214,7 @@ public class SchoolServiceImp implements SchoolService {
 	
 	
 	// Store grades information into database
-	private int saveGrades(List<Grade> grades, final String schId) {
+	private int saveGrades(List<Grade> grades, String schId) {
 		int num = 0;
 		String msg = null;
 		// grade schema is as below,
@@ -223,8 +223,24 @@ public class SchoolServiceImp implements SchoolService {
 		String sqlGr = "insert into ustudy.grade values(?,?,?,?,?)";
 		
 		String sqlCla = "insert into ustudy.gradesub values(?,?,?,?);";
+		HashSet<String> highS = new HashSet<String>();
+		HashSet<String> juniorS = new HashSet<String>();
+		HashSet<String> priS = new HashSet<String>();
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
+			HashSet<String> depS = null;
+			if (gr.getGradeName().compareTo("高一") == 0 || gr.getGradeName().compareTo("高二") == 0 ||
+					gr.getGradeName().compareTo("高三") == 0) {
+				depS= highS;
+			} else if (gr.getGradeName().compareTo("九年级") == 0 || gr.getGradeName().compareTo("八年级") == 0 ||
+					gr.getGradeName().compareTo("七年级") == 0) {
+				depS = juniorS;
+			} else if (gr.getGradeName().compareTo("六年级") == 0 || gr.getGradeName().compareTo("五年级") == 0 ||
+					gr.getGradeName().compareTo("四年级") == 0 || gr.getGradeName().compareTo("三年级") == 0 || 
+					gr.getGradeName().compareTo("二年级") == 0 || gr.getGradeName().compareTo("一年级") == 0) {
+				depS = priS;
+			} 
+			
 			// insert grade related information into ustudy.grade firstly
 			// need to retrieve auto generated key
 			int id = -1;
@@ -262,11 +278,36 @@ public class SchoolServiceImp implements SchoolService {
 					logger.warn(msg);
 					throw new RuntimeException(msg);
 				}
+				depS.add(sub.getCourseName());
 			}
+			
 			logger.debug("Num of subjects for " + schId + "," + gr.getGradeName() + " is " + subs.size());
 			logger.debug(schId + " of " + gr.getGradeName() + " has " + gr.getNum() + " classes");
 		}
+		
+		saveDepSub(highS, "high", schId);
+		saveDepSub(juniorS, "junior", schId);
+		saveDepSub(priS, "primary", schId);
 		return grades.size();
+	}
+	
+	private int saveDepSub(HashSet<String> subS, String type, String schId) {
+		// populate subjects for departments, schema is as below,
+		// id, sub_name, sub_owner, type, school_id
+		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
+		int num = 0;
+		String msg = null;
+		for (String sub: subS) {
+			num = jdbcT.update(sqlDepSub, null, sub, null, type, schId);
+			if (num != 1) {
+				msg = "saveDepSub(), return value for departsub insert is " + num;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+		}
+		logger.debug("saveDepSub(), number of departent subject records for"
+				+ "school " + schId + ":" + type + "->" + subS.size() );
+		return subS.size();
 	}
 	
 }

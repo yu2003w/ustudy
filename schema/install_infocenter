@@ -61,16 +61,16 @@ FOREIGN KEY (teac_id)
 # subject leader at department level
 create table if not exists ustudy.departsub (
 id INT NOT NULL AUTO_INCREMENT,
-value varchar(32) NOT NULL,
-teac_id varchar(32),
+sub_name varchar(32) NOT NULL,
+sub_owner varchar(32),
 type ENUM('high','junior','primary','other'),
 school_id varchar(32) NOT NULL,
-INDEX(teac_id, school_id, type),
+INDEX(sub_owner, school_id, type),
 PRIMARY KEY (id),
 FOREIGN KEY (school_id)
     REFERENCES ustudy.school(school_id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (teac_id)
+FOREIGN KEY (sub_owner)
     REFERENCES ustudy.teacher(teacid)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;

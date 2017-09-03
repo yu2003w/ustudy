@@ -126,7 +126,7 @@ public class SchoolServiceImp implements SchoolService {
 			}
 		});
 		
-		String sqlT = "select value, teacid from departsub where "
+		String sqlT = "select sub_name, sub_owner from departsub where "
 				+ "departsub.school_id = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
@@ -167,19 +167,28 @@ public class SchoolServiceImp implements SchoolService {
 		String sqlClsSub = "select sub_name, sub_owner from classsub where cls_id = ?";
 		
 		// populate <subject> + <prepare lesson teacher>
+		if (gr.getId() == null || gr.getId().isEmpty()) {
+			logger.warn("populateGrade(), grade id is not correct.");
+			return false;
+		}
 		List<SubjectTeac> grsubL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), gr.getId());
 		logger.debug("populateGrade(), grade subject ->" + grsubL.toString());
 		gr.setSubs(grsubL);
 		// populate class information
-		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
-		logger.debug("populateGrade(), class info ->" + grclsL.toString());
-		for (ClassInfo cls : grclsL) {
-			if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
-				gr.setType(true);
+		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(),gr.getId());
+		
+		if (grclsL != null && !grclsL.isEmpty()) {
+			logger.debug("populateGrade(), class info ->" + grclsL.toString());
+			for (ClassInfo cls : grclsL) {
+				if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
+					gr.setType(true);
+				}
+				List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
+				cls.setSubs(cSub);
 			}
-			List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
-			cls.setSubs(cSub);
-		}
+		} else
+			logger.debug("populateGrade(), no classes configured for grade " + gr.getId() + ":" + gr.getName());
+		
 		gr.setcInfo(grclsL);
 		return true;
 	}

@@ -142,8 +142,7 @@ public class Grade implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Department [name=" + name + ", type=" + type + ", gradeO=" + gradeO + ", subs=" + subs + ", classNum="
-				+ classNum + ", cInfo=" + cInfo + "]";
-	}
-	
+		return "Grade [id=" + id + ", name=" + name + ", type=" + type + ", gradeO=" + gradeO + ", subs=" + subs
+				+ ", classNum=" + classNum + ", cInfo=" + cInfo + "]";
+	}	
 }
