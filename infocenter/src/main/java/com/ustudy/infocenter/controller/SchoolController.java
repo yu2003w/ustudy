@@ -102,6 +102,33 @@ public class SchoolController {
 		return result;
 	}
 	
+	@RequestMapping(value = "departteac/{id}", method = RequestMethod.GET)
+	public List<TeacherBrife> getDepartTea(@PathVariable String id, HttpServletResponse resp) {
+		logger.debug("getDepartTea(), endpoint /school/departteac/" + id + " is visited.");
+		List<TeacherBrife> itemL = null;
+		String msg = null;
+		try {
+			itemL = schS.getDepTeac(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			msg = "getDepartTea()" + ie.getMessage();
+			logger.warn(msg);
+		} catch (Exception e) {
+			msg = "getDepartTea(), failed to retrieve teacher information for department " + id + "\n"
+					+ e.getMessage();
+			logger.warn(msg);
+			resp.setStatus(500);
+			resp.setHeader("reason", msg);
+			return null;
+		}
+		
+		if (itemL == null) {
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
+		}
+		return null;
+	}
+	
 	@RequestMapping(value = "/grade/{id}", method = RequestMethod.GET)
 	public Grade getGrade(@PathVariable String id, HttpServletResponse resp) {
 		logger.debug("getGrade(), endpoint /school/grade/" + id + " is visited.");
@@ -151,8 +178,29 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/gradeteac/{id}", method = RequestMethod.GET)
-	public List<TeacherBrife> getGradeTeac(@PathVariable String id, HttpServletResponse resp) {
-		logger.debug("getGradeTeac(), endpoint /school/gradeteac/" + id + " is visited.");
+	public List<TeacherBrife> getGradeTea(@PathVariable String id, HttpServletResponse resp) {
+		logger.debug("getGradeTea(), endpoint /school/gradeteac/" + id + " is visited.");
+		List<TeacherBrife> itemL = null;
+		String msg = null;
+		try {
+			itemL = schS.getGradeTeac(id);
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			msg = "getGradeTea()" + ie.getMessage();
+			logger.warn(msg);
+		} catch (Exception e) {
+			msg = "getGradeTea(), failed to retrieve teacher information for grade " + id + "\n"
+					+ e.getMessage();
+			logger.warn(msg);
+			resp.setStatus(500);
+			resp.setHeader("reason", msg);
+			return null;
+		}
+		
+		if (itemL == null) {
+			resp.setStatus(404);
+			resp.setHeader("reason", msg);
+			logger.warn(msg);
+		}
 		return null;
 	}
 	
@@ -205,17 +253,17 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/classteac/{id}", method = RequestMethod.GET)
-	public List<TeacherBrife> getClassSub(@PathVariable String id, HttpServletResponse resp) {
-		logger.debug("getClassInfo(), endpoint /school/classteac/" + id + " is visited.");
+	public List<TeacherBrife> getClassTea(@PathVariable String id, HttpServletResponse resp) {
+		logger.debug("getClassTea(), endpoint /school/classteac/" + id + " is visited.");
 		List<TeacherBrife> itemL = null;
 		String msg = null;
 		try {
 			itemL = schS.getClassTeac(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
-			msg = "getClassSub()" + ie.getMessage();
+			msg = "getClassTea()" + ie.getMessage();
 			logger.warn(msg);
 		} catch (Exception e) {
-			msg = "getClassSub(), failed to retrieve teacher information for class " + id + "\n"
+			msg = "getClassTea(), failed to retrieve teacher information for class " + id + "\n"
 					+ e.getMessage();
 			logger.warn(msg);
 			resp.setStatus(500);

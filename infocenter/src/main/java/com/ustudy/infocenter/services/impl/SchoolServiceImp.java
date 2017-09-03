@@ -30,6 +30,7 @@ import com.ustudy.infocenter.util.InfoUtil;
 import com.ustudy.infocenter.util.OwnerRowMapper;
 import com.ustudy.infocenter.util.SchoolRowMapper;
 import com.ustudy.infocenter.util.SubjectTeacRowMapper;
+import com.ustudy.infocenter.util.TeacherBrifeRowMapper;
 
 @Service
 public class SchoolServiceImp implements SchoolService {
@@ -269,7 +270,9 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	@Transactional
 	public List<TeacherBrife> getGradeTeac(String id) {
-		List<TeacherBrife> teaL = null;
+		String sqlGrTea = "select teacid, teacname from teacher where teacid = (select teac_id "
+				+ "from teachergrade join grade on grade.grade_name = teachergrade.value where grade.id = ?)";
+		List<TeacherBrife> teaL = schS.query(sqlGrTea, new TeacherBrifeRowMapper(), id);
 		return teaL;
 	}
 	

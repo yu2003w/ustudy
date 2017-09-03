@@ -1,5 +1,6 @@
 package com.ustudy.infocenter.services.impl;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -187,8 +188,8 @@ public class TeacherServiceImpl implements TeacherService {
 						md.update(pw.getBytes(), 0, 6);
 							
 					}
-			
-					item.setPasswd(new String(md.digest()));
+					
+					item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
 				} catch (NoSuchAlgorithmException ne) {
 					String emsg = "createItem(), failed to initialize MD5 algorithm.";
 					logger.warn(emsg);

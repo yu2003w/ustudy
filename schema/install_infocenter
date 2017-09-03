@@ -90,7 +90,7 @@ create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
 value varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
-INDEX(teac_id),
+INDEX(teac_id, value),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
