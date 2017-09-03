@@ -2,7 +2,6 @@ package com.ustudy.infocenter.services.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,52 +77,6 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Transactional
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
-		String sqlG = null; 
-		if (dType.compareTo("high") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and "
-					+ "grade.grade_name in ('高一', '高二', '高三')";
-		} else if (dType.compareTo("junior") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and "
-					+ "grade.grade_name in('七年级', '八年级','九年级')";
-		} else if (dType.compareTo("primary") == 0) {
-			sqlG = "select id from grade where grade.school_id = ? and grade.grade_name "
-					+ "in('六年级','五年级','四年级','三年级','二年级','一年级')";
-		}
-		
-		// get Grade Ids for specified department
-		List<String> gIds = schS.query(sqlG, new RowMapper<String>() {
-			@Override
-			public String mapRow(ResultSet rs, int row) throws SQLException {
-				String id = new String(rs.getString("id"));
-				return id;
-			}
-		}, orgId);
-		
-		if (gIds == null || gIds.isEmpty()) {
-			logger.warn("populateDepartSub(), no grade id found for " + orgId + " " + dType);
-			throw new RuntimeException("No grade id found");
-		}
-		
-		// get subject name list for specified grades
-		String sqlSub = "select sub_name from gradesub where grade_id = ";
-		boolean first = true;
-		for (String id: gIds) {
-			if (first) {
-				sqlSub += id;
-				first = false;
-			}
-			else {
-				sqlSub += " or grade_id = " + id;
-			}
-		}
-		
-		List<String> subL = schS.query(sqlSub, new RowMapper<String>() {
-			@Override
-			public String mapRow(ResultSet rs, int row) throws SQLException {
-				String id = new String(rs.getString("sub_name"));
-				return id;
-			}
-		});
 		
 		String sqlT = "select sub_name, sub_owner from departsub where "
 				+ "departsub.school_id = ? and departsub.type = ?";
@@ -137,13 +89,13 @@ public class SchoolServiceImp implements SchoolService {
 			for (SubjectTeac st: soL) {
 				if (!ret.contains(st.getSub())) {
 					List<TeacherBrife> tL = new ArrayList<TeacherBrife>();
-					if (st.getTeac() != null) {
+					if (st.getTeac().getTeacname() != null) {
 						tL.add(st.getTeac());
 					}
 					ret.put(st.getSub(), tL);
 				}
 				else {
-					if (st.getTeac() != null)
+					if (st.getTeac().getTeacname() != null)
 						ret.get(st.getSub()).add(st.getTeac());
 				}
 			}
@@ -153,8 +105,9 @@ public class SchoolServiceImp implements SchoolService {
 		if (ret != null && !ret.isEmpty())
 			ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v))); 
 		
-		logger.debug("populateDepartSub(), populate department subject leaders successful for " +
+		logger.debug("populateDepartSub(), populate department subject leaders for " +
 				dType + " in school -> " + orgId);
+		logger.debug("populateDepartSub()," + lead.toString());
 		return lead;
 	}
 	
@@ -191,7 +144,7 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Transactional
-	private boolean populateDeparts(School item, String orgId) {
+	private void populateDeparts(School item, String orgId) {
 		String sqlGr = "select id, grade_name, classes_num, grade_owner from grade where school_id = ?";
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
@@ -209,7 +162,7 @@ public class SchoolServiceImp implements SchoolService {
 			else if (gr.isPrimary())
 				priL.add(gr);
 			else
-				othL.add(gr);	
+				othL.add(gr);
 		}
 		// populate department information
 		List<Department> departs = new ArrayList<Department>();
@@ -236,7 +189,7 @@ public class SchoolServiceImp implements SchoolService {
 			departs.add(od);
 		}
 		
-		return true;
+		item.setDeparts(departs);
 	}
 
 	@Override

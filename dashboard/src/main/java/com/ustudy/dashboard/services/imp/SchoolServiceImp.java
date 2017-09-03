@@ -282,13 +282,29 @@ public class SchoolServiceImp implements SchoolService {
 			}
 			
 			logger.debug("Num of subjects for " + schId + "," + gr.getGradeName() + " is " + subs.size());
-			logger.debug(schId + " of " + gr.getGradeName() + " has " + gr.getNum() + " classes");
+			num = saveClasses(gr, id);
+			logger.debug(schId + " of " + gr.getGradeName() + " has " + num + " classes");
 		}
 		
 		saveDepSub(highS, "high", schId);
 		saveDepSub(juniorS, "junior", schId);
 		saveDepSub(priS, "primary", schId);
 		return grades.size();
+	}
+	
+	private int saveClasses(Grade g, int id) {
+		// class schemas as below,
+		// id, grade_id, cls_name, cls_type, cls_owner
+		String sqlCls = "insert into class values (?,?,?,?,?)";
+		for (int i = 0; i<g.getNum(); i++) {
+			String clsN = g.getGradeName() + "(" + String.valueOf(i+1) + ")";
+			int ret = jdbcT.update(sqlCls, null, id, clsN, "none", null);
+			if (ret != 1) {
+				logger.warn("saveClasses(), ret code for class insertion is " + ret);
+				throw new RuntimeException("saveClasses(), insert record into class failed." + g.toString());
+			}
+		}
+		return g.getNum();
 	}
 	
 	private int saveDepSub(HashSet<String> subS, String type, String schId) {

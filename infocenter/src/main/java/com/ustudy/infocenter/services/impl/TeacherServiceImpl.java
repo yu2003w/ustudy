@@ -107,9 +107,8 @@ public class TeacherServiceImpl implements TeacherService {
 		
 		// retrieve roles and exclude addi_{teac_id}
 		String aRole = "addi_" + item.getTeacId();
-		sqlD = "select * from ustudy.teacherroles where teac_id = ?";
-		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		rs.remove(aRole);
+		sqlD = "select * from ustudy.teacherroles where teac_id = ? and value != ?";
+		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole);
 		// convert internal role to user readable role name
 		for (UElem e: rs) {
 			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
@@ -119,8 +118,7 @@ public class TeacherServiceImpl implements TeacherService {
 		
 		// retrieve additional permissions
 		sqlD = "select * from ustudy.perms where role_name = ?";
-		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		rs.remove(aRole);
+		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), aRole);
 		item.setAddiPerms(ps);
 		
 	}
@@ -186,6 +184,7 @@ public class TeacherServiceImpl implements TeacherService {
 							throw new RuntimeException("createItem(), failed to set password.");
 						}
 						String pw = item.getTeacId().substring(item.getTeacId().length() - 6, item.getTeacId().length());
+						logger.debug("createItem(), original password ->" + pw);
 						md.update(pw.getBytes(), 0, 6);
 							
 					}
