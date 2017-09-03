@@ -130,28 +130,25 @@ public class SchoolServiceImp implements SchoolService {
 				+ "departsub.school_id = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
+		logger.debug("populateDepartSub(), " + soL.toString());
 		ConcurrentHashMap<String, List<TeacherBrife>> ret = null;
 		if (soL != null && !soL.isEmpty()) {
 			ret = new ConcurrentHashMap<String, List<TeacherBrife>>();
 			for (SubjectTeac st: soL) {
 				if (!ret.contains(st.getSub())) {
 					List<TeacherBrife> tL = new ArrayList<TeacherBrife>();
-					tL.add(st.getTeac());
+					if (st.getTeac() != null) {
+						tL.add(st.getTeac());
+					}
 					ret.put(st.getSub(), tL);
 				}
 				else {
-					ret.get(st.getSub()).add(st.getTeac());
+					if (st.getTeac() != null)
+						ret.get(st.getSub()).add(st.getTeac());
 				}
 			}
-			
-			// subjects for which leader is not assigned, need to populate here
-			// populate department subject leaders, set teacher list as empty
-			for (String s: subL) {
-				if (!ret.contains(s))
-					ret.put(s, null);
-			}
 		}
-
+		logger.debug("populateDepartSub()," + ret.toString());
 		List<SubjectLeader> lead = new ArrayList<SubjectLeader>();
 		if (ret != null && !ret.isEmpty())
 			ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v))); 

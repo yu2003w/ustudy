@@ -52,7 +52,7 @@ public class SubjectTeac implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SubjectPlan [sub=" + sub + ", planner=" + teac + "]";
+		return "SubjectTeac [sub=" + sub + ", teac=" + teac + "]";
 	}
 	
 }

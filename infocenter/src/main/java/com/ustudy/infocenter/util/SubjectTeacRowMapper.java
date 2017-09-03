@@ -14,9 +14,10 @@ public class SubjectTeacRowMapper implements RowMapper<SubjectTeac> {
 		String tid = rs.getString("sub_owner");
 		String tn = null;
 		if (tid != null && !tid.isEmpty()) {
-			tn = rs.getString("teacname");
+			return new SubjectTeac(rs.getString("sub_name"), tid, tn);
 		}
-		SubjectTeac item = new SubjectTeac(rs.getString("sub_name"), tid, tn);
-		return item;
+		else
+			return new SubjectTeac(rs.getString("sub_name"), null);
+
 	}
 }
