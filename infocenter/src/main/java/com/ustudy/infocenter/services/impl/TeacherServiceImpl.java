@@ -184,12 +184,11 @@ public class TeacherServiceImpl implements TeacherService {
 							throw new RuntimeException("createItem(), failed to set password.");
 						}
 						String pw = item.getTeacId().substring(item.getTeacId().length() - 6, item.getTeacId().length());
-						logger.debug("createItem(), original password ->" + pw);
 						md.update(pw.getBytes(), 0, 6);
 							
 					}
-					
-					item.setPasswd((md.digest()).toString());
+			
+					item.setPasswd(new String(md.digest()));
 				} catch (NoSuchAlgorithmException ne) {
 					String emsg = "createItem(), failed to initialize MD5 algorithm.";
 					logger.warn(emsg);

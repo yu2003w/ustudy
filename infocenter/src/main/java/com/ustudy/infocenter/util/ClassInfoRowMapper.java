@@ -11,7 +11,7 @@ public class ClassInfoRowMapper implements RowMapper<ClassInfo> {
 
 	@Override
 	public ClassInfo mapRow(ResultSet rs, int num) throws SQLException {
-		String tid = rs.getString("cls_name");
+		String tid = rs.getString("cls_owner");
 		String tn = null;
 		if (tid != null && !tid.isEmpty()) {
 			tn = rs.getString("teacname");

@@ -139,6 +139,7 @@ public class SchoolServiceImp implements SchoolService {
 		} else
 			logger.debug("populateGrade(), no classes configured for grade " + gr.getId() + ":" + gr.getName());
 		
+		logger.debug("populateGrade(), classes configured for " + gr.getName() + " as ->" + grclsL);
 		gr.setcInfo(grclsL);
 		return true;
 	}
