@@ -80,7 +80,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
 		
-		String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on depart.sub_owner = "
+		String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on departsub.sub_owner = "
 				+ "teacher.teacid where departsub.school_id = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
@@ -148,7 +148,8 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Transactional
 	private void populateDeparts(School item, String orgId) {
-		String sqlGr = "select id, grade_name, classes_num, grade_owner from grade where school_id = ?";
+		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from grade join teacher "
+				+ "on grade.grade_owner = teacher.teacid where school_id = ?";
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();

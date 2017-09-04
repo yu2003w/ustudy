@@ -163,6 +163,8 @@ public class TeacherServiceImpl implements TeacherService {
 				orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("createItem(), it seemed user not logged in");
 		}
+		item.setOrgid(orgId);
+		item.setOrgtype(orgT);
 		
 		// need to retrieve auto id of teacher item which is returned back in header location
 		int num = jTea.update(new PreparedStatementCreator(){
@@ -313,6 +315,8 @@ public class TeacherServiceImpl implements TeacherService {
 		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
 		String sqlGSub = "update gradesub set sub_owner = ? where grade_id = (select id from grade where school_id "
 				+ "= ? and grade_name = (select value from teachergrade where teac_id = ?)) and sub_name = ?";
+		String sqlGrO = "update grade set grade_owner = ? where school_id =? and grade_name = "
+				+ "(select value from teachergrade where teac_id = ?)";
 		String msg = null;
 		int num = 0;
 		
@@ -323,7 +327,12 @@ public class TeacherServiceImpl implements TeacherService {
 					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
 						psmt.setNull(1, java.sql.Types.NULL);
-						psmt.setString(2, InfoUtil.getRolemapping().get(u.getValue()));
+						String r = InfoUtil.getRolemapping().get(u.getValue());
+						if (r == null || r.isEmpty()) {
+							logger.warn("saveRoles, unsupported role " + u.getValue());
+							throw new RuntimeException("saveRoles, unsupported role " + u.getValue());
+						}
+						psmt.setString(2, r);
 						psmt.setString(3, item.getTeacId());
 						return psmt;
 					}
@@ -338,8 +347,10 @@ public class TeacherServiceImpl implements TeacherService {
 				// if role is sleader, need to populate into corresponding departsub
 				if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("sleader") == 0) {
 					List<String> tyL = determineDepartType(item.getGrades());
+					logger.debug("saveRoles()," + tyL.toString());
 					for (String t: tyL) {
-						num = jTea.update(sqlDepSub, null, item.getSubjects().get(0), item.getTeacId(), t, item.getOrgid());
+						num = jTea.update(sqlDepSub, null, item.getSubjects().get(0).getValue(), 
+								item.getTeacId(), t, item.getOrgid());
 						if (num != 1) {
 							msg = "saveRoles(), return value from department subject insert is " + num;
 							logger.warn(msg);
@@ -347,10 +358,13 @@ public class TeacherServiceImpl implements TeacherService {
 						}
 					}
 				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("pleader") == 0) {
-					jTea.update(sqlGSub, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), 
-							item.getTeacId(), item.getSubjects().get(0));
+					logger.debug("saveRoles()," + item.getSubjects().get(0).getValue());
+					num = jTea.update(sqlGSub, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), 
+							item.getTeacId(), item.getSubjects().get(0).getValue());
+				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("gleader") == 0) {
+					// need to update grade owner
+					num = jTea.update(sqlGrO, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId());
 				}
-				
 			}
 		}
 		
@@ -490,12 +504,17 @@ public class TeacherServiceImpl implements TeacherService {
 	
 	private List<String> determineDepartType(List<UElem> gL) {
 		List<String> tL = new ArrayList<String>();
-		if (gL.contains(new UElem("高一")) || gL.contains(new UElem("高二")) || gL.contains(new UElem("高三")))
+		List<String> sGl = new ArrayList<String>();
+		for(UElem e : gL) {
+			sGl.add(e.getValue());
+		}
+		
+		if (sGl.contains("高一") || sGl.contains("高二") || sGl.contains("高三"))
 			tL.add("high");
-		if (gL.contains(new UElem("九年级")) || gL.contains(new UElem("八年级")) || gL.contains(new UElem("七年级")))
+		if (sGl.contains("九年级") || sGl.contains("八年级") || sGl.contains("七年级"))
 			tL.add("junior");
-		if (gL.contains(new UElem("六年级")) || gL.contains(new UElem("五年级")) || gL.contains(new UElem("四年级")) ||
-				gL.contains(new UElem("三年级")) || gL.contains(new UElem("二年级")) || gL.contains(new UElem("一年级")))
+		if (sGl.contains("六年级") || sGl.contains("五年级") || sGl.contains("四年级") ||
+				sGl.contains("三年级") || sGl.contains("二年级") || sGl.contains("一年级"))
 			tL.add("primary");
 		logger.debug("determineDepartType(), " + tL.toString());
 		return tL;
