@@ -270,7 +270,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	@Transactional
 	public List<TeacherBrife> getGradeTeac(String id) {
-		String sqlGrTea = "select teacid, teacname from teacher where teacid = (select teac_id "
+		String sqlGrTea = "select teacid, teacname from teacher where teacid in (select teac_id "
 				+ "from teachergrade join grade on grade.grade_name = teachergrade.value where grade.id = ?)";
 		List<TeacherBrife> teaL = schS.query(sqlGrTea, new TeacherBrifeRowMapper(), id);
 		return teaL;
@@ -300,7 +300,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	private List<SubjectTeac> getClassSubs(String id) {
 		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
-				+ "classsub.sub_owner = teacher.teacid where class.cls_id = ?";
+				+ "classsub.sub_owner = teacher.teacid where classsub.cls_id = ?";
 		List<SubjectTeac> stL = schS.query(sqlT, new SubjectTeacRowMapper(), id);
 		
 		return stL;

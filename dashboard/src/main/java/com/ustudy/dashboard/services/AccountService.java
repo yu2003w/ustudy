@@ -20,4 +20,6 @@ public interface AccountService {
 	
 	public int updateItem(Account item, int id);
 	
+	public boolean updateLLTime(String id);
+	
 }

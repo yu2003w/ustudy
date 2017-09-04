@@ -249,4 +249,15 @@ public class AccountServiceImp implements AccountService {
 		}
 		return num;
 	}
+
+	@Override
+	public boolean updateLLTime(String id) {
+		String sqlLL = "update ustudy.users set ll_time = ? where id = ?";
+		int num = jdbcT.update(sqlLL, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), id);
+		if (num != 1) {
+			logger.debug("updateLLTime(), set last login time failed for user " + id);
+			return false;
+		}
+		return true;
+	}
 }

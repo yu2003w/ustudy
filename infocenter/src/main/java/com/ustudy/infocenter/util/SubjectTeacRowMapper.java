@@ -16,6 +16,11 @@ public class SubjectTeacRowMapper implements RowMapper<SubjectTeac> {
 		if (tid != null && !tid.isEmpty()) {
 			tn = rs.getString("teacname");
 		}
+		else {
+			// to fit frontend logic, set teacher id/name as empty string
+			tid = "";
+			tn = "";
+		}
 		return new SubjectTeac(rs.getString("sub_name"), tid, tn);
 	}
 }

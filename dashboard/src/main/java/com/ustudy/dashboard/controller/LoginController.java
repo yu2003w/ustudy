@@ -14,14 +14,21 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ustudy.dashboard.model.Account;
+import com.ustudy.dashboard.services.AccountService;
 
 @RestController
 public class LoginController {
 
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
+	
+	@Autowired
+	AccountService accS;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public void login(HttpServletRequest request, HttpServletResponse response) {
@@ -70,6 +77,11 @@ public class LoginController {
 			//WebUtils.redirectToSavedRequest(request, response, null);
 			//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
 			redirectUrl = sr.getRequestUrl();
+			
+			Account user = accS.findUserByLoginName(currentUser.getPrincipal().toString());
+			if (!accS.updateLLTime(user.getId()))
+				logger.warn("login(), failed to set last login time for user " + currentUser.getPrincipal().toString());
+			
 		} else {
 			logger.warn(msg);
 			// login failed here, need to redirect to error pages

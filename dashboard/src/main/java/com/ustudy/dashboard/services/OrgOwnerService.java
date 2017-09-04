@@ -18,4 +18,5 @@ public interface OrgOwnerService {
 	public int delItemSet(String ids);
 	
 	public int deleteItem(int id);
+	
 }

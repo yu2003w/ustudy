@@ -126,7 +126,7 @@ public class SchoolController {
 			resp.setHeader("reason", msg);
 			logger.warn(msg);
 		}
-		return null;
+		return itemL;
 	}
 	
 	@RequestMapping(value = "/grade/{id}", method = RequestMethod.GET)
@@ -201,7 +201,7 @@ public class SchoolController {
 			resp.setHeader("reason", msg);
 			logger.warn(msg);
 		}
-		return null;
+		return itemL;
 	}
 	
 	@RequestMapping(value = "/class/{id}", method = RequestMethod.GET)

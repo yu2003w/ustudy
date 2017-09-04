@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.ustudy.dashboard.model.OrgBrife;
 import com.ustudy.dashboard.model.School;
 import com.ustudy.dashboard.services.SchoolService;
 
@@ -45,6 +46,24 @@ public class SchoolController {
 			}
 		}
 		return res;
+	}
+	
+	@RequestMapping(value = "list/brife/{id}", method = RequestMethod.GET)
+	public List<OrgBrife> getOrgBrifeList(@PathVariable int id, HttpServletResponse resp) {
+		logger.debug("endpoint /school/brife/" + id + " is visited");
+		List<OrgBrife> ret = null;
+		try {
+			ret = ss.getOrgBrifeList(id);
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			String msg = "getOrgBrifeList(), Failed to retrieve orgnization brife list since " + id;
+			try {
+				resp.sendError(500, msg);
+			} catch (Exception re) {
+				logger.warn("getOrgBrifeList(), Failed to set error status in response");
+			}
+		}
+		return ret;
 	}
 	
 	@RequestMapping(value="/add", method = RequestMethod.POST)
