@@ -1,5 +1,8 @@
 package com.ustudy.infocenter.services.impl;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,8 +14,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,15 +51,18 @@ public class TeacherServiceImpl implements TeacherService {
 		
 		String sqlOrg = "select * from ustudy.teacher where id > ? and orgid = ? and orgtype = ? limit 10000";
 		try {
+
+			String orgT = InfoUtil.retrieveSessAttr("orgType");
+			String orgId = InfoUtil.retrieveSessAttr("orgId");
+			if ( orgT == null || orgT.isEmpty() ||
+					orgId == null || orgId.isEmpty()) {
+				throw new RuntimeException("getList(), it seemed user not logged in");
+			}
+			
 			if (id < 0)
 				id = 0;
-			if (getOrgId() == null || getOrgId().isEmpty() ||
-					getOrgType() == null || getOrgType().isEmpty()) {
-				logger.warn("getList(), it seemed that user not logged in");
-				return teaL;
-			}
-			else
-			    teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, getOrgId(), getOrgType());
+			
+			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, orgId, orgT);
 			logger.debug("Fetched " + teaL.size() + " items of user");
 
 			for (Teacher tea : teaL) {
@@ -102,17 +106,20 @@ public class TeacherServiceImpl implements TeacherService {
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
 		
-		// retrieve roles and excluter addi_{teac_id}
+		// retrieve roles and exclude addi_{teac_id}
 		String aRole = "addi_" + item.getTeacId();
-		sqlD = "select * from ustudy.teacherroles where teac_id = ?";
-		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		rs.remove(aRole);
+		sqlD = "select * from ustudy.teacherroles where teac_id = ? and value != ?";
+		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole);
+		// convert internal role to user readable role name
+		for (UElem e: rs) {
+			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
+		}
+		logger.debug("retrieveProp(), roles -> " + rs.toString());
 		item.setRoles(rs);
 		
 		// retrieve additional permissions
 		sqlD = "select * from ustudy.perms where role_name = ?";
-		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		rs.remove(aRole);
+		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), aRole);
 		item.setAddiPerms(ps);
 		
 	}
@@ -126,17 +133,33 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	@Transactional
+	public boolean updateLLTime(final String id) {
+		String sqlLL = "update teacher set ll_time = ? where id = ?";
+		int num = jTea.update(sqlLL, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), id);
+		if (num != 1) {
+			logger.debug("updateLLTime(), set last login time failed for teacher " + id);
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	@Transactional
 	public int createItem(Teacher item) {
+		logger.debug("createItem(), " + item);
 		// Noted: Schema for table ustudy.teacher is as below,
-		// id, teacid, teacname, passwd, ctime, lltime
-		String sqlOwner = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?);";
+		// id, teacid, teacname, passwd, orgType, orgId, ctime, lltime
+		String sqlTeac = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?)";
 
 		// insert record into ustudy.teacher firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
+		String msg = null;
 	
-		if (getOrgId() == null || getOrgId().isEmpty() ||
-				getOrgType() == null || getOrgType().isEmpty()) {
+		String orgT = InfoUtil.retrieveSessAttr("orgType");
+		String orgId = InfoUtil.retrieveSessAttr("orgId");
+		if ( orgT == null || orgT.isEmpty() ||
+				orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("createItem(), it seemed user not logged in");
 		}
 		
@@ -144,15 +167,40 @@ public class TeacherServiceImpl implements TeacherService {
 		int num = jTea.update(new PreparedStatementCreator(){
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlOwner, Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement psmt = conn.prepareStatement(sqlTeac, Statement.RETURN_GENERATED_KEYS);
 				psmt.setNull(1, java.sql.Types.INTEGER);
 				psmt.setString(2, item.getTeacId());
 				psmt.setString(3, item.getTeacName());
+				
+				// Noted: password should be set as last 6 digits of teacher id which is phone number
+				try {
+					MessageDigest md = MessageDigest.getInstance("MD5");
+					if (item.getPasswd() != null) {
+						md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+					} else {
+						// if no passwd set for teacher, passwd should be last 6 characters in teacId
+						if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+							logger.warn("createItem(), teacher id contains less than 6 "
+									+ "characters, failed to populate password");
+							throw new RuntimeException("createItem(), failed to set password.");
+						}
+						String pw = item.getTeacId().substring(item.getTeacId().length() - 6, item.getTeacId().length());
+						md.update(pw.getBytes(), 0, 6);
+							
+					}
+					
+					item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
+				} catch (NoSuchAlgorithmException ne) {
+					String emsg = "createItem(), failed to initialize MD5 algorithm.";
+					logger.warn(emsg);
+					throw new RuntimeException(emsg);
+				}
+				
 				psmt.setString(4, item.getPasswd());
 				
 				// Noted: need to populate current user's orgtype, orgid
-				psmt.setString(5, getOrgType());
-				psmt.setString(6, getOrgId());
+				psmt.setString(5, orgT);
+				psmt.setString(6, orgId);
 				
 				// teacher creation time should be set to current time
 				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -162,14 +210,14 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 		}, keyH);
 		if (num != 1) {
-			String msg = "createItem(), return value for teacher insert is " + num;
+			msg = "createItem(), return value for teacher insert is " + num;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
 	
 		id = keyH.getKey().intValue();
 		if (id < 0) {
-			String msg = "createItem() failed with invalid id " + id;
+			msg = "createItem() failed with invalid id " + id;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
@@ -419,16 +467,6 @@ public class TeacherServiceImpl implements TeacherService {
 
 	    return clss.size();
 
-	}
-	
-	private String getOrgId() {
-		Session ses = SecurityUtils.getSubject().getSession();
-		return ses.getAttribute("orgid").toString();
-	}
-	
-	private String getOrgType() {
-		Session ses = SecurityUtils.getSubject().getSession();
-		return ses.getAttribute("orgtype").toString();
 	}
 	
 }

@@ -121,7 +121,6 @@ public class TeacherController {
 	@RequestMapping(value="/add", method = RequestMethod.POST)
 	public String createItem(@RequestBody @Valid Teacher item, HttpServletResponse resp, UriComponentsBuilder builder) {
 		logger.debug("endpoint /teacher/add is visited.");
-		logger.debug(item.toString());
 		String result = null;
 		try {
 			// Before create item, need to check whether corresponding orgId is valid.

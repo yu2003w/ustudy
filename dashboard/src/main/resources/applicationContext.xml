@@ -44,6 +44,7 @@
                 /school/update = authc, perms[school:edit]
                 /school/delete = authc, perms[school:edit]
                 /school/delete/** = authc, perms[school:edit]
+                /school/list/brife/** = authc, perms[school:view]
                 
                 <!-- shool web page filter chain -->
                 /schoolList = authc, perms[school:view]

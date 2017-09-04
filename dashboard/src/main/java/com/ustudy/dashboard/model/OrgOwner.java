@@ -31,6 +31,9 @@ public class OrgOwner implements Serializable {
 	@JsonProperty("orgId")
 	private String orgId = null;
 	
+	@JsonProperty("role")
+	private String role = null;
+	
 	@JsonProperty("creationTime")
 	private String createTime = null;
 	
@@ -38,8 +41,8 @@ public class OrgOwner implements Serializable {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	public OrgOwner(String id, String name, String loginname, String passwd, String orgType, String orgId,
+
+	public OrgOwner(String id, String name, String loginname, String passwd, String orgType, String orgId, String role,
 			String createTime) {
 		super();
 		this.id = id;
@@ -48,24 +51,27 @@ public class OrgOwner implements Serializable {
 		this.passwd = passwd;
 		this.orgType = orgType;
 		this.orgId = orgId;
+		this.role = role;
 		this.createTime = createTime;
 	}
 
 	// construct without the field of password
-	public OrgOwner(String id, String name, String loginname, String orgType, String orgId, String createTime) {
+	public OrgOwner(String id, String name, String loginname, String orgType, String orgId, String role,
+			String createTime) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.loginname = loginname;
 		this.orgType = orgType;
 		this.orgId = orgId;
+		this.role = role;
 		this.createTime = createTime;
 	}
 
 	public String getId() {
 		return id;
 	}
-
+	
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -109,6 +115,14 @@ public class OrgOwner implements Serializable {
 	public void setOrgId(String orgId) {
 		this.orgId = orgId;
 	}
+	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 
 	public String getCreateTime() {
 		return createTime;
@@ -117,11 +131,11 @@ public class OrgOwner implements Serializable {
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "OrgOwner [id=" + id + ", name=" + name + ", loginname=" + loginname + ", passwd=" + passwd
-				+ ", orgType=" + orgType + ", orgId=" + orgId + ", createTime=" + createTime + "]";
+				+ ", orgType=" + orgType + ", orgId=" + orgId + ", role=" + role + ", createTime=" + createTime + "]";
 	}
 
 	public Map<String, String> compare(OrgOwner item) {
@@ -136,6 +150,8 @@ public class OrgOwner implements Serializable {
 			ret.put("passwd", this.getPasswd());
 		if (this.getOrgType().compareTo(item.getOrgType()) != 0)
 			ret.put("orgtype", this.getOrgType());
+		if (this.getRole().compareTo(item.getRole()) != 0)
+			ret.put("role", this.getRole());
 		if (this.getOrgId().compareTo(item.getOrgId()) != 0)
 			ret.put("orgid", this.getOrgId());
 		return ret;

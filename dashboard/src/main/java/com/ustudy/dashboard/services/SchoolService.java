@@ -2,6 +2,7 @@ package com.ustudy.dashboard.services;
 
 import java.util.List;
 
+import com.ustudy.dashboard.model.OrgBrife;
 import com.ustudy.dashboard.model.School;
 
 /**
@@ -31,4 +32,7 @@ public interface SchoolService {
 	public int updateItem(School data, int id);
 	
 	public int delItemSet(String ids);
+	
+	public List<OrgBrife> getOrgBrifeList(int id);
+	
 }

@@ -61,9 +61,13 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Transactional
 	public int createItem(OrgOwner item) {
 		// Noted: Schema for table ustudy.orgowner is as below,
-		// id, name, loginname, passwd, orgtype, orgid, ctime
-		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?);";
+		// id, name, loginname, passwd, orgtype, orgid, role, ctime
+		String sqlOwner = "insert into ustudy.orgowner values(?,?,?,?,?,?,?,?);";
 
+		if (item.getRole() == null || !((item.getRole().compareTo("校长") == 0) ||
+				item.getRole().compareTo("考务老师") == 0))
+			throw new RuntimeException("createItem(), unsupported role type " + item.getRole());
+		
 		// insert record into dashoboard.school firstly, also auto generated keys is required.
 		KeyHolder keyH = new GeneratedKeyHolder();
 		int id = -1;    // auto generated id
@@ -81,9 +85,9 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 				//TODO: need to check whether organization id is valid for corresponding type
 				psmt.setString(5, item.getOrgType());
 				psmt.setString(6, item.getOrgId());
-				
+				psmt.setString(7, item.getRole());
 				// account creation time should be set to current time
-				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+				psmt.setString(8, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 				
 				return psmt;
 			}
@@ -230,7 +234,16 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
 				psmt.setNull(1, java.sql.Types.NULL);
-				psmt.setString(2, "org_owner");
+				if (item.getRole().compareTo("校长") == 0) {
+					psmt.setString(2, "org_owner");
+				} else if (item.getRole().compareTo("考务老师") == 0) {
+					psmt.setString(2, "leader");
+				} else {
+					logger.warn("populateTeachers(), role is " + item.getRole() +
+							", set teacher as default role");
+					psmt.setString(2, "teacher");
+				}
+				
 				psmt.setString(3, item.getLoginname());
 				return psmt;
 			}
