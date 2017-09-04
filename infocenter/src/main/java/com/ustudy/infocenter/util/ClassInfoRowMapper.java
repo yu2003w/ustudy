@@ -16,6 +16,10 @@ public class ClassInfoRowMapper implements RowMapper<ClassInfo> {
 		if (tid != null && !tid.isEmpty()) {
 			tn = rs.getString("teacname");
 		}
+		else {
+			tid = "";
+			tn = "";
+		}
 		ClassInfo cls = new ClassInfo(rs.getString("id"), rs.getString("cls_name"), rs.getString("cls_type"),
 				tid, tn);
 		return cls;

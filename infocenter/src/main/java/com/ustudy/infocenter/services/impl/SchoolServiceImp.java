@@ -140,7 +140,7 @@ public class SchoolServiceImp implements SchoolService {
 		} else
 			logger.debug("populateGrade(), no classes configured for grade " + gr.getId() + ":" + gr.getName());
 		
-		logger.debug("populateGrade(), classes configured for " + gr.getName() + " as ->" + grclsL);
+		logger.debug("populateGrade(), classes configured for " + gr.getName() + " as ->" + grclsL.toString());
 		gr.setcInfo(grclsL);
 		return true;
 	}
@@ -152,7 +152,6 @@ public class SchoolServiceImp implements SchoolService {
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();
 		List<Grade> priL = new ArrayList<Grade>();
-		List<Grade> othL = new ArrayList<Grade>();
 		
 		logger.debug("populateDeparts(), departments for school " + orgId + "->\n" + grL.toString());
 		for (Grade gr: grL) {
@@ -164,7 +163,7 @@ public class SchoolServiceImp implements SchoolService {
 			else if (gr.isPrimary())
 				priL.add(gr);
 			else
-				othL.add(gr);
+				logger.warn("populateDeparts(), unknown type.");
 		}
 		// populate department information
 		List<Department> departs = new ArrayList<Department>();
@@ -183,12 +182,6 @@ public class SchoolServiceImp implements SchoolService {
 			Department pd = new Department("小学部", highL);
 			pd.setSubLeader(populateDepartSub( orgId, "primary"));
 			departs.add(pd);
-		}
-
-		if (!othL.isEmpty()) {
-			Department od = new Department("其他", highL);
-			od.setSubLeader(populateDepartSub(orgId, "other"));
-			departs.add(od);
 		}
 		
 		item.setDeparts(departs);
