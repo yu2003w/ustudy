@@ -35,7 +35,8 @@ import com.ustudy.infocenter.util.TeacherBrifeRowMapper;
 @Service
 public class SchoolServiceImp implements SchoolService {
 
-	private static final String SQL_GRADE_SUB = "select sub_name, sub_owner from gradesub where grade_id = ?";
+	private static final String SQL_GRADE_SUB = "select sub_name, sub_owner, teacname from gradesub "
+			+ "join teacher on gradesub.sub_owner = teacher.teacid where grade_id = ?";
 	
 	private static final Logger logger = LogManager.getLogger(SchoolServiceImp.class);
 	
@@ -79,8 +80,8 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
 		
-		String sqlT = "select sub_name, sub_owner from departsub where "
-				+ "departsub.school_id = ? and departsub.type = ?";
+		String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on depart.sub_owner = "
+				+ "teacher.teacid where departsub.school_id = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
 		logger.debug("populateDepartSub(), " + soL.toString());
