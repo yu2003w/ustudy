@@ -66,5 +66,11 @@ else
   echo "Launched ustudy-dw container successfully"
 fi
 
-# docker exec -u root web-mysql /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_infocenter'
+# set container timezone to Asia/Shanghai
+#docker exec -u root ustudy-dw /bin/sh -c 'echo "Asia/Shanghai" > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata'
+#if [ $? != 0 ];then
+#  echo "Failed to set container timezone to Asia/Shanghai"
+#else
+#  echo "Set timezone to Asia/Shanghai"
+#fi
 
