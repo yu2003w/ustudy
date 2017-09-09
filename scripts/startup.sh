@@ -54,6 +54,27 @@ if [ $? != 0 ]; then
 fi
 echo "Deploying info.war successfully"
 
+if [ -d ${WORK_DIR}/webapps/exam ]; then
+  rm -rf ${WORK_DIR}/webapps/exam  ${WORK_DIR}/webapps/exam.war
+  if [ $? != 0 ]; then
+    echo "Failed to delete deployed war"
+    exit 1
+  fi
+else
+  mkdir -p ${WORK_DIR}/webapps/
+  if [ $? != 0 ]; then
+    echo "Failed to create directory" ${WORK_DIR}/webapps/
+    exit 1
+  fi
+fi
+
+cp -f ${SOURCE_DIR}/ustudy/exam/target/exam.war ${WORK_DIR}/webapps/exam.war
+if [ $? != 0 ]; then
+  echo "Failed to copy exam.war into destination directory"
+  exit 1
+fi
+echo "Deploying exam.war successfully"
+
 # before launching tomcat, clear logs generated last time
 echo "clear logs generated in ${WORK_DIR}/logs/ustudy/"
 rm ${WORK_DIR}/logs/ustudy/*
