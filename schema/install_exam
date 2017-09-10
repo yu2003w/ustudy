@@ -1,0 +1,14 @@
+# create databases for examination center
+set names "utf8";
+create database if not exists ustudy character set utf8;
+create table if not exists ustudy.examresult (
+id INT NOT NULL AUTO_INCREMENT,
+stuname VARCHAR(64) NOT NULL,
+stuno CHAR(32) NOT NULL,
+score INT,
+PRIMARY KEY(id),
+INDEX (stuname, stuno),
+UNIQUE KEY (stuno)
+) ENGINE=InnoDB;
+
+

@@ -35,50 +35,13 @@
         </property>
         <property name="filterChainDefinitions">
             <value>
-                <!-- Noted: some issues unresolved, that failed to start application if specifying 
-                     multiple roles like "roles[admin,user]". Actually this is supported at least
-                     in shiro.ini. To work around this, only using single roles or single permissions.
-                -->
-                <!-- school filter chain -->
-                /school/view/** = authc, perms[school:view]
-                /school/list/** = authc, perms[school:view]
-                /school/add = authc, perms[school:edit]
-                /school/update = authc, perms[school:edit]
-                /school/delete = authc, perms[school:edit]
-                /school/delete/** = authc, perms[school:edit]
-                /school/list/brife/** = authc, perms[school:view]
-                
-                <!-- shool web page filter chain -->
-                /schoolList = authc, perms[school:view]
- 
-                <!-- user filter chain -->
-                /user/list/** = authc, perms[user:view]
-                /user/view/** = authc, perms[user:view]
-                /user/add = authc, perms[user:edit]
-                /user/update/** = authc, perms[user:edit]
-                /user/delete = authc, perms[user:edit]
-                /user/delete/** = authc, perms[user:edit]
-                
-                <!-- user web page filter chain -->
-                /userList = authc, perms[user:view]
-
-                <!-- OrgOwner filter chain -->
-                /owner/list/** = authc, perms[orgowner:view]
-                /owner/view/** = authc, perms[orgowner:view]
-                /owner/add = authc, perms[orgowner:edit]
-                /owner/update/** = authc, perms[orgowner:edit]
-                /owner/delete = authc, perms[orgowner:edit]
-                /owner/delete/** = authc, perms[orgowner:edit]
-                
-                <!-- OrgOwner web page filter chain -->
-                /ownerList = authc, perms[orgowner:view]
-             
+                   
                 /** = anon
             </value>
         </property>
     </bean>
-
-    <bean id="adminboard" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
+    
+    <bean id="examCenter" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
                 <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
@@ -87,7 +50,7 @@
                 <property name="password" value="mysql"/>
                 <property name="testWhileIdle" value="true"/>  
                 <property name="testOnBorrow" value="true"/>  
-                <property name="validationInterval" value="60000"/>  
+                <property name="validationInterval" value="30000"/>  
                 <property name="testOnReturn" value="false"/>  
                 <property name="validationQuery" value="/* ping */"/>  
                 <property name="timeBetweenEvictionRunsMillis" value="30000"/>  
@@ -108,7 +71,7 @@
     
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
-        <property name="realm" ref="adminRealm"/>
+        <property name="realm" ref="authRealm"/>
         <!-- By default the servlet container sessions will be used.  Uncomment this line
            to use shiro's native sessions (see the JavaDoc for more): -->
         <!-- <property name="sessionMode" value="native"/> -->
@@ -117,37 +80,23 @@
 
     <!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
     <!-- security datasource: -->
-    <bean id="adminRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
-        <property name="dataSource" ref="adminboard" />
+    <bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+        <property name="dataSource" ref="examCenter" />
         <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select passwd from ustudy.users where loginname = ?" />
-        <property name="userRolesQuery" value="select value from ustudy.roles where user_name = ?" />
+        <property name="authenticationQuery" value="select passwd from ustudy.teacher where teacid = ?" />
+        <property name="userRolesQuery" value="select value from ustudy.teacherroles where teac_id = ?" />
         <property name="permissionsQuery" value="select value from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
         <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager"/>
     </bean>
-    
+       
     <!-- Secure Spring remoting:  Ensure any Spring Remoting method invocations
          can be associated with a Subject for security checks. -->
     <bean id="secureRemoteInvocationExecutor" class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
          <property name="securityManager" ref="securityManager"/>
     </bean>
-    
-    <!-- 
-    <tx:advice id="txAdvice" transaction-manager="txManager">
-        <tx:attributes>
-            <tx:method name="get*" read-only="true"/>
-            <tx:method name="*"/>
-        </tx:attributes>
-    </tx:advice>
-    <aop:config>
-        <aop:pointcut id="schoolServiceOperation"
-             expression="execution(* com.ustudy.dashboard.services.SchoolServiceImp.*(..))"/>
-        <aop:advisor advice-ref="txAdvice" pointcut-ref="schoolServiceOperation"/>
-    </aop:config>
-    -->
     
     <!-- Noted: Two methods for enabling spring transaction managent with jdbc.
          Above is XML based configuration. Declaring with @Transactional in java
@@ -155,16 +104,15 @@
     <tx:annotation-driven transaction-manager="txManager"/>
     <bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="adminboard" />
+		<property name="dataSource" ref="examCenter" />
 	</bean>
-	
-	<!-- sql session factory for mybatis -->
+
+    <!-- sql session factory for mybatis -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-       <property name="dataSource" ref="adminboard" />
+       <property name="dataSource" ref="examCenter" />
     </bean>
     
     <!-- scan for mappers and make them autowired -->
-    <mybatis:scan base-package="com.ustudy.dashboard.mapper" />
-    
-    
+    <mybatis:scan base-package="com.ustudy.exam.mapper" />
+
 </beans>

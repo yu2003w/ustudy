@@ -66,7 +66,7 @@ public class InfoUtil {
 		rolemapping.put("班主任", "cteacher");
 		rolemapping.put("备课组长", "pleader");
 		rolemapping.put("学科组长", "sleader");
-		rolemapping.put("年级组长", "gleader");
+		rolemapping.put("年级主任", "gleader");
 		rolemapping.put("校长", "org_owner");
 		rolemapping.put("考务老师", "leader");
 		
@@ -74,7 +74,7 @@ public class InfoUtil {
 		rolemapping.put("cteacher", "班主任");
 		rolemapping.put("pleader", "备课组长");
 		rolemapping.put("sleader", "学科组长");
-		rolemapping.put("gleader", "年级组长");
+		rolemapping.put("gleader", "年级主任");
 		rolemapping.put("org_owner", "校长");
 		rolemapping.put("leader", "考务老师");
 	}

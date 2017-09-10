@@ -107,3 +107,36 @@ FOREIGN KEY (sub_owner)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+create table if not exists ustudy.exam (
+id INT NOT NULL AUTO_INCREMENT,
+exam_name VARCHAR(32) NOT NULL,
+exam_date date NOT NULL,
+PRIMARY KEY(id),
+INDEX(exam_name, exam_date),
+UNIQUE KEY (exam_name)
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.examschool (
+exam_id INT NOT NULL,
+school_id VARCHAR(32) NOT NULL,
+school_name VARCHAR(128) NOT NULL,
+PRIMARY KEY (exam_id),
+FOREIGN KEY (exam_id)
+    REFERENCES ustudy.exam(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (school_id)
+    REFERENCES ustudy.school(school_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.examsubject (
+exam_id INT NOT NULL,
+grade_name VARCHAR(32) NOT NULL,
+subject_name VARCHAR(32) NOT NULL,
+UNIQUE KEY (grade_name, subject_name),
+PRIMARY KEY(exam_id),
+FOREIGN KEY (exam_id)
+    REFERENCES ustudy.exam(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+

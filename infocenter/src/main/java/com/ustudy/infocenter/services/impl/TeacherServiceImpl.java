@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -162,6 +163,8 @@ public class TeacherServiceImpl implements TeacherService {
 				orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("createItem(), it seemed user not logged in");
 		}
+		item.setOrgid(orgId);
+		item.setOrgtype(orgT);
 		
 		// need to retrieve auto id of teacher item which is returned back in header location
 		int num = jTea.update(new PreparedStatementCreator(){
@@ -222,16 +225,6 @@ public class TeacherServiceImpl implements TeacherService {
 			throw new RuntimeException(msg);
 		}
 		
-		// save roles
-		num = saveRoles(item.getRoles(), item.getTeacId());
-		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
-		
-		// save additional permissions
-		num = 0;
-		if (item.getAddiPerms() != null)
-			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
-		
 		// save subjects
 		num = 0;
 		if (item.getSubjects() != null)
@@ -249,6 +242,16 @@ public class TeacherServiceImpl implements TeacherService {
 		if (item.getClasses() != null)
 		    num = saveClasses(item.getClasses(), item.getTeacId());
 		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
+		
+		// save roles
+		num = saveRoles(item.getRoles(), item);
+		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
+				
+		// save additional permission
+		num = 0;
+		if (item.getAddiPerms() != null)
+			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
 		
 		return id;
 	}
@@ -306,8 +309,14 @@ public class TeacherServiceImpl implements TeacherService {
 		return jTea.update(sqlDel, id);
 	}
 
-	private int saveRoles(List<UElem> roles, String teachid) {
+	@Transactional
+	private int saveRoles(List<UElem> roles, Teacher item) {
 		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
+		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
+		String sqlGSub = "update gradesub set sub_owner = ? where grade_id = (select id from grade where school_id "
+				+ "= ? and grade_name = (select value from teachergrade where teac_id = ?)) and sub_name = ?";
+		String sqlGrO = "update grade set grade_owner = ? where school_id =? and grade_name = "
+				+ "(select value from teachergrade where teac_id = ?)";
 		String msg = null;
 		int num = 0;
 		
@@ -318,8 +327,13 @@ public class TeacherServiceImpl implements TeacherService {
 					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
 						psmt.setNull(1, java.sql.Types.NULL);
-						psmt.setString(2, InfoUtil.getRolemapping().get(u.getValue()));
-						psmt.setString(3, teachid);
+						String r = InfoUtil.getRolemapping().get(u.getValue());
+						if (r == null || r.isEmpty()) {
+							logger.warn("saveRoles, unsupported role " + u.getValue());
+							throw new RuntimeException("saveRoles, unsupported role " + u.getValue());
+						}
+						psmt.setString(2, r);
+						psmt.setString(3, item.getTeacId());
 						return psmt;
 					}
 				});
@@ -329,7 +343,28 @@ public class TeacherServiceImpl implements TeacherService {
 					throw new RuntimeException(msg);
 				}
 				
-				logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + teachid);
+				logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + item.getTeacId());
+				// if role is sleader, need to populate into corresponding departsub
+				if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("sleader") == 0) {
+					List<String> tyL = determineDepartType(item.getGrades());
+					logger.debug("saveRoles()," + tyL.toString());
+					for (String t: tyL) {
+						num = jTea.update(sqlDepSub, null, item.getSubjects().get(0).getValue(), 
+								item.getTeacId(), t, item.getOrgid());
+						if (num != 1) {
+							msg = "saveRoles(), return value from department subject insert is " + num;
+							logger.warn(msg);
+							throw new RuntimeException(msg);
+						}
+					}
+				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("pleader") == 0) {
+					logger.debug("saveRoles()," + item.getSubjects().get(0).getValue());
+					num = jTea.update(sqlGSub, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), 
+							item.getTeacId(), item.getSubjects().get(0).getValue());
+				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("gleader") == 0) {
+					// need to update grade owner
+					num = jTea.update(sqlGrO, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId());
+				} 
 			}
 		}
 		
@@ -341,8 +376,8 @@ public class TeacherServiceImpl implements TeacherService {
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
 				psmt.setNull(1, java.sql.Types.NULL);
-				psmt.setString(2, "addi_" + teachid);
-				psmt.setString(3, teachid);
+				psmt.setString(2, "addi_" + item.getTeacId());
+				psmt.setString(3, item.getTeacId());
 				return psmt;
 			}
 		});
@@ -352,8 +387,7 @@ public class TeacherServiceImpl implements TeacherService {
 			throw new RuntimeException(msg);
 		}
 		
-		logger.debug("saveRoles(), populated additional roles for " + teachid);
-		
+		logger.debug("saveRoles(), populated additional roles for " + item.getTeacId());
 		if (roles != null)
 			num = roles.size() + 1;
 		else
@@ -466,7 +500,52 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 
 	    return clss.size();
-
 	}
 	
+	private List<String> determineDepartType(List<UElem> gL) {
+		List<String> tL = new ArrayList<String>();
+		List<String> sGl = new ArrayList<String>();
+		for(UElem e : gL) {
+			sGl.add(e.getValue());
+		}
+		
+		if (sGl.contains("高一") || sGl.contains("高二") || sGl.contains("高三"))
+			tL.add("high");
+		if (sGl.contains("九年级") || sGl.contains("八年级") || sGl.contains("七年级"))
+			tL.add("junior");
+		if (sGl.contains("六年级") || sGl.contains("五年级") || sGl.contains("四年级") ||
+				sGl.contains("三年级") || sGl.contains("二年级") || sGl.contains("一年级"))
+			tL.add("primary");
+		logger.debug("determineDepartType(), " + tL.toString());
+		return tL;
+	}
+
+	@Override
+	public String findPriRoleById(String teaid) {
+		// front end need login user information including teacher id and highest priority role
+		String sqlRole = "select value from ustudy.teacherroles where teac_id = ?";
+		List<String> rL = jTea.queryForList(sqlRole, String.class, teaid);
+		if (rL == null || rL.isEmpty()) {
+			logger.warn("findPriRoleById(), Something goes wrong, no roles bind with user " + teaid);
+			return null;
+		}
+		
+		String r = null;
+		if (rL.contains("org_owner")) {
+			r = "org_owner";
+		} else if (rL.contains("leader")) {
+			r = "leader";
+		} else if (rL.contains("gleader")) {
+			r = "gleader";
+		} else if (rL.contains("sleader")) {
+			r = "sleader";
+		} else if (rL.contains("pleader")) {
+			r = "pleader";
+		} else if (rL.contains("cteacher")) {
+			r = "cteacher";
+		} else
+			r = "teacher";
+		
+		return InfoUtil.getRolemapping().get(r);
+	}
 }

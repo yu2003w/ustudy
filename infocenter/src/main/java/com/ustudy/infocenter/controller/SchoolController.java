@@ -19,7 +19,7 @@ import com.ustudy.infocenter.model.ClassInfo;
 import com.ustudy.infocenter.model.Grade;
 import com.ustudy.infocenter.model.School;
 import com.ustudy.infocenter.model.SubjectLeader;
-import com.ustudy.infocenter.model.TeacherBrife;
+import com.ustudy.infocenter.model.TeacherSub;
 import com.ustudy.infocenter.services.SchoolService;
 
 @RestController
@@ -103,9 +103,9 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "departteac/{id}", method = RequestMethod.GET)
-	public List<TeacherBrife> getDepartTea(@PathVariable String id, HttpServletResponse resp) {
+	public List<TeacherSub> getDepartTea(@PathVariable String id, HttpServletResponse resp) {
 		logger.debug("getDepartTea(), endpoint /school/departteac/" + id + " is visited.");
-		List<TeacherBrife> itemL = null;
+		List<TeacherSub> itemL = null;
 		String msg = null;
 		try {
 			itemL = schS.getDepTeac(id);
@@ -178,9 +178,9 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/gradeteac/{id}", method = RequestMethod.GET)
-	public List<TeacherBrife> getGradeTea(@PathVariable String id, HttpServletResponse resp) {
+	public List<TeacherSub> getGradeTea(@PathVariable String id, HttpServletResponse resp) {
 		logger.debug("getGradeTea(), endpoint /school/gradeteac/" + id + " is visited.");
-		List<TeacherBrife> itemL = null;
+		List<TeacherSub> itemL = null;
 		String msg = null;
 		try {
 			itemL = schS.getGradeTeac(id);
@@ -253,9 +253,9 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/classteac/{id}", method = RequestMethod.GET)
-	public List<TeacherBrife> getClassTea(@PathVariable String id, HttpServletResponse resp) {
+	public List<TeacherSub> getClassTea(@PathVariable String id, HttpServletResponse resp) {
 		logger.debug("getClassTea(), endpoint /school/classteac/" + id + " is visited.");
-		List<TeacherBrife> itemL = null;
+		List<TeacherSub> itemL = null;
 		String msg = null;
 		try {
 			itemL = schS.getClassTeac(id);
