@@ -523,7 +523,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public String findPriRoleById(String teaid) {
 		// front end need login user information including teacher id and highest priority role
-		String sqlRole = "select value from ustudy.roles where user_name = ?";
+		String sqlRole = "select value from ustudy.teacherroles where teac_id = ?";
 		List<String> rL = jTea.queryForList(sqlRole, String.class, teaid);
 		if (rL == null || rL.isEmpty()) {
 			logger.warn("findPriRoleById(), Something goes wrong, no roles bind with user " + teaid);
