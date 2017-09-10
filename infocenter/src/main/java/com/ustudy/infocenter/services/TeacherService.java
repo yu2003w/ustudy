@@ -21,5 +21,7 @@ public interface TeacherService {
 	public Teacher findTeacherById(String teaid);
 	
 	public boolean updateLLTime(String teaid);
+	
+	public String findPriRoleById(String teaid);
 
 }

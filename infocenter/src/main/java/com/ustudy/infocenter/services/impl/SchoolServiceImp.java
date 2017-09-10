@@ -23,6 +23,7 @@ import com.ustudy.infocenter.model.School;
 import com.ustudy.infocenter.model.SubjectLeader;
 import com.ustudy.infocenter.model.SubjectTeac;
 import com.ustudy.infocenter.model.TeacherBrife;
+import com.ustudy.infocenter.model.TeacherSub;
 import com.ustudy.infocenter.services.SchoolService;
 import com.ustudy.infocenter.util.ClassInfoRowMapper;
 import com.ustudy.infocenter.util.GradeRowMapper;
@@ -30,7 +31,7 @@ import com.ustudy.infocenter.util.InfoUtil;
 import com.ustudy.infocenter.util.OwnerRowMapper;
 import com.ustudy.infocenter.util.SchoolRowMapper;
 import com.ustudy.infocenter.util.SubjectTeacRowMapper;
-import com.ustudy.infocenter.util.TeacherBrifeRowMapper;
+import com.ustudy.infocenter.util.TeacherSubRowMapper;
 
 @Service
 public class SchoolServiceImp implements SchoolService {
@@ -55,6 +56,7 @@ public class SchoolServiceImp implements SchoolService {
 			logger.info("getSchool(), failed to populate school/exam owner, maybe not set yet");
 		
 		populateDeparts(item, orgId);
+		logger.debug("getSchool(), detailed information as below:\n" + item.toString());
 		return item;
 	}
 	
@@ -127,7 +129,7 @@ public class SchoolServiceImp implements SchoolService {
 		logger.debug("populateGrade(), grade subject ->" + grsubL.toString());
 		gr.setSubs(grsubL);
 		// populate class information
-		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(),gr.getId());
+		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
 		
 		if (grclsL != null && !grclsL.isEmpty()) {
 			logger.debug("populateGrade(), class info ->" + grclsL.toString());
@@ -136,6 +138,8 @@ public class SchoolServiceImp implements SchoolService {
 					gr.setType(true);
 				}
 				List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
+				if (cSub == null || cSub.isEmpty())
+					cSub = new ArrayList<SubjectTeac>();
 				cls.setSubs(cSub);
 			}
 		} else
@@ -233,14 +237,33 @@ public class SchoolServiceImp implements SchoolService {
 	}
 
 	@Override
-	public List<TeacherBrife> getDepTeac(String depName) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<TeacherSub> getDepTeac(String depName) {
+		// retrieve all teacher information for specified department
+		String sqlDepTea = "select teachergrade.teac_id as teacherId, teacname as teacherName, teachersub.value"
+				+ " as subName from grade join (teachergrade, teacher, teachersub) on (teachergrade.value "
+				+ "= grade.grade_name and teacher.teacid = teachergrade.teac_id and teachersub.teac_id = "
+				+ "teacher.teacid) where school_id = ? and grade_name in (";
+		
+		if (depName.compareTo("high") == 0) {
+			sqlDepTea += "'高一','高二','高三')";
+		}
+		else if (depName.compareTo("junior") == 0) {
+			sqlDepTea += "'九年级','八年级','七年级')";
+		} else if (depName.compareTo("primary") == 0) {
+			sqlDepTea = "'六年级','五年级','四年级','三年级','二年级','一年级')";
+		} else {
+			throw new RuntimeException("getDepTeac(), unsupport department type " + depName);
+		}
+		List<TeacherSub> depTeaL = schS.query(sqlDepTea, new TeacherSubRowMapper(), 
+				InfoUtil.retrieveSessAttr("orgId"));
+		logger.debug("getDepTeac(), " + depTeaL.toString());
+		return depTeaL;
 	}
 
 	@Override
 	public Grade getGradeInfo(String id) {
-		String sqlGr = "select * from ustudy.grade where id = ?";
+		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from "
+				+ "ustudy.grade join teacher on grade.grade_owner = teacher.teacid where grade.id = ?";
 		Grade info = schS.queryForObject(sqlGr, new GradeRowMapper(), id);
 		populateGrade(info);
 		return info;
@@ -264,10 +287,10 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	@Transactional
-	public List<TeacherBrife> getGradeTeac(String id) {
+	public List<TeacherSub> getGradeTeac(String id) {
 		String sqlGrTea = "select teacid, teacname from teacher where teacid in (select teac_id "
 				+ "from teachergrade join grade on grade.grade_name = teachergrade.value where grade.id = ?)";
-		List<TeacherBrife> teaL = schS.query(sqlGrTea, new TeacherBrifeRowMapper(), id);
+		List<TeacherSub> teaL = schS.query(sqlGrTea, new TeacherSubRowMapper(), id);
 		return teaL;
 	}
 	
@@ -303,8 +326,8 @@ public class SchoolServiceImp implements SchoolService {
 	
 	@Override
 	@Transactional
-	public List<TeacherBrife> getClassTeac(String id) {
-		List<TeacherBrife> teaL = null;
+	public List<TeacherSub> getClassTeac(String id) {
+		List<TeacherSub> teaL = null;
 		return teaL;
 	}
 	

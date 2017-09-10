@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.infocenter.model.TeacRole;
 import com.ustudy.infocenter.model.Teacher;
 import com.ustudy.infocenter.services.TeacherService;
 
@@ -128,22 +129,26 @@ public class LoginController {
 	
 	
 	@RequestMapping(value="/loginId", method = RequestMethod.GET)
-	public String getLoginName(HttpServletResponse resp) {
-		logger.debug("endpoint /loginId is visited");
+	public TeacRole getLoginUser(HttpServletResponse resp) {
+		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
+		TeacRole u = null;
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
-			logger.warn("Failed to get subject --> " + e.getMessage());
+			logger.warn("getLoginUser(),Failed to get subject --> " + e.getMessage());
 		}
 		if (cUser.getPrincipal() == null) {
-			logger.warn("User didn't log in");
+			logger.warn("getLoginUser(), User didn't log in");
 			resp.setStatus(404);
-			return "No User logged in";
+			resp.setHeader("Failure reason:", "No User logged in");
+			return u;
 		}
 		else {
-			logger.debug(cUser.getPrincipal().toString());
-			return cUser.getPrincipal().toString();
+			String uId = cUser.getPrincipal().toString();
+			u = new TeacRole(uId, teaS.findPriRoleById(uId));
+			logger.debug("getLoginUser(), " + u.toString());
+			return u;
 		}
 		
 	}

@@ -48,5 +48,10 @@ public class TeacherBrife implements Serializable {
 	public void setTeacname(String teacname) {
 		this.teacname = teacname;
 	}
+
+	@Override
+	public String toString() {
+		return "TeacherBrife [teacid=" + teacid + ", teacname=" + teacname + "]";
+	}
 	
 }

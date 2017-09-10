@@ -225,16 +225,6 @@ public class TeacherServiceImpl implements TeacherService {
 			throw new RuntimeException(msg);
 		}
 		
-		// save roles
-		num = saveRoles(item.getRoles(), item);
-		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
-		
-		// save additional permissions
-		num = 0;
-		if (item.getAddiPerms() != null)
-			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
-		
 		// save subjects
 		num = 0;
 		if (item.getSubjects() != null)
@@ -252,6 +242,16 @@ public class TeacherServiceImpl implements TeacherService {
 		if (item.getClasses() != null)
 		    num = saveClasses(item.getClasses(), item.getTeacId());
 		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
+		
+		// save roles
+		num = saveRoles(item.getRoles(), item);
+		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
+				
+		// save additional permission
+		num = 0;
+		if (item.getAddiPerms() != null)
+			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
 		
 		return id;
 	}
@@ -364,7 +364,7 @@ public class TeacherServiceImpl implements TeacherService {
 				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("gleader") == 0) {
 					// need to update grade owner
 					num = jTea.update(sqlGrO, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId());
-				}
+				} 
 			}
 		}
 		
@@ -518,5 +518,34 @@ public class TeacherServiceImpl implements TeacherService {
 			tL.add("primary");
 		logger.debug("determineDepartType(), " + tL.toString());
 		return tL;
+	}
+
+	@Override
+	public String findPriRoleById(String teaid) {
+		// front end need login user information including teacher id and highest priority role
+		String sqlRole = "select value from ustudy.roles where user_name = ?";
+		List<String> rL = jTea.queryForList(sqlRole, String.class, teaid);
+		if (rL == null || rL.isEmpty()) {
+			logger.warn("findPriRoleById(), Something goes wrong, no roles bind with user " + teaid);
+			return null;
+		}
+		
+		String r = null;
+		if (rL.contains("org_owner")) {
+			r = "org_owner";
+		} else if (rL.contains("leader")) {
+			r = "leader";
+		} else if (rL.contains("gleader")) {
+			r = "gleader";
+		} else if (rL.contains("sleader")) {
+			r = "sleader";
+		} else if (rL.contains("pleader")) {
+			r = "pleader";
+		} else if (rL.contains("cteacher")) {
+			r = "cteacher";
+		} else
+			r = "teacher";
+		
+		return InfoUtil.getRolemapping().get(r);
 	}
 }
