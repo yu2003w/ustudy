@@ -58,6 +58,7 @@
                 <property name="initialSize" value="10"/>  
                 <property name="maxWait" value="10000"/>
                 <!--
+                
                 <property name="removeAbandonedTimeout" value="60"/>  
                 <property name="minEvictableIdleTimeMillis" value="30000"/>  
                 <property name="minIdle" value="10"/>
