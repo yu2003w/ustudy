@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/mvc
-           http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
            http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/context/spring-context.xsd
            http://www.springframework.org/schema/tx
            http://www.springframework.org/schema/tx/spring-tx.xsd
            http://www.springframework.org/schema/util
@@ -20,130 +17,148 @@
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd
            http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
-      
-    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
-        <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login.jsp"/>
-        <property name="successUrl" value="/index.jsp"/>
-        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
-        <property name="filters">
-            <util:map>
-                <entry key="authc">
-                    <bean class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter"/>
-                </entry>
-            </util:map>
-        </property>
-        <property name="filterChainDefinitions">
-            <value>
-                <!-- student filter chain -->
-                /student/list/** = authc, perms[student:view]
-                /student/view/** = authc, perms[student:view]
-                /student/add = authc, perms[student:edit]
-                /student/update/** = authc, perms[student:edit]
-                /student/delete = authc, perms[student:edit]
-                /student/delete/** = authc, perms[student:edit]
-                /studentList = authc, perms[student:view]
-                
-                <!-- teacher filter chain -->
-                /teacher/list/** = authc, perms[teacher:view]
-                /teacher/view/** = authc, perms[teacher:view]
-                /teacher/add = authc, perms[teacher:edit]
-                /teacher/update/** = authc, perms[teacher:edit]
-                /teacher/delete = authc, perms[teacher:edit]
-                /teacher/delete/** = authc, perms[teacher:edit]
-                /teacherList = authc, perms[teacher:view]
-                
-                <!-- school filter chain -->
-                /schoolDetails = authc, perms[infoschool:view]
-                
-                /school/detail = authc, perms[infoschool:view]
-                /school/departsubs/** = authc, perms[infoschool:view]
-                /school/departsubs/update/** = authc, perms[infoschool:edit]
-                /school/departteac/** = authc,perms[infoschool:view]
-                /school/grade/** = authc, perms[infoschool:view]
-                /school/grade/update = authc, perms[infoschool:edit]
-                /school/gradeteac/** = authc, perms[infoschool:view]
-                /school/class/** = authc, perms[infoschool:view]
-                /school/class/update = authc, perms[infoschool:edit]
-                /school/classteac/** = authc, perms[infoschool:view]
-                   
-                /** = anon
-            </value>
-        </property>
-    </bean>
-    
-    <bean id="infoCenter" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
-        <property name="poolProperties">  
-            <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-                <property name="username" value="root"/>  
-                <property name="password" value="mysql"/>
-                <property name="testWhileIdle" value="true"/>  
-                <property name="testOnBorrow" value="true"/>  
-                <property name="validationInterval" value="30000"/>  
-                <property name="testOnReturn" value="false"/>  
-                <property name="validationQuery" value="/* ping */"/>  
-                <property name="timeBetweenEvictionRunsMillis" value="30000"/>  
-                <property name="maxActive" value="100"/>  
-                <property name="initialSize" value="10"/>  
-                <property name="maxWait" value="10000"/>
-                <!--
-                <property name="removeAbandonedTimeout" value="60"/>  
-                <property name="minEvictableIdleTimeMillis" value="30000"/>  
-                <property name="minIdle" value="10"/>
-                <property name="logAbandoned" value="true"/>
-                <property name="removeAbandoned" value="true"/>  
-                <property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"/>
-                -->
-            </bean>  
-        </property>  
-    </bean>
-    
-    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
-        <property name="realm" ref="authRealm"/>
-        <!-- By default the servlet container sessions will be used.  Uncomment this line
-           to use shiro's native sessions (see the JavaDoc for more): -->
-        <!-- <property name="sessionMode" value="native"/> -->
-    </bean>
-    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
 
-    <!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
-    <!-- security datasource: -->
-    <bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
-        <property name="dataSource" ref="infoCenter" />
-        <property name="permissionsLookupEnabled" value="true"/>
-        <property name="authenticationQuery" value="select passwd from ustudy.teacher where teacid = ?" />
-        <property name="userRolesQuery" value="select value from ustudy.teacherroles where teac_id = ?" />
-        <property name="permissionsQuery" value="select value from ustudy.perms where role_name = ?"/>
-    </bean>
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
-        <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
-        <property name="securityManager" ref="securityManager"/>
-    </bean>
-       
-    <!-- Secure Spring remoting:  Ensure any Spring Remoting method invocations
-         can be associated with a Subject for security checks. -->
-    <bean id="secureRemoteInvocationExecutor" class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
-         <property name="securityManager" ref="securityManager"/>
-    </bean>
-    
-    <!-- Noted: Two methods for enabling spring transaction managent with jdbc.
-         Above is XML based configuration. Declaring with @Transactional in java
-         source code is also very flexible. -->
-    <tx:annotation-driven transaction-manager="txManager"/>
-    <bean id="txManager"
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login.jsp" />
+		<property name="successUrl" value="/index.jsp" />
+		<property name="unauthorizedUrl" value="/unauthorized.jsp" />
+		<property name="filters">
+			<util:map>
+				<entry key="authc">
+					<bean
+						class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter" />
+				</entry>
+			</util:map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- student filter chain -->
+				/student/list/** = authc, perms[student:view]
+				/student/view/** = authc, perms[student:view]
+				/student/add = authc, perms[student:edit]
+				/student/update/** = authc, perms[student:edit]
+				/student/delete = authc, perms[student:edit]
+				/student/delete/** = authc, perms[student:edit]
+				/studentList = authc, perms[student:view]
+
+				<!-- teacher filter chain -->
+				/teacher/list/** = authc, perms[teacher:view]
+				/teacher/view/** = authc, perms[teacher:view]
+				/teacher/add = authc, perms[teacher:edit]
+				/teacher/update/** = authc, perms[teacher:edit]
+				/teacher/delete = authc, perms[teacher:edit]
+				/teacher/delete/** = authc, perms[teacher:edit]
+				/teacherList = authc, perms[teacher:view]
+
+				<!-- school filter chain -->
+				/schoolDetails = authc, perms[infoschool:view]
+
+				/school/detail = authc, perms[infoschool:view]
+				/school/departsubs/** = authc, perms[infoschool:view]
+				/school/departsubs/update/** = authc, perms[infoschool:edit]
+				/school/departteac/** = authc,perms[infoschool:view]
+				/school/grade/** = authc, perms[infoschool:view]
+				/school/grade/update = authc, perms[infoschool:edit]
+				/school/gradeteac/** = authc, perms[infoschool:view]
+				/school/class/** = authc, perms[infoschool:view]
+				/school/class/update = authc, perms[infoschool:edit]
+				/school/classteac/** = authc, perms[infoschool:view]
+
+				/** = anon
+			</value>
+		</property>
+	</bean>
+
+	<bean id="infoCenter" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		<property name="poolProperties">
+			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
+				<property name="url"
+					value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
+				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+				<property name="username" value="root" />
+				<property name="password" value="mysql" />
+				<property name="testWhileIdle" value="true" />
+				<property name="testOnBorrow" value="true" />
+				<property name="validationInterval" value="30000" />
+				<property name="testOnReturn" value="false" />
+				<property name="validationQuery" value="/* ping */" />
+				<property name="timeBetweenEvictionRunsMillis" value="30000" />
+				<property name="maxActive" value="100" />
+				<property name="initialSize" value="10" />
+				<property name="maxWait" value="10000" />
+				<!-- <property name="removeAbandonedTimeout" value="60"/> <property name="minEvictableIdleTimeMillis" 
+					value="30000"/> <property name="minIdle" value="10"/> <property name="logAbandoned" 
+					value="true"/> <property name="removeAbandoned" value="true"/> <property 
+					name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"/> -->
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!-- Single realm app. If you have multiple realms, use the 'realms' property 
+			instead. -->
+		<property name="realm" ref="authRealm" />
+		<!-- By default the servlet container sessions will be used. Uncomment 
+			this line to use shiro's native sessions (see the JavaDoc for more): -->
+		<!-- <property name="sessionMode" value="native"/> -->
+	</bean>
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- Define the Shiro Realm implementation you want to use to connect to 
+		your back-end -->
+	<!-- security datasource: -->
+	<bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+		<property name="dataSource" ref="infoCenter" />
+		<property name="permissionsLookupEnabled" value="true" />
+		<property name="authenticationQuery"
+			value="select passwd from ustudy.teacher where teacid = ?" />
+		<property name="userRolesQuery"
+			value="select value from ustudy.teacherroles where teac_id = ?" />
+		<property name="permissionsQuery"
+			value="select value from ustudy.perms where role_name = ?" />
+	</bean>
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" />
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- Secure Spring remoting: Ensure any Spring Remoting method invocations 
+		can be associated with a Subject for security checks. -->
+	<bean id="secureRemoteInvocationExecutor"
+		class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- Noted: Two methods for enabling spring transaction managent with jdbc. 
+		Above is XML based configuration. Declaring with @Transactional in java source 
+		code is also very flexible. -->
+	<tx:annotation-driven transaction-manager="txManager" />
+	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="infoCenter" />
 	</bean>
-	
+
 	<!-- sql session factory for mybatis -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-       <property name="dataSource" ref="infoCenter" />
-    </bean>
-    
-    <!-- scan for mappers and make them autowired -->
-    <mybatis:scan base-package="com.ustudy.infocenter.mapper" />
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="infoCenter" />
+	</bean>
+
+	<!-- scan for mappers and make them autowired -->
+	<mybatis:scan base-package="com.ustudy.infocenter.mapper" />
+
+	<!-- spring data redis related configurations -->
+	<bean id="jedisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
+		p:timeout="100" />
+
+	<context:annotation-config />
+	<bean
+		class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration" />
 
 </beans>
