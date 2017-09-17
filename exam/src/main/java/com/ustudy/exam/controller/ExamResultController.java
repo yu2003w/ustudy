@@ -21,7 +21,7 @@ public class ExamResultController {
 	@Autowired
 	private ExamResultService erS; 
 	
-	@RequestMapping(value = "result/", method = RequestMethod.GET)
+	@RequestMapping(value = "/result", method = RequestMethod.GET)
 	public List<ExamResult> getAllResult() {
 		logger.debug("getAllResult(), start to retriing all examination result.");
 		
