@@ -13,7 +13,7 @@ public class OrgBrifeRowMapper implements RowMapper<OrgBrife> {
 	
 	@Override
 	public OrgBrife mapRow(ResultSet rs, int num) throws SQLException {
-		OrgBrife item = new OrgBrife(rs.getString("school_id"), rs.getString("school_name"), this.type);
+		OrgBrife item = new OrgBrife(rs.getString("schid"), rs.getString("schname"), this.type);
 		return item;
 	}
 
