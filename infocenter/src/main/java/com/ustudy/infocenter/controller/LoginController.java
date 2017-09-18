@@ -121,7 +121,10 @@ public class LoginController {
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
 		
 		Subject currentUser = SecurityUtils.getSubject();
-		logger.info("user " + currentUser.getPrincipal().toString() + " logged out");
+		
+		if(null != currentUser && null != currentUser.getPrincipal()){
+			logger.info("user " + currentUser.getPrincipal().toString() + " logged out");
+		}
 		
 		currentUser.logout();
 		
