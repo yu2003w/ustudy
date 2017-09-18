@@ -19,7 +19,7 @@ PRIMARY KEY (id)
 
 create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
-value varchar(32) NOT NULL,
+role_name varchar(32) NOT NULL,
 user_name varchar(32) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
@@ -30,7 +30,7 @@ FOREIGN KEY (user_name)
 
 create table if not exists ustudy.perms (
 id INT NOT NULL AUTO_INCREMENT,
-value varchar(64) NOT NULL,
+perm varchar(64) NOT NULL,
 role_name varchar(32) NOT NULL,
 INDEX (role_name),
 PRIMARY KEY(id)
@@ -51,15 +51,15 @@ INDEX(name,loginname)
 
 create table if not exists ustudy.school (
 id INT NOT NULL AUTO_INCREMENT,
-school_id  VARCHAR(32) NOT NULL,
-school_name VARCHAR(128) NOT NULL,
-school_type ENUM('高中', '初中', '完中', '九年制', '小学', '十二年制', '补习', '其他') NOT NULL,
+schid  VARCHAR(32) NOT NULL,
+schname VARCHAR(128) NOT NULL,
+type ENUM('高中', '初中', '完中', '九年制', '小学', '十二年制', '补习', '其他') NOT NULL,
 province  VARCHAR(32) NOT NULL,
 city      VARCHAR(32) NOT NULL,
 district  VARCHAR(32) NOT NULL,
 PRIMARY KEY (id),
-INDEX(school_name),
-UNIQUE KEY (school_id)
+INDEX(schname, schid),
+UNIQUE KEY (schid)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teacher (
@@ -81,11 +81,11 @@ id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
 grade_owner VARCHAR(32),
-school_id VARCHAR(32) NOT NULL,
+schid VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
-INDEX(school_id, grade_name),
-FOREIGN KEY (school_id)
-    REFERENCES ustudy.school(school_id)
+INDEX(schid, grade_name),
+FOREIGN KEY (schid)
+    REFERENCES ustudy.school(schid)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (grade_owner)
     REFERENCES ustudy.teacher(teacid)
@@ -117,25 +117,26 @@ UNIQUE KEY (exam_name)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.examschool (
-exam_id INT NOT NULL,
-school_id VARCHAR(32) NOT NULL,
-school_name VARCHAR(128) NOT NULL,
-PRIMARY KEY (exam_id),
-FOREIGN KEY (exam_id)
+examid INT NOT NULL,
+schid VARCHAR(32) NOT NULL,
+schname VARCHAR(128) NOT NULL,
+PRIMARY KEY (examid),
+INDEX(schid,schname),
+FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (school_id)
-    REFERENCES ustudy.school(school_id)
+FOREIGN KEY (schid)
+    REFERENCES ustudy.school(schid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.examsubject (
-exam_id INT NOT NULL,
+examid INT NOT NULL,
 grade_name VARCHAR(32) NOT NULL,
 subject_name VARCHAR(32) NOT NULL,
 UNIQUE KEY (grade_name, subject_name),
-PRIMARY KEY(exam_id),
-FOREIGN KEY (exam_id)
+PRIMARY KEY(examid),
+FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;

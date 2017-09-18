@@ -20,14 +20,15 @@ public class ExamResultServiceImpl implements ExamResultService {
 	@Autowired
 	private RedisTemplate<String, ExamResult> examRT;
 
+	/*
 	public ExamResultMapper getErM() {
 		return erM;
 	}
 
 	public void setErM(ExamResultMapper erM) {
 		this.erM = erM;
-	}
-
+	} */
+	
 	@Override
 	public List<ExamResult> getAllResult() {
 		List<ExamResult> res = this.erM.getAllResult();

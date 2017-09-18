@@ -115,11 +115,11 @@ public class School implements Serializable {
 		if (target == this)
 			return null;
 		if (target.getSchoolId() != this.schoolId)
-			comRes.put("school_id", this.schoolId);
+			comRes.put("schid", this.schoolId);
 		if (target.getSchoolName() != this.schoolName)
-			comRes.put("school_name", this.schoolName);
+			comRes.put("schname", this.schoolName);
 		if (target.getSchoolType() != this.schoolType)
-			comRes.put("school_type", this.schoolType);
+			comRes.put("type", this.schoolType);
 		if (target.getProvince() != this.province)
 			comRes.put("province", this.province);
 		if (target.getCity() != this.city)
