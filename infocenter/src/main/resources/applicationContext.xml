@@ -65,7 +65,6 @@
 				/school/class/update = authc, perms[infoschool:edit]
 				/school/classteac/** = authc, perms[infoschool:view]
 				
-				/loginId = authc
 				/** = anon
 			</value>
 		</property>
