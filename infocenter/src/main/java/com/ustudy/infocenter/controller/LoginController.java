@@ -12,6 +12,7 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
@@ -82,26 +83,40 @@ public class LoginController {
 		
 		if (status) {
 			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
-			// login successful, redirect to original request
-			msg = "Authentication successful";
-			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
-			//WebUtils.redirectToSavedRequest(request, response, null);
-			//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
-			redirectUrl = sr.getRequestUrl();
 			
-			// need to populate current user's orgtype, orgid information
-			Session ses = currentUser.getSession(true);
+			// need to populate current user's orgtype, orgid information into session
 			Teacher tea = teaS.findTeacherById(currentUser.getPrincipal().toString());
-			ses.setAttribute("orgType", tea.getOrgtype());
-			ses.setAttribute("orgId", tea.getOrgid());
 			
 			// update last login time for logged teacher
-			if (!teaS.updateLLTime(tea.getId()))
-				logger.warn("login(), failed to set last login time for user " + currentUser.getPrincipal().toString());
+			if (!teaS.updateLLTime(tea.getId())) {
+				logger.warn("login(), failed to set login time for user " + tea.getTeacId());
+				redirectUrl = "/info/error.jsp";
+			}
+			
+			try {
+				Session ses = currentUser.getSession(true);
+				ses.setAttribute("orgType", tea.getOrgtype());
+				ses.setAttribute("orgId", tea.getOrgid());
+			} catch (SessionException e) {
+				logger.warn("login(), session failed -> " + e.getMessage());
+				redirectUrl = "/info/error.jsp";
+			}
+			
+			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid());
 			
 			// TODO: need to redirect user to proper pages based on organization type
 			
-			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid()); 
+			// login successful, redirect to original request or /info/welcome
+			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
+			if (sr == null) {
+				logger.debug("login(), no saved request existed here.");
+				redirectUrl = "/info/welcome";
+			}
+			else
+				redirectUrl = sr.getRequestUrl();
+					
+			logger.debug("login(), redirect url ->" + redirectUrl);
+			
 		} else {
 			logger.warn(msg);
 			// login failed here, need to redirect to error pages
@@ -112,7 +127,7 @@ public class LoginController {
 			logger.debug("redirect to " + redirectUrl);
 			response.sendRedirect(redirectUrl);
 		} catch (Exception re) {
-			logger.warn("Failed to redirect to login pages --> " + re.getMessage());
+			logger.warn("Failed to redirect --> " + re.getMessage());
 		}
 		
 	}
@@ -122,7 +137,6 @@ public class LoginController {
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		logger.info("user " + currentUser.getPrincipal().toString() + " logged out");
-		
 		currentUser.logout();
 		
 	}
