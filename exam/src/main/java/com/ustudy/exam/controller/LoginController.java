@@ -74,22 +74,35 @@ public class LoginController {
 
 		if (status) {
 			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
-			// login successful, redirect to original request
-			msg = "Authentication successful";
+			
+			// login successful, redirect to original request or /exam/welcome
 			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
 			// WebUtils.redirectToSavedRequest(request, response, null);
-			// WebUtils.issueRedirect(request, response, sr.getRequestUrl(),
-			// null, false);
-			redirectUrl = sr.getRequestUrl();
-
+			// WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
+			if (sr == null) {
+				logger.debug("login(), no saved request existed here.");
+				redirectUrl = "/info/welcome";
+			}
+			else
+				redirectUrl = sr.getRequestUrl();
+			
 			// need to populate current user's orgtype, orgid information
-			Session ses = currentUser.getSession();
-			User u = userS.findUserById(currentUser.getPrincipal().toString());
-			if (u != null) {
-				ses.setAttribute("userName", u.getUname());
-			} else
-				logger.warn("login(), failed to retrieve user information for id " +
-						currentUser.getPrincipal().toString());
+			try {
+				Session ses = currentUser.getSession(true);
+				User u = userS.findUserById(currentUser.getPrincipal().toString());
+				if (u != null) {
+					ses.setAttribute("userName", u.getUname());
+				} else {
+					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
+					redirectUrl = "/exam/error.jsp";
+				}
+					
+			} catch (Exception e) {
+				logger.warn("login(), session failed -> " + e.getMessage());
+				redirectUrl = "/exam/error.jsp";
+			}
+			
+			logger.debug("login(), redirect url ->" + redirectUrl);
 
 			/*
 			 * ses.setAttribute("orgType", u.getOrgtype());
@@ -106,18 +119,17 @@ public class LoginController {
 			 * logger.debug("logged user: orgtype -> " + tea.getOrgtype() +
 			 * "; orgid -> " + tea.getOrgid());
 			 */
-
 		} else {
 			logger.warn(msg);
 			// login failed here, need to redirect to error pages
-			redirectUrl = "/info/error.jsp";
+			redirectUrl = "/exam/error.jsp";
 		}
 
 		try {
-			logger.debug("redirect to " + redirectUrl);
+			logger.debug("login(), redirect to " + redirectUrl);
 			response.sendRedirect(redirectUrl);
 		} catch (Exception re) {
-			logger.warn("Failed to redirect to login pages --> " + re.getMessage());
+			logger.warn("Failed to redirect --> " + re.getMessage());
 		}
 
 	}

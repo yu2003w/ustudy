@@ -126,6 +126,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	public Teacher findTeacherById(String teaid) {
+		logger.debug("findTeacherById(), retrieve information for " + teaid);
 		String sqlT = "select * from ustudy.teacher where teacid = ?";
 		Teacher item = jTea.queryForObject(sqlT, new TeacherRowMapper(), teaid);
 		return item;
