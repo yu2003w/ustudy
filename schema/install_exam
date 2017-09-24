@@ -1,14 +1,95 @@
 # create databases for examination center
 set names "utf8";
 create database if not exists ustudy character set utf8;
-create table if not exists ustudy.examresult (
+# tables for answer setting
+create table if not exists ustudy.quesanswer (
 id INT NOT NULL AUTO_INCREMENT,
-stuname VARCHAR(64) NOT NULL,
-stuno CHAR(32) NOT NULL,
-score INT,
-PRIMARY KEY(id),
-INDEX (stuname, stuno),
-UNIQUE KEY (stuno)
+quesno INT NOT NULL,
+type ENUM('单选题','多选题','判断题','解答题','证明题') NOT NULL,
+branch varchar(16) default '不分科',
+choice_num INT NOT NULL,
+# for different type, answer have different type of values
+# answer maybe json data for multiple choice
+answer varchar(64),
+score int NOT NULL,
+assign_mode ENUM ('平均', '动态', '比例'),
+score_mode ENUM ('单评', '双评'),
+teac_owner INT,
+exam_grade_sub_id INT NOT NULL,
+INDEX(exam_grade_sub_id, quesno),
+UNIQUE KEY(exam_grade_sub_id, quesno),
+PRIMARY KEY (id),
+FOREIGN KEY (exam_grade_sub_id)
+    REFERENCES ustudy.examgradesub(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (teac_owner)
+    REFERENCES ustudy.teacher(id)
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+create table if not exists ustudy.quesanswerdiv (
+id INT NOT NULL AUTO_INCREMENT,
+seqname varchar(16) NOT NULL,
+branch varchar(16) default '不分科',
+score INT NOT NULL,
+quesanswerid INT NOT NULL,
+PRIMARY KEY (id),
+FOREIGN KEY (quesanswerid)
+    REFERENCES ustudy.quesanswer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.teacherscoretask (
+id INT NOT NULL AUTO_INCREMENT,
+teacid INT NOT NULL,
+quesid INT NOT NULL,
+# for certain teacher, number of task is limited
+threshold INT,
+type ENUM ('初评','终评'),
+PRIMARY KEY (id),
+FOREIGN KEY (teacid)
+    REFERENCES ustudy.teacher(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (quesid)
+    REFERENCES ustudy.quesanswer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.stuanswer (
+id INT NOT NULL AUTO_INCREMENT,
+stuid INT NOT NULL,
+examid INT NOT NULL,
+exam_grade_sub_id INT NOT NULL,
+quesid INT NOT NULL,
+classid INT,
+answer VARCHAR(64),
+score INT,
+teacid1 INT,
+teacid2 INT,
+teacid3 INT,
+mark ENUM ('excellent','faq','weird'),
+PRIMARY KEY(id),
+INDEX (stuid, examid, exam_grade_sub_id, quesid, mark),
+FOREIGN KEY (stuid)
+    REFERENCES ustudy.student(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (examid)
+    REFERENCES ustudy.exam(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (exam_grade_sub_id)
+    REFERENCES ustudy.examgradesub(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (quesid)
+    REFERENCES ustudy.quesanswer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (teacid1)
+    REFERENCES ustudy.teacher(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (teacid2)
+    REFERENCES ustudy.teacher(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (teacid3)
+    REFERENCES ustudy.teacher(id)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
