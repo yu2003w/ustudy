@@ -39,6 +39,22 @@ FOREIGN KEY (quesanswerid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+# only meaningful for union examinations
+create table if not exists ustudy.schooltask (
+id INT NOT NULL AUTO_INCREMENT,
+examsch INT NOT NULL,
+quesid INT NOT NULL,
+ratio FLOAT(3,2) default 0,
+assign_mode ENUM('平均','动态'),
+PRIMARY KEY (id),
+FOREIGN KEY (examsch)
+    REFERENCES ustudy.examschool(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (quesid)
+    REFERENCES ustudy.quesanswer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 create table if not exists ustudy.teacherscoretask (
 id INT NOT NULL AUTO_INCREMENT,
 teacid INT NOT NULL,
@@ -62,8 +78,18 @@ examid INT NOT NULL,
 exam_grade_sub_id INT NOT NULL,
 quesid INT NOT NULL,
 classid INT,
-answer VARCHAR(64),
-score INT,
+# for subjective question, this is url for image location
+answer VARCHAR(128),
+score1 INT,
+score2 INT,
+score3 INT,
+# for subjective question, maybe two image layers needed for each teacher
+comment11 VARCHAR(128),
+comment12 VARCHAR(128),
+comment21 VARCHAR(128),
+comment22 VARCHAR(128),
+comment31 VARCHAR(128),
+comment32 VARCHAR(128),
 teacid1 INT,
 teacid2 INT,
 teacid3 INT,

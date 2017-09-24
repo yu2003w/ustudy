@@ -80,6 +80,7 @@ fi
 
 # start nginx as proxy for frontend services
 docker run --rm -it --name nginx -p 80:80 -d nginx:1.12
+docker cp nginx.conf nginx:/etc/nginx/nginx.conf
 if [ $? != 0 ];then
   echo "Failed to launch nginx container"
   docker stop ustudy-dw redis
