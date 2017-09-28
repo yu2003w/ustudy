@@ -13,15 +13,13 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.SavedRequest;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ustudy.exam.model.User;
-import com.ustudy.exam.service.UserService;
+import com.ustudy.exam.model.Teacher;
+import com.ustudy.exam.service.TeacherService;
 
 @RestController
 public class LoginController {
@@ -29,17 +27,17 @@ public class LoginController {
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
 
 	// for each login user, need to retrieve some meta information such as
-	// orgtype, orgid,
-	// orgname and so on.
+	// orgtype, orgid, orgname, roles and so on.
 	@Autowired
-	private UserService userS;
+	private TeacherService userS;
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public void login(HttpServletRequest request, HttpServletResponse response) {
+	public Teacher login(HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("endpoint /login is visited");
 		String msg = null;
 		boolean status = true;
+		Teacher tea = null;
 
 		Subject currentUser = SecurityUtils.getSubject();
 
@@ -61,76 +59,49 @@ public class LoginController {
 				msg = "Account is locked, username:" + username;
 				status = false;
 			} catch (AuthenticationException ae) {
-				logger.warn(ae.getMessage());
+				msg = ae.getMessage();
 				status = false;
 			} catch (Exception e) {
-				logger.warn(e.getMessage());
+				msg = e.getMessage();
 				status = false;
 			}
 
 		}
-
-		String redirectUrl = null;
 
 		if (status) {
 			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
 			
-			// login successful, redirect to original request or /exam/welcome
-			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
-			// WebUtils.redirectToSavedRequest(request, response, null);
-			// WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
-			if (sr == null) {
-				logger.debug("login(), no saved request existed here.");
-				redirectUrl = "/info/welcome";
-			}
-			else
-				redirectUrl = sr.getRequestUrl();
-			
 			// need to populate current user's orgtype, orgid information
 			try {
 				Session ses = currentUser.getSession(true);
-				User u = userS.findUserById(currentUser.getPrincipal().toString());
-				if (u != null) {
-					ses.setAttribute("userName", u.getUname());
+				tea = userS.findUserById(currentUser.getPrincipal().toString());
+				if (tea != null) {
+					ses.setAttribute("uname", tea.getUname());
+					ses.setAttribute("orgtype", tea.getOrgtype());
+					ses.setAttribute("orgid", tea.getUid());
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
-					redirectUrl = "/exam/error.jsp";
+					response.setStatus(404);
+					response.setHeader("loginresult", "failed to retrieve user information");
+					return tea;
 				}
-					
+				tea.setRoles(userS.getRolesById(tea.getUid()));
+				logger.debug("login()," + tea.toString());
+				
 			} catch (Exception e) {
 				logger.warn("login(), session failed -> " + e.getMessage());
-				redirectUrl = "/exam/error.jsp";
+				response.setStatus(404);
+				response.setHeader("loginresult", "session operation failed");
+				return tea;
 			}
 			
-			logger.debug("login(), redirect url ->" + redirectUrl);
-
-			/*
-			 * ses.setAttribute("orgType", u.getOrgtype());
-			 * ses.setAttribute("orgId", u.getUid());
-			 * 
-			 * // update last login time for logged teacher if
-			 * (!userS.updateLLTime(u.getUid()))
-			 * logger.warn("login(), failed to set last login time for user " +
-			 * currentUser.getPrincipal().toString());
-			 * 
-			 * // TODO: need to redirect user to proper pages based on
-			 * organization type
-			 * 
-			 * logger.debug("logged user: orgtype -> " + tea.getOrgtype() +
-			 * "; orgid -> " + tea.getOrgid());
-			 */
 		} else {
 			logger.warn(msg);
-			// login failed here, need to redirect to error pages
-			redirectUrl = "/exam/error.jsp";
+			response.setStatus(404);
+			response.setHeader("loginresult", "authencation failed");
 		}
-
-		try {
-			logger.debug("login(), redirect to " + redirectUrl);
-			response.sendRedirect(redirectUrl);
-		} catch (Exception re) {
-			logger.warn("Failed to redirect --> " + re.getMessage());
-		}
+		
+		return tea;
 
 	}
 
@@ -145,10 +116,10 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/loginId", method = RequestMethod.GET)
-	public User getLoginUser(HttpServletResponse resp) {
+	public Teacher getLoginUser(HttpServletResponse resp) {
 		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
-		User u = null;
+		Teacher u = null;
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
@@ -160,8 +131,13 @@ public class LoginController {
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;
 		} else {
+			// at this point, user information could be retrieved from session
 			String uId = cUser.getPrincipal().toString();
-			u = userS.findUserById(uId);
+			Session ses = cUser.getSession();
+			u = new Teacher(uId, ses.getAttribute("uname").toString(), 
+					ses.getAttribute("orgtype").toString(), ses.getAttribute("orgid").toString());
+			// need to retrieve roles for the login teacher
+			u.setRoles(userS.getRolesById(uId));
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}

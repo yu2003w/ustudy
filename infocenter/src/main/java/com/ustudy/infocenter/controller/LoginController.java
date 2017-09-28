@@ -14,8 +14,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.SavedRequest;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,11 +41,12 @@ public class LoginController {
 	private TeacherService teaS;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
-	public void login(HttpServletRequest request, HttpServletResponse response) {
+	public TeacRole login(HttpServletRequest request, HttpServletResponse response) {
 				
 		logger.debug("endpoint /login is visited");
 		String msg = null;
 		boolean status = true;
+		TeacRole teaR = null;
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		
@@ -79,7 +78,8 @@ public class LoginController {
 			
 		} 
 		
-		String redirectUrl = null;
+		// current architecture is frontend served by nginx, and nginx then talked with tomcat container.
+		// For login operation, no need to redirect and only set response status and json data.
 		
 		if (status) {
 			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
@@ -90,7 +90,7 @@ public class LoginController {
 			// update last login time for logged teacher
 			if (!teaS.updateLLTime(tea.getId())) {
 				logger.warn("login(), failed to set login time for user " + tea.getTeacId());
-				redirectUrl = "/info/error.jsp";
+				// although update login time failed, login succeed. only warning here.
 			}
 			
 			try {
@@ -99,37 +99,21 @@ public class LoginController {
 				ses.setAttribute("orgId", tea.getOrgid());
 			} catch (SessionException e) {
 				logger.warn("login(), session failed -> " + e.getMessage());
-				redirectUrl = "/info/error.jsp";
+				response.setStatus(404);
+				response.setHeader("loginresult", "session operation failed.");
+				return teaR;
 			}
 			
 			logger.debug("logged user: orgtype -> " + tea.getOrgtype() + "; orgid -> " + tea.getOrgid());
-			
-			// TODO: need to redirect user to proper pages based on organization type
-			
-			// login successful, redirect to original request or /info/welcome
-			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
-			if (sr == null) {
-				logger.debug("login(), no saved request existed here.");
-				redirectUrl = "/info/welcome";
-			}
-			else
-				redirectUrl = sr.getRequestUrl();
-					
-			logger.debug("login(), redirect url ->" + redirectUrl);
-			
+			teaR = new TeacRole(tea.getTeacId(), teaS.findPriRoleById(tea.getTeacId()));
+			logger.debug("login(), " + teaR.toString());
 		} else {
 			logger.warn(msg);
-			// login failed here, need to redirect to error pages
-			redirectUrl = "/info/error.jsp";
+			response.setStatus(404);
+			response.setHeader("loginresult", "login failed");
 		}
 		
-		try {
-			logger.debug("redirect to " + redirectUrl);
-			response.sendRedirect(redirectUrl);
-		} catch (Exception re) {
-			logger.warn("Failed to redirect --> " + re.getMessage());
-		}
-		
+		return teaR;
 	}
 	
 	@RequestMapping(value="/logout", method = RequestMethod.GET) 
