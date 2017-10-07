@@ -40,7 +40,6 @@
 				/student/update/** = authc, perms[student:edit]
 				/student/delete = authc, perms[student:edit]
 				/student/delete/** = authc, perms[student:edit]
-				/studentList = authc, perms[student:view]
 
 				<!-- teacher filter chain -->
 				/teacher/list/** = authc, perms[teacher:view]
@@ -49,11 +48,8 @@
 				/teacher/update/** = authc, perms[teacher:edit]
 				/teacher/delete = authc, perms[teacher:edit]
 				/teacher/delete/** = authc, perms[teacher:edit]
-				/teacherList = authc, perms[teacher:view]
 
 				<!-- school filter chain -->
-				/schoolDetails = authc, perms[infoschool:view]
-
 				/school/detail = authc, perms[infoschool:view]
 				/school/departsubs/** = authc, perms[infoschool:view]
 				/school/departsubs/update/** = authc, perms[infoschool:edit]
