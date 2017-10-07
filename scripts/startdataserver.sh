@@ -90,7 +90,7 @@ else
 fi
 docker cp nginx.conf nginx:/etc/nginx/nginx.conf
 docker exec -u root nginx /bin/sh -c 'nginx -s reload'
-if [ $? !=0 ]; then
+if [ $? != 0 ]; then
   echo "Failed update nginx configuration"
   docker stop ustudy-dw redis nginx
   exit 1
