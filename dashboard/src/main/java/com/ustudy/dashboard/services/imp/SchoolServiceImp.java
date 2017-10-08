@@ -80,7 +80,7 @@ public class SchoolServiceImp implements SchoolService {
 	public int createItem(School data) {
 
 		// Noted: Schema for table ustudy.school is as below,
-		// id, school_id, school_name, school_type, province, city, district
+		// id, schid, schname, type, province, city, district
 		String sqlSch = "insert into ustudy.school values(?,?,?,?,?,?,?);";
 
 		// insert record into dashoboard.school firstly, also auto generated
@@ -149,7 +149,7 @@ public class SchoolServiceImp implements SchoolService {
 
 		// for grades related information, need to replace previous information
 		// delete origin grades information firstly, then insert new values
-		String sqlDelGr = "delete from ustudy.grade where school_id = ?";
+		String sqlDelGr = "delete from ustudy.grade where schid = ?";
 		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
 		logger.info(numOfGr + " grade items deleted for update.");
 
@@ -201,7 +201,7 @@ public class SchoolServiceImp implements SchoolService {
 
 	private void assembleGrades(School sch) {
 		List<Grade> gNames = null;
-		String sqlGra = "select id, grade_name, classes_num from ustudy.grade where school_id = ?;";
+		String sqlGra = "select id, grade_name, classes_num from ustudy.grade where schid = ?;";
 		gNames = jdbcT.query(sqlGra, new GradeRowMapper(), sch.getSchoolId());
 
 		for (Grade gn : gNames) {
@@ -219,7 +219,7 @@ public class SchoolServiceImp implements SchoolService {
 		int num = 0;
 		String msg = null;
 		// grade schema is as below,
-		// id, grade_name, classes_num, grade_owner, school_id
+		// id, grade_name, classes_num, grade_owner, schid
 		// Noted: grade_owner is not used in dashboard, it's used by info center
 		String sqlGr = "insert into ustudy.grade values(?,?,?,?,?)";
 
@@ -310,7 +310,7 @@ public class SchoolServiceImp implements SchoolService {
 
 	private int saveDepSub(HashSet<String> subS, String type, String schId) {
 		// populate subjects for departments, schema is as below,
-		// id, sub_name, sub_owner, type, school_id
+		// id, sub_name, sub_owner, type, schid
 		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
 		int num = 0;
 		String msg = null;
@@ -330,7 +330,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public List<OrgBrife> getOrgBrifeList(int id) {
 		List<OrgBrife> obL = null;
-		String sqlOrgB = "select school_id, school_name from ustudy.school where id > ? limit 10000";
+		String sqlOrgB = "select schid, schname from ustudy.school where id > ? limit 10000";
 		try {
 			if (id < 0)
 				id = 0;

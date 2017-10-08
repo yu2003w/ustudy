@@ -7,6 +7,7 @@
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc
            http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
            http://www.springframework.org/schema/beans
@@ -121,8 +122,8 @@
         <property name="dataSource" ref="adminboard" />
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select passwd from ustudy.users where loginname = ?" />
-        <property name="userRolesQuery" value="select value from ustudy.roles where user_name = ?" />
-        <property name="permissionsQuery" value="select value from ustudy.perms where role_name = ?"/>
+        <property name="userRolesQuery" value="select role_name from ustudy.roles where user_name = ?" />
+        <property name="permissionsQuery" value="select perm from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
         <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
@@ -166,5 +167,14 @@
     <!-- scan for mappers and make them autowired -->
     <mybatis:scan base-package="com.ustudy.dashboard.mapper" />
     
-    
+    <!-- spring data redis related configurations -->
+	<bean id="jedisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
+		p:timeout="100" />
+
+	<context:annotation-config />
+	<bean
+		class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration" />
+		
 </beans>

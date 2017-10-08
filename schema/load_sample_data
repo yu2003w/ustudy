@@ -1,14 +1,19 @@
+LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE ustudy.student
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE ustudy.users
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/roles.data' INTO TABLE ustudy.roles
+LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE ustudy.school
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE ustudy.perms
+LOAD DATA LOCAL INFILE '/root/mysql/schema/teacher.data' INTO TABLE ustudy.teacher
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

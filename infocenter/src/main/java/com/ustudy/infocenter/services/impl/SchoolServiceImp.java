@@ -48,7 +48,7 @@ public class SchoolServiceImp implements SchoolService {
 	public School getSchool() {
 		String orgT = getOrgInfo("orgType"), orgId = getOrgInfo("orgId");
 		
-		String sqlSch = "select * from ustudy.school where school_id = ?";
+		String sqlSch = "select * from ustudy.school where schid = ?";
 		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
 		
 		// populate school owner and exam owner
@@ -83,7 +83,7 @@ public class SchoolServiceImp implements SchoolService {
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
 		
 		String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on departsub.sub_owner = "
-				+ "teacher.teacid where departsub.school_id = ? and departsub.type = ?";
+				+ "teacher.teacid where departsub.schid = ? and departsub.type = ?";
 		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
 		
 		logger.debug("populateDepartSub(), " + soL.toString());
@@ -153,7 +153,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	private void populateDeparts(School item, String orgId) {
 		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from grade join teacher "
-				+ "on grade.grade_owner = teacher.teacid where school_id = ?";
+				+ "on grade.grade_owner = teacher.teacid where schid = ?";
 		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();
@@ -206,7 +206,7 @@ public class SchoolServiceImp implements SchoolService {
 		String orgId = getOrgInfo("orgId"), msg = null;
 
 		int cnt = 0;
-		// table schema is id, value, teac_id, type, school_id
+		// table schema is id, sub_name, sub_owner, type, schid
 		String sqlC = "insert into ustudy.departsub values(?,?,?,?,?)";
 		for (SubjectLeader sl:subs) {
 			// subject name
@@ -239,10 +239,10 @@ public class SchoolServiceImp implements SchoolService {
 	@Override
 	public List<TeacherSub> getDepTeac(String depName) {
 		// retrieve all teacher information for specified department
-		String sqlDepTea = "select teachergrade.teac_id as teacherId, teacname as teacherName, teachersub.value"
-				+ " as subName from grade join (teachergrade, teacher, teachersub) on (teachergrade.value "
+		String sqlDepTea = "select teachergrade.teac_id as teacherId, teacname as teacherName, teachersub.sub_name"
+				+ " as subName from grade join (teachergrade, teacher, teachersub) on (teachergrade.grade_name "
 				+ "= grade.grade_name and teacher.teacid = teachergrade.teac_id and teachersub.teac_id = "
-				+ "teacher.teacid) where school_id = ? and grade_name in (";
+				+ "teacher.teacid) where schid = ? and grade_name in (";
 		
 		if (depName.compareTo("high") == 0) {
 			sqlDepTea += "'高一','高二','高三')";
@@ -289,7 +289,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	public List<TeacherSub> getGradeTeac(String id) {
 		String sqlGrTea = "select teacid, teacname from teacher where teacid in (select teac_id "
-				+ "from teachergrade join grade on grade.grade_name = teachergrade.value where grade.id = ?)";
+				+ "from teachergrade join grade on grade.grade_name = teachergrade.grade_name where grade.id = ?)";
 		List<TeacherSub> teaL = schS.query(sqlGrTea, new TeacherSubRowMapper(), id);
 		return teaL;
 	}

@@ -7,7 +7,7 @@
 if [ $# != 2 ]; then
   echo "Please specify WORK_DIR SCHEMA_DIR firstly"
   echo "Usage: startmysql.sh [work_dir] [schema_dir]"
-  exit
+  exit 1
 fi
 WORK_DIR=$1
 SCHEMA_DIR=$2
@@ -16,7 +16,7 @@ if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   mkdir -p ${WORK_DIR}/mysql/schema/ 
   if [ $? != 0 ]; then
     echo "Failed to create schema directory" ${WORK_DIR}/mysql/schema/
-    exit
+    exit 1
   else
     echo "Created schema directory" ${WORK_DIR}/mysql/schema/
   fi
@@ -25,6 +25,7 @@ fi
 cp -Rf ${SCHEMA_DIR} ${WORK_DIR}/mysql/
 if [ $? != 0 ]; then
   echo "Failed to copy schema files into " ${WORK_DIR}/mysql/schema/
+  exit 1
 else
   echo "Copy schema files into " ${WORK_DIR}/mysql/schema/ " successfully"
 fi
@@ -36,7 +37,7 @@ if [ ! -d ${MYSQL_LOG_DIR} ]; then
   mkdir -p ${MYSQL_LOG_DIR}
   if [ $? != 0 ]; then
     echo "Failed to create directory for mysql logs"
-    exit
+    exit 1
   else
     echo "Create directory ${MYSQL_LOG_DIR} for mysql logs successfully"
   fi
@@ -49,7 +50,7 @@ chown 999:999 ${MYSQL_LOG_DIR}
 
 # before launching mysql service, clear mysql logs 
 echo "clear logs generated in ${MYSQL_LOG_DIR}"
-rm ${MYSQL_LOG_DIR}/*
+rm -rf ${MYSQL_LOG_DIR}/*
 
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
@@ -62,8 +63,39 @@ docker run --rm -it --name ustudy-dw -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
 
 if [ $? != 0 ];then
   echo "Failed to launch ustudy-dw container"
+  exit 1
 else
   echo "Launched ustudy-dw container successfully"
+fi
+
+# start redis as cache
+docker run --rm -it --name redis -p 6379:6379 -v ${MYSQL_LOG_DIR}/../redis -d redis:3.2
+if [ $? != 0 ];then
+  echo "Failed to launch redis container"
+  docker stop ustudy-dw
+  exit 1
+else
+  echo "Launched redis container successfully"
+fi
+
+# start nginx as proxy for frontend services
+docker run --rm -it --name nginx -p 80:80 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
+    -v ${WORK_DIR}/logs/nginx/:/var/log/nginx/ -d nginx:1.12
+if [ $? != 0 ]; then
+  echo "Failed to launch nginx container"
+  docker stop ustudy-dw redis
+  exit 1
+else
+  echo "Launched nginx container successfully"
+fi
+docker cp nginx.conf nginx:/etc/nginx/nginx.conf
+docker exec -u root nginx /bin/sh -c 'nginx -s reload'
+if [ $? != 0 ]; then
+  echo "Failed update nginx configuration"
+  docker stop ustudy-dw redis nginx
+  exit 1
+else
+  echo "Updated nginx configuration"
 fi
 
 # set container timezone to Asia/Shanghai
