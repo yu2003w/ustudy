@@ -109,7 +109,7 @@ FOREIGN KEY (sub_owner)
 
 create table if not exists ustudy.exam (
 id INT NOT NULL AUTO_INCREMENT,
-exam_name VARCHAR(32) NOT NULL,
+exam_name VARCHAR(64) NOT NULL,
 exam_date date NOT NULL,
 type ENUM('校考','联考') NOT NULL,
 PRIMARY KEY(id),
@@ -135,6 +135,7 @@ FOREIGN KEY (schid)
 create table if not exists ustudy.examgradesub (
 id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
+exam_name VARCHAR(64) NOT NULL,
 grade_id INT NOT NULL,
 grade_name varchar(32) NOT NULL,
 sub_name VARCHAR(32) NOT NULL,

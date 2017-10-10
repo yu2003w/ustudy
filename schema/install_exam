@@ -1,6 +1,7 @@
 # create databases for examination center
 set names "utf8";
 create database if not exists ustudy character set utf8;
+
 # tables for answer setting
 create table if not exists ustudy.quesanswer (
 id INT NOT NULL AUTO_INCREMENT,
@@ -27,6 +28,7 @@ FOREIGN KEY (teac_owner)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+# tables for answer setting with sub questions
 create table if not exists ustudy.quesanswerdiv (
 id INT NOT NULL AUTO_INCREMENT,
 seqname varchar(16) NOT NULL,
@@ -61,7 +63,9 @@ teacid INT NOT NULL,
 quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
-type ENUM ('初评','终评'),
+scoretype ENUM ('标准','问题卷','终评'),
+# number of scored papers
+numOfsp INT,
 PRIMARY KEY (id),
 FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(id)

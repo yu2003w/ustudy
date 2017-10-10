@@ -30,6 +30,12 @@ public class Teacher implements Serializable {
 		this.orgid = orgid;
 	}
 
+	public Teacher(String uid, String uname) {
+		super();
+		this.uid = uid;
+		this.uname = uname;
+	}
+
 	public Teacher(String uid, String uname, String orgtype, String orgid, String orgname, List<String> roles) {
 		super();
 		this.uid = uid;

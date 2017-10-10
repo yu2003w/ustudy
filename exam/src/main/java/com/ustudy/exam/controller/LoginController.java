@@ -124,6 +124,7 @@ public class LoginController {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
 			logger.warn("getLoginUser(),Failed to get subject --> " + e.getMessage());
+			return u;
 		}
 		if (cUser.getPrincipal() == null) {
 			logger.warn("getLoginUser(), User didn't log in");
