@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,11 +12,16 @@ import java.net.URL;
 public class ClientApiTest {
 
 	public static void main(String[] args) {
-		saveTemplates();
+//		saveTemplates();
 //		getExamTemplate("123456789");
-//		getSubject("1234","56789");
+		getSubject("1","1");
 //		getExamGrade("123456789", "1");
-//		getExams("1");
+//		try {
+//			getExams("校考");
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 //		getPermissionList("asdfasdxcvbdfghertw");
 //		login("admin", "admin");
 //		update();
@@ -170,9 +176,9 @@ public class ClientApiTest {
 
 	}
 
-	public static void getExams(String MarkingStatus) {
+	public static void getExams(String markingStatus) throws UnsupportedEncodingException {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExams/" + MarkingStatus;
+		String targetURL = "http://127.0.0.1:8080/exam/client/getExams";
 
 		try {
 
@@ -182,6 +188,10 @@ public class ClientApiTest {
 			httpConnection.setDoOutput(true);
 			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(markingStatus.getBytes());
+			outputStream.flush();
 
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : " + httpConnection.getResponseCode());

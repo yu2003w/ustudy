@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.ExamDao">
+
+	<resultMap type="com.ustudy.exam.model.Exam" id="ExamResult">
+        <id property="id" column="id"/>
+        <result property="examName" column="exam_name"/>
+        <result property="examDate" column="exam_date"/>
+        <result property="type" column="type"/>
+    </resultMap>
+
+	<!-- 根据类型查询得到一个Exam对象-->
+	<select id="getExams" parameterType="string" resultMap="ExamResult">
+		SELECT * FROM exam where type=#{type}
+	</select>
+
+</mapper>

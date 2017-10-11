@@ -113,16 +113,16 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExams/{MarkingStatus}", method = RequestMethod.POST)
-	public Map getExams(@PathVariable String MarkingStatus, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExams", method = RequestMethod.POST)
+	public Map getExams(@RequestBody String markingStatus, HttpServletResponse resp) {
 
 		logger.debug("getExams().");
-		logger.debug("MarkingStatus: " + MarkingStatus);
+		logger.debug("MarkingStatus: " + markingStatus);
 
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getExams(MarkingStatus));
+		result.put("data", cs.getExams(markingStatus));
 
 		return result;
 	}

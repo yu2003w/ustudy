@@ -10,6 +10,10 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ClientDao;
+import com.ustudy.exam.dao.ExamDao;
+import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.model.Exam;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 
@@ -18,6 +22,12 @@ public class ClientServiceImpl implements ClientService {
 
 	@Resource
 	private ClientDao clientDaoImpl;
+	
+	@Resource
+	private ExamDao examDaoImpl;
+	
+	@Resource
+	private ExamSubjectDao examSubjectDaoImpl;
 	
 	@Override
 	public boolean saveTemplates(String templates) {
@@ -45,19 +55,10 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public List<Map<String, String>> getSubject(String EGID, String GDID){
+	public List<ExamSubject> getSubject(String EGID, String GDID){
 		
 		System.out.println("EGID: " + EGID + ",GDID: " + GDID);
-		List<Map<String, String>> result = new ArrayList<>();
-		
-		for (int i = 0; i < 5; i++) {
-			Map<String, String> subject = new HashMap<>();
-			subject.put("Id", "科目ID");
-			subject.put("Name", "科目名称");
-			subject.put("UploadBathCount", "每次上传的试卷份数");
-			
-			result.add(subject);
-		}
+		List<ExamSubject> result = examSubjectDaoImpl.getExamSubjects(EGID, GDID);
 		
 		return result;
 	}
@@ -84,21 +85,13 @@ public class ClientServiceImpl implements ClientService {
 		return examGradeResponse;
 	}
 	
-	public Map<String, List<Map<String, String>>> getExams(String MarkingStatus){
+	public Map<String, List<Exam>> getExams(String markingStatus){
 		
-		System.out.println("MarkingStatus: " + MarkingStatus);
+		System.out.println("MarkingStatus: " + markingStatus);
 		
-		Map<String, List<Map<String, String>>> examGradeResponse = new HashMap<>();
+		Map<String, List<Exam>> examGradeResponse = new HashMap<>();
 		
-		List<Map<String, String>> list = new ArrayList<>();
-		
-		for(int i=0;i<5;i++){
-			Map<String, String> result = new HashMap<>();		
-			result.put("Id", "考试数据 ID " + i);
-			result.put("ExamName", "考试名称  " + i);
-			
-			list.add(result);
-		}
+		List<Exam> list = examDaoImpl.getExams(markingStatus);
 		
 		examGradeResponse.put("ExamGradeResponse", list);
 		
