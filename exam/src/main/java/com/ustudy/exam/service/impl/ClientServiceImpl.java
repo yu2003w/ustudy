@@ -1,27 +1,31 @@
 package com.ustudy.exam.service.impl;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
-import com.ustudy.exam.mapper.ClientMapper;
+import com.ustudy.exam.dao.ClientDao;
+import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 
 @Service
 public class ClientServiceImpl implements ClientService {
 
-	@Autowired
-	private ClientMapper cm;
+	@Resource
+	private ClientDao clientDaoImpl;
 	
 	@Override
 	public boolean saveTemplates(String templates) {
 		
-		//cm.saveTemplates();		
+		//cm.saveTemplates();
 		System.out.println("templates: " + templates);
+		Teacher teacher = clientDaoImpl.getTeacher(1);
+		System.out.println(teacher.getUname());
 		
 		return true;
 	}

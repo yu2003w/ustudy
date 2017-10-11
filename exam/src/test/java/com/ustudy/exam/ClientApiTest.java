@@ -11,14 +11,14 @@ import java.net.URL;
 public class ClientApiTest {
 
 	public static void main(String[] args) {
-//		saveTemplates();
+		saveTemplates();
 //		getExamTemplate("123456789");
 //		getSubject("1234","56789");
 //		getExamGrade("123456789", "1");
 //		getExams("1");
 //		getPermissionList("asdfasdxcvbdfghertw");
 //		login("admin", "admin");
-		update();
+//		update();
 	}
 
 	public static void saveTemplates() {

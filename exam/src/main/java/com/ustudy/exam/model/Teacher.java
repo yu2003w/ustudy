@@ -10,6 +10,7 @@ public class Teacher implements Serializable {
 	 */
 	private static final long serialVersionUID = 6091110002226750766L;
 	
+	private int id;
 	private String uid = null;
 	private String uname = null;
 	private String orgtype = null;
@@ -44,6 +45,14 @@ public class Teacher implements Serializable {
 		this.orgid = orgid;
 		this.orgname = orgname;
 		this.roles = roles;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getUid() {
