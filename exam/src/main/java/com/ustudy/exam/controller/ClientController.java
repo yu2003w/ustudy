@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 
 @RestController
@@ -73,7 +74,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamSubject/{EGID}/{GDID}", method = RequestMethod.POST)
-	public Map getSubject(@PathVariable String EGID, @PathVariable String GDID, HttpServletResponse resp) {
+	public Map getExamSubject(@PathVariable String EGID, @PathVariable String GDID, HttpServletResponse resp) {
 
 		logger.debug("getSubject().");
 		logger.debug("EGID: " + EGID + ",GDID: " + GDID);
@@ -81,7 +82,7 @@ public class ClientController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getSubject(EGID, GDID));
+		result.put("data", cs.getExamSubject(EGID, GDID));
 
 		return result;
 	}
@@ -93,8 +94,8 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamGrade/{egID}/{markingStatus}", method = RequestMethod.POST)
-	public Map getExamGrade(@PathVariable String egID, @PathVariable String markingStatus, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExamGrade/{egID}", method = RequestMethod.POST)
+	public Map getExamGrade(@PathVariable String egID, @RequestBody String markingStatus, HttpServletResponse resp) {
 
 		logger.debug("getSubject().");
 		logger.debug("egID: " + egID + ",markingStatus: " + markingStatus);
@@ -133,16 +134,22 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getPermissions/{tokenstr}", method = RequestMethod.GET)
-	public Map getPermissionList(@PathVariable String tokenstr, HttpServletResponse resp) {
+	@RequestMapping(value = "/getPermissions", method = RequestMethod.POST)
+	public Map getPermissionList(@RequestBody String tokenstr, HttpServletResponse resp) {
 		
 		logger.debug("getPermissionList().");
 		logger.debug("tokenstr: " + tokenstr);
 
-		Map result = new HashMap<>();
+		Map map = cs.login(tokenstr);
 
-		result.put("success", true);
-		result.put("data", cs.getPermissionList(tokenstr));
+		Map result = new HashMap<>();
+		result.put("success", (boolean)map.get("success"));
+		if((boolean)map.get("success")){
+			Teacher teacher = (Teacher)map.get("teacher");
+			result.put("data", teacher.getRoles());
+		}else{
+			result.put("message", map.get("message"));
+		}
 		
 		return result;
 	}
@@ -152,16 +159,17 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/login/{username}/{password}", method = RequestMethod.POST)
-	public Map login(@PathVariable String username, @PathVariable String password, HttpServletResponse resp) {
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public Map login(@RequestBody String token, HttpServletResponse resp) {
 		
 		logger.debug("login().");
-		logger.debug("username: " + username + ",password: " + password);
+		logger.debug("token: " + token);
 
-		Map result = new HashMap<>();
-
-		result.put("success", true);
-		result.put("data", cs.login(username, password));
+//		Map result = new HashMap<>();
+//		result.put("success", true);
+//		result.put("data", cs.login("admin", "admin"));
+		
+		Map result = cs.login(token);
 		
 		return result;
 	}

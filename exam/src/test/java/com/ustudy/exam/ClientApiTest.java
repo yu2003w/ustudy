@@ -4,26 +4,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import com.ustudy.exam.utility.Base64Util;
 
 public class ClientApiTest {
 
 	public static void main(String[] args) {
 //		saveTemplates();
 //		getExamTemplate("123456789");
-		getSubject("1","1");
-//		getExamGrade("123456789", "1");
-//		try {
-//			getExams("校考");
-//		} catch (UnsupportedEncodingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		getPermissionList("asdfasdxcvbdfghertw");
+//		getExamSubject("1","1");
+//		getExamGrade("1", "校考");
+//		getExams("校考");
+		getPermissionList(Base64Util.decode("1381139:hello"));
 //		login("admin", "admin");
+//		login(Base64Util.decode("1381139:hello"));
 //		update();
 	}
 
@@ -104,7 +101,7 @@ public class ClientApiTest {
 
 	}
 
-	public static void getSubject(String EGID, String GDID) {
+	public static void getExamSubject(String EGID, String GDID) {
 
 		String targetURL = "http://127.0.0.1:8080/exam/client/getExamSubject/" + EGID + "/" + GDID;
 
@@ -142,7 +139,7 @@ public class ClientApiTest {
 
 	public static void getExamGrade(String egID, String markingStatus) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExamGrade/" + egID + "/" + markingStatus;
+		String targetURL = "http://127.0.0.1:8080/exam/client/getExamGrade/" + egID;
 
 		try {
 
@@ -152,6 +149,10 @@ public class ClientApiTest {
 			httpConnection.setDoOutput(true);
 			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(markingStatus.getBytes());
+			outputStream.flush();
 
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : " + httpConnection.getResponseCode());
@@ -176,7 +177,7 @@ public class ClientApiTest {
 
 	}
 
-	public static void getExams(String markingStatus) throws UnsupportedEncodingException {
+	public static void getExams(String markingStatus) {
 
 		String targetURL = "http://127.0.0.1:8080/exam/client/getExams";
 
@@ -218,15 +219,20 @@ public class ClientApiTest {
 
 	public static void getPermissionList(String tokenstr) {
 
-		String targetURL = "http://localhost:8080/exam/client/getPermissions/" + tokenstr;
+		String targetURL = "http://localhost:8080/exam/client/getPermissions";
 
 		try {
 
 			URL restServiceURL = new URL(targetURL);
 
 			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
-			httpConnection.setRequestMethod("GET");
-			httpConnection.setRequestProperty("Accept", "application/json");
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(tokenstr.getBytes());
+			outputStream.flush();
 
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException(
@@ -265,6 +271,46 @@ public class ClientApiTest {
 			httpConnection.setDoOutput(true);
 			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
+
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:\n");
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void login(String token) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client/login";
+
+		try {
+
+			URL targetUrl = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) targetUrl.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(token.getBytes());
+			outputStream.flush();
 
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : " + httpConnection.getResponseCode());
