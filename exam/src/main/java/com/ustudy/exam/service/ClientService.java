@@ -23,7 +23,4 @@ public interface ClientService {
 	
 	public Map<String, List<Map<String, String>>> getPermissionList(String tokenstr);
 	
-	public Map<String, Object> login(String username, String password);
-	
-	public Map<String, String> update();
 }

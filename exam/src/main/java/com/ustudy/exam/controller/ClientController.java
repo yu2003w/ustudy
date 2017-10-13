@@ -1,8 +1,12 @@
 package com.ustudy.exam.controller;
 
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
@@ -164,14 +168,8 @@ public class ClientController {
 		
 		logger.debug("login().");
 		logger.debug("token: " + token);
-
-//		Map result = new HashMap<>();
-//		result.put("success", true);
-//		result.put("data", cs.login("admin", "admin"));
 		
-		Map result = cs.login(token);
-		
-		return result;
+		return cs.login(token);
 	}
 	
 	/**
@@ -180,14 +178,47 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
-	public Map update(HttpServletResponse resp) {
+	public Map update(HttpServletRequest request, HttpServletResponse resp) {
+		
+		String currentVersionNo = request.getParameter("currentVersionNo");
 		
 		logger.debug("update().");
+		logger.debug("currentVersionNo: " + currentVersionNo);
 
 		Map result = new HashMap<>();
-
+		boolean beAvailableUpdates = false;
+		String ip = "127.0.0.1";
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		String downLoadPath = request.getRequestURL().toString().replace("localhost", ip);
+		
+		File clientPath = new File(request.getSession().getServletContext().getRealPath("client"));
+		
+		if (clientPath.exists() && clientPath.isDirectory()) {
+			File[] clients = clientPath.listFiles();
+			for (File client : clients) {
+				String name = client.getName();
+				if (name.lastIndexOf(".")>0) {
+					name = name.substring(0, name.lastIndexOf("."));
+				}
+				
+				if (!currentVersionNo.equals(name)) {
+					beAvailableUpdates = true;
+					downLoadPath = downLoadPath.replace("update", "");
+					downLoadPath += client.getName();
+				}
+			}
+		}
+		
+		Map data = new HashMap<>();
+		data.put("BeAvailableUpdates", beAvailableUpdates);
+		data.put("DownLoadPath", downLoadPath);
+		
 		result.put("success", true);
-		result.put("data", cs.update());
+		result.put("data", data);
 		
 		return result;
 	}

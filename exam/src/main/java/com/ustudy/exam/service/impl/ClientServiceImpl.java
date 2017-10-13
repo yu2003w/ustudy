@@ -209,37 +209,4 @@ public class ClientServiceImpl implements ClientService {
 		return permissionList;
 	}
 	
-	public Map<String, Object> login(String username, String password){
-		
-		System.out.println("username: " + username + ",password: " + password);
-		
-		Map<String, Object> userinfo = new HashMap<>();
-		userinfo.put("SchoolName", "用户对应的学校名称");
-		userinfo.put("SID", "学校唯一ID int");
-		userinfo.put("UID", "用户唯一ID int");
-		userinfo.put("UserName", "用户名");
-		userinfo.put("token", "用户登录成功后的token信息");
-		
-		List<Map<String, String>> permissions = new ArrayList<>();
-		
-		for(int i=0;i<5;i++){
-			Map<String, String> permission = new HashMap<>();		
-			permission.put("PermissionName", "扫描 " + i);
-			permissions.add(permission);
-		}
-		
-		userinfo.put("PermissionType", permissions);
-		
-		return userinfo;
-		
-	}
-	
-	public Map<String, String> update(){
-		Map<String, String> result = new HashMap<>();		
-		result.put("BeAvailableUpdates", "是否有可用更新 bool");
-		result.put("DownLoadPath", "更新下载地址");
-		
-		return result;
-	}
-	
 }

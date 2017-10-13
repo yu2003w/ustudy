@@ -8,8 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.ustudy.exam.utility.Base64Util;
-
 public class ClientApiTest {
 
 	public static void main(String[] args) {
@@ -18,10 +16,10 @@ public class ClientApiTest {
 //		getExamSubject("1","1");
 //		getExamGrade("1", "校考");
 //		getExams("校考");
-		getPermissionList(Base64Util.decode("1381139:hello"));
+//		getPermissionList(Base64Util.decode("1381139:hello"));
 //		login("admin", "admin");
 //		login(Base64Util.decode("1381139:hello"));
-//		update();
+		update("ustudy");
 	}
 
 	public static void saveTemplates() {
@@ -335,46 +333,9 @@ public class ClientApiTest {
 
 	}
 
-	public static void update() {
+	public static void update(String currentVersionNo) {
 
-		String targetURL = "http://localhost:8080/exam/client/update";
-
-		try {
-
-			URL restServiceURL = new URL(targetURL);
-
-			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
-			httpConnection.setRequestMethod("GET");
-			httpConnection.setRequestProperty("Accept", "application/json");
-
-			if (httpConnection.getResponseCode() != 200) {
-				throw new RuntimeException(
-						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
-			}
-
-			BufferedReader responseBuffer = new BufferedReader(
-					new InputStreamReader((httpConnection.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server:  \n");
-
-			while ((output = responseBuffer.readLine()) != null) {
-				System.out.println(output);
-			}
-
-			httpConnection.disconnect();
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void getTest() {
-
-		String targetURL = "http://localhost:8080/exam/client/savetemp";
+		String targetURL = "http://localhost:8080/exam/client/update/" + currentVersionNo;
 
 		try {
 
@@ -382,8 +343,8 @@ public class ClientApiTest {
 
 			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
 			httpConnection.setRequestMethod("GET");
-			httpConnection.setRequestProperty("Accept", "application/json");
-
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException(
 						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
