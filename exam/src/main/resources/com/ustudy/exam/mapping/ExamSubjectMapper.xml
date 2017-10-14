@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.ExamSubjectDao">
+
+	<resultMap type="com.ustudy.exam.model.ExamSubject" id="ExamSubjectResult">
+        <id property="id" column="id"/>
+        <result property="examid" column="examid"/>
+        <result property="gradeId" column="grade_id"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="subId" column="sub_id"/>
+        <result property="subName" column="sub_name"/>
+        <result property="stuNum" column="stu_num"/>
+        <result property="teacNum" column="teac_num"/>
+        <result property="examPaper" column="exam_paper"/>
+        <result property="examAnswer" column="exam_answer"/>
+        <result property="examPaperNum" column="exam_paper_num"/>
+        <result property="template" column="template"/>
+        <result property="objItemNum" column="obj_item_num"/>
+        <result property="subItemNum" column="sub_item_num"/>
+        <result property="taskDispatch" column="task_dispatch"/>
+    </resultMap>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="getExamSubjects" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
+	</select>
+
+</mapper>

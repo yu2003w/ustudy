@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.ExamGradeDao">
+
+	<resultMap type="com.ustudy.exam.model.ExamGrade" id="ExamGradeResult">
+        <result property="gradeId" column="grade_id"/>
+        <result property="gradeName" column="grade_name"/>
+    </resultMap>
+
+	<!-- 根据考试ID和考试状态查询得到一个ExamGrade对象-->
+	<select id="getExamGrades" parameterType="java.util.Map" resultMap="ExamGradeResult">
+		SELECT DISTINCT(egs.grade_id),egs.grade_name from examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where e.id=#{examId} and e.status=#{status}
+	</select>
+
+</mapper>
