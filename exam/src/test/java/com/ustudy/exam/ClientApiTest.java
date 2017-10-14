@@ -48,7 +48,7 @@ public class ClientApiTest {
 		
 		getPermissions(token);
 		System.out.println();
-		System.out.println("--------------------getPermissionList-------------------");
+		System.out.println("--------------------getPermissions-------------------");
 		System.out.println();
 		
 		update("ustudy");
