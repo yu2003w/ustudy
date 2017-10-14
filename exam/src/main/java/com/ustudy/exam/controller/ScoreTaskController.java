@@ -26,7 +26,7 @@ public class ScoreTaskController {
 	
 	@RequestMapping(value = "/scoretask/list/", method = RequestMethod.GET)
 	public List<ScoreTask> getScoreTask(HttpServletResponse resp) {
-		logger.debug("getScoreTask(), start to retriing all examination result.");
+		logger.debug("getScoreTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
 		List<ScoreTask> st = null;

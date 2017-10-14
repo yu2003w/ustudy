@@ -3,9 +3,18 @@ set names "utf8";
 create database if not exists ustudy character set utf8;
 
 # tables for answer setting
+# actually each block defined by paper template contains one or multiple question no,
+# start position, height and length
 create table if not exists ustudy.quesanswer (
 id INT NOT NULL AUTO_INCREMENT,
-quesno INT NOT NULL,
+# note, if questno is null, startno/endno should have value
+quesno INT,
+startno INT,
+endno INT, 
+posx INT NOT NULL,
+posy INT NOT NULL,
+height INT NOT NULL,
+length INT NOT NULL,
 type ENUM('单选题','多选题','判断题','解答题','证明题') NOT NULL,
 branch varchar(16) default '不分科',
 choice_num INT NOT NULL,
