@@ -9,6 +9,6 @@ import com.ustudy.exam.model.Exam;
 @MapperScan
 public interface ExamDao {
 
-	public List<Exam> getExams(String type);
+	public List<Exam> getExams(String status);
 	
 }

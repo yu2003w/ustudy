@@ -38,12 +38,18 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveExamTemplate", method = RequestMethod.POST)
-	public Map saveExamTemplates(@RequestBody String templates, HttpServletResponse resp) {
+	public Map saveExamTemplate(@RequestBody String templates, HttpServletResponse resp) {
 
 		logger.debug("saveTemplate().");
 		logger.debug("templates: " + templates);
+		
+		Map result = cs.login("");
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
 
-		Map result = new HashMap<>();
+		result = new HashMap<>();
 
 		result.put("success", cs.saveTemplates(templates));
 
@@ -52,20 +58,29 @@ public class ClientController {
 	
 	/**
 	 * 获取模板
-	 * @param CSID 考试年级科目ID
+	 * @param examId 考试ID
+	 * @param gradeId 年级ID
+	 * @param subjectId 科目ID
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamTemplate/{CSID}", method = RequestMethod.POST)
-	public Map getExamTemplate(@PathVariable String CSID, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExamTemplate/{examId}/{gradeId}/{subjectId}", method = RequestMethod.POST)
+	public Map getExamTemplate(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId, @RequestBody String token, HttpServletResponse resp) {
 
 		logger.debug("getTemplates().");
-		logger.debug("CSID: " + CSID);
+		logger.debug("token: " + token);
+		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId);
 
-		Map result = new HashMap<>();
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getTemplates(CSID));
+		result.put("data", cs.getTemplateById(examId, gradeId, subjectId));
 
 		return result;
 	}
@@ -77,37 +92,51 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubject/{EGID}/{GDID}", method = RequestMethod.POST)
-	public Map getExamSubject(@PathVariable String EGID, @PathVariable String GDID, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.POST)
+	public Map getExamSubjects(@PathVariable String examId, @PathVariable String gradeId, @RequestBody String token, HttpServletResponse resp) {
 
 		logger.debug("getSubject().");
-		logger.debug("EGID: " + EGID + ",GDID: " + GDID);
+		logger.debug("token: " + token);
+		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
 
-		Map result = new HashMap<>();
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getExamSubject(EGID, GDID));
+		result.put("data", cs.getExamSubjects(examId, gradeId));
 
 		return result;
 	}
 	
 	/**
 	 * 获取考试年级
-	 * @param EGID 考试ID
-	 * @param GDID 可进行扫描的考试状态
+	 * @param examId 考试ID
+	 * @param examStatus 可进行扫描的考试状态
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamGrade/{egID}", method = RequestMethod.POST)
-	public Map getExamGrade(@PathVariable String egID, @RequestBody String markingStatus, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExamGrades/{examId}/{examStatus}", method = RequestMethod.POST)
+	public Map getExamGrades(@PathVariable String examId, @PathVariable String examStatus, @RequestBody String token, HttpServletResponse resp) {
 
 		logger.debug("getSubject().");
-		logger.debug("egID: " + egID + ",markingStatus: " + markingStatus);
+		logger.debug("token: " + token);
+		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
 
-		Map result = new HashMap<>();
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getExamGrade(egID, markingStatus));
+		result.put("data", cs.getExamGrades(examId, examStatus));
 
 		return result;
 	}
@@ -118,16 +147,23 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExams", method = RequestMethod.POST)
-	public Map getExams(@RequestBody String markingStatus, HttpServletResponse resp) {
+	@RequestMapping(value = "/getExams/{examStatus}", method = RequestMethod.POST)
+	public Map getExams(@PathVariable String examStatus, @RequestBody String token, HttpServletResponse resp) {
 
 		logger.debug("getExams().");
-		logger.debug("MarkingStatus: " + markingStatus);
+		logger.debug("token: " + token);
+		logger.debug("examStatus: " + examStatus);
 
-		Map result = new HashMap<>();
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", cs.getExams(markingStatus));
+		result.put("data", cs.getExams(examStatus));
 
 		return result;
 	}
@@ -139,14 +175,21 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getPermissions", method = RequestMethod.POST)
-	public Map getPermissionList(@RequestBody String tokenstr, HttpServletResponse resp) {
+	public Map getPermissions(@RequestBody String token, HttpServletResponse resp) {
 		
 		logger.debug("getPermissionList().");
-		logger.debug("tokenstr: " + tokenstr);
+		logger.debug("token: " + token);
 
-		Map map = cs.login(tokenstr);
+		Map map = cs.login(token);
 
-		Map result = new HashMap<>();
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
+		
 		result.put("success", (boolean)map.get("success"));
 		if((boolean)map.get("success")){
 			Teacher teacher = (Teacher)map.get("teacher");
@@ -178,7 +221,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
-	public Map update(HttpServletRequest request, HttpServletResponse resp) {
+	public Map update(HttpServletRequest request, HttpServletResponse response) {
 		
 		String currentVersionNo = request.getParameter("currentVersionNo");
 		
@@ -200,15 +243,17 @@ public class ClientController {
 		if (clientPath.exists() && clientPath.isDirectory()) {
 			File[] clients = clientPath.listFiles();
 			for (File client : clients) {
-				String name = client.getName();
-				if (name.lastIndexOf(".")>0) {
-					name = name.substring(0, name.lastIndexOf("."));
-				}
-				
-				if (!currentVersionNo.equals(name)) {
-					beAvailableUpdates = true;
-					downLoadPath = downLoadPath.replace("update", "");
-					downLoadPath += client.getName();
+				if (client.isFile()) {
+					String name = client.getName();
+					if (name.lastIndexOf(".")>0) {
+						name = name.substring(0, name.lastIndexOf("."));
+					}
+					
+					if (!currentVersionNo.equals(name)) {
+						beAvailableUpdates = true;
+						downLoadPath = downLoadPath.replace("update", "");
+						downLoadPath += client.getName();
+					}
 				}
 			}
 		}

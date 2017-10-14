@@ -13,14 +13,12 @@ public interface ClientService {
 
 	public boolean saveTemplates(String templates);
 	
-	public Map<String, String> getTemplates(String CSID);
+	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
 	
-	public List<ExamSubject> getExamSubject(String EGID, String GDID);
+	public List<ExamSubject> getExamSubjects(String examId, String gradeId);
 	
-	public List<ExamGrade> getExamGrade(String egID, String markingStatus);
+	public List<ExamGrade> getExamGrades(String examId, String examStatus);
 	
-	public Map<String, List<Exam>> getExams(String markingStatus);
-	
-	public Map<String, List<Map<String, String>>> getPermissionList(String tokenstr);
+	public Map<String, List<Exam>> getExams(String examStatus);
 	
 }

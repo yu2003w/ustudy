@@ -11,17 +11,19 @@ public class Exam implements Serializable {
 	private String examName = null;
 	private Date examDate = null;
 	private String type = null;
+	private String status = null;
 	
 	public Exam() {
 		super();
 	}
 
-	public Exam(int id, String examName, Date examDate, String type) {
+	public Exam(int id, String examName, Date examDate, String type, String status) {
 		super();
 		this.id = id;
 		this.examName = examName;
 		this.examDate = examDate;
 		this.type = type;
+		this.status = status;
 	}
 
 	public int getId() {
@@ -54,6 +56,14 @@ public class Exam implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	@Override

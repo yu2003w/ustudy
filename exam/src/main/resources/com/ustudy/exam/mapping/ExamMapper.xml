@@ -7,11 +7,12 @@
         <result property="examName" column="exam_name"/>
         <result property="examDate" column="exam_date"/>
         <result property="type" column="type"/>
+        <result property="status" column="status"/>
     </resultMap>
 
 	<!-- 根据类型查询得到一个Exam对象-->
 	<select id="getExams" parameterType="string" resultMap="ExamResult">
-		SELECT * FROM exam where type=#{type}
+		SELECT * FROM exam where status=#{status}
 	</select>
 
 </mapper>

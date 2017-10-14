@@ -1,6 +1,5 @@
 package com.ustudy.exam.service.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +85,7 @@ public class ClientServiceImpl implements ClientService {
 					currentUser.login(usertoken);
 					logger.debug("Token retrieved -> " + token.toString());
 				} catch (UnknownAccountException | IncorrectCredentialsException uae) {
-					System.out.println(uae.getMessage());
+					logger.debug(uae.getMessage());
 					msg = "Attempt to access with invalid account -> username:" + username;
 					status = false;
 				} catch (LockedAccountException lae) {
@@ -116,7 +115,7 @@ public class ClientServiceImpl implements ClientService {
 					logger.debug("login()," + teacher.toString());
 				} catch (Exception e) {
 					logger.warn("login(), session failed -> " + e.getMessage());
-					System.out.println(e.getMessage());
+					logger.debug(e.getMessage());
 				}
 				
 				result.put("teacher", teacher);
@@ -136,16 +135,16 @@ public class ClientServiceImpl implements ClientService {
 	public boolean saveTemplates(String templates) {
 		
 		//cm.saveTemplates();
-		System.out.println("templates: " + templates);
+		logger.debug("templates: " + templates);
 		Teacher teacher = clientDaoImpl.getTeacher(1);
-		System.out.println(teacher.getUname());
+		logger.debug(teacher.getUname());
 		
 		return true;
 	}
 
-	public Map<String, String> getTemplates(String CSID){
+	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId){
 		
-		System.out.println("CSID: " + CSID);
+		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId );
 		Map<String, String> result = new HashMap<>();
 		
 		result.put("ExamQAPicPath", "标准答案图片名称,多个用‘,’分隔");
@@ -158,55 +157,35 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public List<ExamSubject> getExamSubject(String EGID, String GDID){
+	public List<ExamSubject> getExamSubjects(String examId, String gradeId){
 		
-		System.out.println("EGID: " + EGID + ",GDID: " + GDID);
-		List<ExamSubject> result = examSubjectDaoImpl.getExamSubjects(EGID, GDID);
+		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
+		List<ExamSubject> result = examSubjectDaoImpl.getExamSubjects(examId, gradeId);
 		
 		return result;
 	}
 	
-	public List<ExamGrade> getExamGrade(String examId, String markingStatus){
+	public List<ExamGrade> getExamGrades(String examId, String examStatus){
 		
-		System.out.println("examId: " + examId + ",markingStatus: " + markingStatus);
+		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
 		
-		List<ExamGrade> examGrades = examGradeDaoImpl.getExamGrades(examId, markingStatus);
+		List<ExamGrade> examGrades = examGradeDaoImpl.getExamGrades(examId, examStatus);
 		
 		return examGrades;
 	}
 	
-	public Map<String, List<Exam>> getExams(String markingStatus){
+	public Map<String, List<Exam>> getExams(String examStatus){
 		
-		System.out.println("MarkingStatus: " + markingStatus);
+		logger.debug("examStatus: " + examStatus);
 		
 		Map<String, List<Exam>> examGradeResponse = new HashMap<>();
 		
-		List<Exam> list = examDaoImpl.getExams(markingStatus);
+		List<Exam> list = examDaoImpl.getExams(examStatus);
 		
 		examGradeResponse.put("ExamGradeResponse", list);
 		
 		return examGradeResponse;
 		
-	}
-	
-	public Map<String, List<Map<String, String>>> getPermissionList(String tokenstr){
-		
-		System.out.println("tokenstr: " + tokenstr);
-		
-		Map<String, List<Map<String, String>>> permissionList = new HashMap<>();
-		
-		List<Map<String, String>> list = new ArrayList<>();
-		
-		for(int i=0;i<5;i++){
-			Map<String, String> result = new HashMap<>();		
-			result.put("Name", "权限名称 " + i);
-			result.put("displayName", "权限说明  " + i);
-			list.add(result);
-		}
-		
-		permissionList.put("PermissionList", list);
-		
-		return permissionList;
 	}
 	
 }
