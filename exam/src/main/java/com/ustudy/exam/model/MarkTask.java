@@ -6,7 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ScoreTask implements Serializable {
+public class MarkTask implements Serializable {
 
 	/**
 	 * 
@@ -50,13 +50,13 @@ public class ScoreTask implements Serializable {
 	
 	private List<QuestionPaper> papers = null;
 	
-	public ScoreTask() {
+	public MarkTask() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
 	
-	public ScoreTask(String examId, String examName, String subject, String grade) {
+	public MarkTask(String examId, String examName, String subject, String grade) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
@@ -64,7 +64,7 @@ public class ScoreTask implements Serializable {
 		this.grade = grade;
 	}
 
-	public ScoreTask(String id, String examId, String examName, String teacherId, String teacherName, String subject,
+	public MarkTask(String id, String examId, String examName, String teacherId, String teacherName, String subject,
 			String grade, String scoreType, String scoreMode, String progress, String questionType, String questionNum,
 			String startNum, String endNum, List<QuestionPaper> papers) {
 		super();

@@ -7,10 +7,10 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.ustudy.exam.model.MetaScoreTask;
-import com.ustudy.exam.model.ScoreTask;
+import com.ustudy.exam.model.MarkTask;
 
 @Mapper
-public interface ScoreTaskMapper {
+public interface MarkTaskMapper {
 
 	@Select("select * from ustudy.teacherscoretask where teacid = #{tid}")
 	public List<MetaScoreTask> getMetaScoreTask(@Param("tid") String teacid);
@@ -22,6 +22,6 @@ public interface ScoreTaskMapper {
 			+ "ustudy.examgradesub join ustudy.quesanswer on ustudy.examgradesub.id = "
 			+ "ustudy.quesanswer.exam_grade_sub_id where ustudy.examgradesub.id = (select exam_grade_sub_id "
 			+ "from ustudy.quesanswer where id = #{qid}")
-	public ScoreTask getScoreTask(@Param("qid") String quesid);
+	public MarkTask getScoreTask(@Param("qid") String quesid);
 	
 }
