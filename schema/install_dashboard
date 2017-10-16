@@ -109,19 +109,21 @@ FOREIGN KEY (sub_owner)
 
 create table if not exists ustudy.exam (
 id INT NOT NULL AUTO_INCREMENT,
-exam_name VARCHAR(32) NOT NULL,
+exam_name VARCHAR(64) NOT NULL,
 exam_date date NOT NULL,
+type ENUM('校考','联考') NOT NULL,
 PRIMARY KEY(id),
 INDEX(exam_name, exam_date),
 UNIQUE KEY (exam_name)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.examschool (
+id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
 schid VARCHAR(32) NOT NULL,
 schname VARCHAR(128) NOT NULL,
-PRIMARY KEY (examid),
-INDEX(schid,schname),
+PRIMARY KEY (id),
+INDEX(examid, schid, schname),
 FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -130,14 +132,30 @@ FOREIGN KEY (schid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-create table if not exists ustudy.examsubject (
+create table if not exists ustudy.examgradesub (
+id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
-grade_name VARCHAR(32) NOT NULL,
-subject_name VARCHAR(32) NOT NULL,
-UNIQUE KEY (grade_name, subject_name),
-PRIMARY KEY(examid),
+exam_name VARCHAR(64) NOT NULL,
+grade_id INT NOT NULL,
+grade_name varchar(32) NOT NULL,
+sub_name VARCHAR(32) NOT NULL,
+stu_num INT default 0,
+teac_num INT default 0,
+exam_paper BOOL default false,
+exam_answer BOOL default false,
+exam_paper_num INT default 0,
+template BOOL default false,
+obj_item_num INT default 0,
+sub_item_num INT default 0,
+task_dispatch BOOL default false,
+PRIMARY KEY (id),
+INDEX (grade_id, grade_name),
 FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (grade_id)
+    REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
 

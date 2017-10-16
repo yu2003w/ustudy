@@ -1,20 +1,5 @@
 set names "utf8";
 create database if not exists ustudy character set utf8;
-create table if not exists ustudy.student (
-id INT NOT NULL AUTO_INCREMENT,
-name VARCHAR(100) NOT NULL,
-stuno CHAR(20) NOT NULL,
-grade ENUM('七年级', '八年级', '九年级', '高一','高二','高三'),
-class CHAR(10),
-category ENUM('普通', '体育', '艺术'),
-transient boolean default false,
-orgtype ENUM ('学校','教研室') NOT NULL,
-orgid VARCHAR(32) NOT NULL,
-PRIMARY KEY(id),
-INDEX (name, stuno),
-UNIQUE KEY (stuno, orgtype, orgid)
-) ENGINE=InnoDB;
-
 # table definition for class
 create table if not exists ustudy.class (
 id INT NOT NULL AUTO_INCREMENT,
@@ -30,6 +15,30 @@ FOREIGN KEY (grade_id)
 FOREIGN KEY (cls_owner)
     REFERENCES ustudy.teacher(teacid)
     ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.student (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+stuno CHAR(20) NOT NULL,
+schid INT NOT NULL,
+grade ENUM('七年级', '八年级', '九年级', '高一','高二','高三'),
+classid INT,
+gradeid INT,
+category ENUM('普通', '体育', '艺术'),
+transient boolean default false,
+PRIMARY KEY(id),
+INDEX (name, stuno, classid, gradeid, schid),
+UNIQUE KEY (stuno),
+FOREIGN KEY (classid)
+    REFERENCES ustudy.class(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (gradeid)
+    REFERENCES ustudy.grade(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (schid)
+    REFERENCES ustudy.school(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.classsub (
@@ -127,3 +136,4 @@ FOREIGN KEY (class_id)
     REFERENCES ustudy.class(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+

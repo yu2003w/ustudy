@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.ClientDao">
+
+	<resultMap type="com.ustudy.exam.model.Teacher" id="TeacherResult">
+        <id property="id" column="id"/>
+        <result property="uid" column="teacid"/>
+        <result property="uname" column="teacname"/>
+        <result property="orgtype" column="orgtype"/>
+        <result property="orgid" column="orgid"/>
+        <result property="orgname" column="schname"/>
+    </resultMap>
+
+	<!-- 根据id查询得到一个Teacher对象-->
+	<select id="getTeacher" parameterType="int" resultMap="TeacherResult">
+		select t.*,s.schname from teacher t LEFT JOIN school s ON t.orgid=s.id where t.id=#{id}
+	</select>
+
+</mapper>

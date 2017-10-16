@@ -34,7 +34,9 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
-
+			    /marktask/list/ = authc, perms[scoretask:view]
+			    /marktask/view/ = authc, perms[scoretask:view]
+			    
 				/** = anon
 			</value>
 		</property>
@@ -44,7 +46,6 @@
 		destroy-method="close">
 		<property name="poolProperties">
 			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
-				<!-- <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/> -->
 				<property name="url"
 					value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -86,7 +87,7 @@
 		<property name="authenticationQuery"
 			value="select passwd from ustudy.teacher where teacid = ?" />
 		<property name="userRolesQuery"
-			value="select role_name from ustudy.teacherroles where user_name = ?" />
+			value="select role_name from ustudy.teacherroles where teac_id = ?" />
 		<property name="permissionsQuery"
 			value="select perm from ustudy.perms where role_name = ?" />
 	</bean>
@@ -117,10 +118,17 @@
 	<!-- sql session factory for mybatis -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="examCenter" />
+		<!-- 自动扫描mapping.xml文件 -->  
+        <property name="mapperLocations" value="classpath:com/ustudy/exam/mapping/*.xml"></property>  
 	</bean>
 
 	<!-- scan for mappers and make them autowired -->
 	<mybatis:scan base-package="com.ustudy.exam.mapper" />
+	<!-- DAO接口所在包名，Spring会自动查找其下的类 ,包下的类需要使用@MapperScan注解,否则容器注入会失败 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ustudy.exam.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
 
 	<!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
