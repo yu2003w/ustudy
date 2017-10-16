@@ -34,7 +34,7 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
-			    /scoretask/list/ = authc, perms[scoretask:view]
+			    /marktask/list/ = authc, perms[scoretask:view]
 				/** = anon
 			</value>
 		</property>
