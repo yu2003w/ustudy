@@ -21,6 +21,7 @@ public class ExamSubject implements Serializable {
 	private int objItemNum;
 	private int subItemNum;
 	private int taskDispatch;
+	private String answerSeted ;
 	
 	public ExamSubject() {
 	}
@@ -150,6 +151,14 @@ public class ExamSubject implements Serializable {
 
 	public void setTaskDispatch(int taskDispatch) {
 		this.taskDispatch = taskDispatch;
+	}
+
+	public String getAnswerSeted() {
+		return answerSeted;
+	}
+
+	public void setAnswerSeted(String answerSeted) {
+		this.answerSeted = answerSeted;
 	}
 	
 }
