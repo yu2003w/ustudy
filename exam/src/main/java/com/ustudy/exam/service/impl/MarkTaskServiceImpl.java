@@ -19,7 +19,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	private MarkTaskMapper scoreTaskM;
 	
 	@Override
-	public List<MarkTask> getScoreTask(String teacid) {
+	public List<MarkTask> getMarkTask(String teacid) {
 		
 		List<MetaScoreTask> mstL = scoreTaskM.getMetaScoreTask(teacid);
 		List<MarkTask> stL = new ArrayList<MarkTask>();
