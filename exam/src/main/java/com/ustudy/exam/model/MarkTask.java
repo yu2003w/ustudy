@@ -3,9 +3,10 @@ package com.ustudy.exam.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ScoreTask implements Serializable {
+public class MarkTask implements Serializable {
 
 	/**
 	 * 
@@ -25,20 +26,37 @@ public class ScoreTask implements Serializable {
 	private String scoreMode = null;
 	private String progress = null;
 	
-	// attributes for question related
+	// attributes for question block, this may contain one or multiple questions
+	// including question type, question no, startno, endno, position, height, length
 	private String questionType = null;
-	private String questionNum = null;
-	private String startNum = null;
-	private String endNum = null;
+	
+	// question name should be a range for gap filling questions
+	private String questionName = null;
+	@JsonIgnore
+	private String quesno = null;
+	@JsonIgnore
+	private String startno = null;
+	@JsonIgnore
+	private String endno = null;
+	// following attributes used for cutting pictures from student papers
+	@JsonIgnore
+	private int posx = 0;
+	@JsonIgnore
+	private int posy = 0;
+	@JsonIgnore
+	private int height = 0;
+	@JsonIgnore
+	private int length = 0;
+	
 	private List<QuestionPaper> papers = null;
 	
-	public ScoreTask() {
+	public MarkTask() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
 	
-	public ScoreTask(String examId, String examName, String subject, String grade) {
+	public MarkTask(String examId, String examName, String subject, String grade) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
@@ -46,7 +64,7 @@ public class ScoreTask implements Serializable {
 		this.grade = grade;
 	}
 
-	public ScoreTask(String id, String examId, String examName, String teacherId, String teacherName, String subject,
+	public MarkTask(String id, String examId, String examName, String teacherId, String teacherName, String subject,
 			String grade, String scoreType, String scoreMode, String progress, String questionType, String questionNum,
 			String startNum, String endNum, List<QuestionPaper> papers) {
 		super();
@@ -61,9 +79,9 @@ public class ScoreTask implements Serializable {
 		this.scoreMode = scoreMode;
 		this.progress = progress;
 		this.questionType = questionType;
-		this.questionNum = questionNum;
-		this.startNum = startNum;
-		this.endNum = endNum;
+		this.quesno = questionNum;
+		this.startno = startNum;
+		this.endno = endNum;
 		this.papers = papers;
 	}
 
@@ -154,29 +172,69 @@ public class ScoreTask implements Serializable {
 	public void setQuestionType(String questionType) {
 		this.questionType = questionType;
 	}
-
-	public String getQuestionNum() {
-		return questionNum;
+	
+	public String getQuestionName() {
+		return questionName;
 	}
 
-	public void setQuestionNum(String questionNum) {
-		this.questionNum = questionNum;
+	public void setQuestionName(String questionName) {
+		this.questionName = questionName;
 	}
 
-	public String getStartNum() {
-		return startNum;
+	public String getQuesno() {
+		return quesno;
 	}
 
-	public void setStartNum(String startNum) {
-		this.startNum = startNum;
+	public void setQuesno(String quesno) {
+		this.quesno = quesno;
 	}
 
-	public String getEndNum() {
-		return endNum;
+	public String getStartno() {
+		return startno;
+	}
+	
+	public void setStartno(String startno) {
+		this.startno = startno;
+	}
+	
+	public String getEndno() {
+		return endno;
 	}
 
-	public void setEndNum(String endNum) {
-		this.endNum = endNum;
+	public void setEndno(String endno) {
+		this.endno = endno;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getPosx() {
+		return posx;
+	}
+
+	public void setPosx(int posx) {
+		this.posx = posx;
+	}
+
+	public int getPosy() {
+		return posy;
+	}
+
+	public void setPosy(int posy) {
+		this.posy = posy;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
 	}
 
 	public List<QuestionPaper> getPapers() {
@@ -192,7 +250,8 @@ public class ScoreTask implements Serializable {
 		return "ScoreTask [id=" + id + ", examId=" + examId + ", examName=" + examName + ", teacherId=" + teacherId
 				+ ", teacherName=" + teacherName + ", subject=" + subject + ", grade=" + grade + ", scoreType="
 				+ scoreType + ", scoreMode=" + scoreMode + ", progress=" + progress + ", questionType=" + questionType
-				+ ", questionNum=" + questionNum + ", startNum=" + startNum + ", endNum=" + endNum + ", papers="
+				+ ", questionName=" + questionName + ", quesno=" + quesno + ", startno=" + startno + ", endno=" + endno
+				+ ", posx=" + posx + ", posy=" + posy + ", height=" + height + ", length=" + length + ", papers="
 				+ papers + "]";
 	}
 	

@@ -6,30 +6,30 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ustudy.exam.mapper.ScoreTaskMapper;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaScoreTask;
-import com.ustudy.exam.model.ScoreTask;
-import com.ustudy.exam.service.ScoreTaskService;
+import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
 @Service
-public class ScoreTaskServiceImpl implements ScoreTaskService {
+public class MarkTaskServiceImpl implements MarkTaskService {
 
 	@Autowired
-	private ScoreTaskMapper scoreTaskM;
+	private MarkTaskMapper scoreTaskM;
 	
 	@Override
-	public List<ScoreTask> getScoreTask(String teacid) {
+	public List<MarkTask> getScoreTask(String teacid) {
 		
 		List<MetaScoreTask> mstL = scoreTaskM.getMetaScoreTask(teacid);
-		List<ScoreTask> stL = new ArrayList<ScoreTask>();
+		List<MarkTask> stL = new ArrayList<MarkTask>();
 		for (MetaScoreTask mst: mstL) {
 			stL.add(assembleScoreTask(mst));
 		}
 		return stL;
 	}
 	
-	private ScoreTask assembleScoreTask(MetaScoreTask mst) {
+	private MarkTask assembleScoreTask(MetaScoreTask mst) {
 		/*
 		 *  Several steps to construct score task
 		 *  1, retrieve meta score task
@@ -37,7 +37,7 @@ public class ScoreTaskServiceImpl implements ScoreTaskService {
 		 *  3, retrieve question paper information 
 		 */
 		// retrieve basic information such as exam name, grade name, subject and so on.
-		ScoreTask st = scoreTaskM.getScoreTask(mst.getQuesid());
+		MarkTask st = scoreTaskM.getScoreTask(mst.getQuesid());
 		// set teacher information
 		st.setTeacherId(mst.getTeacid());
 		st.setTeacherName(ExamUtil.retrieveSessAttr("uname"));

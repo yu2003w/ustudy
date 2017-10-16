@@ -160,7 +160,7 @@ public class ClientServiceImpl implements ClientService {
 	public List<ExamSubject> getExamSubjects(String examId, String gradeId){
 		
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
-		List<ExamSubject> result = examSubjectDaoImpl.getExamSubjects(examId, gradeId);
+		List<ExamSubject> result = examSubjectDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
 		
 		return result;
 	}
@@ -180,7 +180,7 @@ public class ClientServiceImpl implements ClientService {
 		
 		Map<String, List<Exam>> examGradeResponse = new HashMap<>();
 		
-		List<Exam> list = examDaoImpl.getExams(examStatus);
+		List<Exam> list = examDaoImpl.getExamsByStatus(examStatus);
 		
 		examGradeResponse.put("ExamGradeResponse", list);
 		

@@ -13,7 +13,12 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE ustudy.school
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teacher.data' INTO TABLE ustudy.teacher
+LOAD DATA LOCAL INFILE '/root/mysql/schema/owners.data' INTO TABLE ustudy.orgowner
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/teachers.data' INTO TABLE ustudy.teacher
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

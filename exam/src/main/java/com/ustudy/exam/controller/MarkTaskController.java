@@ -12,24 +12,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ustudy.exam.model.ScoreTask;
-import com.ustudy.exam.service.ScoreTaskService;
+import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
 @RestController
-public class ScoreTaskController {
+public class MarkTaskController {
 
-	private static final Logger logger = LogManager.getLogger(ScoreTaskController.class);
+	private static final Logger logger = LogManager.getLogger(MarkTaskController.class);
 	
 	@Autowired
-	private ScoreTaskService stS; 
+	private MarkTaskService stS; 
 	
 	@RequestMapping(value = "/scoretask/list/", method = RequestMethod.GET)
-	public List<ScoreTask> getScoreTask(HttpServletResponse resp) {
-		logger.debug("getScoreTask(), start to retriing all examination result.");
+	public List<MarkTask> getScoreTask(HttpServletResponse resp) {
+		logger.debug("getScoreTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
-		List<ScoreTask> st = null;
+		List<MarkTask> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();

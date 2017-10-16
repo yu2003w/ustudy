@@ -34,7 +34,7 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
-			    /scoretask/list/** = authc, perms[scoretask:view]
+			    /marktask/list/ = authc, perms[scoretask:view]
 				/** = anon
 			</value>
 		</property>
@@ -48,7 +48,7 @@
 					value="jdbc:mysql://127.0.0.1:3306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 				<property name="username" value="root" />
-				<property name="password" value="root" />
+				<property name="password" value="mysql" />
 				<property name="testWhileIdle" value="true" />
 				<property name="testOnBorrow" value="true" />
 				<property name="validationInterval" value="30000" />

@@ -10,9 +10,19 @@
         <result property="status" column="status"/>
     </resultMap>
 
-	<!-- 根据类型查询得到一个Exam对象-->
-	<select id="getExams" parameterType="string" resultMap="ExamResult">
+	<!-- 查询得到全部Exam对象 -->
+	<select id="getAllExams" parameterType="string" resultMap="ExamResult">
+		SELECT * FROM exam
+	</select>
+
+	<!-- 根据类型查询得到Exam对象 -->
+	<select id="getExamsByStatus" parameterType="string" resultMap="ExamResult">
 		SELECT * FROM exam where status=#{status}
+	</select>
+
+	<!-- 根据ID查询得到一个Exam对象-->
+	<select id="getExamsById" parameterType="string" resultMap="ExamResult">
+		SELECT * FROM exam where id=#{id}
 	</select>
 
 </mapper>
