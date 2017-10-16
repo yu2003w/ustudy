@@ -48,7 +48,7 @@
 					value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 				<property name="username" value="root" />
-				<property name="password" value="root" />
+				<property name="password" value="mysql" />
 				<property name="testWhileIdle" value="true" />
 				<property name="testOnBorrow" value="true" />
 				<property name="validationInterval" value="30000" />
