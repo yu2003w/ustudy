@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.SubjectDao">
+
+	<resultMap type="com.ustudy.exam.model.Subject" id="SubjectResult">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+    </resultMap>
+
+	<!-- 查询得到全部Subject对象 -->
+	<select id="getAllSubject" parameterType="string" resultMap="SubjectResult">
+		SELECT * FROM subject
+	</select>
+
+</mapper>

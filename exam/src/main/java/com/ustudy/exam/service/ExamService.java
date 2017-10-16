@@ -1,14 +1,11 @@
-package com.ustudy.exam.dao;
+package com.ustudy.exam.service;
 
 import java.util.List;
 
-import org.mybatis.spring.annotation.MapperScan;
-
 import com.ustudy.exam.model.Exam;
 
-@MapperScan
-public interface ExamDao {
-
+public interface ExamService {
+	
 	public List<Exam> getAllExams();
 	
 	public List<Exam> getExamsByStatus(String status);

@@ -18,11 +18,32 @@
         <result property="objItemNum" column="obj_item_num"/>
         <result property="subItemNum" column="sub_item_num"/>
         <result property="taskDispatch" column="task_dispatch"/>
+        <result property="answerSeted" column="answer_seted"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getExamSubjects" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+	<select id="getAllExamSubject" parameterType="string" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="getAllExamSubjectByExamId" parameterType="string" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where examid=#{examId}
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="getAllExamSubjectByExamIdAndGradeId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId}
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="getExamSubjectById" parameterType="string" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where id=#{id}
 	</select>
 
 </mapper>
