@@ -35,6 +35,8 @@
 		<property name="filterChainDefinitions">
 			<value>
 			    /marktask/list/ = authc, perms[scoretask:view]
+			    /marktask/view/ = authc, perms[scoretask:view]
+			    
 				/** = anon
 			</value>
 		</property>
@@ -85,7 +87,7 @@
 		<property name="authenticationQuery"
 			value="select passwd from ustudy.teacher where teacid = ?" />
 		<property name="userRolesQuery"
-			value="select role_name from ustudy.teacherroles where user_name = ?" />
+			value="select role_name from ustudy.teacherroles where teac_id = ?" />
 		<property name="permissionsQuery"
 			value="select perm from ustudy.perms where role_name = ?" />
 	</bean>
@@ -131,7 +133,7 @@
 	<!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		p:use-pool="true" p:database="0" p:host-name="127.0.0.1" p:port="6379"
+		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
 		p:timeout="100" />
 
 	<!-- redis template definition -->

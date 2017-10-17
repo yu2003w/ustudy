@@ -6,6 +6,6 @@ import com.ustudy.exam.model.MarkTask;
 
 public interface MarkTaskService {
 
-	public List<MarkTask> getScoreTask(String teacid);
+	public List<MarkTask> getMarkTask(String teacid);
 	
 }

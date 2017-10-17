@@ -24,18 +24,41 @@ public class MarkTaskController {
 	@Autowired
 	private MarkTaskService stS; 
 	
-	@RequestMapping(value = "/scoretask/list/", method = RequestMethod.GET)
-	public List<MarkTask> getScoreTask(HttpServletResponse resp) {
-		logger.debug("getScoreTask(), start to retrieving all examination result.");
+	@RequestMapping(value = "/marktask/list/", method = RequestMethod.GET)
+	public List<MarkTask> getMarkTask(HttpServletResponse resp) {
+		logger.debug("getMarkTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
 		List<MarkTask> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getScoreTask(teacid);
+			st = stS.getMarkTask(teacid);
 		} catch (Exception e) {
-			logger.warn("getScoreTask()" + e.getMessage());
+			logger.warn("getMarkTask()" + e.getMessage());
+			String msg = "Failed to retrieve score task for teacher " + teacid;
+			try {
+				resp.sendError(500, msg);
+			} catch (Exception re) {
+				logger.warn("Failed to set error status in response");
+			}
+		}
+
+		return st;
+	}
+	
+	@RequestMapping(value = "/marktask/view/", method = RequestMethod.GET)
+	public List<MarkTask> getMultipleTask(HttpServletResponse resp) {
+		logger.debug("getMultipleTask(), start to retrieving multiple tasks from examination result.");
+		
+		// fetch score task for currently logged in teacher
+		List<MarkTask> st = null;
+		String teacid = null;
+		try {
+			teacid = ExamUtil.getCurrentUserId();
+			st = stS.getMarkTask(teacid);
+		} catch (Exception e) {
+			logger.warn("getMultipleTask()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
