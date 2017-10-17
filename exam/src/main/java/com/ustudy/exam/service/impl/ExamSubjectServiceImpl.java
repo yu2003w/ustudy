@@ -12,6 +12,8 @@ import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
 
+import net.sf.json.JSONObject;
+
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
@@ -65,6 +67,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
+	}
+
+	@Override
+	public boolean saveStudentAnswers(JSONObject data) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 	
