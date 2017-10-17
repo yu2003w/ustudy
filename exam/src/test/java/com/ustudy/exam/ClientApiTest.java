@@ -16,44 +16,54 @@ public class ClientApiTest {
 		
 		String token = Base64Util.decode("1381139:hello");
 		
-		saveTemplates(token);
+//		saveTemplates(token);
+//		System.out.println();
+//		System.out.println("--------------------saveTemplates-------------------");
+//		System.out.println();
+//		
+//		getExamTemplate("123", "456", "789", token);
+//		System.out.println();
+//		System.out.println("--------------------getExamTemplate-------------------");
+//		System.out.println();
+//		
+//		getExamSubjects("1","1", token);
+//		System.out.println();
+//		System.out.println("--------------------getExamSubjects-------------------");
+//		System.out.println();
+//		
+//		getExamGrades("1", "0", token);
+//		System.out.println();
+//		System.out.println("--------------------getExamGrades-------------------");
+//		System.out.println();
+//		
+//		getExams("0", token);
+//		System.out.println();
+//		System.out.println("--------------------getExams-------------------");
+//		System.out.println();
+//		
+//		login(token);
+//		System.out.println();
+//		System.out.println("--------------------login-------------------");
+//		System.out.println();
+//		
+//		getPermissions(token);
+//		System.out.println();
+//		System.out.println("--------------------getPermissions-------------------");
+//		System.out.println();
+//		
+//		update("ustudy");
+//		System.out.println();
+//		System.out.println("--------------------update-------------------");
+//		System.out.println();
+//		
+		saveAnswerPaper(token, "1", "fileName");
 		System.out.println();
-		System.out.println("--------------------saveTemplates-------------------");
+		System.out.println("--------------------saveAnswerPaper-------------------");
 		System.out.println();
 		
-		getExamTemplate("123", "456", "789", token);
+		saveQuestionsPaper(token, "1", "fileName");
 		System.out.println();
-		System.out.println("--------------------getExamTemplate-------------------");
-		System.out.println();
-		
-		getExamSubjects("1","1", token);
-		System.out.println();
-		System.out.println("--------------------getExamSubjects-------------------");
-		System.out.println();
-		
-		getExamGrades("1", "0", token);
-		System.out.println();
-		System.out.println("--------------------getExamGrades-------------------");
-		System.out.println();
-		
-		getExams("0", token);
-		System.out.println();
-		System.out.println("--------------------getExams-------------------");
-		System.out.println();
-		
-		login(token);
-		System.out.println();
-		System.out.println("--------------------login-------------------");
-		System.out.println();
-		
-		getPermissions(token);
-		System.out.println();
-		System.out.println("--------------------getPermissions-------------------");
-		System.out.println();
-		
-		update("ustudy");
-		System.out.println();
-		System.out.println("--------------------update-------------------");
+		System.out.println("--------------------saveQuestionsPaper-------------------");
 		System.out.println();
 	}
 
@@ -376,5 +386,94 @@ public class ClientApiTest {
 		}
 
 	}
+	
+	public static void saveAnswerPaper(String token, String id, String fileName) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client//save/answerPaper";
+		
+		String parameters = "{\"token\":\""+token+"\",\"data\":{\"id\":\""+id+"\",\"fileName\":\""+fileName+"\"}}";
+		System.out.println(parameters);
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(parameters.getBytes());
+			outputStream.flush();
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void saveQuestionsPaper(String token, String id, String fileName) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client//save/questionsPaper";
+		
+		String parameters = "{\"token\":\""+token+"\",\"data\":{\"id\":\""+id+"\",\"fileName\":\""+fileName+"\"}}";
+
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(parameters.getBytes());
+			outputStream.flush();
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 
 }

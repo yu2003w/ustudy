@@ -20,4 +20,8 @@ public interface ExamSubjectDao {
 	
 	public List<ExamSubject> getExamSubjectById(String id);
 	
+	public void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
+	
+	public void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+	
 }

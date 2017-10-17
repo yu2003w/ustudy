@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
+import com.ustudy.exam.service.ExamSubjectService;
+
+import net.sf.json.JSONObject;
 
 @RestController
 @RequestMapping(value = "/client")
@@ -30,6 +33,9 @@ public class ClientController {
 
 	@Autowired
 	private ClientService cs;
+	
+	@Autowired
+	private ExamSubjectService ess;
 
 	/**
 	 * 保存模板
@@ -180,8 +186,6 @@ public class ClientController {
 		logger.debug("getPermissionList().");
 		logger.debug("token: " + token);
 
-		Map map = cs.login(token);
-
 		Map result = cs.login(token);
 		
 		if(!(boolean)result.get("success")){
@@ -190,12 +194,13 @@ public class ClientController {
 
 		result = new HashMap<>();
 		
-		result.put("success", (boolean)map.get("success"));
-		if((boolean)map.get("success")){
-			Teacher teacher = (Teacher)map.get("teacher");
+		result.put("success", (boolean)result.get("success"));
+		if((boolean)result.get("success")){
+			Teacher teacher = (Teacher)result.get("teacher");
 			result.put("data", teacher.getRoles());
+			result.remove("teacher");
 		}else{
-			result.put("message", map.get("message"));
+			result.put("message", result.get("message"));
 		}
 		
 		return result;
@@ -266,6 +271,104 @@ public class ClientController {
 		result.put("data", data);
 		
 		return result;
+	}
+	
+	/**
+	 * 保存空白答题卡数据
+	 * @param parameters 参数
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/save/answerPaper", method = RequestMethod.POST)
+	public Map saveBlankAnswerPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+		
+		
+		JSONObject object = JSONObject.fromObject(parameters);
+		
+		String token = object.getString("token");
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		JSONObject data  = object.getJSONObject("data");
+
+		result = new HashMap<>();
+		
+		if(ess.saveBlankAnswerPaper(data.getString("id"), data.getString("fileName"))){
+			result.put("success", true);
+		} else {
+			result.put("success", false);
+		}
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 保存原卷数据
+	 * @param parameters 参数
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/save/questionsPaper", method = RequestMethod.POST)
+	public Map saveBlankQuestionsPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+		
+		
+		JSONObject object = JSONObject.fromObject(parameters);
+		
+		String token = object.getString("token");
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		JSONObject data  = object.getJSONObject("data");
+
+		result = new HashMap<>();
+		
+		if(ess.saveBlankQuestionsPaper(data.getString("id"), data.getString("fileName"))){
+			result.put("success", true);
+		} else {
+			result.put("success", false);
+		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/save/stuAnswer", method = RequestMethod.POST)
+	public Map saveStudentAnswer(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+		
+		
+		JSONObject object = JSONObject.fromObject(parameters);
+		
+		String token = object.getString("token");
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		JSONObject data  = object.getJSONObject("data");
+
+		result = new HashMap<>();
+		
+		if(ess.saveBlankQuestionsPaper(data.getString("id"), data.getString("fileName"))){
+			result.put("success", true);
+		} else {
+			result.put("success", false);
+		}
+		
+		return result;
+		
 	}
 	
 }

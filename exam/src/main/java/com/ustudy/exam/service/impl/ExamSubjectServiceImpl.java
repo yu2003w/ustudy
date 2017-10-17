@@ -1,9 +1,6 @@
 package com.ustudy.exam.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -45,6 +42,30 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public List<ExamSubject> getExamSubjectById(String id) {
 		logger.debug("getExamSubjectById -> id:" + id);
 		return daoImpl.getExamSubjectById(id);
+	}
+
+	@Override
+	public boolean saveBlankAnswerPaper(String id, String fileName) {
+		logger.debug("saveBlankAnswerPaper -> id:" + id + ",fileName:" + fileName);
+		try {
+			daoImpl.saveBlankAnswerPaper(id, fileName);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	@Override
+	public boolean saveBlankQuestionsPaper(String id, String fileName) {
+		logger.debug("saveBlankQuestionsPaper -> id:" + id + ",fileName:" + fileName);
+		try {
+			daoImpl.saveBlankQuestionsPaper(id, fileName);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 }

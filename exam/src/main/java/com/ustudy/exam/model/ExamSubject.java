@@ -22,6 +22,9 @@ public class ExamSubject implements Serializable {
 	private int subItemNum;
 	private int taskDispatch;
 	private String answerSeted ;
+	private int uploadBathCount ;
+	private String blankAnswerPaper ;
+	private String blankQuestionsPaper ;
 	
 	public ExamSubject() {
 	}
@@ -159,6 +162,30 @@ public class ExamSubject implements Serializable {
 
 	public void setAnswerSeted(String answerSeted) {
 		this.answerSeted = answerSeted;
+	}
+
+	public int getUploadBathCount() {
+		return uploadBathCount;
+	}
+
+	public void setUploadBathCount(int uploadBathCount) {
+		this.uploadBathCount = uploadBathCount;
+	}
+
+	public String getBlankAnswerPaper() {
+		return blankAnswerPaper;
+	}
+
+	public void setBlankAnswerPaper(String blankAnswerPaper) {
+		this.blankAnswerPaper = blankAnswerPaper;
+	}
+
+	public String getBlankQuestionsPaper() {
+		return blankQuestionsPaper;
+	}
+
+	public void setBlankQuestionsPaper(String blankQuestionsPaper) {
+		this.blankQuestionsPaper = blankQuestionsPaper;
 	}
 	
 }

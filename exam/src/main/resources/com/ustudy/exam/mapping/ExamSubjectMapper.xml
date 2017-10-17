@@ -19,6 +19,9 @@
         <result property="subItemNum" column="sub_item_num"/>
         <result property="taskDispatch" column="task_dispatch"/>
         <result property="answerSeted" column="answer_seted"/>
+        <result property="uploadBathCount" column="upload_bath_count"/>
+        <result property="blankAnswerPaper" column="blank_answer_paper"/>
+        <result property="blankQuestionsPaper" column="blank_questions_paper"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
@@ -44,6 +47,16 @@
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectById" parameterType="string" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where id=#{id}
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="saveBlankAnswerPaper" parameterType="java.util.Map">
+		UPDATE examgradesub SET blank_answer_paper=#{fileName} where id=#{id}
+	</select>
+
+	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
+	<select id="saveBlankQuestionsPaper" parameterType="java.util.Map">
+		UPDATE examgradesub SET blank_questions_paper=#{fileName} where id=#{id}
 	</select>
 
 </mapper>

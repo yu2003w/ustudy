@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.ustudy.exam.model.ExamSubject;
 
+import net.sf.json.JSONObject;
+
 public interface ExamSubjectService {
 	
 	public List<ExamSubject> getAllExamSubject();
@@ -16,4 +18,9 @@ public interface ExamSubjectService {
 	
 	public List<ExamSubject> getExamSubjectById(String id);
 	
+	public boolean saveBlankAnswerPaper(String id, String fileName);
+	
+	public boolean saveBlankQuestionsPaper(String id, String fileName);
+
+	public boolean saveStudentAnswers(JSONObject data);
 }
