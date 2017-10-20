@@ -17,6 +17,7 @@ import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
 @RestController
+@RequestMapping(value="/exam/")
 public class MarkTaskController {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskController.class);
