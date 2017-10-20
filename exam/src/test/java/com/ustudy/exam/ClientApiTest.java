@@ -16,46 +16,46 @@ public class ClientApiTest {
 		
 		String token = Base64Util.decode("1381139:hello");
 		
-//		saveTemplates(token);
-//		System.out.println();
-//		System.out.println("--------------------saveTemplates-------------------");
-//		System.out.println();
-//		
-//		getExamTemplate("123", "456", "789", token);
-//		System.out.println();
-//		System.out.println("--------------------getExamTemplate-------------------");
-//		System.out.println();
-//		
-//		getExamSubjects("1","1", token);
-//		System.out.println();
-//		System.out.println("--------------------getExamSubjects-------------------");
-//		System.out.println();
-//		
-//		getExamGrades("1", "0", token);
-//		System.out.println();
-//		System.out.println("--------------------getExamGrades-------------------");
-//		System.out.println();
-//		
-//		getExams("0", token);
-//		System.out.println();
-//		System.out.println("--------------------getExams-------------------");
-//		System.out.println();
-//		
-//		login(token);
-//		System.out.println();
-//		System.out.println("--------------------login-------------------");
-//		System.out.println();
-//		
-//		getPermissions(token);
-//		System.out.println();
-//		System.out.println("--------------------getPermissions-------------------");
-//		System.out.println();
-//		
-//		update("ustudy");
-//		System.out.println();
-//		System.out.println("--------------------update-------------------");
-//		System.out.println();
-//		
+		saveTemplates(token);
+		System.out.println();
+		System.out.println("--------------------saveTemplates-------------------");
+		System.out.println();
+		
+		getExamTemplate("123", "456", "789", token);
+		System.out.println();
+		System.out.println("--------------------getExamTemplate-------------------");
+		System.out.println();
+		
+		getExamSubjects("1","1", token);
+		System.out.println();
+		System.out.println("--------------------getExamSubjects-------------------");
+		System.out.println();
+		
+		getExamGrades("1", "0", token);
+		System.out.println();
+		System.out.println("--------------------getExamGrades-------------------");
+		System.out.println();
+		
+		getExams("0", token);
+		System.out.println();
+		System.out.println("--------------------getExams-------------------");
+		System.out.println();
+		
+		login(token);
+		System.out.println();
+		System.out.println("--------------------login-------------------");
+		System.out.println();
+		
+		getPermissions(token);
+		System.out.println();
+		System.out.println("--------------------getPermissions-------------------");
+		System.out.println();
+		
+		update("ustudy");
+		System.out.println();
+		System.out.println("--------------------update-------------------");
+		System.out.println();
+		
 		saveAnswerPaper(token, "1", "fileName");
 		System.out.println();
 		System.out.println("--------------------saveAnswerPaper-------------------");

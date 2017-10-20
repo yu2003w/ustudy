@@ -188,22 +188,15 @@ public class ClientController {
 
 		Map result = cs.login(token);
 		
-		if(!(boolean)result.get("success")){
+		if (!(boolean)result.get("success")) {
 			return result;
-		}
-
-		result = new HashMap<>();
-		
-		result.put("success", (boolean)result.get("success"));
-		if((boolean)result.get("success")){
+		} else {
 			Teacher teacher = (Teacher)result.get("teacher");
 			result.put("data", teacher.getRoles());
 			result.remove("teacher");
-		}else{
-			result.put("message", result.get("message"));
+			return result;
 		}
 		
-		return result;
 	}
 	
 	/**

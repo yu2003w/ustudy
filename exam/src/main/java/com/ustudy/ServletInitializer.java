@@ -1,4 +1,4 @@
-package com.ustudy.exam;
+package com.ustudy;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;

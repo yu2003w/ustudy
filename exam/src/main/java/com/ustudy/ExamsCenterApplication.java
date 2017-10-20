@@ -1,4 +1,4 @@
-package com.ustudy.exam;
+package com.ustudy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

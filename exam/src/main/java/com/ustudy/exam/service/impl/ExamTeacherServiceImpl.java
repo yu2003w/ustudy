@@ -10,7 +10,7 @@ import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.TeacherService;
 
 @Service
-public class TeacherServiceImpl implements TeacherService {
+public class ExamTeacherServiceImpl implements TeacherService {
 
 	@Autowired
 	private TeacherMapper userM;
