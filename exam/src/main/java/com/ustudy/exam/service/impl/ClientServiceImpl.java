@@ -32,6 +32,8 @@ import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.TeacherService;
 import com.ustudy.exam.utility.Base64Util;
 
+import net.sf.json.JSONObject;
+
 @Service
 public class ClientServiceImpl implements ClientService {
 	
@@ -132,12 +134,10 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public boolean saveTemplates(String templates) {
+	public boolean saveTemplates(JSONObject data) {
 		
 		//cm.saveTemplates();
-		logger.debug("templates: " + templates);
-		Teacher teacher = clientDaoImpl.getTeacher(1);
-		logger.debug(teacher.getUname());
+		logger.debug("data: " + data);
 		
 		return true;
 	}

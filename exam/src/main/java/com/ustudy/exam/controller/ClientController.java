@@ -44,20 +44,22 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveExamTemplate", method = RequestMethod.POST)
-	public Map saveExamTemplate(@RequestBody String templates, HttpServletResponse resp) {
+	public Map saveExamTemplate(@RequestBody String parameters, HttpServletResponse resp) {
 
 		logger.debug("saveTemplate().");
-		logger.debug("templates: " + templates);
+		logger.debug("parameters: " + parameters);
 		
-		Map result = cs.login("");
+		JSONObject object = JSONObject.fromObject(parameters);		
+		String token = object.getString("token");
 		
+		Map result = cs.login(token);		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
-
+		
+		JSONObject data  = object.getJSONObject("data");		
 		result = new HashMap<>();
-
-		result.put("success", cs.saveTemplates(templates));
+		result.put("success", cs.saveTemplates(data));
 
 		return result;
 	}
@@ -338,7 +340,6 @@ public class ClientController {
 	
 	@RequestMapping(value = "/save/stuAnswer", method = RequestMethod.POST)
 	public Map saveStudentAnswer(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
-		
 		
 		JSONObject object = JSONObject.fromObject(parameters);
 		

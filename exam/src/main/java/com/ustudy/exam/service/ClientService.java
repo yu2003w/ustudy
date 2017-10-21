@@ -7,11 +7,13 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
 
+import net.sf.json.JSONObject;
+
 public interface ClientService {
 	
 	public Map<String, Object> login(String token);
 
-	public boolean saveTemplates(String templates);
+	public boolean saveTemplates(JSONObject data);
 	
 	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
 	
