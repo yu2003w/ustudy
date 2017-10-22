@@ -19,9 +19,9 @@ if [ -d ${WORK_DIR}/webapps/dashboard ]; then
     exit 1
   fi
 else
-  mkdir -p ${WORK_DIR}/webapps/ROOT/
+  mkdir -p ${WORK_DIR}/webapps/
   if [ $? != 0 ]; then
-    echo "Failed to create directory" ${WORK_DIR}/webapps/ROOT/
+    echo "Failed to create directory" ${WORK_DIR}/webapps/
     exit 1
   fi
 fi
@@ -33,23 +33,23 @@ if [ $? != 0 ]; then
 fi
 echo "Deploying dashboard.war successfully"
 
-if [ -d ${WORK_DIR}/webapps/ROOT/exam ]; then
-  rm -rf ${WORK_DIR}/webapps/ROOT/exam  ${WORK_DIR}/webapps/ROOT/exam.war
+if [ -d ${WORK_DIR}/webapps/ROOT/ ]; then
+  rm -rf ${WORK_DIR}/webapps/ROOT/  ${WORK_DIR}/webapps/ROOT.war
   if [ $? != 0 ]; then
     echo "Failed to delete deployed war"
     exit 1
   fi
 else
-  mkdir -p ${WORK_DIR}/webapps/ROOT
+  mkdir -p ${WORK_DIR}/webapps/
   if [ $? != 0 ]; then
-    echo "Failed to create directory" ${WORK_DIR}/webapps/ROOT/
+    echo "Failed to create directory" ${WORK_DIR}/webapps/
     exit 1
   fi
 fi
 
-cp -f ${SOURCE_DIR}/ustudy/exam/target/exam.war ${WORK_DIR}/webapps/ROOT/exam.war
+cp -f ${SOURCE_DIR}/ustudy/exam/target/ROOT.war ${WORK_DIR}/webapps/ROOT.war
 if [ $? != 0 ]; then
-  echo "Failed to copy exam.war into destination directory"
+  echo "Failed to copy war of examination into destination directory"
   exit 1
 fi
 echo "Deploying exam.war successfully"
