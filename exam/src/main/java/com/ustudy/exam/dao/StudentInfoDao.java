@@ -8,7 +8,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import com.ustudy.exam.model.ExamSubject;
 
 @MapperScan
-public interface ExamSubjectDao {
+public interface StudentInfoDao {
 
 	List<ExamSubject> getAllExamSubject();
 	

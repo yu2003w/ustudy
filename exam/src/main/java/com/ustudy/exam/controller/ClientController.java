@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.ExamSubjectService;
+import com.ustudy.exam.service.StudentInfoService;
 
 import net.sf.json.JSONObject;
 
@@ -36,6 +37,9 @@ public class ClientController {
 	
 	@Autowired
 	private ExamSubjectService ess;
+	
+	@Autowired
+	private StudentInfoService sis;
 
 	/**
 	 * 保存模板
@@ -89,6 +93,33 @@ public class ClientController {
 
 		result.put("success", true);
 		result.put("data", cs.getTemplateById(examId, gradeId, subjectId));
+
+		return result;
+	}
+	
+	/**
+	 * 获取模板
+	 * @param csId 考试、年级、科目
+	 * @param resp
+	 * @return
+	 */
+	@RequestMapping(value = "/getExamTemplateCsid/{csId}", method = RequestMethod.POST)
+	public Map getExamTemplateByCsid(@PathVariable String csId, @RequestBody String token, HttpServletResponse resp) {
+
+		logger.debug("getTemplates().");
+		logger.debug("token: " + token);
+		logger.debug("examId: " + csId);
+
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
+
+		result.put("success", true);
+		result.put("data", cs.getTemplateById(csId));
 
 		return result;
 	}
@@ -304,7 +335,7 @@ public class ClientController {
 	}
 	
 	/**
-	 * 保存原卷数据
+	 * 保存空白试卷数据
 	 * @param parameters 参数
 	 * @param request
 	 * @param response
@@ -338,6 +369,13 @@ public class ClientController {
 		
 	}
 	
+	/**
+	 * 保存空白答题卡
+	 * @param parameters 参数
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/save/stuAnswer", method = RequestMethod.POST)
 	public Map saveStudentAnswer(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
 		
@@ -355,11 +393,101 @@ public class ClientController {
 
 		result = new HashMap<>();
 		
-		if(ess.saveBlankQuestionsPaper(data.getString("id"), data.getString("fileName"))){
+		if(ess.saveBlankAnswerPaper(data.getString("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
 			result.put("success", false);
 		}
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 根据考试、年级信息获取学生信息
+	 * @param examId
+	 * @param gradeId
+	 * @param token
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/getStudentsInfo/{examId}/{gradeId}", method = RequestMethod.POST)
+	public Map getStudentsInfo(@PathVariable String examId, @PathVariable String gradeId, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		result = new HashMap<>();
+		result.put("date", sis.getStudentsInfo(examId, gradeId));
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 保存学生考试信息
+	 * @param egId
+	 * @param csId
+	 * @param parameters
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/save/answers/{egId}/{csId}", method = RequestMethod.POST)
+	public Map saveStudentsAnswers(@PathVariable String egId, @PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+		
+		JSONObject object = JSONObject.fromObject(parameters);
+		
+		String token = object.getString("token");
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		JSONObject data  = object.getJSONObject("data");
+		
+		result = new HashMap<>();
+		result.put("success", sis.saveStudentsAnswers(egId, csId, data));
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/save/answers/{csId}", method = RequestMethod.POST)
+	public Map getAllPaper(@PathVariable String csId, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		result = new HashMap<>();
+		result.put("success", true);
+		result.put("date", sis.getAllPaper(csId));
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/delete/answers/{csId}/{batchNum}", method = RequestMethod.DELETE)
+	public Map deleteStudentsAnswers(@PathVariable String csId, @PathVariable String batchNum, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+		
+		Map result = cs.login(token);
+		
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		result = new HashMap<>();
+		result.put("success", true);
+		result.put("date", sis.deleteAnswers(csId, batchNum));
 		
 		return result;
 		
