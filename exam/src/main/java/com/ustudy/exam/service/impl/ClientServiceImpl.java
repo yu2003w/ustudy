@@ -22,16 +22,19 @@ import com.ustudy.exam.dao.ClientDao;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamGradeDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.dao.SchoolDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
+import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.TeacherService;
 import com.ustudy.exam.utility.Base64Util;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Service
@@ -53,6 +56,9 @@ public class ClientServiceImpl implements ClientService {
 	
 	@Resource
 	private SchoolDao schoolDaoImpl;
+	
+	@Resource
+	private QuesareaDao quesareaDaoImpl;
 	
 	@Autowired
 	private TeacherService teacherService;
@@ -134,10 +140,25 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public boolean saveTemplates(JSONObject data) {
+	public boolean saveTemplates(String id, JSONObject originalData) {
 		
-		//cm.saveTemplates();
-		logger.debug("data: " + data);
+		logger.debug("originalData: " + originalData);
+		examSubjectDaoImpl.saveOriginalData(id, originalData.toString());
+		
+		JSONArray pages = originalData.getJSONArray("Page");
+		for (int i=0;i< pages.size();i++) {
+			JSONObject page = pages.getJSONObject(i);
+			JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
+			for (int j=0;j< subjectives.size();j++) {
+				JSONObject subjective = subjectives.getJSONObject(j);
+				JSONArray regions = subjective.getJSONArray("regionList");
+				for (int k=0;k< regions.size();k++) {
+					JSONObject region = regions.getJSONObject(j);
+					quesareaDaoImpl.insertQuesarea(new Quesarea(page.getInt("pageIndex"), page.getString("fileName"), subjective.getInt("AreaID"), region.getInt("x"), region.getInt("y"), region.getInt("width"), region.getInt("height"), region.getInt("bottom"), region.getInt("right"), subjective.getString("TopicType"), subjective.getInt("StartQid"), subjective.getInt("EndQid")));
+				}
+			}
+		}
+		
 		
 		return true;
 	}

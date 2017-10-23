@@ -13,7 +13,7 @@ public interface ClientService {
 	
 	Map<String, Object> login(String token);
 
-	boolean saveTemplates(JSONObject data);
+	boolean saveTemplates(String csId, JSONObject data);
 	
 	Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
 	

@@ -47,20 +47,27 @@ FOREIGN KEY (quesid)
 # tables for paper templates, each question block may distribute in 
 # several pages
 create table if not exists ustudy.quesarea (
-id INT NOT NULL AUTO_INCREMENT,
-quesid INT NOT NULL,
-pageno INT NOT NULL,
-posx INT NOT NULL,
-posy INT NOT NULL,
-length INT NOT NULL,
-height INT NOT NULL,
-answer VARCHAR(128),
+id int(11) NOT NULL AUTO_INCREMENT,
+pageno int(11) NOT NULL DEFAULT '1' COMMENT '页码',
+file_name varchar(100) DEFAULT NULL COMMENT '当前页扫描图片文件名',
+area_id int(11) DEFAULT NULL COMMENT 'question',
+posx int(11) NOT NULL DEFAULT '0' COMMENT '横坐标原点',
+posy int(11) NOT NULL DEFAULT '0' COMMENT '纵坐标原点',
+width int(11) NOT NULL DEFAULT '0' COMMENT '横向宽度',
+height int(11) NOT NULL DEFAULT '0' COMMENT '纵向高度',
+posbottom int(11) DEFAULT '0' COMMENT '矩形底边位置',
+posright int(11) DEFAULT '0' COMMENT '矩形底边位置',
+question_type varchar(1) DEFAULT NULL COMMENT '题类型 2填空题，3主观题',
+start_question_no int(2) DEFAULT NULL COMMENT '开始题号',
+end_question_no int(2) DEFAULT NULL COMMENT '结束题号',
+quesid int(11) DEFAULT NULL,
+answer varchar(128) DEFAULT NULL,
 PRIMARY KEY (id),
 INDEX(quesid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.quesanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # tables for answer setting with sub questions
 create table if not exists ustudy.quesanswerdiv (

@@ -161,6 +161,7 @@ answer_seted varchar(1) DEFAULT '0' COMMENT '标准答案是否设置',
 upload_bath_count int(11) DEFAULT '10' COMMENT '批量上传数量',
 blank_answer_paper varchar(255) DEFAULT NULL COMMENT '空白答题卡图片地址',
 blank_questions_paper varchar(255) DEFAULT NULL COMMENT '空白试卷图片地址',
+original_data blob COMMENT '原始json数据',
 PRIMARY KEY (id),
 INDEX (grade_id, grade_name),
 FOREIGN KEY (examid)

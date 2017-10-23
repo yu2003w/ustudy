@@ -23,5 +23,7 @@ public interface ExamSubjectDao {
 	void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
 	
 	void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+
+	void saveOriginalData(@Param("id")String id, @Param("originalData") String originalData);
 	
 }
