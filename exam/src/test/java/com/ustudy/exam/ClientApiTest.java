@@ -14,7 +14,7 @@ public class ClientApiTest {
 
 	public static void main(String[] args) {
 		
-		String token = Base64Util.decode("1381139:hello");
+		String token = Base64Util.decode("1381139:123456");
 		
 		saveTemplates(token);
 		System.out.println();
@@ -69,7 +69,7 @@ public class ClientApiTest {
 
 	public static void saveTemplates(String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/saveExamTemplate";
+		String targetURL = "http://47.92.53.57/api/client/saveExamTemplate";
 
 		try {
 
