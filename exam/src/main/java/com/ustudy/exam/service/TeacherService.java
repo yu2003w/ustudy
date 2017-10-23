@@ -10,4 +10,6 @@ public interface TeacherService {
 	
 	List<String> getRolesById(String id);
 	
+	public String findPriRoleById(String id);
+	
 }

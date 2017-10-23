@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 
+import com.ustudy.exam.utility.ExamUtil;
+
 /**
  * @author jared
  *
@@ -53,32 +55,6 @@ public class InfoUtil {
 		return ret;
 	}
 	
-	private static ConcurrentHashMap<String, String> rolemapping = 
-			new ConcurrentHashMap<String, String>();
-
-	public static ConcurrentHashMap<String, String> getRolemapping() {
-		return rolemapping;
-	}
-
-	// this method is for role mapping between frontend input and backend logic
-	public static void initRoleMapping() {
-		rolemapping.put("任课老师", "teacher");
-		rolemapping.put("班主任", "cteacher");
-		rolemapping.put("备课组长", "pleader");
-		rolemapping.put("学科组长", "sleader");
-		rolemapping.put("年级主任", "gleader");
-		rolemapping.put("校长", "org_owner");
-		rolemapping.put("考务老师", "leader");
-		
-		rolemapping.put("teacher", "任课老师");
-		rolemapping.put("cteacher", "班主任");
-		rolemapping.put("pleader", "备课组长");
-		rolemapping.put("sleader", "学科组长");
-		rolemapping.put("gleader", "年级主任");
-		rolemapping.put("org_owner", "校长");
-		rolemapping.put("leader", "考务老师");
-	}
-	
 	/*
 	 * Calling this method should catch exceptions throws by shiro
 	 */
@@ -91,4 +67,7 @@ public class InfoUtil {
 			return null;
 	}
 
+	public static ConcurrentHashMap<String, String> getRolemapping() {
+		return ExamUtil.getRolemapping();
+	}
 }

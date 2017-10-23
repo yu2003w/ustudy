@@ -1,4 +1,4 @@
-package com.ustudy.info.model;
+package com.ustudy.exam.model;
 
 import java.io.Serializable;
 
