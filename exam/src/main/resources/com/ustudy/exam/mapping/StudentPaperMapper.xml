@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.StudentPaperDao">
+
+	<resultMap type="com.ustudy.exam.model.StudentPaper" id="StudentPaperResult">
+        <id property="id" column="id"/>
+        <result property="stuNo" column="student_number"/>
+        <result property="stuExamNo" column="student_exam_number"/>
+        <result property="examId" column="exam_id"/>
+        <result property="gradeId" column="grade_id"/>
+        <result property="subjectId" column="sub_id"/>        
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="batchNum" column="batch_num"/>
+        <result property="paperImg" column="paper_img"/>
+        <result property="paperStatus" column="paper_status"/>
+    </resultMap>
+
+	<!-- 查询得到全部Exam对象 -->
+	<insert id="insertStudentPaper" parameterType="com.ustudy.exam.model.StudentPaper">
+		INSERT INTO quesarea (student_number, student_exam_number, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status)  
+        VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR})
+	</insert>
+
+</mapper>

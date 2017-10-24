@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.StudentObjectAnswerDao">
+
+	<resultMap type="com.ustudy.exam.model.Quesarea" id="StudentObjectAnswerResult">
+        <id property="id" column="id"/>
+        <result property="paperid" column="paperid"/>
+        <result property="quesno" column="quesno"/>
+        <result property="score" column="score"/>
+        <result property="answer" column="answer"/>
+        <result property="answerHas" column="answerHas"/>
+    </resultMap>
+
+	<!-- 查询得到全部Exam对象 -->
+	<insert id="insertStudentObjectAnswer" parameterType="com.ustudy.exam.model.StudentObjectAnswer">
+		INSERT INTO stuobjanswer (paperid, quesno, score, answer, answerHas)  
+        VALUES (#{paperid}, #{quesno}, #{score}, #{answer,jdbcType=VARCHAR}, #{answerHas})
+	</insert>
+
+</mapper>
