@@ -75,8 +75,6 @@ public class ClientServiceImpl implements ClientService {
 			String username = tokens[0];
 			String password = tokens[1];
 			
-			password = Base64Util.getMd5Pwd(password);
-			
 			String msg = null;
 			boolean status = true;
 			Teacher teacher = null;

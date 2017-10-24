@@ -48,20 +48,18 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveExamTemplate/{csId}", method = RequestMethod.POST)
-	public Map saveExamTemplate(@PathVariable String csId, @RequestBody String parameters, HttpServletResponse resp) {
+	public Map saveExamTemplate(@PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
 		logger.debug("saveTemplate().");
 		logger.debug("csId: " + csId + ",parameters: " + parameters);
 		
-		JSONObject object = JSONObject.fromObject(parameters);		
-		String token = object.getString("token");
-		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
 		
-		JSONObject data  = object.getJSONObject("data");		
+		JSONObject data  = JSONObject.fromObject(parameters);
 		result = new HashMap<>();
 		result.put("success", cs.saveTemplates(csId, data));
 
@@ -77,14 +75,13 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamTemplate/{examId}/{gradeId}/{subjectId}", method = RequestMethod.POST)
-	public Map getExamTemplate(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId, @RequestBody String token, HttpServletResponse resp) {
+	public Map getExamTemplate(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");
-		logger.debug("token: " + token);
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -104,14 +101,13 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamTemplateCsid/{csId}", method = RequestMethod.POST)
-	public Map getExamTemplateByCsid(@PathVariable String csId, @RequestBody String token, HttpServletResponse resp) {
+	public Map getExamTemplateByCsid(@PathVariable String csId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");
-		logger.debug("token: " + token);
 		logger.debug("examId: " + csId);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -132,14 +128,13 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.POST)
-	public Map getExamSubjects(@PathVariable String examId, @PathVariable String gradeId, @RequestBody String token, HttpServletResponse resp) {
+	public Map getExamSubjects(@PathVariable String examId, @PathVariable String gradeId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
-		logger.debug("token: " + token);
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -160,14 +155,13 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamGrades/{examId}/{examStatus}", method = RequestMethod.POST)
-	public Map getExamGrades(@PathVariable String examId, @PathVariable String examStatus, @RequestBody String token, HttpServletResponse resp) {
+	public Map getExamGrades(@PathVariable String examId, @PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
-		logger.debug("token: " + token);
 		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -187,14 +181,13 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExams/{examStatus}", method = RequestMethod.POST)
-	public Map getExams(@PathVariable String examStatus, @RequestBody String token, HttpServletResponse resp) {
+	public Map getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getExams().");
-		logger.debug("token: " + token);
 		logger.debug("examStatus: " + examStatus);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -209,18 +202,16 @@ public class ClientController {
 	
 	/**
 	 * 获取权限接口
-	 * @param tokenstr 用户登录后的token信息
 	 * @param resp
 	 * @return
 	 */
 	@RequestMapping(value = "/getPermissions", method = RequestMethod.POST)
-	public Map getPermissions(@RequestBody String token, HttpServletResponse resp) {
+	public Map getPermissions(HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("getPermissionList().");
-		logger.debug("token: " + token);
 
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if (!(boolean)result.get("success")) {
 			return result;
 		} else {
@@ -238,10 +229,10 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public Map login(@RequestBody String token, HttpServletResponse resp) {
+	public Map login(HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("login().");
-		logger.debug("token: " + token);
+		String token = request.getHeader("token");
 		
 		return cs.login(token);
 	}
@@ -252,7 +243,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
-	public Map update(HttpServletRequest request, HttpServletResponse response) {
+	public Map update(HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String currentVersionNo = request.getParameter("currentVersionNo");
 		
@@ -307,20 +298,16 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/answerPaper", method = RequestMethod.POST)
-	public Map saveBlankAnswerPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+	public Map saveBlankAnswerPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
-		
-		JSONObject object = JSONObject.fromObject(parameters);
-		
-		String token = object.getString("token");
-		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
 		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
 		
-		JSONObject data  = object.getJSONObject("data");
+		JSONObject data  = JSONObject.fromObject(parameters);
 
 		result = new HashMap<>();
 		
@@ -342,23 +329,18 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/questionsPaper", method = RequestMethod.POST)
-	public Map saveBlankQuestionsPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+	public Map saveBlankQuestionsPaper(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
-		
-		JSONObject object = JSONObject.fromObject(parameters);
-		
-		String token = object.getString("token");
-		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
 		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
 		
-		JSONObject data  = object.getJSONObject("data");
-
 		result = new HashMap<>();
 		
+		JSONObject data  = JSONObject.fromObject(parameters);
 		if(ess.saveBlankQuestionsPaper(data.getString("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
@@ -377,22 +359,17 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/stuAnswer", method = RequestMethod.POST)
-	public Map saveStudentAnswer(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+	public Map saveStudentAnswer(@RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
-		JSONObject object = JSONObject.fromObject(parameters);
-		
-		String token = object.getString("token");
-		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
-		
-		JSONObject data  = object.getJSONObject("data");
 
 		result = new HashMap<>();
 		
+		JSONObject data  = JSONObject.fromObject(parameters);
 		if(ess.saveBlankAnswerPaper(data.getString("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
@@ -407,16 +384,15 @@ public class ClientController {
 	 * 根据考试、年级信息获取学生信息
 	 * @param examId
 	 * @param gradeId
-	 * @param token
 	 * @param request
 	 * @param response
 	 * @return
 	 */
 	@RequestMapping(value = "/getStudentsInfo/{examId}/{gradeId}", method = RequestMethod.POST)
-	public Map getStudentsInfo(@PathVariable String examId, @PathVariable String gradeId, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+	public Map getStudentsInfo(@PathVariable String examId, @PathVariable String gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -438,21 +414,17 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/answers/{egId}/{csId}", method = RequestMethod.POST)
-	public Map saveStudentsAnswers(@PathVariable String egId, @PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse response) {
+	public Map saveStudentsAnswers(@PathVariable String egId, @PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
-		JSONObject object = JSONObject.fromObject(parameters);
-		
-		String token = object.getString("token");
-		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
 		
-		JSONObject data  = object.getJSONObject("data");
-		
 		result = new HashMap<>();
+		
+		JSONObject data  = JSONObject.fromObject(parameters);
 		result.put("success", sis.saveStudentsAnswers(egId, csId, data));
 		
 		return result;
@@ -460,10 +432,10 @@ public class ClientController {
 	}
 	
 	@RequestMapping(value = "/save/answers/{csId}", method = RequestMethod.POST)
-	public Map getAllPaper(@PathVariable String csId, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+	public Map getAllPaper(@PathVariable String csId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
@@ -477,10 +449,10 @@ public class ClientController {
 	}
 	
 	@RequestMapping(value = "/delete/answers/{csId}/{batchNum}", method = RequestMethod.DELETE)
-	public Map deleteStudentsAnswers(@PathVariable String csId, @PathVariable String batchNum, @RequestBody String token, HttpServletRequest request, HttpServletResponse response) {
+	public Map deleteStudentsAnswers(@PathVariable String csId, @PathVariable String batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
 		
+		String token = request.getHeader("token");
 		Map result = cs.login(token);
-		
 		if(!(boolean)result.get("success")){
 			return result;
 		}
