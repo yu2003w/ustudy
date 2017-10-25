@@ -118,39 +118,30 @@ FOREIGN KEY (quesid)
 
 # tables for student paper
 create table if not exists ustudy.stupaper (
-id INT NOT NULL AUTO_INCREMENT,
-stuid INT NOT NULL,
-examid INT NOT NULL,
-exam_grade_sub_id INT NOT NULL,
-# url for paper location
-paperImg VARCHAR(128),
+id int(11) NOT NULL AUTO_INCREMENT,
+student_exam_number int(11) DEFAULT NULL COMMENT '考号',
+student_number int(11) NOT NULL COMMENT '学籍号',
+exam_id int(11) NOT NULL,
+grade_id int(11) DEFAULT NULL,
+sub_id int(11) DEFAULT NULL,
+exam_grade_sub_id int(11) NOT NULL,
+batch_num int(11) DEFAULT NULL COMMENT '试卷所属扫描批次',
+paper_img varchar(360) DEFAULT NULL COMMENT '试卷图片地址,多个图片用'',''隔开',
+paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常',
+error_status varchar(5) DEFAULT NULL COMMENT '错误代码',
 PRIMARY KEY(id),
-INDEX (stuid, examid, exam_grade_sub_id),
-FOREIGN KEY (stuid)
-    REFERENCES ustudy.student(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (examid)
-    REFERENCES ustudy.exam(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (exam_grade_sub_id)
-    REFERENCES ustudy.examgradesub(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+INDEX (stuid, examid, exam_grade_sub_id)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.stuobjanswer (
-id INT NOT NULL AUTO_INCREMENT,
-quesid INT NOT NULL,
-paperid INT NOT NULL,
-quesno INT NOT NULL,
-score INT,
+id int(11) NOT NULL AUTO_INCREMENT,
+paperid int(11) NOT NULL COMMENT '所属学生答题卡',
+quesno int(11) NOT NULL COMMENT '题号',
+score int(11) DEFAULT '0' COMMENT '得分',
+answer varchar(16) DEFAULT NULL COMMENT '答案',
+answerHas int(11) DEFAULT NULL COMMENT '答案数值表示',
 PRIMARY KEY(id),
-INDEX (quesid, paperid, quesno),
-FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (paperid)
-    REFERENCES ustudy.stupaper(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+INDEX (quesid, paperid, quesno)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.stuanswer (

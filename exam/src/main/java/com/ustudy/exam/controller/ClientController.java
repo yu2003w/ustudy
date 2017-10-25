@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.ExamSubjectService;
+import com.ustudy.exam.service.StudentAnswerService;
 import com.ustudy.exam.service.StudentInfoService;
 
 import net.sf.json.JSONObject;
@@ -40,6 +41,9 @@ public class ClientController {
 	
 	@Autowired
 	private StudentInfoService sis;
+	
+	@Autowired
+	private StudentAnswerService sas;
 
 	/**
 	 * 保存模板
@@ -414,7 +418,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/answers/{egId}/{csId}", method = RequestMethod.POST)
-	public Map saveStudentsAnswers(@PathVariable String egId, @PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map saveStudentsAnswers(@PathVariable Integer egId, @PathVariable Integer csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -422,10 +426,10 @@ public class ClientController {
 			return result;
 		}
 		
-		result = new HashMap<>();
-		
 		JSONObject data  = JSONObject.fromObject(parameters);
-		result.put("success", sis.saveStudentsAnswers(egId, csId, data));
+		
+		result = new HashMap<>();
+		result.put("success", sas.saveStudentsAnswers(egId, csId, data));
 		
 		return result;
 		

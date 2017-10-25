@@ -13,12 +13,13 @@
         <result property="batchNum" column="batch_num"/>
         <result property="paperImg" column="paper_img"/>
         <result property="paperStatus" column="paper_status"/>
+        <result property="errorStatus" column="error_status"/>
     </resultMap>
 
 	<!-- 查询得到全部Exam对象 -->
-	<insert id="insertStudentPaper" parameterType="com.ustudy.exam.model.StudentPaper">
-		INSERT INTO quesarea (student_number, student_exam_number, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status)  
-        VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR})
+	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
+		INSERT INTO stupaper (student_number, student_exam_number, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
+        VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
 	</insert>
 
 </mapper>

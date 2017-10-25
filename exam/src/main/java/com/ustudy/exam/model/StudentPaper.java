@@ -16,6 +16,7 @@ public class StudentPaper implements Serializable {
 	private int batchNum;
 	private String paperImg;
 	private String paperStatus;
+	private String errorStatus;
 	
 	public int getId() {
 		return id;
@@ -95,6 +96,14 @@ public class StudentPaper implements Serializable {
 	
 	public void setPaperStatus(String paperStatus) {
 		this.paperStatus = paperStatus;
+	}
+	
+	public String getErrorStatus() {
+		return errorStatus;
+	}
+	
+	public void setErrorStatus(String errorStatus) {
+		this.errorStatus = errorStatus;
 	}
 	
 }
