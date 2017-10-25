@@ -16,5 +16,9 @@
 		INSERT INTO stuobjanswer (paperid, quesno, score, answer, answerHas)  
         VALUES (#{paperid}, #{quesno}, #{score}, #{answer,jdbcType=VARCHAR}, #{answerHas})
 	</insert>
+	
+	<delete id="deleteStudentObjectAnswers" parameterType="java.util.Map">
+		DELETE from stuobjanswer where paperid in (SELECT id from stupaper WHERE exam_grade_sub_id=#{csId} and batch_num=#{batchNum});
+	</delete>
 
 </mapper>

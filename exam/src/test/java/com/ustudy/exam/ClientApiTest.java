@@ -68,11 +68,16 @@ public class ClientApiTest {
 //		System.out.println();
 //		System.out.println("--------------------saveQuestionsPaper-------------------");
 //		System.out.println();
-		
-		saveStudentsAnswers(token, 1, 1);
-		System.out.println();
-		System.out.println("--------------------saveStudentsAnswers-------------------");
-		System.out.println();
+//		
+//		saveStudentsAnswers(token, 1, 1);
+//		System.out.println();
+//		System.out.println("--------------------saveStudentsAnswers-------------------");
+//		System.out.println();
+//		
+//		deleteStudentsPapers(token, 3, 2);
+//		System.out.println();
+//		System.out.println("--------------------deleteStudentsPapers-------------------");
+//		System.out.println();
 	}
 
 	public static void saveTemplates(String token) {
@@ -487,6 +492,45 @@ public class ClientApiTest {
 			OutputStream outputStream = httpConnection.getOutputStream();
 			outputStream.write(parameters.getBytes());
 			outputStream.flush();
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void deleteStudentsPapers(String token, int egsId, int batchNum) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client/delete/papers/"+egsId+"/"+batchNum;
+		
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("DELETE");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			httpConnection.setRequestProperty("token", token);
 			
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException(

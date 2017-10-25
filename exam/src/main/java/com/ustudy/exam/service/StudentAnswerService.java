@@ -6,4 +6,6 @@ public interface StudentAnswerService {
 	
 	boolean saveStudentsAnswers(int egId, int csId, JSONObject data);
 	
+	boolean deletePapers(Integer csId, Integer batchNum);
+	
 }

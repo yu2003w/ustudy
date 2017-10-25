@@ -21,5 +21,9 @@
 		INSERT INTO stupaper (student_number, student_exam_number, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
         VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
 	</insert>
+	
+	<delete id="deleteStudentPapers" parameterType="java.util.Map">
+		DELETE from stupaper where exam_grade_sub_id=#{csId} and batch_num=#{batchNum}		
+	</delete>
 
 </mapper>

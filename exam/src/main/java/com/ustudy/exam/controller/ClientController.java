@@ -452,8 +452,8 @@ public class ClientController {
 		
 	}
 	
-	@RequestMapping(value = "/delete/answers/{csId}/{batchNum}", method = RequestMethod.DELETE)
-	public Map deleteStudentsAnswers(@PathVariable String csId, @PathVariable String batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
+	@RequestMapping(value = "/delete/papers/{csId}/{batchNum}", method = RequestMethod.DELETE)
+	public Map deleteStudentsPapers(@PathVariable Integer csId, @PathVariable Integer batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -462,8 +462,7 @@ public class ClientController {
 		}
 		
 		result = new HashMap<>();
-		result.put("success", true);
-		result.put("date", sis.deleteAnswers(csId, batchNum));
+		result.put("success", sas.deletePapers(csId, batchNum));
 		
 		return result;
 		

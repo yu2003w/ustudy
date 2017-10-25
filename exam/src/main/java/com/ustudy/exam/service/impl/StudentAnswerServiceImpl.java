@@ -82,4 +82,10 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 		}
 	}
 	
+	public boolean deletePapers(Integer csId, Integer batchNum){
+		answerDaoImpl.deleteStudentObjectAnswers(csId, batchNum);
+		paperDaoImpl.deleteStudentPapers(csId, batchNum);
+		return true;
+	}
+	
 }
