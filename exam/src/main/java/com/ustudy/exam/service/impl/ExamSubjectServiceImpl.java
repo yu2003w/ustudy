@@ -41,7 +41,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 	}
 	
-	public List<ExamSubject> getExamSubjectById(String id) {
+	public ExamSubject getExamSubjectById(String id) {
 		logger.debug("getExamSubjectById -> id:" + id);
 		return daoImpl.getExamSubjectById(id);
 	}

@@ -185,12 +185,16 @@ public class ClientServiceImpl implements ClientService {
 		logger.debug("csId: " + csId);
 		Map<String, String> result = new HashMap<>();
 		
-		result.put("ExamQAPicPath", "标准答案图片名称,多个用‘,’分隔");
-		result.put("ExamPaperPicPath", "试卷原卷图片名称，多个用‘,’分隔");
-		result.put("AnswerSheetPicPath", "试卷答题卡原图 ,多张图片用 ',' 分隔");
-		result.put("AnswerSheetXMLPath", "试卷答题卡xml模版地址");
-		result.put("AnswerSheetXML", "试卷答题卡xml模版,json格式存储");
-		result.put("Id", "模板保存的数据库主键ID");
+		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
+		
+		if(null != examSubject){
+			result.put("ExamQAPicPath", "");
+			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper());
+			result.put("AnswerSheetPicPath", examSubject.getBlankAnswerPaper());
+			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath());
+			result.put("AnswerSheetXML", examSubject.getOriginalData());
+			result.put("Id", "" + examSubject.getId());
+		}
 		
 		return result;
 	}

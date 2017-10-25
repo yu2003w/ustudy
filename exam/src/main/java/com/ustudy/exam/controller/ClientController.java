@@ -104,7 +104,7 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamTemplateCsid/{csId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/getExamTemplate/{csId}", method = RequestMethod.POST)
 	public Map getExamTemplateByCsid(@PathVariable String csId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");

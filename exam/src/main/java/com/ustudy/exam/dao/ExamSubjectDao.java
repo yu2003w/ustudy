@@ -18,7 +18,7 @@ public interface ExamSubjectDao {
 	
 	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") String examId, @Param("gradeId") String gradeId, @Param("subjectId") String subjectId);
 	
-	List<ExamSubject> getExamSubjectById(String id);
+	ExamSubject getExamSubjectById(String id);
 	
 	void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
 	

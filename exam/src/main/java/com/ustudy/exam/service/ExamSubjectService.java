@@ -16,7 +16,7 @@ public interface ExamSubjectService {
 	
 	List<ExamSubject> getExamSubjectByExamAndGradeAndSubject(String examId, String gradeId, String subjectId);
 	
-	List<ExamSubject> getExamSubjectById(String id);
+	ExamSubject getExamSubjectById(String id);
 	
 	boolean saveBlankAnswerPaper(String id, String fileName);
 	

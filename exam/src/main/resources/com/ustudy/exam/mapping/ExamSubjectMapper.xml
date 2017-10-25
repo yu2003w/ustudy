@@ -22,7 +22,7 @@
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
-        <result property="XmlServerPath" column="xml_server_path"/>
+        <result property="xmlServerPath" column="xml_server_path"/>
         <result property="originalData" column="original_data"/>
     </resultMap>
 
@@ -63,7 +63,7 @@
 
 	<!-- 保存原始模板信息-->
 	<update id="saveOriginalData" parameterType="java.util.Map">
-		UPDATE examgradesub SET original_data=#{originalData}, xml_server_path={#XmlServerPath,jdbcType=VARCHAR} where id=#{id}
+		UPDATE examgradesub SET original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
 
 </mapper>
