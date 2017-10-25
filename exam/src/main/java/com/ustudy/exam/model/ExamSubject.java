@@ -25,6 +25,7 @@ public class ExamSubject implements Serializable {
 	private int uploadBathCount ;
 	private String blankAnswerPaper ;
 	private String blankQuestionsPaper ;
+	private String xmlServerPath;
 	private String originalData;
 
 	public ExamSubject() {
@@ -195,6 +196,14 @@ public class ExamSubject implements Serializable {
 
 	public void setOriginalData(String originalData) {
 		this.originalData = originalData;
+	}
+	
+	public String getXmlServerPath() {
+		return xmlServerPath;
+	}
+
+	public void setXmlServerPath(String xmlServerPath) {
+		this.xmlServerPath = xmlServerPath;
 	}
 	
 }

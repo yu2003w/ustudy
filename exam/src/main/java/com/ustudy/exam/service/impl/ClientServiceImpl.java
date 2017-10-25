@@ -141,7 +141,11 @@ public class ClientServiceImpl implements ClientService {
 	public boolean saveTemplates(String id, JSONObject originalData) {
 		
 		logger.debug("originalData: " + originalData);
-		examSubjectDaoImpl.saveOriginalData(id, originalData.toString());
+		String xmlServerPath = "";
+		if(null != originalData.get("xmlServerPath")){
+			xmlServerPath = originalData.getString("xmlServerPath");
+		}
+		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, originalData.toString());
 		
 		JSONArray pages = originalData.getJSONArray("Page");
 		for (int i=0;i< pages.size();i++) {
