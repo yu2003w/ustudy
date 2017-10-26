@@ -406,6 +406,7 @@ public class ClientController {
 		}
 		
 		result = new HashMap<>();
+		result.put("success", true);
 		result.put("data", ests.getStudentInfoByExamGrade(examId, gradeId));
 		
 		return result;

@@ -81,7 +81,7 @@ public class ExamStudent implements Serializable {
 		this.stuno = stuno;
 	}
 	
-	public int getExamRoom() {
+	public int getRoom() {
 		return room;
 	}
 	
