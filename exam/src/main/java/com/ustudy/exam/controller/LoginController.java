@@ -78,8 +78,8 @@ public class LoginController {
 				tea = userS.findUserById(currentUser.getPrincipal().toString());
 				if (tea != null) {
 					ses.setAttribute("uname", tea.getUname());
-					ses.setAttribute("orgtype", tea.getOrgtype());
-					ses.setAttribute("orgid", tea.getUid());
+					ses.setAttribute("orgType", tea.getOrgtype());
+					ses.setAttribute("orgId", tea.getOrgid());
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
 					response.setStatus(404);
