@@ -23,6 +23,16 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/teachers.data' INTO TABLE ustudy.teac
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/teagrade.data' INTO TABLE ustudy.teachergrade
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/teasub.data' INTO TABLE ustudy.teachersub
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/tearoles.data' INTO TABLE ustudy.teacherroles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'

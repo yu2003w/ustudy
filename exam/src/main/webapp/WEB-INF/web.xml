@@ -35,7 +35,7 @@
     
     <!-- web.xml expects the session timeout in minutes: -->
     <session-config>
-        <session-timeout>30</session-timeout>
+        <session-timeout>86400</session-timeout>
     </session-config>
     
 </web-app>
