@@ -19,10 +19,10 @@ public class ClientApiTest {
 		password = Base64Util.getMd5Pwd(password);
 		String token = Base64Util.decode(username + ":" + password);
 		
-		saveTemplates(token);
-		System.out.println();
-		System.out.println("--------------------saveTemplates-------------------");
-		System.out.println();
+//		saveTemplates(token);
+//		System.out.println();
+//		System.out.println("--------------------saveTemplates-------------------");
+//		System.out.println();
 //		
 //		getExamTemplate("123", "456", "789", token);
 //		System.out.println();
@@ -78,10 +78,15 @@ public class ClientApiTest {
 //		System.out.println();
 //		System.out.println("--------------------deleteStudentsPapers-------------------");
 //		System.out.println();
+//		
+//		getExamTemplate(1, token);
+//		System.out.println();
+//		System.out.println("--------------------getExamTemplate-------------------");
+//		System.out.println();
 		
-		getExamSubject(1, token);
+		getStudentsinfo(token, 1, 1);
 		System.out.println();
-		System.out.println("--------------------getExamSubject-------------------");
+		System.out.println("--------------------getStudentsinfo-------------------");
 		System.out.println();
 	}
 
@@ -201,7 +206,7 @@ public class ClientApiTest {
 
 	}
 
-	public static void getExamSubject(Integer csId, String token) {
+	public static void getExamTemplate(Integer csId, String token) {
 
 		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + csId;
 
@@ -571,6 +576,45 @@ public class ClientApiTest {
 			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
 			httpConnection.setDoOutput(true);
 			httpConnection.setRequestMethod("DELETE");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			httpConnection.setRequestProperty("token", token);
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void getStudentsinfo(String token, int examId, int gradeId) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client//getStudentsInfo/"+examId+"/"+gradeId;
+		
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
 			httpConnection.setRequestProperty("token", token);
 			

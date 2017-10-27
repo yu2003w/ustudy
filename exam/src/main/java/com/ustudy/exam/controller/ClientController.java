@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
+import com.ustudy.exam.service.ExamStudentService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
 import com.ustudy.exam.service.StudentInfoService;
@@ -44,6 +45,9 @@ public class ClientController {
 	
 	@Autowired
 	private StudentAnswerService sas;
+	
+	@Autowired
+	private ExamStudentService ests;
 
 	/**
 	 * 保存模板
@@ -393,7 +397,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getStudentsInfo/{examId}/{gradeId}", method = RequestMethod.POST)
-	public Map getStudentsInfo(@PathVariable String examId, @PathVariable String gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map getStudentsInfo(@PathVariable Integer examId, @PathVariable Integer gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -402,7 +406,8 @@ public class ClientController {
 		}
 		
 		result = new HashMap<>();
-		result.put("date", sis.getStudentsInfo(examId, gradeId));
+		result.put("success", true);
+		result.put("data", ests.getStudentInfoByExamGrade(examId, gradeId));
 		
 		return result;
 		
@@ -446,7 +451,7 @@ public class ClientController {
 		
 		result = new HashMap<>();
 		result.put("success", true);
-		result.put("date", sis.getAllPaper(csId));
+		result.put("data", sis.getAllPaper(csId));
 		
 		return result;
 		
