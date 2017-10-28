@@ -11,22 +11,22 @@ id INT NOT NULL AUTO_INCREMENT,
 quesno INT,
 startno INT,
 endno INT, 
-type ENUM('单选题','多选题','判断题','解答题','证明题') NOT NULL,
+type ENUM('单选题','多选题','判断题','填空题','解答题','证明题') NOT NULL,
 branch varchar(16) default '不分科',
 choice_num INT NOT NULL,
 score int NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
 score_mode ENUM ('单评', '双评'),
-teac_owner INT,
+teac_owner VARCHAR(32),
 exam_grade_sub_id INT NOT NULL,
 INDEX(exam_grade_sub_id, quesno),
-UNIQUE KEY(exam_grade_sub_id, quesno),
+UNIQUE KEY(exam_grade_sub_id, quesno, startno, endno),
 PRIMARY KEY (id),
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (teac_owner)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -100,7 +100,7 @@ FOREIGN KEY (quesid)
 
 create table if not exists ustudy.teacherscoretask (
 id INT NOT NULL AUTO_INCREMENT,
-teacid INT NOT NULL,
+teacid VARCHAR(32) NOT NULL,
 quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
@@ -109,7 +109,7 @@ scoretype ENUM ('标准','问题卷','终评'),
 numOfsp INT,
 PRIMARY KEY (id),
 FOREIGN KEY (teacid)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (quesid)
     REFERENCES ustudy.quesanswer(id)
@@ -178,9 +178,9 @@ comment21 VARCHAR(128),
 comment22 VARCHAR(128),
 comment31 VARCHAR(128),
 comment32 VARCHAR(128),
-teacid1 INT,
-teacid2 INT,
-teacid3 INT,
+teacid1 VARCHAR(32),
+teacid2 VARCHAR(32),
+teacid3 VARCHAR(32),
 mark ENUM ('excellent','faq','weird'),
 PRIMARY KEY(id),
 INDEX (quesid, paperid),
@@ -191,13 +191,13 @@ FOREIGN KEY (paperid)
     REFERENCES ustudy.stupaper(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (teacid1)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY (teacid2)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY (teacid3)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
