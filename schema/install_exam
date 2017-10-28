@@ -130,7 +130,7 @@ paper_img varchar(360) DEFAULT NULL COMMENT '试卷图片地址,多个图片用'
 paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常',
 error_status varchar(5) DEFAULT NULL COMMENT '错误代码',
 PRIMARY KEY(id),
-INDEX (stuid, examid, exam_grade_sub_id)
+INDEX (student_exam_number, exam_id, exam_grade_sub_id)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.stuobjanswer (
@@ -141,7 +141,7 @@ score int(11) DEFAULT '0' COMMENT '得分',
 answer varchar(16) DEFAULT NULL COMMENT '答案',
 answerHas int(11) DEFAULT NULL COMMENT '答案数值表示',
 PRIMARY KEY(id),
-INDEX (quesid, paperid, quesno)
+INDEX (paperid, quesno)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.examstudent (
