@@ -224,7 +224,7 @@ public class ClientController {
 			return result;
 		} else {
 			Teacher teacher = (Teacher)result.get("teacher");
-			result.put("data", teacher.getRoles());
+			result.put("data", teacher.getRole());
 			result.remove("teacher");
 			return result;
 		}

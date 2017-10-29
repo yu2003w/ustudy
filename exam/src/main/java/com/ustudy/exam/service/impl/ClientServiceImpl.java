@@ -118,6 +118,7 @@ public class ClientServiceImpl implements ClientService {
 						teacher.setOrgname(schoole.getSchname());
 					}
 					teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
+					teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
 					logger.debug("login()," + teacher.toString());
 				} catch (Exception e) {
 					logger.warn("login(), session failed -> " + e.getMessage());
