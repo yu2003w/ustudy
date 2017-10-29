@@ -46,6 +46,9 @@ public class ExamUtil {
 			new ConcurrentHashMap<String, String>();
 
 	public static ConcurrentHashMap<String, String> getRolemapping() {
+		if(null == rolemapping || rolemapping.size()==0){
+			initRoleMapping();
+		}
 		return rolemapping;
 	}
 

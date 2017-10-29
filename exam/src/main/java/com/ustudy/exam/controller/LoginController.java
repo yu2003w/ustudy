@@ -117,7 +117,7 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/loginId", method = RequestMethod.GET)
-	public TeacRole getLoginUser(HttpServletResponse resp) {
+	public TeacRole getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
 		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
 		TeacRole u = null;
@@ -129,7 +129,7 @@ public class LoginController {
 		}
 		if (cUser.getPrincipal() == null) {
 			logger.warn("getLoginUser(), User didn't log in");
-			resp.setStatus(404);
+			resp.setStatus(530);
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;
 		} else {

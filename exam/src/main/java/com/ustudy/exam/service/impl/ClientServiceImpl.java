@@ -76,7 +76,7 @@ public class ClientServiceImpl implements ClientService {
 			String password = tokens[1];
 			
 			String msg = null;
-			boolean status = true;
+			boolean status = false;
 			Teacher teacher = null;
 			
 			Subject currentUser = SecurityUtils.getSubject();
@@ -89,20 +89,22 @@ public class ClientServiceImpl implements ClientService {
 					UsernamePasswordToken usertoken = new UsernamePasswordToken(username, password);
 					usertoken.setRememberMe(true);
 					currentUser.login(usertoken);
+					status = true;
 					logger.debug("Token retrieved -> " + token.toString());
-				} catch (UnknownAccountException | IncorrectCredentialsException uae) {
-					logger.debug(uae.getMessage());
-					msg = "Attempt to access with invalid account -> username:" + username;
-					status = false;
-				} catch (LockedAccountException lae) {
-					msg = "Account is locked, username:" + username;
-					status = false;
-				} catch (AuthenticationException ae) {
-					msg = ae.getMessage();
-					status = false;
+				} catch (UnknownAccountException | IncorrectCredentialsException e) {
+					logger.error(e.getMessage());
+					logger.error("Attempt to access with invalid account -> username:" + username);
+					msg = "用户名或密码有误";
+				} catch (LockedAccountException e) {
+					logger.error(e.getMessage());
+					logger.error("Account is locked, username:" + username);
+					msg = "账号被锁定";
+				} catch (AuthenticationException e) {
+					logger.error(e.getMessage());
+					msg = "账号被锁定";
 				} catch (Exception e) {
-					msg = e.getMessage();
-					status = false;
+					logger.error(e.getMessage());
+					msg = "账号认证失败";
 				}
 
 			}
@@ -120,12 +122,13 @@ public class ClientServiceImpl implements ClientService {
 					teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
 					teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
 					logger.debug("login()," + teacher.toString());
+					
+					result.put("teacher", teacher);
 				} catch (Exception e) {
 					logger.warn("login(), session failed -> " + e.getMessage());
-					logger.debug(e.getMessage());
+					result.put("success", status);
+					result.put("message", "用户信息有误");
 				}
-				
-				result.put("teacher", teacher);
 			} else {
 				result.put("message", msg);
 			}
@@ -133,7 +136,7 @@ public class ClientServiceImpl implements ClientService {
 			
 		}else {
 			result.put("success", false);
-			result.put("message", "Token is wrong .");
+			result.put("message", "用户名、密码有误");
 		}
 		
 		return result;
