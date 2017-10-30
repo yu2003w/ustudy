@@ -33,10 +33,11 @@ FOREIGN KEY (teac_owner)
 # tables for referenced answers
 create table if not exists ustudy.refanswer (
 id INT NOT NULL AUTO_INCREMENT,
-quesid INT NOT NULL,
-quesno INT NOT NULL,
+quesid INT NOT NULL COMMENT 'quesanswer中的记录ID',
+quesno INT NOT NULL COMMENT '题目编号',
 # for multiple choice questions, answer format should be 'A,B,C'
 answer VARCHAR(128),
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
 FOREIGN KEY (quesid)
@@ -76,6 +77,7 @@ seqname varchar(16) NOT NULL,
 branch varchar(16) default '不分科',
 score INT NOT NULL,
 quesanswerid INT NOT NULL,
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
 FOREIGN KEY (quesanswerid)
     REFERENCES ustudy.quesanswer(id)
