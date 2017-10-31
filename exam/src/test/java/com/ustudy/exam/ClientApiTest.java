@@ -83,8 +83,13 @@ public class ClientApiTest {
 //		System.out.println();
 //		System.out.println("--------------------getExamTemplate-------------------");
 //		System.out.println();
-		
-		getStudentsinfo(token, 1, 1);
+//		
+//		getStudentsinfo(token, 1, 1);
+//		System.out.println();
+//		System.out.println("--------------------getStudentsinfo-------------------");
+//		System.out.println();
+
+		getStudentsinfo(1);
 		System.out.println();
 		System.out.println("--------------------getStudentsinfo-------------------");
 		System.out.println();
@@ -617,6 +622,44 @@ public class ClientApiTest {
 			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
 			httpConnection.setRequestProperty("token", token);
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void getStudentsinfo(int egsId) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/setanswers/getAnswers/"+egsId;
+		
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
 			
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException(
