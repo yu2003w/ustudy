@@ -1,0 +1,5 @@
+id,quesid,paperid,answerImg,mflag,isviewed,score1,score2,score3,comment11,comment12,comment21,comment22,comment31,comment32,teacid1,teacid2,teacid3
+null,1,1,/a100001/01.img,none,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,2,1,/a100001/02.img,none,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,1,2,/a100002/01.img,none,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,2,2,/a100002/02.img,none,false,0,0,0,null,null,null,null,null,null,null,null,null
