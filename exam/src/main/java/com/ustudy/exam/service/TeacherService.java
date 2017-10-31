@@ -6,8 +6,10 @@ import com.ustudy.exam.model.Teacher;
 
 public interface TeacherService {
 
-	public Teacher findUserById(String id);
+	Teacher findUserById(String id);
 	
-	public List<String> getRolesById(String id);
+	List<String> getRolesById(String id);
+	
+	public String findPriRoleById(String id);
 	
 }

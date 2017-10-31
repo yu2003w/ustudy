@@ -22,15 +22,20 @@ import com.ustudy.exam.dao.ClientDao;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamGradeDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.dao.SchoolDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
+import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.TeacherService;
 import com.ustudy.exam.utility.Base64Util;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -52,6 +57,9 @@ public class ClientServiceImpl implements ClientService {
 	@Resource
 	private SchoolDao schoolDaoImpl;
 	
+	@Resource
+	private QuesareaDao quesareaDaoImpl;
+	
 	@Autowired
 	private TeacherService teacherService;
 	
@@ -67,10 +75,8 @@ public class ClientServiceImpl implements ClientService {
 			String username = tokens[0];
 			String password = tokens[1];
 			
-			password = Base64Util.getMd5Pwd(password);
-			
 			String msg = null;
-			boolean status = true;
+			boolean status = false;
 			Teacher teacher = null;
 			
 			Subject currentUser = SecurityUtils.getSubject();
@@ -83,20 +89,22 @@ public class ClientServiceImpl implements ClientService {
 					UsernamePasswordToken usertoken = new UsernamePasswordToken(username, password);
 					usertoken.setRememberMe(true);
 					currentUser.login(usertoken);
+					status = true;
 					logger.debug("Token retrieved -> " + token.toString());
-				} catch (UnknownAccountException | IncorrectCredentialsException uae) {
-					logger.debug(uae.getMessage());
-					msg = "Attempt to access with invalid account -> username:" + username;
-					status = false;
-				} catch (LockedAccountException lae) {
-					msg = "Account is locked, username:" + username;
-					status = false;
-				} catch (AuthenticationException ae) {
-					msg = ae.getMessage();
-					status = false;
+				} catch (UnknownAccountException | IncorrectCredentialsException e) {
+					logger.error(e.getMessage());
+					logger.error("Attempt to access with invalid account -> username:" + username);
+					msg = "用户名或密码有误";
+				} catch (LockedAccountException e) {
+					logger.error(e.getMessage());
+					logger.error("Account is locked, username:" + username);
+					msg = "账号被锁定";
+				} catch (AuthenticationException e) {
+					logger.error(e.getMessage());
+					msg = "账号被锁定";
 				} catch (Exception e) {
-					msg = e.getMessage();
-					status = false;
+					logger.error(e.getMessage());
+					msg = "账号认证失败";
 				}
 
 			}
@@ -112,13 +120,15 @@ public class ClientServiceImpl implements ClientService {
 						teacher.setOrgname(schoole.getSchname());
 					}
 					teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
+					teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
 					logger.debug("login()," + teacher.toString());
+					
+					result.put("teacher", teacher);
 				} catch (Exception e) {
 					logger.warn("login(), session failed -> " + e.getMessage());
-					logger.debug(e.getMessage());
+					result.put("success", status);
+					result.put("message", "用户信息有误");
 				}
-				
-				result.put("teacher", teacher);
 			} else {
 				result.put("message", msg);
 			}
@@ -126,18 +136,35 @@ public class ClientServiceImpl implements ClientService {
 			
 		}else {
 			result.put("success", false);
-			result.put("message", "Token is wrong .");
+			result.put("message", "用户名、密码有误");
 		}
 		
 		return result;
 	}
 	
-	public boolean saveTemplates(String templates) {
+	public boolean saveTemplates(String id, JSONObject originalData) {
 		
-		//cm.saveTemplates();
-		logger.debug("templates: " + templates);
-		Teacher teacher = clientDaoImpl.getTeacher(1);
-		logger.debug(teacher.getUname());
+		logger.debug("originalData: " + originalData);
+		String xmlServerPath = "";
+		if(null != originalData.get("xmlServerPath")){
+			xmlServerPath = originalData.getString("xmlServerPath");
+		}
+		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, originalData.toString());
+		
+		JSONArray pages = originalData.getJSONArray("Page");
+		for (int i=0;i< pages.size();i++) {
+			JSONObject page = pages.getJSONObject(i);
+			JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
+			for (int j=0;j< subjectives.size();j++) {
+				JSONObject subjective = subjectives.getJSONObject(j);
+				JSONArray regions = subjective.getJSONArray("regionList");
+				for (int k=0;k< regions.size();k++) {
+					JSONObject region = regions.getJSONObject(j);
+					quesareaDaoImpl.insertQuesarea(new Quesarea(page.getInt("pageIndex"), page.getString("fileName"), subjective.getInt("AreaID"), region.getInt("x"), region.getInt("y"), region.getInt("width"), region.getInt("height"), region.getInt("bottom"), region.getInt("right"), subjective.getString("TopicType"), subjective.getInt("StartQid"), subjective.getInt("EndQid")));
+				}
+			}
+		}
+		
 		
 		return true;
 	}
@@ -153,6 +180,25 @@ public class ClientServiceImpl implements ClientService {
 		result.put("AnswerSheetXMLPath", "试卷答题卡xml模版地址");
 		result.put("AnswerSheetXML", "试卷答题卡xml模版,json格式存储");
 		result.put("Id", "模板保存的数据库主键ID");
+		
+		return result;
+	}
+	
+	public Map<String, String> getTemplateById(String csId){
+		
+		logger.debug("csId: " + csId);
+		Map<String, String> result = new HashMap<>();
+		
+		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
+		
+		if(null != examSubject){
+			result.put("ExamQAPicPath", "");
+			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper());
+			result.put("AnswerSheetPicPath", examSubject.getBlankAnswerPaper());
+			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath());
+			result.put("AnswerSheetXML", examSubject.getOriginalData());
+			result.put("Id", "" + examSubject.getId());
+		}
 		
 		return result;
 	}

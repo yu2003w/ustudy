@@ -22,6 +22,8 @@
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
+        <result property="xmlServerPath" column="xml_server_path"/>
+        <result property="originalData" column="original_data"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
@@ -50,13 +52,18 @@
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="saveBlankAnswerPaper" parameterType="java.util.Map">
+	<update id="saveBlankAnswerPaper" parameterType="java.util.Map">
 		UPDATE examgradesub SET blank_answer_paper=#{fileName} where id=#{id}
-	</select>
+	</update>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="saveBlankQuestionsPaper" parameterType="java.util.Map">
+	<update id="saveBlankQuestionsPaper" parameterType="java.util.Map">
 		UPDATE examgradesub SET blank_questions_paper=#{fileName} where id=#{id}
-	</select>
+	</update>
+
+	<!-- 保存原始模板信息-->
+	<update id="saveOriginalData" parameterType="java.util.Map">
+		UPDATE examgradesub SET original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+	</update>
 
 </mapper>

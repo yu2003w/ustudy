@@ -4,7 +4,6 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ustudy</groupId>
-	<artifactId>exam</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -39,7 +38,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<version>6.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
@@ -113,7 +112,7 @@
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session</artifactId>
-			<version>1.3.1.RELEASE</version>
+			<!-- <version>1.3.1.RELEASE</version> -->
 		</dependency>
 		
 		<!-- aliyun oss support -->
@@ -131,7 +130,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>exam</finalName>
+		<finalName>ROOT</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -141,4 +140,5 @@
 	</build>
 
 
+	<artifactId>exam</artifactId>
 </project>

@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
 @RestController
+@RequestMapping(value="/exam/")
 public class MarkTaskController {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskController.class);
@@ -25,15 +27,15 @@ public class MarkTaskController {
 	private MarkTaskService stS; 
 	
 	@RequestMapping(value = "/marktask/list/", method = RequestMethod.GET)
-	public List<MarkTask> getMarkTask(HttpServletResponse resp) {
+	public List<MarkTaskBrife> getMarkTask(HttpServletResponse resp) {
 		logger.debug("getMarkTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
-		List<MarkTask> st = null;
+		List<MarkTaskBrife> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getMarkTask(teacid);
+			st = stS.getMarkTaskBrife(teacid);
 		} catch (Exception e) {
 			logger.warn("getMarkTask()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
@@ -48,17 +50,17 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value = "/marktask/view/", method = RequestMethod.GET)
-	public List<MarkTask> getMultipleTask(HttpServletResponse resp) {
-		logger.debug("getMultipleTask(), start to retrieving multiple tasks from examination result.");
+	public List<MarkTask> getTaskPapers(HttpServletResponse resp) {
+		logger.debug("getTaskPapers(), start to retrieving multiple tasks from examination result.");
 		
 		// fetch score task for currently logged in teacher
 		List<MarkTask> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getMarkTask(teacid);
+			st = stS.getTaskPapers(teacid);
 		} catch (Exception e) {
-			logger.warn("getMultipleTask()" + e.getMessage());
+			logger.warn("getTaskPapers()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
@@ -68,5 +70,11 @@ public class MarkTaskController {
 		}
 
 		return st;
+	}
+	
+	@RequestMapping(value="/marktask/update/", method = RequestMethod.GET)
+	public String updateMarkResult(HttpServletResponse resp) {
+		logger.debug("updateMarkResult(), update mark results");
+		return null;
 	}
 }

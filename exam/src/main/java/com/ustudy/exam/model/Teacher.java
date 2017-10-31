@@ -16,6 +16,7 @@ public class Teacher implements Serializable {
 	private String orgtype = null;
 	private String orgid = null;
 	private String orgname = null;
+	private String role = null;
 	private List<String> roles = null;
 	
 	public Teacher() {
@@ -93,6 +94,14 @@ public class Teacher implements Serializable {
 
 	public void setOrgname(String orgname) {
 		this.orgname = orgname;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public List<String> getRoles() {
