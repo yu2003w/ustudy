@@ -29,7 +29,7 @@ public class SetAnswersController {
 	@Autowired
 	private SetAnswersService service;
 
-	@RequestMapping(value = "/getAnswers/{egsId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/getAnswers/{egsId}", method = RequestMethod.GET)
 	public Map getQuesAnswers(@PathVariable Integer egsId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubjects().");
@@ -54,7 +54,7 @@ public class SetAnswersController {
 			HttpServletResponse response) {
 
 		logger.debug("getSubjects().");
-		logger.debug("egsId: " + egsId);
+		logger.debug("egsId: " + egsId + ",parameters=" + parameters);
 
 		Map result = new HashMap<>();
 

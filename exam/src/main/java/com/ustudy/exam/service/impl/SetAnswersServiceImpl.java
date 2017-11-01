@@ -19,6 +19,7 @@ import com.ustudy.exam.model.QuesAnswerDiv;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.service.SetAnswersService;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Service
@@ -78,17 +79,84 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		try {
 			deleteQuesAnswers(egsId);
 			
-			List<RefAnswer> refAnswers = new ArrayList<>();
-			if(!refAnswers.isEmpty()){
-				refAnswerDaoImpl.insertRefAnswers(refAnswers);
+			List<QuesAnswer> quesAnswers = new ArrayList<>();
+			JSONArray objectives = ques.getJSONArray("objectives");
+			for(int i=0;i<objectives.size();i++){
+				JSONObject objective = objectives.getJSONObject(i);
+				
+				QuesAnswer quesAnswer = new QuesAnswer();
+				if(null != objective.get("quesno")) quesAnswer.setQuesno(objective.getInt("quesno"));
+				if(null != objective.get("startno")) quesAnswer.setStartno(objective.getInt("startno"));
+				if(null != objective.get("endno")) quesAnswer.setEndno(objective.getInt("endno"));
+				if(null != objective.get("type")) quesAnswer.setType(objective.getString("type"));
+				if(null != objective.get("branch")) quesAnswer.setBranch(objective.getString("branch"));
+				if(null != objective.get("choiceNum")) quesAnswer.setChoiceNum(objective.getInt("choiceNum"));
+				if(null != objective.get("score")) quesAnswer.setScore(objective.getInt("score"));
+				if(null != objective.get("assignMode")) quesAnswer.setAssignMode(objective.getString("assignMode"));
+				if(null != objective.get("scoreMode")) quesAnswer.setScoreMode(objective.getString("scoreMode"));				
+				if(null != objective.get("teacOwner")) quesAnswer.setTeacOwner(objective.getString("teacOwner"));
+				quesAnswer.setExamGradeSubId(egsId);
+				
+				quesAnswers.add(quesAnswer);
+			}			
+			JSONArray subjectives = ques.getJSONArray("subjectives");
+			for(int i=0;i<subjectives.size();i++){
+				JSONObject subjective = subjectives.getJSONObject(i);
+				
+				QuesAnswer quesAnswer = new QuesAnswer();
+				if(null != subjective.get("quesno")) quesAnswer.setQuesno(subjective.getInt("quesno"));
+				if(null != subjective.get("startno")) quesAnswer.setStartno(subjective.getInt("startno"));
+				if(null != subjective.get("endno")) quesAnswer.setEndno(subjective.getInt("endno"));
+				if(null != subjective.get("type")) quesAnswer.setType(subjective.getString("type"));
+				if(null != subjective.get("branch")) quesAnswer.setBranch(subjective.getString("branch"));
+				if(null != subjective.get("choiceNum")) quesAnswer.setChoiceNum(subjective.getInt("choiceNum"));
+				if(null != subjective.get("score")) quesAnswer.setScore(subjective.getInt("score"));
+				if(null != subjective.get("assignMode")) quesAnswer.setAssignMode(subjective.getString("assignMode"));
+				if(null != subjective.get("scoreMode")) quesAnswer.setScoreMode(subjective.getString("scoreMode"));				
+				if(null != subjective.get("teacOwner")) quesAnswer.setTeacOwner(subjective.getString("teacOwner"));
+				quesAnswer.setExamGradeSubId(egsId);
+				
+				quesAnswers.add(quesAnswer);
 			}
+			if(!quesAnswers.isEmpty()){
+				quesAnswerDaoImpl.insertQuesAnswers(quesAnswers);
+			}
+			
+			Map<Integer, Integer> quesids = new HashMap<>();
+			for (QuesAnswer quesAnswer : quesAnswers) {
+				for (int i = quesAnswer.getStartno(); i <= quesAnswer.getEndno(); i++) {
+					quesids.put(i, quesAnswer.getId());
+				}
+			}
+
 			List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
 			if(!quesAnswerDivs.isEmpty()){
 				quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
 			}
-			List<QuesAnswer> quesAnswers = new ArrayList<>();
-			if(!quesAnswers.isEmpty()){
-				quesAnswerDaoImpl.insertQuesAnswers(quesAnswers);
+			
+			List<RefAnswer> refAnswers = new ArrayList<>();
+			JSONArray objectiveAnswers = ques.getJSONArray("objectiveAnswers");
+			for(int i=0;i<objectiveAnswers.size();i++){
+				JSONObject objectiveAnswer = objectiveAnswers.getJSONObject(i);
+				
+				RefAnswer refAnswer = new RefAnswer();
+				if(null != objectiveAnswer.get("quesno")) {
+					refAnswer.setQuesid(quesids.get(objectiveAnswer.getInt("quesno")));
+					refAnswer.setQuesno(objectiveAnswer.getInt("quesno"));
+				}
+				if(null != objectiveAnswer.get("quesno")) {
+					String answer = objectiveAnswer.getString("answer");
+					if(answer.startsWith(",")){
+						answer = answer.substring(1);
+					}
+					refAnswer.setAnswer(answer);
+				}
+				refAnswer.setEgsId(egsId);
+				
+				refAnswers.add(refAnswer);
+			}
+			if(!refAnswers.isEmpty()){
+				refAnswerDaoImpl.insertRefAnswers(refAnswers);
 			}
 			
 			return true;

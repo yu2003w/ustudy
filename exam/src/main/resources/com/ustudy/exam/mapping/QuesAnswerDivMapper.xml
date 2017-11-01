@@ -23,7 +23,7 @@
 		delete FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
 	</delete>
 
-	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" parameterType="java.util.List">
+	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into quesanswerdiv (seqname,branch,score,quesanswerid,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.seqname},#{item.branch},#{item.score},#{item.quesanswerid},#{item.egsId})  

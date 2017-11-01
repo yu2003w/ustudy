@@ -18,7 +18,7 @@
 		delete FROM refanswer where exam_grade_sub_id=#{egsId}
 	</delete>
 
-	<insert id="insertRefAnswers" useGeneratedKeys="true" parameterType="java.util.List">
+	<insert id="insertRefAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into refanswer (quesid,quesno,answer,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.quesid},#{item.quesno},#{item.answer},#{item.egsId})  

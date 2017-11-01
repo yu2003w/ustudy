@@ -25,7 +25,7 @@
 		delete FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</delete>
 
-	<insert id="insertQuesAnswers" useGeneratedKeys="true" parameterType="java.util.List">
+	<insert id="insertQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into quesanswer (quesno,startno,endno,type,branch,choice_num,score,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.branch},#{item.choiceNum},#{item.score},#{item.examGradeSubId})  
