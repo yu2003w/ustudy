@@ -40,6 +40,9 @@ public class MarkTaskBrife implements Serializable {
 	private String quesType = null;
 	
 	private List<QuesMarkSum> summary = null;
+	
+	@JsonProperty("groups")
+	private List<QuestionPaper> papers = null;
 
 	public MarkTaskBrife() {
 		super();
@@ -185,13 +188,21 @@ public class MarkTaskBrife implements Serializable {
 	public void setQuesType(String quesType) {
 		this.quesType = quesType;
 	}
+	
+	public List<QuestionPaper> getPapers() {
+		return papers;
+	}
+
+	public void setPapers(List<QuestionPaper> papers) {
+		this.papers = papers;
+	}
 
 	@Override
 	public String toString() {
 		return "MarkTaskBrife [id=" + id + ", examId=" + examId + ", examName=" + examName + ", teacherId=" + teacherId
 				+ ", teacherName=" + teacherName + ", subject=" + subject + ", grade=" + grade + ", scoreType="
 				+ scoreType + ", progress=" + progress + ", quesno=" + quesno + ", startno=" + startno + ", endno="
-				+ endno + ", quesType=" + quesType + ", summary=" + summary + "]";
+				+ endno + ", quesType=" + quesType + ", summary=" + summary + ", papers=" + papers + "]";
 	}
 	
 

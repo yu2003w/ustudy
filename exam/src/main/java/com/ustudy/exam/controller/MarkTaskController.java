@@ -4,16 +4,19 @@ package com.ustudy.exam.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
+import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
@@ -49,16 +52,16 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value = "/marktask/view/", method = RequestMethod.GET)
-	public List<MarkTask> getTaskPapers(HttpServletResponse resp) {
-		logger.debug("getTaskPapers(), start to retrieving multiple tasks from examination result.");
+	@RequestMapping(value = "/marktask/paper/view/", method = RequestMethod.POST)
+	public MarkTaskBrife getTaskPapers(@RequestBody @Valid QuesComb quesR, HttpServletResponse resp) {
+		logger.debug("getTaskPapers(), start to retrieving student papers per request -> \n" +  quesR);
 		
 		// fetch score task for currently logged in teacher
-		List<MarkTask> st = null;
+		MarkTaskBrife st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getTaskPapers(teacid);
+			st = stS.getTaskPapers(teacid, quesR);
 		} catch (Exception e) {
 			logger.warn("getTaskPapers()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
@@ -72,7 +75,7 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value="/marktask/update/", method = RequestMethod.GET)
+	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.GET)
 	public String updateMarkResult(HttpServletResponse resp) {
 		logger.debug("updateMarkResult(), update mark results");
 		return null;
