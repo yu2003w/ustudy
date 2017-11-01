@@ -23,6 +23,6 @@ public interface ClientService {
 	
 	List<ExamGrade> getExamGrades(String examId, String examStatus);
 	
-	Map<String, List<Exam>> getExams(String examStatus);
+	List<Exam> getExams(String examStatus);
 	
 }

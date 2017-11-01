@@ -220,17 +220,11 @@ public class ClientServiceImpl implements ClientService {
 		return examGrades;
 	}
 	
-	public Map<String, List<Exam>> getExams(String examStatus){
+	public List<Exam> getExams(String examStatus){
 		
 		logger.debug("examStatus: " + examStatus);
 		
-		Map<String, List<Exam>> examGradeResponse = new HashMap<>();
-		
-		List<Exam> list = examDaoImpl.getExamsByStatus(examStatus);
-		
-		examGradeResponse.put("ExamGradeResponse", list);
-		
-		return examGradeResponse;
+		return examDaoImpl.getExamsByStatus(examStatus);
 		
 	}
 	
