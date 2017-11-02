@@ -1,6 +1,7 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class QuesAnswer implements Serializable {
 
@@ -18,6 +19,8 @@ public class QuesAnswer implements Serializable {
 	private String scoreMode;
 	private String teacOwner;
 	private int examGradeSubId;
+	
+	private List<QuesAnswerDiv> child;
 
 	public int getId() {
 		return id;
@@ -113,6 +116,14 @@ public class QuesAnswer implements Serializable {
 
 	public void setExamGradeSubId(int examGradeSubId) {
 		this.examGradeSubId = examGradeSubId;
+	}
+
+	public List<QuesAnswerDiv> getChild() {
+		return child;
+	}
+
+	public void setChild(List<QuesAnswerDiv> child) {
+		this.child = child;
 	}
 
 }

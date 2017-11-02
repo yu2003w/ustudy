@@ -7,10 +7,10 @@ public class QuesAnswerDiv implements Serializable {
 	private static final long serialVersionUID = 6622342777771917094L;
 
 	private int id;
-	private String seqname;
+	private String quesno;
 	private String branch;
 	private int score;
-	private int quesanswerid;
+	private int quesid;
 	private int egsId;
 
 	public int getEgsId() {
@@ -29,12 +29,12 @@ public class QuesAnswerDiv implements Serializable {
 		this.id = id;
 	}
 
-	public String getSeqname() {
-		return seqname;
+	public String getQuesno() {
+		return quesno;
 	}
 
-	public void setSeqname(String seqname) {
-		this.seqname = seqname;
+	public void setQuesno(String quesno) {
+		this.quesno = quesno;
 	}
 
 	public String getBranch() {
@@ -53,12 +53,12 @@ public class QuesAnswerDiv implements Serializable {
 		this.score = score;
 	}
 
-	public int getQuesanswerid() {
-		return quesanswerid;
+	public int getQuesid() {
+		return quesid;
 	}
 
-	public void setQuesanswerid(int quesanswerid) {
-		this.quesanswerid = quesanswerid;
+	public void setQuesid(int quesid) {
+		this.quesid = quesid;
 	}
 
 }

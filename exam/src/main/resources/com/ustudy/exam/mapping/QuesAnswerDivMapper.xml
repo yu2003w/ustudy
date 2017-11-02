@@ -4,10 +4,10 @@
 
 	<resultMap type="com.ustudy.exam.model.QuesAnswerDiv" id="QuesAnswerDivResult">
         <id property="id" column="id"/>
-        <result property="seqname" column="seqname"/>
+        <result property="quesno" column="quesno"/>
         <result property="branch" column="branch"/>
         <result property="score" column="score"/>
-        <result property="quesanswerid" column="quesanswerid"/>
+        <result property="quesid" column="quesid"/>
         <result property="egsId" column="exam_grade_sub_id"/>
     </resultMap>
 
@@ -16,7 +16,7 @@
 	</select>
 	
 	<select id="getQuesAnswerDivs" parameterType="int" resultMap="QuesAnswerDivResult">
-		SELECT * FROM quesanswerdiv where quesanswerid=#{quesId}
+		SELECT * FROM quesanswerdiv where quesid=#{quesId}
 	</select>
 
 	<delete id="deleteQuesAnswerDivs" parameterType="int">
@@ -24,9 +24,9 @@
 	</delete>
 
 	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into quesanswerdiv (seqname,branch,score,quesanswerid,exam_grade_sub_id) values  
+		insert into quesanswerdiv (quesno,branch,score,quesid,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.seqname},#{item.branch},#{item.score},#{item.quesanswerid},#{item.egsId})  
+	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.egsId})  
 	    </foreach>  
 	</insert>
 

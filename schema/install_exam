@@ -11,7 +11,7 @@ id INT NOT NULL AUTO_INCREMENT,
 quesno INT,
 startno INT,
 endno INT, 
-type ENUM('单选题','多选题','判断题','填空题','解答题','证明题') NOT NULL,
+type ENUM('单选题','多选题','判断题','填空题','解答题','证明题','作文题','论述题') NOT NULL,
 branch varchar(16) default '不分科',
 choice_num INT NOT NULL,
 score int NOT NULL,
@@ -33,11 +33,12 @@ FOREIGN KEY (teac_owner)
 # tables for referenced answers
 create table if not exists ustudy.refanswer (
 id INT NOT NULL AUTO_INCREMENT,
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 quesid INT NOT NULL COMMENT 'quesanswer中的记录ID',
 quesno INT NOT NULL COMMENT '题目编号',
+branch varchar(16) DEFAULT '不分科',
 # for multiple choice questions, answer format should be 'A,B,C'
 answer VARCHAR(128),
-exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
 FOREIGN KEY (quesid)

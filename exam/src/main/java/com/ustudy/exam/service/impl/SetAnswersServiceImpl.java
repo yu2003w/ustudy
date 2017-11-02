@@ -43,9 +43,24 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		try {
 			Map<String, Object> result = new HashMap<>();
 			
-			result.put("quesAnswers", quesAnswerDaoImpl.getQuesAnswers(egsId));
-			result.put("quesAnswerDivs", quesAnswerDivDaoImpl.getAllQuesAnswerDivs(egsId));
 			result.put("refAnswers", refAnswerDaoImpl.getRefAnswers(egsId));
+			
+			List<QuesAnswer> quesAnswers = quesAnswerDaoImpl.getQuesAnswers(egsId);
+			List<QuesAnswerDiv> quesAnswerDivs = quesAnswerDivDaoImpl.getAllQuesAnswerDivs(egsId);
+			Map<Integer, List<QuesAnswerDiv>> map = new HashMap<>();
+			for (QuesAnswerDiv quesAnswerDiv : quesAnswerDivs) {
+				List<QuesAnswerDiv> divs = map.get(quesAnswerDiv.getQuesid());
+				if(null == divs){
+					divs = new ArrayList<>();
+				}
+				divs.add(quesAnswerDiv);
+				map.put(quesAnswerDiv.getQuesid(), divs);
+			}
+			for (QuesAnswer quesAnswer : quesAnswers) {
+				quesAnswer.setChild(map.get(quesAnswer.getId()));
+			}
+			
+			result.put("quesAnswers", quesAnswers);
 			
 			return result;
 		} catch (Exception e) {
@@ -98,7 +113,8 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 				quesAnswer.setExamGradeSubId(egsId);
 				
 				quesAnswers.add(quesAnswer);
-			}			
+			}
+			
 			JSONArray subjectives = ques.getJSONArray("subjectives");
 			for(int i=0;i<subjectives.size();i++){
 				JSONObject subjective = subjectives.getJSONObject(i);
@@ -128,11 +144,6 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 					quesids.put(i, quesAnswer.getId());
 				}
 			}
-
-			List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
-			if(!quesAnswerDivs.isEmpty()){
-				quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
-			}
 			
 			List<RefAnswer> refAnswers = new ArrayList<>();
 			JSONArray objectiveAnswers = ques.getJSONArray("objectiveAnswers");
@@ -157,6 +168,32 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			}
 			if(!refAnswers.isEmpty()){
 				refAnswerDaoImpl.insertRefAnswers(refAnswers);
+			}
+
+			List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
+			for(int i=0;i<subjectives.size();i++){
+				JSONObject subjective = subjectives.getJSONObject(i);
+				
+				if(null != subjective.get("child") && !subjective.get("child").equals(null)){
+					JSONArray childs = subjective.getJSONArray("child");
+					for(int j=0; j<childs.size(); j++){
+						JSONObject child = childs.getJSONObject(j);
+						QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+						
+						if(null != child.get("quesno")) quesAnswerDiv.setQuesno(child.getString("quesno"));
+						if(null != child.get("branch")) quesAnswerDiv.setBranch(child.getString("branch"));
+						if(null != child.get("score")) quesAnswerDiv.setScore(child.getInt("score"));
+						if(null != subjective.get("quesno") && null != quesids.get(subjective.getInt("quesno"))) {
+							quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("quesno")));
+						}
+						quesAnswerDiv.setEgsId(egsId);
+						
+						quesAnswerDivs.add(quesAnswerDiv);
+					}
+				}
+			}
+			if(!quesAnswerDivs.isEmpty()){
+				quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
 			}
 			
 			return true;

@@ -4,14 +4,17 @@
 
 	<resultMap type="com.ustudy.exam.model.RefAnswer" id="RefAnswerResult">
         <id property="id" column="id"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
         <result property="quesid" column="quesid"/>
         <result property="quesno" column="quesno"/>
+        <result property="branch" column="branch"/>
         <result property="answer" column="answer"/>
-        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="type" column="type"/>
+        <result property="choiceNum" column="choice_num"/>
     </resultMap>
 
 	<select id="getRefAnswers" parameterType="Integer" resultMap="RefAnswerResult">
-		SELECT * FROM refanswer where exam_grade_sub_id=#{egsId}
+		SELECT r.*, q.type, q.choice_num FROM refanswer r LEFT JOIN quesanswer q ON r.quesid = q.id WHERE r.exam_grade_sub_id = #{egsId} ORDER BY r.quesno
 	</select>
 
 	<delete id="deleteRefAnswers" parameterType="Integer">
