@@ -165,6 +165,15 @@ KEY gradeid (gradeid),
 KEY schid (schid)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
+create table if not exists ustudy.multiple_score_set (
+id int(11) NOT NULL AUTO_INCREMENT,
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
+correct_answer_count smallint(6) DEFAULT NULL COMMENT '正确答案数',
+student_correct_count smallint(6) DEFAULT NULL COMMENT '学生答对数',
+score smallint(255) DEFAULT NULL,
+ PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='多选题答案给分设置';
+
 create table if not exists ustudy.stuanswer (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT NOT NULL,
