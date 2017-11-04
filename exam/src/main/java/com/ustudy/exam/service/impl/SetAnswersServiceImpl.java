@@ -232,7 +232,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 				refAnswer.setQuesid(quesids.get(objectiveAnswer.getInt("quesno")));
 				refAnswer.setQuesno(objectiveAnswer.getInt("quesno"));
 			}
-			if(null != objectiveAnswer.get("quesno")) {
+			if(null != objectiveAnswer.get("answer")) {
 				String answer = objectiveAnswer.getString("answer");
 				if(answer.startsWith(",")){
 					answer = answer.substring(1);
@@ -262,8 +262,8 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 					if(null != child.get("quesno")) quesAnswerDiv.setQuesno(child.getString("quesno"));
 					if(null != child.get("branch")) quesAnswerDiv.setBranch(child.getString("branch"));
 					if(null != child.get("score")) quesAnswerDiv.setScore(child.getInt("score"));
-					if(null != subjective.get("quesno") && null != quesids.get(subjective.getInt("quesno"))) {
-						quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("quesno")));
+					if(null != subjective.get("startno") && null != quesids.get(subjective.getInt("startno"))) {
+						quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("startno")));
 					}
 					quesAnswerDiv.setEgsId(egsId);
 					
