@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.exam.service.SubjectService;
 
 @RestController
-@RequestMapping(value = "/subject")
+@RequestMapping(value = "/")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectController {
 	
@@ -31,7 +31,7 @@ public class SubjectController {
 	 * @param response HttpServletResponse
 	 * @return
 	 */
-	@RequestMapping(value = "/getSubjects", method = RequestMethod.GET)
+	@RequestMapping(value = "/subjects", method = RequestMethod.GET)
 	public Map getSubjects(HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("getSubjects().");

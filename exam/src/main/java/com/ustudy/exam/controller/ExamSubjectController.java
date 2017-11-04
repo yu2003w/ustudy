@@ -17,7 +17,7 @@ import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
 
 @RestController
-@RequestMapping(value = "/examsubject")
+@RequestMapping(value = "/")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExamSubjectController {
 	
@@ -30,7 +30,7 @@ public class ExamSubjectController {
 	 * 获取所有考试科目信息
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects", method = RequestMethod.GET)
+	@RequestMapping(value = "/examsubjects", method = RequestMethod.GET)
 	public Map getAllExamSubject() {
 		
 		logger.debug("getAllExamSubject().");
@@ -48,7 +48,7 @@ public class ExamSubjectController {
 	 * @param examId 考试ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects/{examId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/examsubjects/{examId}", method = RequestMethod.GET)
 	public Map getAllExamSubjectByExamId(@PathVariable String examId) {
 		
 		logger.debug("getAllExamSubjectByExamId().");
@@ -85,7 +85,7 @@ public class ExamSubjectController {
 	 * @param gradeId 年级ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/examsubjects/{examId}/{gradeId}", method = RequestMethod.GET)
 	public Map getAllExamSubjectByExamIdAndGradeId(@PathVariable String examId, @PathVariable String gradeId) {
 		
 		logger.debug("getAllExamSubjectByExamIdAndGradeId().");
@@ -105,7 +105,7 @@ public class ExamSubjectController {
 	 * @param subjectId 科目ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/gxamsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
 	public Map getExamSubjectByExamIdAndGradeIdAndSubjectId(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId) {
 		
 		logger.debug("getExamSubjectByExamIdAndGradeIdAndSubjectId().");
@@ -123,7 +123,7 @@ public class ExamSubjectController {
 	 * @param id 考试科目ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubject/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/examsubject/{id}", method = RequestMethod.GET)
 	public Map getAllExamSubjectById(@PathVariable String id) {
 		
 		logger.debug("getAllExamSubjectById().");
