@@ -11,9 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesAnswerDivDao;
 import com.ustudy.exam.dao.RefAnswerDao;
+import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.QuesAnswerDiv;
 import com.ustudy.exam.model.RefAnswer;
@@ -35,6 +37,9 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 	
 	@Resource
 	private RefAnswerDao refAnswerDaoImpl;
+	
+	@Resource
+	private MultipleScoreSetDao multipleScoreSetDaoImpl;
 
 	public Map<String, Object> getQuesAnswer(int egsId) throws Exception {
 		
@@ -61,6 +66,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			}
 			
 			result.put("quesAnswers", quesAnswers);
+			result.put("checkBoxScores", multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId));
 			
 			return result;
 		} catch (Exception e) {
@@ -79,6 +85,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			quesAnswerDivDaoImpl.deleteQuesAnswerDivs(egsId);
 			quesAnswerDaoImpl.deleteQuesAnswers(egsId);
 			refAnswerDaoImpl.deleteRefAnswers(egsId);
+			multipleScoreSetDaoImpl.deleteMultipleScoreSets(egsId);
 			
 			return true;
 		} catch (Exception e) {
@@ -194,6 +201,33 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			}
 			if(!quesAnswerDivs.isEmpty()){
 				quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
+			}
+			
+			List<MultipleScoreSet> multipleScoreSets = new ArrayList<>();
+			JSONArray checkBoxScores = ques.getJSONArray("checkBoxScores");
+			for(int i=0;i<checkBoxScores.size();i++){
+				JSONObject checkBoxScore = checkBoxScores.getJSONObject(i);
+				if(null != checkBoxScore.get("size") && null != checkBoxScore.get("scores") && !checkBoxScore.get("scores").equals(null)){
+					int correctAnswerCount = checkBoxScore.getInt("size");
+					JSONArray scores = checkBoxScore.getJSONArray("scores");
+					for(int j=0; j<scores.size(); j++){
+						JSONObject score = scores.getJSONObject(j);
+						if(null != score.get("count") && null != score.get("score")){
+							int studentCorrectCount = score.getInt("count");
+							int score_ = score.getInt("score");
+							MultipleScoreSet multipleScoreSet = new MultipleScoreSet();
+							multipleScoreSet.setExamGradeSubId(egsId);
+							multipleScoreSet.setCorrectAnswerCount(correctAnswerCount);
+							multipleScoreSet.setStudentCorrectCount(studentCorrectCount);
+							multipleScoreSet.setScore(score_);
+							
+							multipleScoreSets.add(multipleScoreSet);
+						}
+					}
+				}
+			}
+			if(!multipleScoreSets.isEmpty()){
+				multipleScoreSetDaoImpl.insertMultipleScoreSets(multipleScoreSets);
 			}
 			
 			return true;
