@@ -102,8 +102,8 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			List<MultipleScoreSet> list = scores.get(size);
 			for (MultipleScoreSet multipleScoreSet : list) {
 				JSONObject object_ = new JSONObject();
-				object.put("count", multipleScoreSet.getStudentCorrectCount());
-				object.put("score", multipleScoreSet.getScore());
+				object_.put("count", multipleScoreSet.getStudentCorrectCount());
+				object_.put("score", multipleScoreSet.getScore());
 				
 				scores_.add(object_);
 			}
