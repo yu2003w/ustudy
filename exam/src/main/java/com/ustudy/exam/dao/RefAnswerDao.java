@@ -15,4 +15,6 @@ public interface RefAnswerDao {
 	
 	boolean insertRefAnswers(List<RefAnswer> refAnswers);
 	
+	boolean updateRefAnswer(RefAnswer refAnswer);
+	
 }

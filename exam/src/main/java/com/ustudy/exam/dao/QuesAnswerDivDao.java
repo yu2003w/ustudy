@@ -17,4 +17,6 @@ public interface QuesAnswerDivDao {
 	
 	boolean insertQuesAnswerDivs(List<QuesAnswerDiv> quesAnswerDivs);
 	
+	boolean updateQuesAnswerDiv(QuesAnswerDiv quesAnswerDiv);
+	
 }
