@@ -178,25 +178,28 @@ create table if not exists ustudy.stuanswer (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT NOT NULL,
 paperid INT NOT NULL,
-# for subjective question, this is url for image location
-answerImg VARCHAR(128),
+# for subjective question, this is url for image location, student's answer
+paper_img VARCHAR(128),
 mflag ENUM ('none','excellent','faq','weird', 'problem'),
 isviewed boolean default false,
 score1 INT default 0,
 score2 INT default 0,
 score3 INT default 0,
 # for subjective question, maybe two image layers needed for each teacher
-comment11 VARCHAR(128),
-comment12 VARCHAR(128),
-comment21 VARCHAR(128),
-comment22 VARCHAR(128),
-comment31 VARCHAR(128),
-comment32 VARCHAR(128),
+# this layer includes answer and comments
+answer_img1 VARCHAR(128),
+# this layer includes only comments
+mark_img1 VARCHAR(128),
+answer_img2 VARCHAR(128),
+mark_img2 VARCHAR(128),
+answer_img3 VARCHAR(128),
+mark_img3 VARCHAR(128),
 teacid1 VARCHAR(32),
 teacid2 VARCHAR(32),
 teacid3 VARCHAR(32),
 PRIMARY KEY(id),
 INDEX (quesid, paperid),
+UNIQUE KEY (quesid, paperid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.quesanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -218,10 +221,10 @@ create table if not exists ustudy.stuanswerdiv (
 id INT NOT NULL AUTO_INCREMENT,
 quesno varchar(16) NOT NULL,
 score INT NOT NULL,
-answerid INT NOT NULL,
+answer_id INT NOT NULL,
 PRIMARY KEY (id),
-INDEX(answerid),
-FOREIGN KEY (answerid)
+INDEX(answer_id),
+FOREIGN KEY (answer_id)
     REFERENCES ustudy.stuanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;

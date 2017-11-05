@@ -3,6 +3,7 @@ package com.ustudy.exam.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -30,23 +31,46 @@ public class BlockAnswer implements Serializable {
 	private String paperId = null;
 	private String quesid = null;
 	
-	@JsonProperty("markFlag")
+	@JsonProperty("answerType")
 	private String mflag = null;
-	
-	@JsonProperty("isProblemPaper")
-	private boolean isProbP = false;
 	
 	private int fullscore = 0;
 	// real score for this question block
 	private int score = 0;
 	List<SingleAnswer> steps = null;
 	
-	@JsonProperty("paperImg")
-	private String answerImg = null;
+	private String paperImg = null;
 	
+	private String answerImg = null;
 	private String markImg = null;
 	
+	@JsonIgnore
+	private int score1 = 0;
+	@JsonIgnore
+	private int score2 = 0;
+	@JsonIgnore
+	private int score3 = 0;
+	
+	@JsonIgnore
+	private String answerImg1 = null;
+	@JsonIgnore
+	private String markImg1 = null;
+	@JsonIgnore
+	private String answerImg2 = null;
+	@JsonIgnore
+	private String markImg2 = null;
+	@JsonIgnore
+	private String answerImg3 = null;
+	@JsonIgnore
+	private String markImg3 = null;
 
+	@JsonIgnore
+	private String teacid1 = null;
+	@JsonIgnore
+	private String teacid2 = null;
+	@JsonIgnore
+	private String teacid3 = null;
+	
 	public BlockAnswer() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -66,11 +90,30 @@ public class BlockAnswer implements Serializable {
 		this.score = score;
 	}
 
-	public BlockAnswer(boolean isMarked, String mflag, boolean isProbP, String answerImg, String markImg) {
+	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String markImg,
+			String answerImg1, String markImg1, String answerImg2, String markImg2, String answerImg3,
+			String markImg3) {
 		super();
 		this.isMarked = isMarked;
 		this.mflag = mflag;
-		this.isProbP = isProbP;
+		this.paperImg = paperImg;
+		this.answerImg = answerImg;
+		this.markImg = markImg;
+		this.answerImg1 = answerImg1;
+		this.markImg1 = markImg1;
+		this.answerImg2 = answerImg2;
+		this.markImg2 = markImg2;
+		this.answerImg3 = answerImg3;
+		this.markImg3 = markImg3;
+		this.answerImg = this.answerImg1;
+		this.markImg = this.markImg1;
+	}
+
+	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String markImg) {
+		super();
+		this.isMarked = isMarked;
+		this.mflag = mflag;
+		this.paperImg = paperImg;
 		this.answerImg = answerImg;
 		this.markImg = markImg;
 	}
@@ -162,14 +205,6 @@ public class BlockAnswer implements Serializable {
 		this.paperId = paperId;
 	}
 
-	public boolean isProbP() {
-		return isProbP;
-	}
-
-	public void setProbP(boolean isProbP) {
-		this.isProbP = isProbP;
-	}
-
 	public String getAnswerImg() {
 		return answerImg;
 	}
@@ -186,12 +221,119 @@ public class BlockAnswer implements Serializable {
 		this.markImg = markImg;
 	}
 
+	public String getPaperImg() {
+		return paperImg;
+	}
+
+	public void setPaperImg(String paperImg) {
+		this.paperImg = paperImg;
+	}
+
+	public String getAnswerImg1() {
+		return answerImg1;
+	}
+
+	public void setAnswerImg1(String answerImg1) {
+		this.answerImg1 = answerImg1;
+	}
+
+	public String getMarkImg1() {
+		return markImg1;
+	}
+
+	public void setMarkImg1(String markImg1) {
+		this.markImg1 = markImg1;
+	}
+
+	public String getAnswerImg2() {
+		return answerImg2;
+	}
+
+	public void setAnswerImg2(String answerImg2) {
+		this.answerImg2 = answerImg2;
+	}
+
+	public String getMarkImg2() {
+		return markImg2;
+	}
+
+	public void setMarkImg2(String markImg2) {
+		this.markImg2 = markImg2;
+	}
+
+	public String getAnswerImg3() {
+		return answerImg3;
+	}
+
+	public void setAnswerImg3(String answerImg3) {
+		this.answerImg3 = answerImg3;
+	}
+
+	public String getMarkImg3() {
+		return markImg3;
+	}
+
+	public void setMarkImg3(String markImg3) {
+		this.markImg3 = markImg3;
+	}
+
+	public int getScore1() {
+		return score1;
+	}
+
+	public void setScore1(int score1) {
+		this.score1 = score1;
+	}
+
+	public int getScore2() {
+		return score2;
+	}
+
+	public void setScore2(int score2) {
+		this.score2 = score2;
+	}
+
+	public int getScore3() {
+		return score3;
+	}
+
+	public void setScore3(int score3) {
+		this.score3 = score3;
+	}
+
+	public String getTeacid1() {
+		return teacid1;
+	}
+
+	public void setTeacid1(String teacid1) {
+		this.teacid1 = teacid1;
+	}
+
+	public String getTeacid2() {
+		return teacid2;
+	}
+
+	public void setTeacid2(String teacid2) {
+		this.teacid2 = teacid2;
+	}
+
+	public String getTeacid3() {
+		return teacid3;
+	}
+
+	public void setTeacid3(String teacid3) {
+		this.teacid3 = teacid3;
+	}
+
 	@Override
 	public String toString() {
 		return "BlockAnswer [questionName=" + questionName + ", questionType=" + questionType + ", markMode=" + markMode
 				+ ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid + ", mflag=" + mflag
-				+ ", isProbP=" + isProbP + ", fullscore=" + fullscore + ", score=" + score + ", steps=" + steps
-				+ ", answerImg=" + answerImg + ", markImg=" + markImg + "]";
+				+ ", fullscore=" + fullscore + ", score=" + score + ", steps=" + steps + ", paperImg=" + paperImg
+				+ ", answerImg=" + answerImg + ", markImg=" + markImg + ", score1=" + score1 + ", score2=" + score2
+				+ ", score3=" + score3 + ", answerImg1=" + answerImg1 + ", markImg1=" + markImg1 + ", answerImg2="
+				+ answerImg2 + ", markImg2=" + markImg2 + ", answerImg3=" + answerImg3 + ", markImg3=" + markImg3
+				+ ", teacid1=" + teacid1 + ", teacid2=" + teacid2 + ", teacid3=" + teacid3 + "]";
 	}
 	
 }

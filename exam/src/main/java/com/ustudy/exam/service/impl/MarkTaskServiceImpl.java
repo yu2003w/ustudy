@@ -16,7 +16,6 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
-import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
@@ -137,9 +136,38 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	}
 	
 	@Override
-	public String updateMarkResult(List<MarkTask> papers) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean updateMarkResult(QuestionPaper up) {
+		// here only one student paper need to be handled
+		int pid = up.getPaperSeq();
+		List<BlockAnswer> blocks = up.getBlocks();
+		for (BlockAnswer ba:blocks) {
+			int realScore = 0, num = 0;
+			if (ba.getSteps().isEmpty() == false) {
+				List<SingleAnswer> saL = ba.getSteps();
+				String ansId = scoreTaskM.getStuanswerId(pid, ba.getQuesid());
+				for (SingleAnswer sa:saL) {
+					num = scoreTaskM.insertStuAnswerDiv(sa, ansId);
+					if (num != 1) {
+						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
+					}
+					else
+						realScore += sa.getScore();
+				}
+			}
+			// score, answerType, markImg, and isMarked should be set to true
+			ba.setAnswerImg1(ba.getAnswerImg());
+			ba.setMarkImg1(ba.getMarkImg());
+			ba.setTeacid1(ExamUtil.getCurrentUserId());
+			if (realScore != 0)
+			    ba.setScore(realScore);
+			num = scoreTaskM.updateStuAnswer(ba);
+			if (num != 1) {
+				logger.warn("updateMarkResult(), " + num + " records updated. It seemed something went wrong.");
+			}
+			else
+				logger.debug("updateMarkResult(), updated -> " + ba.toString());
+		}
+		return true;
 	}
 
 }

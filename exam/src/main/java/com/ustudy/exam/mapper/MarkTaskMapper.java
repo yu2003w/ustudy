@@ -2,9 +2,11 @@ package com.ustudy.exam.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.ustudy.exam.model.MetaScoreTask;
 import com.ustudy.exam.model.QuesMarkSum;
@@ -62,8 +64,21 @@ public interface MarkTaskMapper {
 	@Select("select quesno, score as fullscore from quesanswerdiv where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
-	@Select("select isviewed as isMarked, mflag, isviewed as isProbP, answerImg, comment11 as markImg, quesid,"
-			+ " paperid as paperId from ustudy.stuanswer where quesid = #{qid} and paperid = #{pid};")
+	@Select("select isviewed as isMarked, mflag, paper_img as paperImg, answer_img1 as answerImg1, mark_img1 as "
+			+ "markImg1, answer_img2 as answerImg2, mark_img2 as markImg2, answer_img3 as answerImg3, mark_img3 as "
+			+ "markImg3, quesid, paperid as paperId from ustudy.stuanswer where quesid = #{qid} and paperid = #{pid};")
 	public BlockAnswer getStuAnswer(@Param("qid") String quesid, @Param("pid") String pid);
 	
+	
+	@Update("update ustudy.stuanswer set mflag=#{answerType}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
+			+ "isMarked=true, answer_img1=#{answerImg1}, mark_img1=#{markImg1}, answer_img2=#{answerImg2}, "
+			+ "mark_img2=#{markImg2}, answer_img3=#{answerImg3}, mark_img3=#{markImg3}, teacid1=#{teacid1}, "
+			+ "teacid2=#{teacid2}, teacid3=#{teacid3} where id=#{quesid}")
+	public int updateStuAnswer(BlockAnswer ba);
+	
+	@Insert("insert into ustudy.stuanswerdiv(quesno, score, answer_id) values(#{quesno},#{score},#{aid})")
+	public int insertStuAnswerDiv(SingleAnswer sa, @Param("aid") String aid);
+	
+	@Select("select id from ustudy.stuanswer where quesid=#{qid} and paperid=#{pid}")
+	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
 }
