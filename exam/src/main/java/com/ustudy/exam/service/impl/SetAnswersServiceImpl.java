@@ -121,7 +121,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 		try {
 			quesAnswerDivDaoImpl.deleteQuesAnswerDivs(egsId);
-			quesAnswerDaoImpl.deleteQuesAnswers(egsId);
+//			quesAnswerDaoImpl.deleteQuesAnswers(egsId);
 			refAnswerDaoImpl.deleteRefAnswers(egsId);
 			multipleScoreSetDaoImpl.deleteMultipleScoreSets(egsId);
 			
@@ -139,32 +139,13 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		try {
 			deleteQuesAnswers(egsId);
 			
-			List<QuesAnswer> quesAnswers = getRefAnswers(egsId, ques);
-			if(!quesAnswers.isEmpty()){
-				quesAnswerDaoImpl.insertQuesAnswers(quesAnswers);
-			}
+			Map<Integer, Integer> quesids = getRefAnswers(egsId, ques);
 			
-			Map<Integer, Integer> quesids = new HashMap<>();
-			for (QuesAnswer quesAnswer : quesAnswers) {
-				for (int i = quesAnswer.getStartno(); i <= quesAnswer.getEndno(); i++) {
-					quesids.put(i, quesAnswer.getId());
-				}
-			}
-			
-			List<RefAnswer> refAnswers = getQuesAnswers(egsId, ques, quesids);
-			if(!refAnswers.isEmpty()){
-				refAnswerDaoImpl.insertRefAnswers(refAnswers);
-			}
+			getQuesAnswers(egsId, ques, quesids);
 
-			List<QuesAnswerDiv> quesAnswerDivs = getQuesAnswerDivs(egsId, ques, quesids);
-			if(!quesAnswerDivs.isEmpty()){
-				quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
-			}
+			getQuesAnswerDivs(egsId, ques, quesids);
 			
-			List<MultipleScoreSet> multipleScoreSets = getCheckBoxScores(egsId, ques);
-			if(!multipleScoreSets.isEmpty()){
-				multipleScoreSetDaoImpl.insertMultipleScoreSets(multipleScoreSets);
-			}
+			getCheckBoxScores(egsId, ques);
 			
 			return true;
 		} catch (Exception e) {
@@ -175,9 +156,25 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 	
-	private List<QuesAnswer> getRefAnswers(int egsId, JSONObject ques) throws Exception {
+	private Map<Integer, Integer> getAnswerQuesIds(Map<Integer, Integer> quesids, QuesAnswer quesAnswer){
+		
+		if(null == quesids){
+			quesids = new HashMap<>();
+		}
+		
+		for (int i = quesAnswer.getStartno(); i <= quesAnswer.getEndno(); i++) {
+			quesids.put(i, quesAnswer.getId());
+		}
+		
+		return quesids;
+	}
+	
+	private Map<Integer, Integer> getRefAnswers(int egsId, JSONObject ques) throws Exception {
+		
+		Map<Integer, Integer> quesids = new HashMap<>();
 		
 		List<QuesAnswer> quesAnswers = new ArrayList<>();
+		List<Integer> quesAnswerIds = new ArrayList<>();
 		JSONArray objectives = ques.getJSONArray("objectives");
 		for(int i=0;i<objectives.size();i++){
 			JSONObject objective = objectives.getJSONObject(i);
@@ -190,12 +187,16 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			if(null != objective.get("branch")) quesAnswer.setBranch(objective.getString("branch"));
 			if(null != objective.get("choiceNum")) quesAnswer.setChoiceNum(objective.getInt("choiceNum"));
 			if(null != objective.get("score")) quesAnswer.setScore(objective.getInt("score"));
-			if(null != objective.get("assignMode")) quesAnswer.setAssignMode(objective.getString("assignMode"));
-			if(null != objective.get("scoreMode")) quesAnswer.setScoreMode(objective.getString("scoreMode"));				
-			if(null != objective.get("teacOwner")) quesAnswer.setTeacOwner(objective.getString("teacOwner"));
 			quesAnswer.setExamGradeSubId(egsId);
 			
-			quesAnswers.add(quesAnswer);
+			if(null != objective.get("id") && objective.getLong("id")>0){
+				quesAnswer.setId(objective.getInt("id"));
+				quesAnswerDaoImpl.updateQuesAnswer(quesAnswer);
+				quesAnswerIds.add(objective.getInt("id"));
+				quesids = getAnswerQuesIds(quesids, quesAnswer);
+			}else{
+				quesAnswers.add(quesAnswer);
+			}			
 		}
 		
 		JSONArray subjectives = ques.getJSONArray("subjectives");
@@ -210,18 +211,33 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			if(null != subjective.get("branch")) quesAnswer.setBranch(subjective.getString("branch"));
 			if(null != subjective.get("choiceNum")) quesAnswer.setChoiceNum(subjective.getInt("choiceNum"));
 			if(null != subjective.get("score")) quesAnswer.setScore(subjective.getInt("score"));
-			if(null != subjective.get("assignMode")) quesAnswer.setAssignMode(subjective.getString("assignMode"));
-			if(null != subjective.get("scoreMode")) quesAnswer.setScoreMode(subjective.getString("scoreMode"));				
-			if(null != subjective.get("teacOwner")) quesAnswer.setTeacOwner(subjective.getString("teacOwner"));
 			quesAnswer.setExamGradeSubId(egsId);
 			
-			quesAnswers.add(quesAnswer);
+			if(null != subjective.get("id") && subjective.getLong("id")>0){
+				quesAnswer.setId(subjective.getInt("id"));
+				quesAnswerDaoImpl.updateQuesAnswer(quesAnswer);
+				quesAnswerIds.add(subjective.getInt("id"));
+				quesids = getAnswerQuesIds(quesids, quesAnswer);
+			}else{
+				quesAnswers.add(quesAnswer);
+			}			
 		}
 		
-		return quesAnswers;
+		if(!quesAnswerIds.isEmpty()){
+			quesAnswerDaoImpl.deleteQuesAnswerByIds(egsId, quesAnswerIds);
+		}
+		
+		if(!quesAnswers.isEmpty()){
+			quesAnswerDaoImpl.insertQuesAnswers(quesAnswers);
+			for (QuesAnswer quesAnswer : quesAnswers) {
+				quesids = getAnswerQuesIds(quesids, quesAnswer);
+			}
+		}
+		
+		return quesids;
 	}
 	
-	private List<RefAnswer> getQuesAnswers(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
+	private void getQuesAnswers(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
 		List<RefAnswer> refAnswers = new ArrayList<>();
 		JSONArray objectiveAnswers = ques.getJSONArray("objectiveAnswers");
 		for(int i=0;i<objectiveAnswers.size();i++){
@@ -244,10 +260,13 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			refAnswers.add(refAnswer);
 		}
 		
-		return refAnswers;
+		if(!refAnswers.isEmpty()){
+			refAnswerDaoImpl.insertRefAnswers(refAnswers);
+		}
+		
 	}
 	
-	private List<QuesAnswerDiv> getQuesAnswerDivs(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
+	private void getQuesAnswerDivs(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
 		List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
 		JSONArray subjectives = ques.getJSONArray("subjectives");
 		for(int i=0;i<subjectives.size();i++){
@@ -272,10 +291,13 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			}
 		}
 		
-		return quesAnswerDivs;
+		if(!quesAnswerDivs.isEmpty()){
+			quesAnswerDivDaoImpl.insertQuesAnswerDivs(quesAnswerDivs);
+		}
+		
 	}
 	
-	private List<MultipleScoreSet> getCheckBoxScores(int egsId, JSONObject ques) throws Exception {
+	private void getCheckBoxScores(int egsId, JSONObject ques) throws Exception {
 		List<MultipleScoreSet> multipleScoreSets = new ArrayList<>();
 		JSONArray checkBoxScores = ques.getJSONArray("checkBoxScores");
 		for(int i=0;i<checkBoxScores.size();i++){
@@ -299,7 +321,11 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 				}
 			}
 		}
-		return multipleScoreSets;
+		
+		if(!multipleScoreSets.isEmpty()){
+			multipleScoreSetDaoImpl.insertMultipleScoreSets(multipleScoreSets);
+		}
+		
 	}
 
 }

@@ -29,5 +29,9 @@
 	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.egsId})  
 	    </foreach>  
 	</insert>
+	
+	<update id="updateQuesAnswerDiv" parameterType="com.ustudy.exam.model.QuesAnswerDiv">  
+        UPDATE quesanswerdiv set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid} WHERE id=#{id}
+	</update>
 
 </mapper>

@@ -27,5 +27,9 @@
 	        (#{item.quesid},#{item.quesno},#{item.answer},#{item.egsId})  
 	    </foreach>  
 	</insert>
+	
+	<update id="updateRefAnswer" parameterType="com.ustudy.exam.model.RefAnswer">  
+        UPDATE refanswer set quesid=#{quesid}, quesno=#{quesno}, branch=#{branch}, answer=#{answer}, type=#{type}, choice_num=#{choiceNum} WHERE id=#{id}
+	</update>
 
 </mapper>
