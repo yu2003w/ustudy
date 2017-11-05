@@ -84,7 +84,7 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.GET)
+	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
 	public String updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
 		if (up == null) {
 			logger.warn("updateMarkResult(), request parameter is not valid");
