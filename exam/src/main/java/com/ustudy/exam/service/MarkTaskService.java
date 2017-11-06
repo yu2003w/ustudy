@@ -2,9 +2,9 @@ package com.ustudy.exam.service;
 
 import java.util.List;
 
-import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
+import com.ustudy.exam.model.QuestionPaper;
 
 public interface MarkTaskService {
 
@@ -12,5 +12,10 @@ public interface MarkTaskService {
 	
 	public MarkTaskBrife getTaskPapers(String teacid, QuesComb comb);
 	
-	public String updateMarkResult(List<MarkTask> papers);
+	/*
+	 * each time, only one student's paper need to be updated afer mark completed
+	 * 
+	 */
+	public boolean updateMarkResult(QuestionPaper qp);
+	
 }

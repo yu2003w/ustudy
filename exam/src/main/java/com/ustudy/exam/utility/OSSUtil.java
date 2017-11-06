@@ -28,7 +28,7 @@ public class OSSUtil {
      * @return 
      */  
     @SuppressWarnings("restriction")
-	public static void putObject(String bucketName, String key, File file) {
+	public static void putObject(String key, File file) {
     	try {
     		ossClient.putObject(bucketName, key, file);
     	} catch (OSSException oe) {
@@ -48,7 +48,7 @@ public class OSSUtil {
      * @return 
      */  
     @SuppressWarnings("restriction")
-	public static void putObject(String bucketName, String key, InputStream inputStream) {
+	public static void putObject(String key, InputStream inputStream) {
     	try {
     		ossClient.putObject(bucketName, key, inputStream);
     	} catch (OSSException oe) {
