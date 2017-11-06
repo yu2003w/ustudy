@@ -658,7 +658,7 @@ public class ClientApiTest {
 
 			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
 			httpConnection.setDoOutput(true);
-			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestMethod("GET");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
 			
 			if (httpConnection.getResponseCode() != 200) {

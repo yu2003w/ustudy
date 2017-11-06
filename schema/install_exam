@@ -122,8 +122,8 @@ FOREIGN KEY (quesid)
 # tables for student paper
 create table if not exists ustudy.stupaper (
 id int(11) NOT NULL AUTO_INCREMENT,
-stuexamno VARCHAR(20) DEFAULT NULL COMMENT '考号',
-stuno VARCHAR(20) NOT NULL COMMENT '学籍号',
+stuexamno VARCHAR(20) NOT NULL COMMENT '考号',
+stuno VARCHAR(20) DEFAULT NULL COMMENT '学籍号',
 exam_id int(11) NOT NULL,
 grade_id int(11) DEFAULT NULL,
 sub_id int(11) DEFAULT NULL,

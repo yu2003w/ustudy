@@ -17,11 +17,11 @@
         <result property="examGradeSubId" column="exam_grade_sub_id"/>
     </resultMap>
 
-	<select id="getQuesAnswers" parameterType="int" resultMap="QuesAnswerResult">
+	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
 		SELECT * FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</select>
 
-	<delete id="deleteQuesAnswers" parameterType="Integer">
+	<delete id="deleteQuesAnswers" parameterType="Long">
 		delete FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</delete>
 	

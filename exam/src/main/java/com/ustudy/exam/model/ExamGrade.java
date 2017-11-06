@@ -6,15 +6,15 @@ public class ExamGrade implements Serializable {
 
 	private static final long serialVersionUID = -3726305286199495819L;
 	
-	private int gradeId;
+	private Long gradeId;
 	private String gradeName = null;
 	private String gradeClassName = null;
 	
-	public int getGradeId() {
+	public Long getGradeId() {
 		return gradeId;
 	}
 	
-	public void setGradeId(int gradeId) {
+	public void setGradeId(Long gradeId) {
 		this.gradeId = gradeId;
 	}
 	

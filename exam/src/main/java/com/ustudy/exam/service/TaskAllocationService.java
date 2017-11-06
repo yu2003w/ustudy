@@ -5,10 +5,12 @@ import net.sf.json.JSONObject;
 
 public interface TaskAllocationService {
 
-	JSONArray getQuestions(int egsId) throws Exception;
+	JSONArray getQuestions(Long egsId) throws Exception;
 	
-	JSONObject getSchools(int schoolId) throws Exception;
+	JSONArray getQuestions(Long examId, Long gradeId, Long subjectId) throws Exception;
 	
-	JSONObject getGrades(int gradeId) throws Exception;
+	JSONObject getSchools(Long schoolId) throws Exception;
+	
+	JSONObject getGrades(Long gradeId) throws Exception;
 	
 }

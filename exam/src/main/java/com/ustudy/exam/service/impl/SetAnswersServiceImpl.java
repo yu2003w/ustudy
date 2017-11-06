@@ -41,7 +41,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 	@Resource
 	private MultipleScoreSetDao multipleScoreSetDaoImpl;
 
-	public Map<String, Object> getQuesAnswer(int egsId) throws Exception {
+	public Map<String, Object> getQuesAnswer(Long egsId) throws Exception {
 		
 		logger.info("getQuesAnswer -> egsId=" + egsId);
 		
@@ -61,11 +61,11 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 	
-	private List<QuesAnswer> getQuesAnswers(int egsId){
+	private List<QuesAnswer> getQuesAnswers(Long egsId){
 		
 		List<QuesAnswer> quesAnswers = quesAnswerDaoImpl.getQuesAnswers(egsId);
 		List<QuesAnswerDiv> quesAnswerDivs = quesAnswerDivDaoImpl.getAllQuesAnswerDivs(egsId);
-		Map<Integer, List<QuesAnswerDiv>> map = new HashMap<>();
+		Map<Long, List<QuesAnswerDiv>> map = new HashMap<>();
 		for (QuesAnswerDiv quesAnswerDiv : quesAnswerDivs) {
 			List<QuesAnswerDiv> divs = map.get(quesAnswerDiv.getQuesid());
 			if(null == divs){
@@ -81,7 +81,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		return quesAnswers;
 	}
 	
-	private JSONArray getCheckBoxScores(int egsId){
+	private JSONArray getCheckBoxScores(Long egsId){
 		JSONArray checkBoxScores = new JSONArray();
 		List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
 		Map<Integer, List<MultipleScoreSet>> scores = new HashMap<>();			
@@ -115,7 +115,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		return checkBoxScores;
 	}
 
-	public boolean deleteQuesAnswers(int egsId) throws Exception {
+	public boolean deleteQuesAnswers(Long egsId) throws Exception {
 		
 		logger.info("deleteQuesAnswers -> egsId=" + egsId);
 		
@@ -134,12 +134,12 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 
-	public boolean saveQuesAnswers(int egsId, JSONObject ques) throws Exception {
+	public boolean saveQuesAnswers(Long egsId, JSONObject ques) throws Exception {
 		
 		try {
 			deleteQuesAnswers(egsId);
 			
-			Map<Integer, Integer> quesids = getRefAnswers(egsId, ques);
+			Map<Integer, Long> quesids = getRefAnswers(egsId, ques);
 			
 			getQuesAnswers(egsId, ques, quesids);
 
@@ -156,7 +156,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 	
-	private Map<Integer, Integer> getAnswerQuesIds(Map<Integer, Integer> quesids, QuesAnswer quesAnswer){
+	private Map<Integer, Long> getAnswerQuesIds(Map<Integer, Long> quesids, QuesAnswer quesAnswer){
 		
 		if(null == quesids){
 			quesids = new HashMap<>();
@@ -169,9 +169,9 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		return quesids;
 	}
 	
-	private Map<Integer, Integer> getRefAnswers(int egsId, JSONObject ques) throws Exception {
+	private Map<Integer, Long> getRefAnswers(Long egsId, JSONObject ques) throws Exception {
 		
-		Map<Integer, Integer> quesids = new HashMap<>();
+		Map<Integer, Long> quesids = new HashMap<>();
 		
 		List<QuesAnswer> quesAnswers = new ArrayList<>();
 		List<Integer> quesAnswerIds = new ArrayList<>();
@@ -190,7 +190,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			quesAnswer.setExamGradeSubId(egsId);
 			
 			if(null != objective.get("id") && objective.getLong("id")>0){
-				quesAnswer.setId(objective.getInt("id"));
+				quesAnswer.setId(objective.getLong("id"));
 				quesAnswerDaoImpl.updateQuesAnswer(quesAnswer);
 				quesAnswerIds.add(objective.getInt("id"));
 				quesids = getAnswerQuesIds(quesids, quesAnswer);
@@ -214,7 +214,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 			quesAnswer.setExamGradeSubId(egsId);
 			
 			if(null != subjective.get("id") && subjective.getLong("id")>0){
-				quesAnswer.setId(subjective.getInt("id"));
+				quesAnswer.setId(subjective.getLong("id"));
 				quesAnswerDaoImpl.updateQuesAnswer(quesAnswer);
 				quesAnswerIds.add(subjective.getInt("id"));
 				quesids = getAnswerQuesIds(quesids, quesAnswer);
@@ -237,7 +237,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		return quesids;
 	}
 	
-	private void getQuesAnswers(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
+	private void getQuesAnswers(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
 		List<RefAnswer> refAnswers = new ArrayList<>();
 		JSONArray objectiveAnswers = ques.getJSONArray("objectiveAnswers");
 		for(int i=0;i<objectiveAnswers.size();i++){
@@ -266,7 +266,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 	
-	private void getQuesAnswerDivs(int egsId, JSONObject ques, Map<Integer, Integer> quesids) throws Exception {
+	private void getQuesAnswerDivs(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
 		List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
 		JSONArray subjectives = ques.getJSONArray("subjectives");
 		for(int i=0;i<subjectives.size();i++){
@@ -297,7 +297,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 		
 	}
 	
-	private void getCheckBoxScores(int egsId, JSONObject ques) throws Exception {
+	private void getCheckBoxScores(Long egsId, JSONObject ques) throws Exception {
 		List<MultipleScoreSet> multipleScoreSets = new ArrayList<>();
 		JSONArray checkBoxScores = ques.getJSONArray("checkBoxScores");
 		for(int i=0;i<checkBoxScores.size();i++){

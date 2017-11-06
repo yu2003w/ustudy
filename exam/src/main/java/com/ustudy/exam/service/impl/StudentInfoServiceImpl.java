@@ -22,25 +22,25 @@ public class StudentInfoServiceImpl implements StudentInfoService {
 	@Resource
 	private StudentInfoDao daoImpl;
 
-	public List getStudentsInfo(String examId, String gradeId) {
+	public List getStudentsInfo(Long examId, Long gradeId) {
 		logger.debug("getStudentsInfo -> examId:" + examId + ", gradeId:" + gradeId);
 		return new ArrayList<>();
 	}
 
 	@Override
-	public boolean saveStudentsAnswers(String egId, String csId, JSONObject data) {
+	public boolean saveStudentsAnswers(Long egId, Long csId, JSONObject data) {
 		logger.debug("saveStudentsAnswers -> egId:" + egId + ", csId:" + csId + ", data:" + data);
 		return false;
 	}
 
 	@Override
-	public List getAllPaper(String csId) {
+	public List getAllPaper(Long csId) {
 		logger.debug("getAllPaper -> csId:" + csId);
 		return null;
 	}
 
 	@Override
-	public boolean deleteAnswers(String csId, String batchNum) {
+	public boolean deleteAnswers(Long csId, String batchNum) {
 		logger.debug("deleteAnswers -> csId:" + csId + ", batchNum:" + batchNum);
 		return false;
 	}

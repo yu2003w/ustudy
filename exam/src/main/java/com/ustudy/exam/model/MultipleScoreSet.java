@@ -6,25 +6,25 @@ public class MultipleScoreSet implements Serializable {
 
 	private static final long serialVersionUID = -443273934491200663L;
 	
-	private int id;
-	private int examGradeSubId;
+	private Long id;
+	private Long examGradeSubId;
 	private int correctAnswerCount;
 	private int studentCorrectCount;
 	private int score;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
-	public int getExamGradeSubId() {
+	public Long getExamGradeSubId() {
 		return examGradeSubId;
 	}
 	
-	public void setExamGradeSubId(int examGradeSubId) {
+	public void setExamGradeSubId(Long examGradeSubId) {
 		this.examGradeSubId = examGradeSubId;
 	}
 	

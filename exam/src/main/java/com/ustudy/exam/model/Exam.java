@@ -7,7 +7,7 @@ public class Exam implements Serializable {
 
 	private static final long serialVersionUID = -6746378698426998299L;
 	
-	private int id;
+	private Long id;
 	private String examName = null;
 	private Date examDate = null;
 	private String type = null;
@@ -17,7 +17,7 @@ public class Exam implements Serializable {
 		super();
 	}
 
-	public Exam(int id, String examName, Date examDate, String type, String status) {
+	public Exam(Long id, String examName, Date examDate, String type, String status) {
 		super();
 		this.id = id;
 		this.examName = examName;
@@ -26,11 +26,11 @@ public class Exam implements Serializable {
 		this.status = status;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

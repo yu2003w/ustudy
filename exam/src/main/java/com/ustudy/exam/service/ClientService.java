@@ -13,15 +13,15 @@ public interface ClientService {
 	
 	Map<String, Object> login(String token);
 
-	boolean saveTemplates(String csId, JSONObject data);
+	boolean saveTemplates(Long csId, JSONObject data);
 	
-	Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
+	Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId);
 	
-	Map<String, String> getTemplateById(String csId);
+	Map<String, String> getTemplateById(Long csId);
 	
-	List<ExamSubject> getExamSubjects(String examId, String gradeId);
+	List<ExamSubject> getExamSubjects(Long examId, Long gradeId);
 	
-	List<ExamGrade> getExamGrades(String examId, String examStatus);
+	List<ExamGrade> getExamGrades(Long examId, String examStatus);
 	
 	List<Exam> getExams(String examStatus);
 	

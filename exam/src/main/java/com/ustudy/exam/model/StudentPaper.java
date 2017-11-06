@@ -6,71 +6,71 @@ public class StudentPaper implements Serializable {
 
 	private static final long serialVersionUID = -1972317428254370128L;
 	
-	private int id;
-	private int stuNo;
-	private int stuExamNo;
-	private int examId;
-	private int gradeId;
-	private int subjectId;
-	private int egsId;
+	private Long id;
+	private String stuNo;
+	private String stuExamNo;
+	private Long examId;
+	private Long gradeId;
+	private Long subjectId;
+	private Long egsId;
 	private int batchNum;
 	private String paperImg;
 	private String paperStatus;
 	private String errorStatus;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
-	public int getStuNo() {
+	public String getStuNo() {
 		return stuNo;
 	}
 	
-	public void setStuNo(int stuNo) {
+	public void setStuNo(String stuNo) {
 		this.stuNo = stuNo;
 	}
 	
-	public int getStuExamNo() {
+	public String getStuExamNo() {
 		return stuExamNo;
 	}
 	
-	public void setStuExamNo(int stuExamNo) {
+	public void setStuExamNo(String stuExamNo) {
 		this.stuExamNo = stuExamNo;
 	}
 	
-	public int getExamId() {
+	public Long getExamId() {
 		return examId;
 	}
 	
-	public void setExamId(int examId) {
+	public void setExamId(Long examId) {
 		this.examId = examId;
 	}
 	
-	public int getGradeId() {
+	public Long getGradeId() {
 		return gradeId;
 	}
 	
-	public void setGradeId(int gradeId) {
+	public void setGradeId(Long gradeId) {
 		this.gradeId = gradeId;
 	}
 	
-	public int getSubjectId() {
+	public Long getSubjectId() {
 		return subjectId;
 	}
 	
-	public void setSubjectId(int subjectId) {
+	public void setSubjectId(Long subjectId) {
 		this.subjectId = subjectId;
 	}
 	
-	public int getEgsId() {
+	public Long getEgsId() {
 		return egsId;
 	}
 	
-	public void setEgsId(int egsId) {
+	public void setEgsId(Long egsId) {
 		this.egsId = egsId;
 	}
 	

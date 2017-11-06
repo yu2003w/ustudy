@@ -11,15 +11,15 @@
         <result property="egsId" column="exam_grade_sub_id"/>
     </resultMap>
 
-	<select id="getAllQuesAnswerDivs" parameterType="int" resultMap="QuesAnswerDivResult">
+	<select id="getAllQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
 		SELECT * FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
 	</select>
 	
-	<select id="getQuesAnswerDivs" parameterType="int" resultMap="QuesAnswerDivResult">
+	<select id="getQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
 		SELECT * FROM quesanswerdiv where quesid=#{quesId}
 	</select>
 
-	<delete id="deleteQuesAnswerDivs" parameterType="int">
+	<delete id="deleteQuesAnswerDivs" parameterType="Long">
 		delete FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
 	</delete>
 

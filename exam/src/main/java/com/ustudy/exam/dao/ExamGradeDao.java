@@ -10,6 +10,6 @@ import com.ustudy.exam.model.ExamGrade;
 @MapperScan
 public interface ExamGradeDao {
 
-	List<ExamGrade> getExamGrades(@Param("examId") String examId, @Param("status") String status);
+	List<ExamGrade> getExamGrades(@Param("examId") Long examId, @Param("status") String status);
 	
 }

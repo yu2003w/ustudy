@@ -30,7 +30,7 @@ public class SetAnswersController {
 	private SetAnswersService service;
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
-	public Map getQuesAnswers(@PathVariable Integer egsId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getQuesAnswers().");
 		logger.debug("egsId: " + egsId);
@@ -50,7 +50,7 @@ public class SetAnswersController {
 	}
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
-	public Map saveQuesAnswers(@PathVariable Integer egsId, @RequestBody String parameters, HttpServletRequest request,
+	public Map saveQuesAnswers(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		logger.debug("saveQuesAnswers().");

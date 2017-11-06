@@ -142,7 +142,7 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public boolean saveTemplates(String id, JSONObject originalData) {
+	public boolean saveTemplates(Long id, JSONObject originalData) {
 		
 		logger.debug("originalData: " + originalData);
 		String xmlServerPath = "";
@@ -169,7 +169,7 @@ public class ClientServiceImpl implements ClientService {
 		return true;
 	}
 
-	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId){
+	public Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId){
 		
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId );
 		Map<String, String> result = new HashMap<>();
@@ -184,7 +184,7 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public Map<String, String> getTemplateById(String csId){
+	public Map<String, String> getTemplateById(Long csId){
 		
 		logger.debug("csId: " + csId);
 		Map<String, String> result = new HashMap<>();
@@ -203,7 +203,7 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public List<ExamSubject> getExamSubjects(String examId, String gradeId){
+	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId){
 		
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
 		List<ExamSubject> result = examSubjectDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
@@ -211,7 +211,7 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public List<ExamGrade> getExamGrades(String examId, String examStatus){
+	public List<ExamGrade> getExamGrades(Long examId, String examStatus){
 		
 		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
 		

@@ -9,9 +9,9 @@ import com.ustudy.exam.model.MultipleScoreSet;
 @MapperScan
 public interface MultipleScoreSetDao {
 
-	List<MultipleScoreSet> getAllMultipleScoreSets(int egsId);
+	List<MultipleScoreSet> getAllMultipleScoreSets(Long egsId);
 	
-	boolean deleteMultipleScoreSets(int egsId);
+	boolean deleteMultipleScoreSets(Long egsId);
 	
 	boolean insertMultipleScoreSets(List<MultipleScoreSet> multipleScoreSet);
 	

@@ -56,7 +56,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveExamTemplate/{csId}", method = RequestMethod.POST)
-	public Map saveExamTemplate(@PathVariable String csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map saveExamTemplate(@PathVariable Long csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
 		logger.debug("saveTemplate().");
 		logger.debug("csId: " + csId + ",parameters: " + parameters);
@@ -83,7 +83,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamTemplate/{examId}/{gradeId}/{subjectId}", method = RequestMethod.POST)
-	public Map getExamTemplate(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExamTemplate(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId);
@@ -109,7 +109,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamTemplate/{csId}", method = RequestMethod.POST)
-	public Map getExamTemplateByCsid(@PathVariable String csId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExamTemplateByCsid(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");
 		logger.debug("examId: " + csId);
@@ -136,7 +136,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.POST)
-	public Map getExamSubjects(@PathVariable String examId, @PathVariable String gradeId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
@@ -163,7 +163,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getExamGrades/{examId}/{examStatus}", method = RequestMethod.POST)
-	public Map getExamGrades(@PathVariable String examId, @PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExamGrades(@PathVariable Long examId, @PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
 		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
@@ -319,7 +319,7 @@ public class ClientController {
 
 		result = new HashMap<>();
 		
-		if(ess.saveBlankAnswerPaper(data.getString("id"), data.getString("fileName"))){
+		if(ess.saveBlankAnswerPaper(data.getLong("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
 			result.put("success", false);
@@ -349,7 +349,7 @@ public class ClientController {
 		result = new HashMap<>();
 		
 		JSONObject data  = JSONObject.fromObject(parameters);
-		if(ess.saveBlankQuestionsPaper(data.getString("id"), data.getString("fileName"))){
+		if(ess.saveBlankQuestionsPaper(data.getLong("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
 			result.put("success", false);
@@ -378,7 +378,7 @@ public class ClientController {
 		result = new HashMap<>();
 		
 		JSONObject data  = JSONObject.fromObject(parameters);
-		if(ess.saveBlankAnswerPaper(data.getString("id"), data.getString("fileName"))){
+		if(ess.saveBlankAnswerPaper(data.getLong("id"), data.getString("fileName"))){
 			result.put("success", true);
 		} else {
 			result.put("success", false);
@@ -397,7 +397,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getStudentsInfo/{examId}/{gradeId}", method = RequestMethod.POST)
-	public Map getStudentsInfo(@PathVariable Integer examId, @PathVariable Integer gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map getStudentsInfo(@PathVariable Long examId, @PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -423,7 +423,7 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/save/answers/{egId}/{csId}", method = RequestMethod.POST)
-	public Map saveStudentsAnswers(@PathVariable Integer egId, @PathVariable Integer csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map saveStudentsAnswers(@PathVariable Long egId, @PathVariable Long csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -441,7 +441,7 @@ public class ClientController {
 	}
 	
 	@RequestMapping(value = "/save/answers/{csId}", method = RequestMethod.POST)
-	public Map getAllPaper(@PathVariable String csId, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map getAllPaper(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -458,7 +458,7 @@ public class ClientController {
 	}
 	
 	@RequestMapping(value = "/delete/papers/{csId}/{batchNum}", method = RequestMethod.DELETE)
-	public Map deleteStudentsPapers(@PathVariable Integer csId, @PathVariable Integer batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
+	public Map deleteStudentsPapers(@PathVariable Long csId, @PathVariable Integer batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);

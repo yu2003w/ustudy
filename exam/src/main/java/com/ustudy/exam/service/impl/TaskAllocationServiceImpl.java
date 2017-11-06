@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesAnswerDivDao;
@@ -17,36 +18,42 @@ import net.sf.json.JSONObject;
 
 @Service
 public class TaskAllocationServiceImpl implements TaskAllocationService {
-	
+
 	private static final Logger logger = LogManager.getLogger(TaskAllocationServiceImpl.class);
-	
+
 	@Resource
 	private QuesAnswerDao quesAnswerDaoImpl;
-	
+
 	@Resource
 	private QuesAnswerDivDao quesAnswerDivDaoImpl;
-	
+
 	@Resource
 	private RefAnswerDao refAnswerDaoImpl;
+
+	@Resource
+	private ExamSubjectDao examSubjectDaoImpl;
 	
 	@Resource
 	private MultipleScoreSetDao multipleScoreSetDaoImpl;
 
-	@Override
-	public JSONArray getQuestions(int egsId) throws Exception {
+	public JSONArray getQuestions(Long egsId) throws Exception {
 		logger.info("getQuestions -> egsId=" + egsId);
+		examSubjectDaoImpl.getExamSubjectById(egsId);
+		return null;
+	}
+	
+	public JSONArray getQuestions(Long examId, Long gradeId, Long subjectId) throws Exception {
+		logger.info("getQuestions -> examId=" + examId + ",gradeId=" + gradeId + ",subjectId=" + subjectId);
 		return null;
 	}
 
-	@Override
-	public JSONObject getSchools(int schoolId) throws Exception {
+	public JSONObject getSchools(Long schoolId) throws Exception {
 		logger.info("getSchools -> schoolId=" + schoolId);
 		return null;
 	}
 
-	@Override
-	public JSONObject getGrades(int gradeId) throws Exception {
-		// logger.info("getGrades -> gradeId=" + gradeId);
+	public JSONObject getGrades(Long gradeId) throws Exception {
+		logger.info("getGrades -> gradeId=" + gradeId);
 		return null;
 	}
 

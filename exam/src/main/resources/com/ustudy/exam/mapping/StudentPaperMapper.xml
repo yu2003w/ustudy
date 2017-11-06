@@ -4,8 +4,8 @@
 
 	<resultMap type="com.ustudy.exam.model.StudentPaper" id="StudentPaperResult">
         <id property="id" column="id"/>
-        <result property="stuNo" column="student_number"/>
-        <result property="stuExamNo" column="student_exam_number"/>
+        <result property="stuNo" column="stuno"/>
+        <result property="stuExamNo" column="stuexamno"/>
         <result property="examId" column="exam_id"/>
         <result property="gradeId" column="grade_id"/>
         <result property="subjectId" column="sub_id"/>        
@@ -18,7 +18,7 @@
 
 	<!-- 查询得到全部Exam对象 -->
 	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
-		INSERT INTO stupaper (student_number, student_exam_number, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
+		INSERT INTO stupaper (stuno, stuexamno, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
         VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
 	</insert>
 	

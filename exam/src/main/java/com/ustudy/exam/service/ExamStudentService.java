@@ -6,6 +6,6 @@ import com.ustudy.exam.model.ExamStudent;
 
 public interface ExamStudentService {
 
-	List<ExamStudent> getStudentInfoByExamGrade(int examId, int gradeId);
+	List<ExamStudent> getStudentInfoByExamGrade(Long examId, Long gradeId);
 	
 }

@@ -6,26 +6,26 @@ public class QuesAnswerDiv implements Serializable {
 
 	private static final long serialVersionUID = 6622342777771917094L;
 
-	private int id;
+	private Long id;
 	private String quesno;
 	private String branch;
 	private int score;
-	private int quesid;
-	private int egsId;
+	private Long quesid;
+	private Long egsId;
 
-	public int getEgsId() {
+	public Long getEgsId() {
 		return egsId;
 	}
 
-	public void setEgsId(int egsId) {
+	public void setEgsId(Long egsId) {
 		this.egsId = egsId;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -53,11 +53,11 @@ public class QuesAnswerDiv implements Serializable {
 		this.score = score;
 	}
 
-	public int getQuesid() {
+	public Long getQuesid() {
 		return quesid;
 	}
 
-	public void setQuesid(int quesid) {
+	public void setQuesid(Long quesid) {
 		this.quesid = quesid;
 	}
 

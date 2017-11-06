@@ -8,19 +8,19 @@ import net.sf.json.JSONObject;
 
 public interface ExamSubjectService {
 	
-	List<ExamSubject> getAllExamSubject();
+	List<ExamSubject> getExamSubjects();
 	
-	List<ExamSubject> getAllExamSubjectByExam(String examId);
+	List<ExamSubject> getExamSubjects(Long examId);
 	
-	List<ExamSubject> getAllExamSubjectByExamAndGrade(String examId, String gradeId);
+	List<ExamSubject> getExamSubjects(Long examId, Long gradeId);
 	
-	List<ExamSubject> getExamSubjectByExamAndGradeAndSubject(String examId, String gradeId, String subjectId);
+	List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId);
 	
-	ExamSubject getExamSubjectById(String id);
+	ExamSubject getExamSubject(Long id);
 	
-	boolean saveBlankAnswerPaper(String id, String fileName);
+	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
-	boolean saveBlankQuestionsPaper(String id, String fileName);
+	boolean saveBlankQuestionsPaper(Long id, String fileName);
 
 	boolean saveStudentAnswers(JSONObject data);
 }

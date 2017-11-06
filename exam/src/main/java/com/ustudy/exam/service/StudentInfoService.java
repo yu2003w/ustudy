@@ -6,11 +6,11 @@ import net.sf.json.JSONObject;
 
 public interface StudentInfoService {
 	
-	List getStudentsInfo(String examId, String gradeId);
+	List getStudentsInfo(Long examId, Long gradeId);
 	
-	boolean saveStudentsAnswers(String egId, String csId, JSONObject data);
+	boolean saveStudentsAnswers(Long egId, Long csId, JSONObject data);
 	
-	List getAllPaper(String csId);
+	List getAllPaper(Long csId);
 	
-	boolean deleteAnswers(String csId, String batchNum);
+	boolean deleteAnswers(Long csId, String batchNum);
 }

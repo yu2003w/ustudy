@@ -27,7 +27,7 @@ public class TaskAllocationController {
 	private SetAnswersService service;
 
 	@RequestMapping(value = "/questions/{egsId}", method = RequestMethod.GET)
-	public Map getQuestions(@PathVariable Integer egsId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getQuestions(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getQuestions().");
 		logger.debug("egsId: " + egsId);
