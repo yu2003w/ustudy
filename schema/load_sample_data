@@ -68,7 +68,22 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/quesanswer.data' INTO TABLE ustudy.qu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/quesdiv.data' INTO TABLE ustudy.quesanswerdiv
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/teascoretask.data' INTO TABLE ustudy.teacherscoretask
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/stupaper.data' INTO TABLE ustudy.stupaper
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/stuanswer.data' INTO TABLE ustudy.stuanswer
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

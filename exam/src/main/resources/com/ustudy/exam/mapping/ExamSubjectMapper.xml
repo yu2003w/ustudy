@@ -32,7 +32,7 @@
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getAllExamSubjectByExamId" parameterType="string" resultMap="ExamSubjectResult">
+	<select id="getAllExamSubjectByExamId" parameterType="Long" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where examid=#{examId}
 	</select>
 
@@ -47,7 +47,7 @@
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getExamSubjectById" parameterType="string" resultMap="ExamSubjectResult">
+	<select id="getExamSubjectById" parameterType="Long" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where id=#{id}
 	</select>
 

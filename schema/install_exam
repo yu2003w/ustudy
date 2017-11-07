@@ -11,12 +11,12 @@ id INT NOT NULL AUTO_INCREMENT,
 quesno INT,
 startno INT,
 endno INT, 
-type ENUM('单选题','多选题','判断题','填空题','解答题','证明题') NOT NULL,
+type ENUM('单选题','多选题','判断题','填空题','解答题','证明题','作文题','论述题') NOT NULL,
 branch varchar(16) default '不分科',
 choice_num INT NOT NULL,
 score int NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
-score_mode ENUM ('单评', '双评'),
+mark_mode ENUM ('单评', '双评'),
 teac_owner VARCHAR(32),
 exam_grade_sub_id INT NOT NULL,
 INDEX(exam_grade_sub_id, quesno),
@@ -33,11 +33,12 @@ FOREIGN KEY (teac_owner)
 # tables for referenced answers
 create table if not exists ustudy.refanswer (
 id INT NOT NULL AUTO_INCREMENT,
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 quesid INT NOT NULL COMMENT 'quesanswer中的记录ID',
 quesno INT NOT NULL COMMENT '题目编号',
+branch varchar(16) DEFAULT '不分科',
 # for multiple choice questions, answer format should be 'A,B,C'
 answer VARCHAR(128),
-exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
 FOREIGN KEY (quesid)
@@ -73,13 +74,13 @@ FOREIGN KEY (quesid)
 # tables for answer setting with sub questions
 create table if not exists ustudy.quesanswerdiv (
 id INT NOT NULL AUTO_INCREMENT,
-seqname varchar(16) NOT NULL,
+quesno varchar(16) NOT NULL,
 branch varchar(16) default '不分科',
 score INT NOT NULL,
-quesanswerid INT NOT NULL,
+quesid INT NOT NULL,
 exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
-FOREIGN KEY (quesanswerid)
+FOREIGN KEY (quesid)
     REFERENCES ustudy.quesanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
@@ -121,8 +122,8 @@ FOREIGN KEY (quesid)
 # tables for student paper
 create table if not exists ustudy.stupaper (
 id int(11) NOT NULL AUTO_INCREMENT,
-student_exam_number int(11) DEFAULT NULL COMMENT '考号',
-student_number int(11) NOT NULL COMMENT '学籍号',
+stuexamno VARCHAR(20) NOT NULL COMMENT '考号',
+stuno VARCHAR(20) DEFAULT NULL COMMENT '学籍号',
 exam_id int(11) NOT NULL,
 grade_id int(11) DEFAULT NULL,
 sub_id int(11) DEFAULT NULL,
@@ -132,7 +133,7 @@ paper_img varchar(360) DEFAULT NULL COMMENT '试卷图片地址,多个图片用'
 paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常',
 error_status varchar(5) DEFAULT NULL COMMENT '错误代码',
 PRIMARY KEY(id),
-INDEX (student_exam_number, exam_id, exam_grade_sub_id)
+INDEX (stuexamno, exam_id, exam_grade_sub_id)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.stuobjanswer (
@@ -164,42 +165,66 @@ KEY gradeid (gradeid),
 KEY schid (schid)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
+create table if not exists ustudy.multiple_score_set (
+id int(11) NOT NULL AUTO_INCREMENT,
+exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
+correct_answer_count smallint(6) DEFAULT NULL COMMENT '正确答案数',
+student_correct_count smallint(6) DEFAULT NULL COMMENT '学生答对数',
+score smallint(255) DEFAULT NULL,
+ PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='多选题答案给分设置';
+
 create table if not exists ustudy.stuanswer (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT NOT NULL,
 paperid INT NOT NULL,
-# for subjective question, this is url for image location
-answerImg VARCHAR(128),
-score1 INT,
-score2 INT,
-score3 INT,
+# for subjective question, this is url for image location, student's answer
+paper_img VARCHAR(128),
+mflag ENUM ('none','excellent','faq','weird', 'problem'),
+isviewed boolean default false,
+score1 INT default 0,
+score2 INT default 0,
+score3 INT default 0,
 # for subjective question, maybe two image layers needed for each teacher
-comment11 VARCHAR(128),
-comment12 VARCHAR(128),
-comment21 VARCHAR(128),
-comment22 VARCHAR(128),
-comment31 VARCHAR(128),
-comment32 VARCHAR(128),
+# this layer includes answer and comments
+answer_img1 VARCHAR(128),
+# this layer includes only comments
+mark_img1 VARCHAR(128),
+answer_img2 VARCHAR(128),
+mark_img2 VARCHAR(128),
+answer_img3 VARCHAR(128),
+mark_img3 VARCHAR(128),
 teacid1 VARCHAR(32),
 teacid2 VARCHAR(32),
 teacid3 VARCHAR(32),
-mark ENUM ('excellent','faq','weird'),
 PRIMARY KEY(id),
 INDEX (quesid, paperid),
+UNIQUE KEY (quesid, paperid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.quesanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (paperid)
     REFERENCES ustudy.stupaper(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (teacid1)
-    REFERENCES ustudy.teacher(teacid)
-    ON DELETE SET NULL ON UPDATE CASCADE,
-FOREIGN KEY (teacid2)
-    REFERENCES ustudy.teacher(teacid)
-    ON DELETE SET NULL ON UPDATE CASCADE,
-FOREIGN KEY (teacid3)
-    REFERENCES ustudy.teacher(teacid)
-    ON DELETE SET NULL ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
+#FOREIGN KEY (teacid1)
+#    REFERENCES ustudy.teacher(teacid)
+#    ON DELETE SET NULL ON UPDATE CASCADE,
+#FOREIGN KEY (teacid2)
+#    REFERENCES ustudy.teacher(teacid)
+#    ON DELETE SET NULL ON UPDATE CASCADE,
+#FOREIGN KEY (teacid3)
+#    REFERENCES ustudy.teacher(teacid)
+#    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+create table if not exists ustudy.stuanswerdiv (
+id INT NOT NULL AUTO_INCREMENT,
+quesno varchar(16) NOT NULL,
+score INT NOT NULL,
+answer_id INT NOT NULL,
+PRIMARY KEY (id),
+INDEX(answer_id),
+FOREIGN KEY (answer_id)
+    REFERENCES ustudy.stuanswer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;

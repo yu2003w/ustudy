@@ -6,22 +6,22 @@ public class ExamStudent implements Serializable {
 
 	private static final long serialVersionUID = 1545105478018201996L;
 	
-	private int id;
+	private Long id;
 	private String examCode;
-	private int examid;
-	private int schid;
-	private int gradeid;
+	private Long examid;
+	private Long schid;
+	private Long gradeid;
 	private String className;
 	private String name;
 	private String stuno;
 	private int room;
 	private String paperStatus;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
@@ -33,27 +33,27 @@ public class ExamStudent implements Serializable {
 		this.examCode = examCode;
 	}
 	
-	public int getExamid() {
+	public Long getExamid() {
 		return examid;
 	}
 	
-	public void setExamid(int examid) {
+	public void setExamid(Long examid) {
 		this.examid = examid;
 	}
 	
-	public int getSchid() {
+	public Long getSchid() {
 		return schid;
 	}
 	
-	public void setSchid(int schid) {
+	public void setSchid(Long schid) {
 		this.schid = schid;
 	}
 	
-	public int getGradeid() {
+	public Long getGradeid() {
 		return gradeid;
 	}
 	
-	public void setGradeid(int gradeid) {
+	public void setGradeid(Long gradeid) {
 		this.gradeid = gradeid;
 	}
 	

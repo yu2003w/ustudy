@@ -16,7 +16,7 @@ public class ExamStudentServiceImpl implements ExamStudentService {
 	@Resource
 	private ExamStudentDao examStudentDaompl;
 	
-	public List<ExamStudent> getStudentInfoByExamGrade(int examId, int gradeId) {
+	public List<ExamStudent> getStudentInfoByExamGrade(Long examId, Long gradeId) {
 		return examStudentDaompl.getStudentInfoByExamIDAndGradeId(examId, gradeId);
 	}
 

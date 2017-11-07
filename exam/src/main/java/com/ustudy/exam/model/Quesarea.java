@@ -6,7 +6,7 @@ public class Quesarea implements Serializable {
 
 	private static final long serialVersionUID = 6563687105648046566L;
 	
-	private int id ;
+	private Long id ;
 	private int pageno ;
 	private String fileName ;
 	private int areaId ;
@@ -39,11 +39,11 @@ public class Quesarea implements Serializable {
 		this.endQuestionNo = endQuestionNo;
 	}
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	

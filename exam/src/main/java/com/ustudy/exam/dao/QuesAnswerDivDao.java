@@ -9,12 +9,14 @@ import com.ustudy.exam.model.QuesAnswerDiv;
 @MapperScan
 public interface QuesAnswerDivDao {
 
-	List<QuesAnswerDiv> getAllQuesAnswerDivs(int egsId);
+	List<QuesAnswerDiv> getAllQuesAnswerDivs(Long egsId);
 	
-	List<QuesAnswerDiv> getQuesAnswerDivs(int quesId);
+	List<QuesAnswerDiv> getQuesAnswerDivs(Long quesId);
 	
-	boolean deleteQuesAnswerDivs(int egsId);
+	boolean deleteQuesAnswerDivs(Long egsId);
 	
 	boolean insertQuesAnswerDivs(List<QuesAnswerDiv> quesAnswerDivs);
+	
+	boolean updateQuesAnswerDiv(QuesAnswerDiv quesAnswerDiv);
 	
 }

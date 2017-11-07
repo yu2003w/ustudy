@@ -2,6 +2,7 @@ package com.ustudy.exam.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.QuesAnswer;
@@ -9,10 +10,14 @@ import com.ustudy.exam.model.QuesAnswer;
 @MapperScan
 public interface QuesAnswerDao {
 
-	List<QuesAnswer> getQuesAnswers(int egsId);
+	List<QuesAnswer> getQuesAnswers(Long egsId);
 	
-	boolean deleteQuesAnswers(int egsId);
+	boolean deleteQuesAnswers(Long egsId);
+	
+	boolean deleteQuesAnswerByIds(@Param("egsId")Long egsId, @Param("quesAnswerIds")List<Integer> quesAnswerIds);
 	
 	boolean insertQuesAnswers(List<QuesAnswer> quesAnswers);
+	
+	boolean updateQuesAnswer(QuesAnswer quesAnswer);
 	
 }

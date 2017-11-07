@@ -650,7 +650,7 @@ public class ClientApiTest {
 	
 	public static void getStudentsinfo(int egsId) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/setanswers/getAnswers/"+egsId;
+		String targetURL = "http://127.0.0.1:8080/exam/setanswers/answers/"+egsId;
 		
 		try {
 
@@ -658,7 +658,7 @@ public class ClientApiTest {
 
 			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
 			httpConnection.setDoOutput(true);
-			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestMethod("GET");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
 			
 			if (httpConnection.getResponseCode() != 200) {

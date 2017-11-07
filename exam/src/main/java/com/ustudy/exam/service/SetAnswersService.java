@@ -6,10 +6,10 @@ import net.sf.json.JSONObject;
 
 public interface SetAnswersService {
 
-	Map<String, Object> getQuesAnswer(int egsId) throws Exception;
+	Map<String, Object> getQuesAnswer(Long egsId) throws Exception;
 	
-	boolean deleteQuesAnswers(int egsId) throws Exception;
+	boolean deleteQuesAnswers(Long egsId) throws Exception;
 	
-	boolean saveQuesAnswers(int egsId, JSONObject ques) throws Exception;
+	boolean saveQuesAnswers(Long egsId, JSONObject ques) throws Exception;
 	
 }

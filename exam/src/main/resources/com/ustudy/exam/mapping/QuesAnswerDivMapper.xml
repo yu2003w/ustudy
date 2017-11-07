@@ -4,30 +4,34 @@
 
 	<resultMap type="com.ustudy.exam.model.QuesAnswerDiv" id="QuesAnswerDivResult">
         <id property="id" column="id"/>
-        <result property="seqname" column="seqname"/>
+        <result property="quesno" column="quesno"/>
         <result property="branch" column="branch"/>
         <result property="score" column="score"/>
-        <result property="quesanswerid" column="quesanswerid"/>
+        <result property="quesid" column="quesid"/>
         <result property="egsId" column="exam_grade_sub_id"/>
     </resultMap>
 
-	<select id="getAllQuesAnswerDivs" parameterType="int" resultMap="QuesAnswerDivResult">
+	<select id="getAllQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
 		SELECT * FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
 	</select>
 	
-	<select id="getQuesAnswerDivs" parameterType="int" resultMap="QuesAnswerDivResult">
-		SELECT * FROM quesanswerdiv where quesanswerid=#{quesId}
+	<select id="getQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
+		SELECT * FROM quesanswerdiv where quesid=#{quesId}
 	</select>
 
-	<delete id="deleteQuesAnswerDivs" parameterType="int">
+	<delete id="deleteQuesAnswerDivs" parameterType="Long">
 		delete FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
 	</delete>
 
-	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" parameterType="java.util.List">
-		insert into quesanswerdiv (seqname,branch,score,quesanswerid,exam_grade_sub_id) values  
+	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		insert into quesanswerdiv (quesno,branch,score,quesid,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.seqname},#{item.branch},#{item.score},#{item.quesanswerid},#{item.egsId})  
+	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.egsId})  
 	    </foreach>  
 	</insert>
+	
+	<update id="updateQuesAnswerDiv" parameterType="com.ustudy.exam.model.QuesAnswerDiv">  
+        UPDATE quesanswerdiv set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid} WHERE id=#{id}
+	</update>
 
 </mapper>

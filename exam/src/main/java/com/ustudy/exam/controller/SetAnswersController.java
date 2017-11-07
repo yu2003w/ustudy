@@ -29,10 +29,10 @@ public class SetAnswersController {
 	@Autowired
 	private SetAnswersService service;
 
-	@RequestMapping(value = "/getAnswers/{egsId}", method = RequestMethod.POST)
-	public Map getQuesAnswers(@PathVariable Integer egsId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
+	public Map getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getSubjects().");
+		logger.debug("getQuesAnswers().");
 		logger.debug("egsId: " + egsId);
 
 		Map result = new HashMap<>();
@@ -49,12 +49,12 @@ public class SetAnswersController {
 		return result;
 	}
 
-	@RequestMapping(value = "/saveAnswers/{egsId}", method = RequestMethod.POST)
-	public Map saveQuesAnswers(@PathVariable Integer egsId, @RequestBody String parameters, HttpServletRequest request,
+	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
+	public Map saveQuesAnswers(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		logger.debug("getSubjects().");
-		logger.debug("egsId: " + egsId);
+		logger.debug("saveQuesAnswers().");
+		logger.debug("egsId: " + egsId + ",parameters=" + parameters);
 
 		Map result = new HashMap<>();
 

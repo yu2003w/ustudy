@@ -13,6 +13,6 @@ public interface ExamDao {
 	
 	List<Exam> getExamsByStatus(String status);
 	
-	List<Exam> getExamsById(String id);
+	List<Exam> getExamsById(Long id);
 	
 }

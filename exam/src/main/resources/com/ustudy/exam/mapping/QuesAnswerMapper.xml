@@ -12,24 +12,35 @@
         <result property="choiceNum" column="choice_num"/>
         <result property="score" column="score"/>
         <result property="assignMode" column="assign_mode"/>
-        <result property="scoreMode" column="score_mode"/>
+        <result property="scoreMode" column="mark_mode"/>
         <result property="teacOwner" column="teac_owner"/>
         <result property="examGradeSubId" column="exam_grade_sub_id"/>
     </resultMap>
 
-	<select id="getQuesAnswers" parameterType="int" resultMap="QuesAnswerResult">
+	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
 		SELECT * FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</select>
 
-	<delete id="deleteQuesAnswers" parameterType="Integer">
+	<delete id="deleteQuesAnswers" parameterType="Long">
 		delete FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</delete>
+	
+	<delete id="deleteQuesAnswerByIds" parameterType="java.util.Map">
+		delete FROM quesanswer where exam_grade_sub_id=#{egsId} and id not in 
+		<foreach item="item" index="index" collection="quesAnswerIds" open="(" separator="," close=")">  
+		 #{item}  
+		</foreach>
+	</delete>
 
-	<insert id="insertQuesAnswers" useGeneratedKeys="true" parameterType="java.util.List">
+	<insert id="insertQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into quesanswer (quesno,startno,endno,type,branch,choice_num,score,exam_grade_sub_id) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.branch},#{item.choiceNum},#{item.score},#{item.examGradeSubId})  
 	    </foreach>  
 	</insert>
+	
+	<update id="updateQuesAnswer" parameterType="com.ustudy.exam.model.QuesAnswer">  
+        UPDATE quesanswer set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}
+	</update>
 
 </mapper>
