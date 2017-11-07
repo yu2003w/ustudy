@@ -1,9 +1,12 @@
 package com.ustudy.exam.utility;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class Base64Util {
 
@@ -14,8 +17,8 @@ public class Base64Util {
      */  
     @SuppressWarnings("restriction")
 	public static String decode(final String token) {  
-    	return new sun.misc.BASE64Encoder().encode(token.getBytes());    
-    }  
+    	return new String(Base64.getEncoder().encode(token.getBytes()));
+    }
   
     /** 
      * 二进制数据编码为BASE64字符串 
@@ -25,17 +28,17 @@ public class Base64Util {
      * @throws Exception 
      */  
     @SuppressWarnings("restriction")
-    public static String encode(final String token) {  
-    	byte[] bt = null;    
-	   try {    
-		sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();    
-	       bt = decoder.decodeBuffer(token);    
-	   } catch (IOException e) {    
-	       e.printStackTrace();    
-	   }
-	   return new String(bt);
-    }  
-    
+    public static String encode(final String token) {
+        byte[] bt = null;
+        try {
+            Base64.Decoder decoder = Base64.getDecoder();
+            bt = decoder.decode(token);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new String(bt);
+    }
+
     /** 
 	 * md5加密
      * @param password 

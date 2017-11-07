@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class Base64Test {
 
@@ -38,7 +39,7 @@ public class Base64Test {
      * @return 
      */  
     public static String decode(final String token) {  
-    	return new sun.misc.BASE64Encoder().encode(token.getBytes());    
+    	return new String(Base64.getDecoder().decode(token));
     }  
   
     /** 
@@ -51,9 +52,9 @@ public class Base64Test {
     public static String encode(final String token) {  
     	byte[] bt = null;    
 	   try {    
-	       sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();    
-	       bt = decoder.decodeBuffer(token);    
-	   } catch (IOException e) {    
+	       Base64.Decoder decoder = Base64.getDecoder();
+	       bt = decoder.decode(token);
+	   } catch (Exception e) {
 	       e.printStackTrace();    
 	   }
 	   return new String(bt);
