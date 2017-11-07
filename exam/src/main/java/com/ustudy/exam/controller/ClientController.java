@@ -224,7 +224,9 @@ public class ClientController {
 			return result;
 		} else {
 			Teacher teacher = (Teacher)result.get("teacher");
-			result.put("data", teacher.getRole());
+			String[] role = new String[1];
+			role[0] = teacher.getRole();
+			result.put("data", role);
 			result.remove("teacher");
 			return result;
 		}
