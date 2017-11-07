@@ -10,11 +10,11 @@ import com.ustudy.exam.model.QuesAnswer;
 @MapperScan
 public interface QuesAnswerDao {
 
-	List<QuesAnswer> getQuesAnswers(int egsId);
+	List<QuesAnswer> getQuesAnswers(Long egsId);
 	
-	boolean deleteQuesAnswers(int egsId);
+	boolean deleteQuesAnswers(Long egsId);
 	
-	boolean deleteQuesAnswerByIds(@Param("egsId")int egsId, @Param("quesAnswerIds")List<Integer> quesAnswerIds);
+	boolean deleteQuesAnswerByIds(@Param("egsId")Long egsId, @Param("quesAnswerIds")List<Integer> quesAnswerIds);
 	
 	boolean insertQuesAnswers(List<QuesAnswer> quesAnswers);
 	

@@ -9,9 +9,9 @@ import com.ustudy.exam.model.RefAnswer;
 @MapperScan
 public interface RefAnswerDao {
 
-	List<RefAnswer> getRefAnswers(int egsId);
+	List<RefAnswer> getRefAnswers(Long egsId);
 	
-	boolean deleteRefAnswers(int egsId);
+	boolean deleteRefAnswers(Long egsId);
 	
 	boolean insertRefAnswers(List<RefAnswer> refAnswers);
 	

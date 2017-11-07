@@ -74,7 +74,7 @@ public class ExamController {
 	 * @return Map
 	 */
 	@RequestMapping(value = "/exam/{examId}", method = RequestMethod.GET)
-	public Map getExam(@PathVariable String examId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExam(@PathVariable Long examId, HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("getExam().");
 		logger.debug("examId: " + examId);

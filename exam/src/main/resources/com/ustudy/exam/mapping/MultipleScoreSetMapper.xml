@@ -10,11 +10,11 @@
         <result property="score" column="score"/>
     </resultMap>
 
-	<select id="getAllMultipleScoreSets" parameterType="int" resultMap="MultipleScoreSetResult">
+	<select id="getAllMultipleScoreSets" parameterType="Long" resultMap="MultipleScoreSetResult">
 		SELECT * FROM multiple_score_set where exam_grade_sub_id=#{egsId}
 	</select>
 
-	<delete id="deleteMultipleScoreSets" parameterType="int">
+	<delete id="deleteMultipleScoreSets" parameterType="Long">
 		delete FROM multiple_score_set where exam_grade_sub_id=#{egsId}
 	</delete>
 

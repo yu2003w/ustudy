@@ -13,11 +13,11 @@
         <result property="choiceNum" column="choice_num"/>
     </resultMap>
 
-	<select id="getRefAnswers" parameterType="Integer" resultMap="RefAnswerResult">
+	<select id="getRefAnswers" parameterType="Long" resultMap="RefAnswerResult">
 		SELECT r.*, q.type, q.choice_num FROM refanswer r LEFT JOIN quesanswer q ON r.quesid = q.id WHERE r.exam_grade_sub_id = #{egsId} ORDER BY r.quesno
 	</select>
 
-	<delete id="deleteRefAnswers" parameterType="Integer">
+	<delete id="deleteRefAnswers" parameterType="Long">
 		delete FROM refanswer where exam_grade_sub_id=#{egsId}
 	</delete>
 

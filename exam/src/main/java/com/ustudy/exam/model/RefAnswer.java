@@ -6,36 +6,36 @@ public class RefAnswer implements Serializable {
 
 	private static final long serialVersionUID = -7483001885279740033L;
 
-	private int id;
-	private int egsId;
-	private int quesid;
+	private Long id;
+	private Long egsId;
+	private Long quesid;
 	private int quesno;
 	private String branch;
 	private String answer;
 	private String type;
 	private int choiceNum;
 
-	public int getEgsId() {
+	public Long getEgsId() {
 		return egsId;
 	}
 
-	public void setEgsId(int egsId) {
+	public void setEgsId(Long egsId) {
 		this.egsId = egsId;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public int getQuesid() {
+	public Long getQuesid() {
 		return quesid;
 	}
 
-	public void setQuesid(int quesid) {
+	public void setQuesid(Long quesid) {
 		this.quesid = quesid;
 	}
 

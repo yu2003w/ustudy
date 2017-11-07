@@ -26,7 +26,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 	@Resource
 	private StudentObjectAnswerDao answerDaoImpl;
 
-	public boolean saveStudentsAnswers(int examId, int egsId, JSONObject data) {
+	public boolean saveStudentsAnswers(Long examId, Long egsId, JSONObject data) {
 		
 		logger.debug("saveStudentsAnswers -> examId:" + examId + ", egsId:" + egsId + ", data:" + data);
 		
@@ -38,7 +38,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 				paper.setExamId(examId);
 				paper.setEgsId(egsId);
 				if(null != object.get("ESID")){
-					paper.setStuExamNo(object.getInt("ESID"));
+					paper.setStuExamNo(object.getString("ESID"));
 				}
 				if(null != object.get("BatchNum")){
 					paper.setBatchNum(object.getInt("BatchNum"));
@@ -82,7 +82,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 		}
 	}
 	
-	public boolean deletePapers(Integer csId, Integer batchNum){
+	public boolean deletePapers(Long csId, Integer batchNum){
 		answerDaoImpl.deleteStudentObjectAnswers(csId, batchNum);
 		paperDaoImpl.deleteStudentPapers(csId, batchNum);
 		return true;

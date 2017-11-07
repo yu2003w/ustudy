@@ -6,26 +6,26 @@ public class StudentObjectAnswer implements Serializable {
 	
 	private static final long serialVersionUID = -6960129453974134171L;
 	
-	private int id;
-	private int paperid;
+	private Long id;
+	private Long paperid;
 	private int quesno;
 	private int score;
 	private String answer;
 	private int answerHas;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
-	public int getPaperid() {
+	public Long getPaperid() {
 		return paperid;
 	}
 	
-	public void setPaperid(int paperid) {
+	public void setPaperid(Long paperid) {
 		this.paperid = paperid;
 	}
 	

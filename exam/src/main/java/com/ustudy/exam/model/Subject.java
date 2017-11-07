@@ -6,15 +6,15 @@ public class Subject implements Serializable {
 
 	private static final long serialVersionUID = -6746378698426998299L;
 	
-	private int id;
+	private Long id;
 	private String name = null;
 	private String type = null;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

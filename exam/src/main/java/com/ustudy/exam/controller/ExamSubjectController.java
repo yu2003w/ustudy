@@ -31,14 +31,14 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubjects", method = RequestMethod.GET)
-	public Map getAllExamSubject() {
+	public Map getExamSubjects() {
 		
-		logger.debug("getAllExamSubject().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getAllExamSubject());
+		result.put("data", service.getExamSubjects());
 
 		return result;
 	}
@@ -49,15 +49,15 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubjects/{examId}", method = RequestMethod.GET)
-	public Map getAllExamSubjectByExamId(@PathVariable String examId) {
+	public Map getExamSubjects(@PathVariable Long examId) {
 		
-		logger.debug("getAllExamSubjectByExamId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
 		
-		List<ExamSubject> examSubjects = service.getAllExamSubjectByExam(examId);
+		List<ExamSubject> examSubjects = service.getExamSubjects(examId);
 		Map<String, Map<String, Object>> grades = new HashMap<>();
 		for (ExamSubject examSubject : examSubjects) {
 			Map<String, Object> grade = grades.get("" + examSubject.getGradeId());
@@ -86,14 +86,14 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubjects/{examId}/{gradeId}", method = RequestMethod.GET)
-	public Map getAllExamSubjectByExamIdAndGradeId(@PathVariable String examId, @PathVariable String gradeId) {
+	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId) {
 		
-		logger.debug("getAllExamSubjectByExamIdAndGradeId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getAllExamSubjectByExamAndGrade(examId, gradeId));
+		result.put("data", service.getExamSubjects(examId, gradeId));
 
 		return result;
 	}
@@ -106,14 +106,14 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/gxamsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
-	public Map getExamSubjectByExamIdAndGradeIdAndSubjectId(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId) {
+	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId) {
 		
-		logger.debug("getExamSubjectByExamIdAndGradeIdAndSubjectId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjectByExamAndGradeAndSubject(examId, gradeId, subjectId));
+		result.put("data", service.getExamSubjects(examId, gradeId, subjectId));
 
 		return result;
 	}
@@ -124,14 +124,14 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubject/{id}", method = RequestMethod.GET)
-	public Map getAllExamSubjectById(@PathVariable String id) {
+	public Map getExamSubject(@PathVariable Long id) {
 		
-		logger.debug("getAllExamSubjectById().");
+		logger.debug("getExamSubject().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjectById(id));
+		result.put("data", service.getExamSubject(id));
 
 		return result;
 	}

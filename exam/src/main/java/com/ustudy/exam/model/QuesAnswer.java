@@ -7,7 +7,7 @@ public class QuesAnswer implements Serializable {
 
 	private static final long serialVersionUID = -8233762600675469685L;
 
-	private int id;
+	private Long id;
 	private int quesno;
 	private int startno;
 	private int endno;
@@ -18,15 +18,15 @@ public class QuesAnswer implements Serializable {
 	private String assignMode;
 	private String scoreMode;
 	private String teacOwner;
-	private int examGradeSubId;
+	private Long examGradeSubId;
 	
 	private List<QuesAnswerDiv> child;
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -110,11 +110,11 @@ public class QuesAnswer implements Serializable {
 		this.teacOwner = teacOwner;
 	}
 
-	public int getExamGradeSubId() {
+	public Long getExamGradeSubId() {
 		return examGradeSubId;
 	}
 
-	public void setExamGradeSubId(int examGradeSubId) {
+	public void setExamGradeSubId(Long examGradeSubId) {
 		this.examGradeSubId = examGradeSubId;
 	}
 

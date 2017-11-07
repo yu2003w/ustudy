@@ -12,18 +12,18 @@ public interface ExamSubjectDao {
 
 	List<ExamSubject> getAllExamSubject();
 	
-	List<ExamSubject> getAllExamSubjectByExamId(String examId);
+	List<ExamSubject> getAllExamSubjectByExamId(Long examId);
 	
-	List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") String examId, @Param("gradeId") String gradeId);
+	List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") Long examId, @Param("gradeId") Long gradeId);
 	
-	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") String examId, @Param("gradeId") String gradeId, @Param("subjectId") String subjectId);
+	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") Long examId, @Param("gradeId") Long gradeId, @Param("subjectId") Long subjectId);
 	
-	ExamSubject getExamSubjectById(String id);
+	ExamSubject getExamSubjectById(Long id);
 	
-	void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
+	void saveBlankAnswerPaper(@Param("id")Long id, @Param("fileName") String fileName);
 	
-	void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+	void saveBlankQuestionsPaper(@Param("id")Long id, @Param("fileName") String fileName);
 
-	void saveOriginalData(@Param("id")String id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
+	void saveOriginalData(@Param("id")Long id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
 }
