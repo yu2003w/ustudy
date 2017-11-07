@@ -7,6 +7,6 @@ import com.ustudy.exam.model.School;
 @MapperScan
 public interface SchoolDao {
 
-	public School getSchoolById(String schid);
+	School getSchoolById(String schid);
 	
 }

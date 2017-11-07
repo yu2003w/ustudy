@@ -6,10 +6,10 @@ import com.ustudy.exam.model.Exam;
 
 public interface ExamService {
 	
-	public List<Exam> getAllExams();
+	List<Exam> getAllExams();
 	
-	public List<Exam> getExamsByStatus(String status);
+	List<Exam> getExamsByStatus(String status);
 	
-	public List<Exam> getExamsById(String id);
+	List<Exam> getExamsById(String id);
 	
 }

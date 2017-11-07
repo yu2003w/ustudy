@@ -1,0 +1,7 @@
+id,quesno,startno,endno,type,branch,choice_num,score,assign_mode,score_mode,teac_owner,exam_grade_sub_id
+null,0,21,30,填空题,null,0,0,平均,单评,13811341,1
+null,0,31,35,判断题,null,0,0,平均,单评,13811341,1
+null,36,0,0,解答题,null,0,0,平均,单评,13811345,1
+null,37,0,0,解答题,null,0,0,平均,单评,13811345,1
+null,38,0,0,解答题,null,0,0,平均,单评,13811345,1
+null,0,39,40,解答题,null,0,0,平均,单评,13811345,1

@@ -9,6 +9,6 @@ import com.ustudy.exam.model.Subject;
 @MapperScan
 public interface SubjectDao {
 
-	public List<Subject> getAllSubject();
+	List<Subject> getAllSubject();
 	
 }

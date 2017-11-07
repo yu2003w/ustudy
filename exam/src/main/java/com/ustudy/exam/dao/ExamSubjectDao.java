@@ -10,18 +10,20 @@ import com.ustudy.exam.model.ExamSubject;
 @MapperScan
 public interface ExamSubjectDao {
 
-	public List<ExamSubject> getAllExamSubject();
+	List<ExamSubject> getAllExamSubject();
 	
-	public List<ExamSubject> getAllExamSubjectByExamId(String examId);
+	List<ExamSubject> getAllExamSubjectByExamId(String examId);
 	
-	public List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") String examId, @Param("gradeId") String gradeId);
+	List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") String examId, @Param("gradeId") String gradeId);
 	
-	public List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") String examId, @Param("gradeId") String gradeId, @Param("subjectId") String subjectId);
+	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") String examId, @Param("gradeId") String gradeId, @Param("subjectId") String subjectId);
 	
-	public List<ExamSubject> getExamSubjectById(String id);
+	ExamSubject getExamSubjectById(String id);
 	
-	public void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
+	void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
 	
-	public void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+	void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+
+	void saveOriginalData(@Param("id")String id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
 }

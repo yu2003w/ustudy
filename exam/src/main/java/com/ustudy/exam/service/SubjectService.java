@@ -6,6 +6,6 @@ import com.ustudy.exam.model.Subject;
 
 public interface SubjectService {
 	
-	public List<Subject> getAllSubject();
+	List<Subject> getAllSubject();
 	
 }

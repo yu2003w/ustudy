@@ -41,12 +41,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 	}
 	
-	public List<ExamSubject> getExamSubjectById(String id) {
+	public ExamSubject getExamSubjectById(String id) {
 		logger.debug("getExamSubjectById -> id:" + id);
 		return daoImpl.getExamSubjectById(id);
 	}
 
-	@Override
 	public boolean saveBlankAnswerPaper(String id, String fileName) {
 		logger.debug("saveBlankAnswerPaper -> id:" + id + ",fileName:" + fileName);
 		try {
@@ -58,7 +57,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	@Override
 	public boolean saveBlankQuestionsPaper(String id, String fileName) {
 		logger.debug("saveBlankQuestionsPaper -> id:" + id + ",fileName:" + fileName);
 		try {
@@ -70,7 +68,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	@Override
 	public boolean saveStudentAnswers(JSONObject data) {
 		// TODO Auto-generated method stub
 		return false;

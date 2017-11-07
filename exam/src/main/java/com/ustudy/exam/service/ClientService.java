@@ -7,18 +7,22 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
 
+import net.sf.json.JSONObject;
+
 public interface ClientService {
 	
-	public Map<String, Object> login(String token);
+	Map<String, Object> login(String token);
 
-	public boolean saveTemplates(String templates);
+	boolean saveTemplates(String csId, JSONObject data);
 	
-	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
+	Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
 	
-	public List<ExamSubject> getExamSubjects(String examId, String gradeId);
+	Map<String, String> getTemplateById(String csId);
 	
-	public List<ExamGrade> getExamGrades(String examId, String examStatus);
+	List<ExamSubject> getExamSubjects(String examId, String gradeId);
 	
-	public Map<String, List<Exam>> getExams(String examStatus);
+	List<ExamGrade> getExamGrades(String examId, String examStatus);
+	
+	Map<String, List<Exam>> getExams(String examStatus);
 	
 }
