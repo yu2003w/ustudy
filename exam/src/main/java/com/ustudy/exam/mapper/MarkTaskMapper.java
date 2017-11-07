@@ -70,14 +70,14 @@ public interface MarkTaskMapper {
 	public BlockAnswer getStuAnswer(@Param("qid") String quesid, @Param("pid") String pid);
 	
 	
-	@Update("update ustudy.stuanswer set mflag=#{answerType}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
-			+ "isMarked=true, answer_img1=#{answerImg1}, mark_img1=#{markImg1}, answer_img2=#{answerImg2}, "
+	@Update("update ustudy.stuanswer set mflag=#{mflag}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
+			+ "isviewed=true, answer_img1=#{answerImg1}, mark_img1=#{markImg1}, answer_img2=#{answerImg2}, "
 			+ "mark_img2=#{markImg2}, answer_img3=#{answerImg3}, mark_img3=#{markImg3}, teacid1=#{teacid1}, "
 			+ "teacid2=#{teacid2}, teacid3=#{teacid3} where id=#{quesid}")
 	public int updateStuAnswer(BlockAnswer ba);
 	
-	@Insert("insert into ustudy.stuanswerdiv(quesno, score, answer_id) values(#{quesno},#{score},#{aid})")
-	public int insertStuAnswerDiv(SingleAnswer sa, @Param("aid") String aid);
+	@Insert("insert into ustudy.stuanswerdiv(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid})")
+	public int insertStuAnswerDiv(@Param("sa") SingleAnswer sa, @Param("aid") String aid);
 	
 	@Select("select id from ustudy.stuanswer where quesid=#{qid} and paperid=#{pid}")
 	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);

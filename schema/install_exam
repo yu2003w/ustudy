@@ -224,6 +224,7 @@ score INT NOT NULL,
 answer_id INT NOT NULL,
 PRIMARY KEY (id),
 INDEX(answer_id),
+UNIQUE KEY (quesno, answer_id),
 FOREIGN KEY (answer_id)
     REFERENCES ustudy.stuanswer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
