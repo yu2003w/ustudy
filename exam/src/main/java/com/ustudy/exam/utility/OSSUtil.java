@@ -28,17 +28,19 @@ public class OSSUtil {
      * @return 
      */  
     @SuppressWarnings("restriction")
-	public static void putObject(String key, File file) {
+	public static void putObject(String key, File file) throws Exception{
     	try {
     		ossClient.putObject(bucketName, key, file);
     	} catch (OSSException oe) {
     		logger.warn("Caught an OSSException");
     		logger.warn("Error Message: " + oe.getErrorMessage());
     		logger.warn("Error Code: " + oe.getErrorCode());
+    		throw new Exception("can not put object due to oss exception", oe);
     	} catch (ClientException ce) {
     		logger.warn("Caught an ClientException");
     		logger.warn("Error Message: " + ce.getErrorMessage());
     		logger.warn("Error Code: " + ce.getErrorCode());
+    		throw new Exception("can not put object due to client exception", ce);
     	}
     }
 

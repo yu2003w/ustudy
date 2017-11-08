@@ -42,7 +42,10 @@ public class BlockAnswer implements Serializable {
 	private String paperImg = null;
 	
 	private String answerImg = null;
+	private String answerImgData = null;
+	
 	private String markImg = null;
+	private String markImgData = null;
 	
 	@JsonIgnore
 	private int score1 = 0;
@@ -90,14 +93,16 @@ public class BlockAnswer implements Serializable {
 		this.score = score;
 	}
 
-	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String markImg,
-			String answerImg1, String markImg1, String answerImg2, String markImg2, String answerImg3,
+	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String answerImgData, String markImg,
+			String markImgData, String answerImg1, String markImg1, String answerImg2, String markImg2, String answerImg3,
 			String markImg3) {
 		super();
 		this.isMarked = isMarked;
 		this.mflag = mflag;
 		this.paperImg = paperImg;
 		this.answerImg = answerImg;
+		this.answerImgData = answerImgData;
+		this.markImgData = markImgData;
 		this.markImg = markImg;
 		this.answerImg1 = answerImg1;
 		this.markImg1 = markImg1;
@@ -109,13 +114,15 @@ public class BlockAnswer implements Serializable {
 		this.markImg = this.markImg1;
 	}
 
-	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String markImg) {
+	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String answerImgData, String markImg, String markImgData) {
 		super();
 		this.isMarked = isMarked;
 		this.mflag = mflag;
 		this.paperImg = paperImg;
 		this.answerImg = answerImg;
+		this.answerImgData = answerImgData;
 		this.markImg = markImg;
+		this.markImgData = markImgData;
 	}
 
 	public void setMetaInfo(String questionName, String questionType, String markMode, int score) {
@@ -213,12 +220,28 @@ public class BlockAnswer implements Serializable {
 		this.answerImg = answerImg;
 	}
 
+	public String getAnswerImgData() {
+		return answerImgData;
+	}
+
+	public void setAnswerImgData(String answerImgData) {
+		this.answerImgData = answerImgData;
+	}
+
 	public String getMarkImg() {
 		return markImg;
 	}
 
 	public void setMarkImg(String markImg) {
 		this.markImg = markImg;
+	}
+	
+	public String getMarkImgData() {
+		return markImgData;
+	}
+
+	public void setMarkImgData(String markImgData) {
+		this.markImgData = markImgData;
 	}
 
 	public String getPaperImg() {
