@@ -2,6 +2,7 @@ package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.ByteArrayInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,7 @@ import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
+import com.ustudy.exam.utility.OSSUtil;
 
 @Service
 public class MarkTaskServiceImpl implements MarkTaskService {
@@ -154,6 +156,26 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						realScore += sa.getScore();
 				}
 			}
+			
+			String answer = ba.getAnswerImgData();
+			String mark = ba.getMarkImgData();
+			
+			if (answer == "" || mark == "") {
+				return false;
+			}
+			
+			try{
+				String b64AnswerImg = answer.split(",")[1];
+				byte[] answerBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64AnswerImg);
+				OSSUtil.putObject(ba.getAnswerImg(), new ByteArrayInputStream(answerBytes));
+				String b64MarkImg = mark.split(",")[1];
+				byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
+				OSSUtil.putObject(ba.getMarkImg(), new ByteArrayInputStream(markBytes));
+			} catch (Exception e) {
+				logger.error("updateMarkResult(), failed to upload image to oss -> " + e.getMessage());
+				return false;
+			}
+			
 			// score, answerType, markImg, and isMarked should be set to true
 			ba.setAnswerImg1(ba.getAnswerImg());
 			ba.setMarkImg1(ba.getMarkImg());
