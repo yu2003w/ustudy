@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.GradeDao">
+
+	<resultMap type="com.ustudy.exam.model.Grade" id="GradeResult">
+        <id property="id" column="id"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="classesNum" column="classes_num"/>
+        <result property="gradeOwner" column="grade_owner"/>
+        <result property="schid" column="schid"/>
+    </resultMap>
+    
+    <resultMap id="GradesubResult" type="HashMap">  
+	    <result property="id" column="grade_id" />  
+	    <result property="name" column="sub_name" />
+	    <result property="owner" column="sub_owner" />          
+	</resultMap>
+
+	<select id="getGradesBySchoolId" parameterType="String" resultMap="GradeResult">
+		SELECT * from grade where schid=#{schoolId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getGradesubBySchoolId" parameterType="String" resultMap="GradesubResult">
+		SELECT grade_id,sub_name,sub_owner from gradesub where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR})
+	</select>
+
+</mapper>

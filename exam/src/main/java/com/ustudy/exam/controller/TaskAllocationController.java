@@ -66,19 +66,26 @@ public class TaskAllocationController {
 		return result;
 	}
 
-	@RequestMapping(value = "/schools/{schoolId}", method = RequestMethod.POST)
-	public Map getSchools(@PathVariable Integer schoolId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/schools/{schoolId}", method = RequestMethod.GET)
+	public Map getSchools(@PathVariable String schoolId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSchools().");
 		logger.debug("schoolId: " + schoolId);
 
 		Map result = new HashMap<>();
-		result.put("success", true);
+		try {
+			result.put("success", true);
+			result.put("data", service.getSchools(schoolId));
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+			e.printStackTrace();
+		}
 
 		return result;
 	}
 
-	@RequestMapping(value = "/grades/{gradeId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/grades/{gradeId}", method = RequestMethod.GET)
 	public Map getGrades(@PathVariable Integer gradeId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getGrades().");

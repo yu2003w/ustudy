@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.TaskAllocationDao">
+
+	<resultMap id="TeacherResult" type="HashMap">  
+	    <result property="id" column="teacid" />  
+	    <result property="name" column="teacname" />          
+	</resultMap>
+
+	<select id="getTeacherBySchoolIdType" parameterType="java.util.Map" resultMap="TeacherResult">
+		select t.teacid,t.teacname from teacher t left join teacherroles tr on t.teacid=tr.teac_id where t.orgid=#{schoolId} and tr.role_name=#{type,jdbcType=VARCHAR} limit 1 
+	</select>
+	
+	<select id="getTeachersBySchoolId" parameterType="string" resultMap="TeacherResult">
+		select t.teacid,t.teacname from teacher t left join teacherroles tr on t.teacid=tr.teac_id where t.orgid=#{schoolId}
+	</select>
+
+</mapper>

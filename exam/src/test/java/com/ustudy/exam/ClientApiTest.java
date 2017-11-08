@@ -44,10 +44,10 @@ public class ClientApiTest {
 //		System.out.println("--------------------getExams-------------------");
 //		System.out.println();
 //		
-//		login(token);
-//		System.out.println();
-//		System.out.println("--------------------login-------------------");
-//		System.out.println();
+		login(token);
+		System.out.println();
+		System.out.println("--------------------login-------------------");
+		System.out.println();
 //		
 //		getPermissions(token);
 //		System.out.println();
@@ -88,11 +88,11 @@ public class ClientApiTest {
 //		System.out.println();
 //		System.out.println("--------------------getStudentsinfo-------------------");
 //		System.out.println();
-
-		getStudentsinfo(1);
-		System.out.println();
-		System.out.println("--------------------getStudentsinfo-------------------");
-		System.out.println();
+//
+//		getStudentsinfo(1);
+//		System.out.println();
+//		System.out.println("--------------------getStudentsinfo-------------------");
+//		System.out.println();
 	}
 
 	public static void saveTemplates(String token) {
