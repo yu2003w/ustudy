@@ -117,10 +117,10 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/loginId", method = RequestMethod.GET)
-	public Teacher getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
+	public TeacRole getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
 		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
-		Teacher u = null;
+		TeacRole u = null;
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
@@ -133,15 +133,21 @@ public class LoginController {
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;
 		} else {
-			u = userS.findUserById(cUser.getPrincipal().toString());
-			if (u == null) {
-				logger.warn("getLoginUser(), failed to retrieve user information for id " + cUser.getPrincipal());
-				return u;
-			} else {
-				u.setRole(userS.findPriRoleById(u.getUid()));
-			}
+			// at this point, user information could be retrieved from session
+			String uId = cUser.getPrincipal().toString();
+			//Session ses = cUser.getSession();
+			
+			/*
+			u = new Teacher(uId, ses.getAttribute("uname").toString(), 
+					ses.getAttribute("orgtype").toString(), ses.getAttribute("orgid").toString());
+			// need to retrieve roles for the login teacher
+			// u.setRoles(userS.getRolesById(uId));
+			// only retrieve highest priority role for the logined user */
+			
+			u = new TeacRole(uId, userS.findPriRoleById(uId));
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}
+
 	}
 }
