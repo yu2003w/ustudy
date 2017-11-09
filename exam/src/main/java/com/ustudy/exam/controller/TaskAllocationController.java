@@ -66,16 +66,16 @@ public class TaskAllocationController {
 		return result;
 	}
 
-	@RequestMapping(value = "/schools/{schoolId}", method = RequestMethod.GET)
-	public Map getSchools(@PathVariable String schoolId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/school/{schoolId}", method = RequestMethod.GET)
+	public Map getSchool(@PathVariable String schoolId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getSchools().");
+		logger.debug("getSchool().");
 		logger.debug("schoolId: " + schoolId);
 
 		Map result = new HashMap<>();
 		try {
 			result.put("success", true);
-			result.put("data", service.getSchools(schoolId));
+			result.put("data", service.getSchool(schoolId));
 		} catch (Exception e) {
 			result.put("success", false);
 			result.put("message", e.getMessage());
@@ -85,14 +85,21 @@ public class TaskAllocationController {
 		return result;
 	}
 
-	@RequestMapping(value = "/grades/{gradeId}", method = RequestMethod.GET)
-	public Map getGrades(@PathVariable Integer gradeId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/grade/{gradeId}", method = RequestMethod.GET)
+	public Map getGrade(@PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getGrades().");
+		logger.debug("getGrade().");
 		logger.debug("gradeId: " + gradeId);
 
 		Map result = new HashMap<>();
-		result.put("success", true);
+		try {
+			result.put("success", true);
+			result.put("data", service.getGrade(gradeId));
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+			e.printStackTrace();
+		}
 
 		return result;
 	}

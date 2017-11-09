@@ -12,6 +12,12 @@ public interface GradeDao {
 
 	List<Grade> getGradesBySchoolId(String schoolId);
 	
+	Grade getGradeById(Long gradeId);
+	
 	List<Map> getGradesubBySchoolId(String schoolId);
+	
+	List<Map> getGradesubByGradeId(Long gradeId);
+	
+	List<Map> getGradeGroupsByGradeId(Long gradeId);
 	
 }	

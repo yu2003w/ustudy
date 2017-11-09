@@ -20,8 +20,16 @@
 		SELECT * from class where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR})
 	</select>
 	
+	<select id="getClassByGradeId" parameterType="long" resultMap="ClassResult">
+		SELECT * from class where grade_id=#{gradeId}
+	</select>
+	
 	<select id="getClassubBySchoolId" parameterType="String" resultMap="ClassubResult">
 		SELECT cls_id,sub_name,sub_owner from classsub where cls_id in (SELECT id from class where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR}))
+	</select>
+	
+	<select id="getClassubByGradeId" parameterType="long" resultMap="ClassubResult">
+		SELECT cls_id,sub_name,sub_owner from classsub where cls_id in (SELECT id from class where grade_id=#{gradeId})
 	</select>
 
 </mapper>

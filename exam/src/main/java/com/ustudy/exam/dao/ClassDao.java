@@ -11,6 +11,10 @@ public interface ClassDao {
 
 	List<com.ustudy.exam.model.Class> getClassBySchoolId(String schoolId);
 	
+	List<com.ustudy.exam.model.Class> getClassByGradeId(Long gradeId);
+	
 	List<Map> getClassubBySchoolId(String schoolId);
+	
+	List<Map> getClassubByGradeId(Long gradeId);
 	
 }	

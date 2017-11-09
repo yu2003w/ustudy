@@ -9,8 +9,8 @@ public interface TaskAllocationService {
 	
 	JSONArray getQuestions(Long examId, Long gradeId, Long subjectId) throws Exception;
 	
-	JSONObject getSchools(String schoolId) throws Exception;
+	JSONObject getSchool(String schoolId) throws Exception;
 	
-	JSONObject getGrades(Long gradeId) throws Exception;
+	JSONObject getGrade(Long gradeId) throws Exception;
 	
 }
