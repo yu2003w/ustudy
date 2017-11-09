@@ -3,6 +3,8 @@ package com.ustudy.exam.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Teacher implements Serializable {
 
 	/**
@@ -11,11 +13,22 @@ public class Teacher implements Serializable {
 	private static final long serialVersionUID = 6091110002226750766L;
 	
 	private Long id;
+	
+	@JsonProperty("userId")
 	private String uid = null;
+	
+	@JsonProperty("userName")
 	private String uname = null;
+	
+	@JsonProperty("orgType")
 	private String orgtype = null;
+	
+	@JsonProperty("orgId")
 	private String orgid = null;
+	
+	@JsonProperty("orgName")
 	private String orgname = null;
+	
 	private String role = null;
 	private List<String> roles = null;
 	
