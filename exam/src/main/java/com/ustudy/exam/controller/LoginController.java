@@ -117,10 +117,10 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/loginId", method = RequestMethod.GET)
-	public TeacRole getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
+	public Teacher getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
 		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
-		TeacRole u = null;
+		Teacher u = null;
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
@@ -135,16 +135,16 @@ public class LoginController {
 		} else {
 			// at this point, user information could be retrieved from session
 			String uId = cUser.getPrincipal().toString();
-			//Session ses = cUser.getSession();
+			Session ses = cUser.getSession();
 			
-			/*
+			
 			u = new Teacher(uId, ses.getAttribute("uname").toString(), 
 					ses.getAttribute("orgtype").toString(), ses.getAttribute("orgid").toString());
 			// need to retrieve roles for the login teacher
 			// u.setRoles(userS.getRolesById(uId));
-			// only retrieve highest priority role for the logined user */
-			
-			u = new TeacRole(uId, userS.findPriRoleById(uId));
+			// only retrieve highest priority role for the logined user 
+			u.setRole(userS.findPriRoleById(uId));
+//			u = new TeacRole(uId, userS.findPriRoleById(uId));
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}
