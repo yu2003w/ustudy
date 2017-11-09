@@ -10,12 +10,13 @@ public class Teacher implements Serializable {
 	 */
 	private static final long serialVersionUID = 6091110002226750766L;
 	
-	private int id;
+	private Long id;
 	private String uid = null;
 	private String uname = null;
 	private String orgtype = null;
 	private String orgid = null;
 	private String orgname = null;
+	private String role = null;
 	private List<String> roles = null;
 	
 	public Teacher() {
@@ -47,11 +48,11 @@ public class Teacher implements Serializable {
 		this.roles = roles;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -93,6 +94,14 @@ public class Teacher implements Serializable {
 
 	public void setOrgname(String orgname) {
 		this.orgname = orgname;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public List<String> getRoles() {
