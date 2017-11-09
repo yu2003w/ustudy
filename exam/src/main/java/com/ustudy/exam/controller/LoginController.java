@@ -145,9 +145,8 @@ public class LoginController {
 			// only retrieve highest priority role for the logined user 
 			u.setRole(userS.findPriRoleById(uId));
 //			u = new TeacRole(uId, userS.findPriRoleById(uId));
-			//logger.debug("getLoginUser(), " + u.toString());
+			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}
-
 	}
 }
