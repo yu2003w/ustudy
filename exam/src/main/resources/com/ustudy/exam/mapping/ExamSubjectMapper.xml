@@ -41,6 +41,10 @@
 		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
 	</select>
 
+	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where examid=#{examId} AND template=#{templateStatus} AND grade_id=(SELECT id from grade where grade_name=#{gradeName,jdbcType=VARCHAR}) AND exam_answer=#{markingStatus}
+	</select>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId}

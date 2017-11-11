@@ -29,7 +29,7 @@ public class ExamServiceImpl implements ExamService {
 		return examDaoImpl.getExamsByStatus(status);
 	}
 	
-	public List<Exam> getExamsById(Long id){
+	public Exam getExamsById(Long id){
 		logger.debug("getExamsById -> id:" + id);
 		return examDaoImpl.getExamsById(id);
 	}

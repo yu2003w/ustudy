@@ -23,7 +23,7 @@ import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.ExamStudentService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
-import com.ustudy.exam.service.StudentInfoService;
+import com.ustudy.exam.service.StudentPaperService;
 
 import net.sf.json.JSONObject;
 
@@ -41,13 +41,13 @@ public class ClientController {
 	private ExamSubjectService ess;
 	
 	@Autowired
-	private StudentInfoService sis;
-	
-	@Autowired
 	private StudentAnswerService sas;
 	
 	@Autowired
 	private ExamStudentService ests;
+	
+	@Autowired
+	private StudentPaperService sps;
 
 	/**
 	 * 保存模板
@@ -151,6 +151,32 @@ public class ClientController {
 
 		result.put("success", true);
 		result.put("data", cs.getExamSubjects(examId, gradeId));
+
+		return result;
+	}
+	
+	/**
+	 * 获取考试年级科目
+	 * @param EGID 考试ID
+	 * @param GDID 年级ID
+	 * @param resp
+	 * @return
+	 */
+	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeCode}/{markingStatus}", method = RequestMethod.GET)
+	public Map getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Integer gradeCode, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
+
+		logger.debug("getSubject().");
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
+
+		String token = request.getHeader("token");
+		Map result = cs.login(token);
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+
+		result = new HashMap<>();
+		result.put("success", true);
+		result.put("data", cs.getExamSubjectStatus(examId, templateStatus, gradeCode, markingStatus));
 
 		return result;
 	}
@@ -442,8 +468,15 @@ public class ClientController {
 		
 	}
 	
-	@RequestMapping(value = "/save/answers/{csId}", method = RequestMethod.POST)
-	public Map getAllPaper(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse responseonse) {
+	/**
+	 * 获取所有考卷名称
+	 * @param csId
+	 * @param request
+	 * @param responseonse
+	 * @return
+	 */
+	@RequestMapping(value = "/exam/papers/{csId}", method = RequestMethod.GET)
+	public Map getStudentPapers(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -453,7 +486,7 @@ public class ClientController {
 		
 		result = new HashMap<>();
 		result.put("success", true);
-		result.put("data", sis.getAllPaper(csId));
+		result.put("data", sps.getStudentPapers(csId));
 		
 		return result;
 		

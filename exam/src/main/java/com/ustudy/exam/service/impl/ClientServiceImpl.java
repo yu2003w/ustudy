@@ -22,11 +22,13 @@ import com.ustudy.exam.dao.ClientDao;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamGradeDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.GradeDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.dao.SchoolDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
+import com.ustudy.exam.model.Grade;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.model.Teacher;
@@ -58,6 +60,9 @@ public class ClientServiceImpl implements ClientService {
 	private SchoolDao schoolDaoImpl;
 	
 	@Resource
+	private GradeDao gradeDaoImpl;
+	
+	@Resource
 	private QuesareaDao quesareaDaoImpl;
 	
 	@Autowired
@@ -67,7 +72,13 @@ public class ClientServiceImpl implements ClientService {
 		
 		Map<String, Object> result = new HashMap<>();
 		
-		token = Base64Util.encode(token);
+		if(null != token && token.trim().length()>0){
+			token = Base64Util.encode(token);			
+		}else {
+			result.put("success", false);
+			result.put("message", "用户名、密码未提供");
+			return result;
+		}
 		
 		String[] tokens = token.split(":");
 		
@@ -210,6 +221,59 @@ public class ClientServiceImpl implements ClientService {
 		
 		return result;
 	}
+
+	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Integer gradeCode, String markingStatus){
+		
+		JSONArray resault = new JSONArray();
+		
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
+		String gradeName = getGradeName(gradeCode);
+		
+		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectStatus(examId, templateStatus, gradeName, markingStatus);
+		Exam exam = examDaoImpl.getExamsById(examId);
+		List<School> schools = schoolDaoImpl.getSchoolsByExamId(examId);
+		
+		if(null != examSubjects && examSubjects.size()>0 && null != exam && null != schools && schools.size()>0){
+			School school = schools.get(0);
+			String sType = school.getType();
+			
+			for (ExamSubject examSubject : examSubjects) {
+				JSONObject object = new JSONObject();
+				
+				object.put("id", examSubject.getId());
+				object.put("csid", examSubject.getId());
+				object.put("egid", examId);
+				object.put("sType", sType);
+				object.put("gradeCode", examSubject.getGradeId());
+				
+				Grade grade = gradeDaoImpl.getGradeById(examSubject.getGradeId());
+				object.put("classNum", grade.getClassesNum());
+				object.put("gradeName", grade.getGradeName());
+				
+				object.put("subjectID", examSubject.getSubId());
+				object.put("subjectName", examSubject.getSubName());
+				
+				object.put("examName", exam.getExamName());
+				
+				object.put("templatStatus", examSubject.getTemplate());
+				object.put("answerScoreStatus", examSubject.getAnswerSeted());
+				object.put("teachTaskStatus", examSubject.getTaskDispatch());
+				object.put("tcaStatus", examSubject.getExamAnswer());
+				object.put("uploadBathCount", examSubject.getUploadBathCount());
+				
+				JSONObject examGroup = new JSONObject();
+				examGroup.put("id", exam.getId());
+				examGroup.put("egid", exam.getId());
+				examGroup.put("status", exam.getStatus());
+				examGroup.put("examName", exam.getExamName());				
+				object.put("exam_group", examGroup);
+				
+				resault.add(object);
+			}
+		}
+		
+		return resault;
+	}
 	
 	public List<ExamGrade> getExamGrades(Long examId, String examStatus){
 		
@@ -226,6 +290,52 @@ public class ClientServiceImpl implements ClientService {
 		
 		return examDaoImpl.getExamsByStatus(examStatus);
 		
+	}
+	
+	private String getGradeName(Integer gradeCode){
+		String gradeName = "";
+		switch (gradeCode) {
+		case 1:
+			gradeName = "一年级";
+			break;
+		case 2:
+			gradeName = "二年级";
+			break;
+		case 3:
+			gradeName = "三年级";
+			break;
+		case 4:
+			gradeName = "四年级";
+			break;
+		case 5:
+			gradeName = "五年级";
+			break;
+		case 6:
+			gradeName = "六年级";
+			break;
+		case 7:
+			gradeName = "七年级";
+			break;
+		case 8:
+			gradeName = "八年级";
+			break;
+		case 9:
+			gradeName = "九年级";
+			break;
+		case 10:
+			gradeName = "高一";
+			break;
+		case 11:
+			gradeName = "高二";
+			break;
+		case 12:
+			gradeName = "高三";
+			break;
+		default:
+			break;
+		}
+		
+		return gradeName;
 	}
 	
 }

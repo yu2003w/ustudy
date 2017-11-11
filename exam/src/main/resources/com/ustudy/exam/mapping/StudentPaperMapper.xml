@@ -14,7 +14,11 @@
         <result property="paperImg" column="paper_img"/>
         <result property="paperStatus" column="paper_status"/>
         <result property="errorStatus" column="error_status"/>
-    </resultMap>
+    </resultMap>    
+
+	<select id="getStudentPapers" parameterType="long" resultMap="StudentPaperResult">
+		SELECT * from stupaper where exam_grade_sub_id=#{csId}
+	</select>
 
 	<!-- 查询得到全部Exam对象 -->
 	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
