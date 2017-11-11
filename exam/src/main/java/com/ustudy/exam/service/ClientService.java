@@ -7,6 +7,7 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public interface ClientService {
@@ -20,6 +21,8 @@ public interface ClientService {
 	Map<String, String> getTemplateById(Long csId);
 	
 	List<ExamSubject> getExamSubjects(Long examId, Long gradeId);
+	
+	JSONArray getExamSubjectStatus(Long examId, String templateStatus, Integer gradeCode, String markingStatus);
 	
 	List<ExamGrade> getExamGrades(Long examId, String examStatus);
 	

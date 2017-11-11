@@ -10,6 +10,6 @@ public interface ExamService {
 	
 	List<Exam> getExamsByStatus(String status);
 	
-	List<Exam> getExamsById(Long id);
+	Exam getExamsById(Long id);
 	
 }

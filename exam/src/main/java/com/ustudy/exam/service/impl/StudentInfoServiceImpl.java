@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ustudy.exam.dao.StudentInfoDao;
 import com.ustudy.exam.service.StudentInfoService;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Service
@@ -34,8 +35,8 @@ public class StudentInfoServiceImpl implements StudentInfoService {
 	}
 
 	@Override
-	public List getAllPaper(Long csId) {
-		logger.debug("getAllPaper -> csId:" + csId);
+	public JSONArray getStudentPapers(Long csId) {
+		logger.debug("getStudentPapers -> csId:" + csId);
 		return null;
 	}
 
