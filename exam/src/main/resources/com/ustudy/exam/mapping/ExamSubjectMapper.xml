@@ -42,7 +42,12 @@
 	</select>
 
 	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} AND template=#{templateStatus} AND grade_id=(SELECT id from grade where grade_name=#{gradeName,jdbcType=VARCHAR}) AND exam_answer=#{markingStatus}
+		SELECT * FROM examgradesub where examid=#{examId} AND grade_id=#{gradeId} AND exam_answer=#{markingStatus}
+		<choose>
+			<when test="templateStatus !=null and templateStatus != '-1'">
+			 AND template=#{templateStatus}
+			</when>
+		</choose>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->

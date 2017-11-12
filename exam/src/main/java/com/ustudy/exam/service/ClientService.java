@@ -24,7 +24,7 @@ public interface ClientService {
 	
 	List<ExamSubject> getExamSubjects(Long examId, Long gradeId);
 	
-	JSONArray getExamSubjectStatus(Long examId, String templateStatus, Integer gradeCode, String markingStatus);
+	JSONArray getExamSubjectStatus(Long examId, String templateStatus, Long gradeId, String markingStatus);
 	
 	List<ExamGrade> getExamGrades(Long examId, String examStatus);
 	

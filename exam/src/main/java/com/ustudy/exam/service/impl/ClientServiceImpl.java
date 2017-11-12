@@ -231,14 +231,13 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Integer gradeCode, String markingStatus){
+	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Long gradeId, String markingStatus){
 		
 		JSONArray resault = new JSONArray();
 		
-		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
-		String gradeName = getGradeName(gradeCode);
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus);
 		
-		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectStatus(examId, templateStatus, gradeName, markingStatus);
+		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectStatus(examId, templateStatus, gradeId, markingStatus);
 		Exam exam = examDaoImpl.getExamsById(examId);
 		List<School> schools = schoolDaoImpl.getSchoolsByExamId(examId);
 		
@@ -299,52 +298,6 @@ public class ClientServiceImpl implements ClientService {
 		
 		return examDaoImpl.getExamsByStatus(examStatus);
 		
-	}
-	
-	private String getGradeName(Integer gradeCode){
-		String gradeName = "";
-		switch (gradeCode) {
-		case 1:
-			gradeName = "一年级";
-			break;
-		case 2:
-			gradeName = "二年级";
-			break;
-		case 3:
-			gradeName = "三年级";
-			break;
-		case 4:
-			gradeName = "四年级";
-			break;
-		case 5:
-			gradeName = "五年级";
-			break;
-		case 6:
-			gradeName = "六年级";
-			break;
-		case 7:
-			gradeName = "七年级";
-			break;
-		case 8:
-			gradeName = "八年级";
-			break;
-		case 9:
-			gradeName = "九年级";
-			break;
-		case 10:
-			gradeName = "高一";
-			break;
-		case 11:
-			gradeName = "高二";
-			break;
-		case 12:
-			gradeName = "高三";
-			break;
-		default:
-			break;
-		}
-		
-		return gradeName;
 	}
 
 	public boolean addLog(HttpServletRequest request, String logs) throws Exception {

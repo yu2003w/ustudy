@@ -163,11 +163,11 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeCode}/{markingStatus}", method = RequestMethod.GET)
-	public Map getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Integer gradeCode, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeId}/{markingStatus}", method = RequestMethod.GET)
+	public Map getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Long gradeId, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
-		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus);
 
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -177,7 +177,7 @@ public class ClientController {
 
 		result = new HashMap<>();
 		result.put("success", true);
-		result.put("data", cs.getExamSubjectStatus(examId, templateStatus, gradeCode, markingStatus));
+		result.put("data", cs.getExamSubjectStatus(examId, templateStatus, gradeId, markingStatus));
 
 		return result;
 	}
