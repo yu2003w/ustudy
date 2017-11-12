@@ -21,6 +21,16 @@ public class QuesAnswer implements Serializable {
 	private Long examGradeSubId;
 	
 	private List<QuesAnswerDiv> child;
+	
+	public QuesAnswer(){}
+	
+	public QuesAnswer(int quesno,int startno,int endno,String type,Long examGradeSubId) {
+		this.quesno = quesno;
+		this.startno = startno;
+		this.endno = endno;
+		this.type = type;
+		this.examGradeSubId = examGradeSubId;
+	}
 
 	public Long getId() {
 		return id;

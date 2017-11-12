@@ -18,6 +18,8 @@ public interface QuesAnswerDao {
 	
 	boolean insertQuesAnswers(List<QuesAnswer> quesAnswers);
 	
+	boolean initQuesAnswers(List<QuesAnswer> quesAnswers);
+	
 	boolean updateQuesAnswer(QuesAnswer quesAnswer);
 	
 }

@@ -68,9 +68,8 @@ public class ClientController {
 			return result;
 		}
 		
-		JSONObject data  = JSONObject.fromObject(parameters);
 		result = new HashMap<>();
-		result.put("success", cs.saveTemplates(csId, data));
+		result.put("success", cs.saveTemplates(csId, parameters));
 
 		return result;
 	}
@@ -560,6 +559,23 @@ public class ClientController {
 			logger.error(e.getMessage());
 			result.put("message", e.getMessage());
 		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/question/type", method = RequestMethod.GET)
+	public Map getQuestionType(HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		String token = request.getHeader("token");
+		Map result = cs.login(token);
+		if(!(boolean)result.get("success")){
+			return result;
+		}
+		
+		result = new HashMap<>();
+		result.put("success", true);
+		result.put("data", cs.getQuestionType());
 		
 		return result;
 		

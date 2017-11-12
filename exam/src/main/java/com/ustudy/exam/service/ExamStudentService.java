@@ -1,11 +1,9 @@
 package com.ustudy.exam.service;
 
-import java.util.List;
-
-import com.ustudy.exam.model.ExamStudent;
+import net.sf.json.JSONArray;
 
 public interface ExamStudentService {
 
-	List<ExamStudent> getStudentInfoByExamGrade(Long examId, Long gradeId);
+	JSONArray getStudentInfoByExamGrade(Long examId, Long gradeId);
 	
 }

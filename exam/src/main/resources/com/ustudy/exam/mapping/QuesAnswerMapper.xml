@@ -38,6 +38,13 @@
 	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.branch},#{item.choiceNum},#{item.score},#{item.examGradeSubId})  
 	    </foreach>  
 	</insert>
+
+	<insert id="initQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		insert into quesanswer (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})  
+	    </foreach>  
+	</insert>
 	
 	<update id="updateQuesAnswer" parameterType="com.ustudy.exam.model.QuesAnswer">  
         UPDATE quesanswer set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}

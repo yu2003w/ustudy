@@ -31,12 +31,14 @@ import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamGradeDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.GradeDao;
+import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.dao.SchoolDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.Grade;
+import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.model.Teacher;
@@ -76,6 +78,9 @@ public class ClientServiceImpl implements ClientService {
 	
 	@Autowired
 	private TeacherService teacherService;
+	
+	@Autowired
+	private QuesAnswerDao quesAnswerDaoImpl;
 	
 	public Map<String, Object> login(String token){
 		
@@ -162,31 +167,202 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public boolean saveTemplates(Long id, JSONObject originalData) {
+	public boolean saveTemplates(Long id, String data) {
 		
+		JSONObject originalData = JSONObject.fromObject(data);
 		logger.debug("originalData: " + originalData);
 		String xmlServerPath = "";
 		if(null != originalData.get("xmlServerPath")){
 			xmlServerPath = originalData.getString("xmlServerPath");
 		}
-		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, originalData.toString());
+		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, data.toString());
+		Map<String, Long> quesAnswersId = getQuesAnswer(originalData);
+		saveQuesareas(quesAnswersId, originalData);
+		return true;
+	}
+	
+	private Map<String, Long> getQuesAnswer(JSONObject originalData){
 		
-		JSONArray pages = originalData.getJSONArray("Page");
-		for (int i=0;i< pages.size();i++) {
-			JSONObject page = pages.getJSONObject(i);
-			JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
-			for (int j=0;j< subjectives.size();j++) {
-				JSONObject subjective = subjectives.getJSONObject(j);
-				JSONArray regions = subjective.getJSONArray("regionList");
-				for (int k=0;k< regions.size();k++) {
-					JSONObject region = regions.getJSONObject(j);
-					quesareaDaoImpl.insertQuesarea(new Quesarea(page.getInt("pageIndex"), page.getString("fileName"), subjective.getInt("AreaID"), region.getInt("x"), region.getInt("y"), region.getInt("width"), region.getInt("height"), region.getInt("bottom"), region.getInt("right"), subjective.getString("TopicType"), subjective.getInt("StartQid"), subjective.getInt("EndQid")));
+		List<QuesAnswer> quesAnswers = new ArrayList<>();
+		
+		if(null != originalData.get("TemplateInfo") && null != originalData.get("CSID") ){
+			Long examGradeSubId = originalData.getLong("CSID");
+			JSONObject templateInfo = originalData.getJSONObject("TemplateInfo");
+			if(null != templateInfo.get("pages")){
+				JSONArray pages = templateInfo.getJSONArray("pages");
+				for (int i=0; i<pages.size(); i++) {
+					JSONObject page = pages.getJSONObject(i);
+					if(null != page.get("OmrSubjectiveList")){
+						JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
+						for (int j=0; j<subjectives.size(); j++) {
+							JSONObject subjective = subjectives.getJSONObject(j);
+							
+							String type = null;
+							int startno = 1;
+							int endno = 1;
+							int quesno = 0;
+							if(null != subjective.get("TopicType")){
+								type = subjective.getString("TopicType");
+							}
+							if(null != subjective.get("StartQid")){
+								startno = subjective.getInt("StartQid");
+							}
+							if(null != subjective.get("EndQid")){
+								endno = subjective.getInt("EndQid");
+							}
+							if(startno == endno){
+								quesno = startno;
+							}
+							
+							quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+						}
+					}
+					if(null != page.get("OmrObjectives") && !page.get("OmrObjectives").equals(null)){
+						JSONArray objectives = page.getJSONArray("OmrObjectives");
+						for (int j=0; j<objectives.size(); j++) {
+							JSONObject objective = objectives.getJSONObject(j);
+							
+							String type = null;
+							int startno = 1;
+							int endno = 0;
+							int quesno = 0;
+							if(null != objective.get("topicType")){
+								type = objective.getString("topicType");
+							}
+							
+							if(null != objective.get("objectiveItems")){
+								JSONArray objectiveItems = objective.getJSONArray("objectiveItems");
+								for (int k=0; k<objectiveItems.size(); k++) {
+									JSONObject item = objectiveItems.getJSONObject(k);
+									if(null != item.get("num") && null != item.getJSONObject("num").get("number")){
+										int number = item.getJSONObject("num").getInt("number");
+										if(number < 1){
+											number = 1;
+										}
+										if(startno > number){
+											startno = number;
+										}
+										if(endno < number){
+											endno = number;
+										}
+									}
+								}
+							}
+							if(startno == endno){
+								quesno = startno;
+							}
+							
+							quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+							
+						}
+					}
 				}
 			}
 		}
 		
+		quesAnswerDaoImpl.initQuesAnswers(quesAnswers);
+		
+		return getQuesAnswersId(quesAnswers);
+	}
+	
+	private Map<String, Long> getQuesAnswersId(List<QuesAnswer> quesAnswers){
+		Map<String, Long> quesAnswersId = new HashMap<>();
+		
+		for (QuesAnswer answer : quesAnswers) {
+			quesAnswersId.put(answer.getStartno() + "-" + answer.getEndno(), answer.getId());
+		}
+		
+		return quesAnswersId;
+	}
+	
+	private boolean saveQuesareas(Map<String, Long> quesAnswersId, JSONObject originalData){
+		if(null != originalData.get("TemplateInfo") && null != originalData.get("CSID") ){
+			Long csId = originalData.getLong("CSID");
+			JSONObject templateInfo = originalData.getJSONObject("TemplateInfo");
+			if(null != templateInfo.get("pages")){
+				JSONArray pages = templateInfo.getJSONArray("pages");
+				for (int i=0; i<pages.size(); i++) {
+					JSONObject page = pages.getJSONObject(i);
+					if(null != page.get("OmrSubjectiveList")){
+						JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
+						for (int j=0; j<subjectives.size(); j++) {
+							JSONObject subjective = subjectives.getJSONObject(j);
+							quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, csId, page, subjective));
+						}
+					}
+				}				
+			}
+		}
 		
 		return true;
+	}
+	
+	private List<Quesarea> getQuesareas(Map<String, Long> quesAnswersId, Long csId, JSONObject page, JSONObject subjective){
+		
+		List<Quesarea> resault = new ArrayList<>();
+		
+		int pageno = 0;
+		String fileName = null;
+		if(null != page.get("pageIndex")){
+			pageno = page.getInt("pageIndex");
+		}
+		if(null != page.get("fileName")){
+			fileName = page.getString("fileName");
+		}
+		
+		int areaId = 0;
+		String questionType = null;
+		int startQuestionNo = 1;
+		int endQuestionNo = 0;
+		if(null != subjective.get("AreaID")){
+			areaId = subjective.getInt("AreaID");
+		}
+		if(null != subjective.get("TopicType")){
+			questionType = subjective.getString("TopicType");
+		}
+		if(null != subjective.get("StartQid")){
+			startQuestionNo = subjective.getInt("StartQid");
+		}
+		if(null != subjective.get("EndQid")){
+			endQuestionNo = subjective.getInt("EndQid");
+		}
+		long quesid = quesAnswersId.get(startQuestionNo + "-" + endQuestionNo);
+		
+		if(null != subjective.get("regionList")){
+			JSONArray regions = subjective.getJSONArray("regionList");								
+			for (int i=0;i< regions.size();i++) {
+				JSONObject region = regions.getJSONObject(i);
+				int posx = 0;
+				int posy = 0;
+				int width = 0;
+				int height = 0;
+				int bottom = 0;
+				int right = 0;
+				
+				if(null != region.get("x")){
+					posx = region.getInt("x");
+				}
+				if(null != region.get("y")){
+					posy = region.getInt("y");
+				}
+				if(null != region.get("width")){
+					width = region.getInt("width");
+				}
+				if(null != region.get("height")){
+					height = region.getInt("height");
+				}
+				if(null != region.get("bottom")){
+					bottom = region.getInt("bottom");
+				}
+				if(null != region.get("right")){
+					right = region.getInt("right");
+				}
+				
+				resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, questionType, startQuestionNo, endQuestionNo, csId, quesid));
+			}
+		}
+		
+		return resault;
 	}
 
 	public Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId){
@@ -212,7 +388,7 @@ public class ClientServiceImpl implements ClientService {
 		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
 		
 		if(null != examSubject){
-			result.put("ExamQAPicPath", "");
+			result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper());
 			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper());
 			result.put("AnswerSheetPicPath", examSubject.getBlankAnswerPaper());
 			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath());
@@ -223,12 +399,24 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId){
+	public JSONArray getExamSubjects(Long examId, Long gradeId){
 		
+		JSONArray resault = new JSONArray();
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
-		List<ExamSubject> result = examSubjectDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
 		
-		return result;
+		List<ExamSubject> subjects = examSubjectDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
+		if(null != subjects && subjects.size()>0){
+			for (ExamSubject subject : subjects) {
+				JSONObject object = JSONObject.fromObject(subject);
+				object.remove("blankAnswerPaper");
+				object.remove("blankQuestionsPaper");
+				object.remove("xmlServerPath");
+				object.remove("originalData");
+				resault.add(object);
+			}
+		}
+		
+		return resault;
 	}
 
 	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Long gradeId, String markingStatus){
@@ -369,6 +557,61 @@ public class ClientServiceImpl implements ClientService {
 		}
 		
 		return true;
+	}
+	
+	public JSONArray getQuestionType() {
+		
+		JSONArray questionType = new JSONArray();
+		
+		JSONObject object1 = new JSONObject();
+		object1.put("code", "单选题");
+		object1.put("name", "单选题");
+		object1.put("type", 1);
+		questionType.add(object1);
+		
+		JSONObject object2 = new JSONObject();
+		object2.put("code", "多选题");
+		object2.put("name", "多选题");
+		object2.put("type", 1);
+		questionType.add(object2);
+		
+		JSONObject object3 = new JSONObject();
+		object3.put("code", "判断题");
+		object3.put("name", "判断题");
+		object3.put("type", 1);
+		questionType.add(object3);
+		
+		JSONObject object4 = new JSONObject();
+		object4.put("code", "填空题");
+		object4.put("name", "填空题");
+		object4.put("type", 2);
+		questionType.add(object4);
+		
+		JSONObject object5 = new JSONObject();
+		object5.put("code", "解答题");
+		object5.put("name", "解答题");
+		object5.put("type", 2);
+		questionType.add(object5);
+		
+		JSONObject object6 = new JSONObject();
+		object6.put("code", "证明题");
+		object6.put("name", "证明题");
+		object6.put("type", 2);
+		questionType.add(object6);
+		
+		JSONObject object7 = new JSONObject();
+		object7.put("code", "作文题");
+		object7.put("name", "作文题");
+		object7.put("type", 2);
+		questionType.add(object7);
+		
+		JSONObject object8 = new JSONObject();
+		object8.put("code", "论述题");
+		object8.put("name", "论述题");
+		object8.put("type", 2);
+		questionType.add(object8);
+		
+		return questionType;
 	}
 	
 }

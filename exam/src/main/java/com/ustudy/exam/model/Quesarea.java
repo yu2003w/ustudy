@@ -7,6 +7,7 @@ public class Quesarea implements Serializable {
 	private static final long serialVersionUID = 6563687105648046566L;
 	
 	private Long id ;
+	private Long egsId ;
 	private int pageno ;
 	private String fileName ;
 	private int areaId ;
@@ -19,12 +20,12 @@ public class Quesarea implements Serializable {
 	private String questionType ;
 	private int startQuestionNo ;
 	private int endQuestionNo ;
-	private int quesid ;
+	private Long quesid ;
 	private String answer ;
 	
 	public Quesarea(){}
 	
-	public Quesarea(int pageno, String fileName, int areaId, int posx, int posy, int width, int height, int bottom, int right, String questionType, int startQuestionNo, int endQuestionNo){
+	public Quesarea(int pageno, String fileName, int areaId, int posx, int posy, int width, int height, int bottom, int right, String questionType, int startQuestionNo, int endQuestionNo, Long egsId, Long quesid){
 		this.pageno = pageno;
 		this.fileName = fileName;
 		this.areaId = areaId;
@@ -37,21 +38,31 @@ public class Quesarea implements Serializable {
 		this.questionType = questionType;
 		this.startQuestionNo = startQuestionNo;
 		this.endQuestionNo = endQuestionNo;
+		this.egsId = egsId;
+		this.quesid = quesid;
 	}
 	
 	public Long getId() {
 		return id;
 	}
 	
+	public void setEgsId(Long egsId) {
+		this.egsId = egsId;
+	}
+	
+	public Long getEgsId() {
+		return egsId;
+	}
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
 	
-	public int getQuesid() {
+	public Long getQuesid() {
 		return quesid;
 	}
 	
-	public void setQuesid(int quesid) {
+	public void setQuesid(Long quesid) {
 		this.quesid = quesid;
 	}
 	
