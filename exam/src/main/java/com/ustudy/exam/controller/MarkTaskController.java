@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.exam.model.ExamGradeSub;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
@@ -115,4 +117,36 @@ public class MarkTaskController {
 		
 		return result;
 	}
+	
+	@RequestMapping(value="/marktasks/", method = RequestMethod.GET)
+	public List<MarkTask> getAllMarkTasks(@RequestBody @Valid ExamGradeSub egsReq, HttpServletResponse resp) {
+		
+		if (egsReq == null) {
+			logger.warn("getAllMarkTasks(), request parameter is not valid");
+			try {
+				resp.sendError(500, "getAllMarkTasks(), request parameter is not valid");
+			} catch (Exception e) {
+				logger.warn("getAllMarkTasks(), Failed to set error status in response");
+				return null;
+			}
+		}
+		else
+			logger.debug("getAllMarkTasks(), start to retrieving all assigned tasks for -> " + egsReq.toString());
+		
+		List<MarkTask> mList = null;
+		try {
+			mList = stS.getMarkTasksBySub(egsReq);
+		} catch (Exception e) {
+			logger.warn("getAllMarkTasks()" + e.getMessage());
+			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
+			try {
+				resp.sendError(500, msg);
+			} catch (Exception re) {
+				logger.warn("getAllMarkTasks(), Failed to set error status in response");
+			}
+			
+		}
+		return mList;
+	}
+	
 }

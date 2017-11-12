@@ -17,6 +17,8 @@ choice_num INT NOT NULL,
 score int NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
 mark_mode ENUM ('单评', '双评'),
+#time out duration for screen this question
+duration INT,
 teac_owner VARCHAR(32),
 exam_grade_sub_id INT NOT NULL,
 INDEX(exam_grade_sub_id, quesno),
@@ -110,6 +112,8 @@ quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
 scoretype ENUM ('标准','问题卷','终评'),
+# no need to set if mark style is single screen
+markrole ENUM ('初评', '终评'),
 # number of scored papers
 numOfsp INT,
 PRIMARY KEY (id),
