@@ -72,7 +72,7 @@
 
 	<!-- 保存原始模板信息-->
 	<update id="saveOriginalData" parameterType="java.util.Map">
-		UPDATE examgradesub SET original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+		UPDATE examgradesub SET template=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
 
 </mapper>
