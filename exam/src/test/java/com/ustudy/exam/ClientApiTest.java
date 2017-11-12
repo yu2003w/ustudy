@@ -100,10 +100,32 @@ public class ClientApiTest {
 		// System.out.println();
 		// System.out.println("--------------------getStudentPapers-------------------");
 		// System.out.println();
+//		
+//		getExamSubjectStatus(token, 1L, "0", 10, "0");
+//		System.out.println();
+//		System.out.println("--------------------getExamSubjectStatus-------------------");
+//		System.out.println();
 		
-		getExamSubjectStatus(token, 1L, "0", 10, "0");
+		
+		StringBuffer logs = new StringBuffer();
+		for (int i = 0; i < 1000; i++) {
+			logs.append("--------------------addClientLogs-------------------\n");
+		}
+		for (int i = 0; i < 1; i++) {
+			addClientLogs(logs.toString());
+		}
 		System.out.println();
-		System.out.println("--------------------getExamSubjectStatus-------------------");
+		System.out.println("--------------------addClientLogs-------------------");
+		System.out.println();
+		
+		getClientLogs();
+		System.out.println();
+		System.out.println("--------------------getClientLogs-------------------");
+		System.out.println();
+		
+		deleteClientLogs();
+		System.out.println();
+		System.out.println("--------------------deleteClientLogs-------------------");
 		System.out.println();
 		
 		System.out.println("--------------- " + (System.currentTimeMillis() - t1));
@@ -740,7 +762,7 @@ public class ClientApiTest {
 
 	}
 	
-	private static void getExamSubjectStatus(String token, Long examId, String templateStatus, Integer gradeCode, String markingStatus){
+	public static void getExamSubjectStatus(String token, Long examId, String templateStatus, Integer gradeCode, String markingStatus){
 		String targetURL = "http://127.0.0.1:8080/exam/client/exam/subject/status/"+examId+"/"+templateStatus+"/"+gradeCode+"/" + markingStatus;
 
 		try {
@@ -769,6 +791,122 @@ public class ClientApiTest {
 			}
 
 			httpConnection.disconnect();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void addClientLogs(String logs) {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client/log";
+
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setDoOutput(true);
+			httpConnection.setRequestMethod("POST");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			OutputStream outputStream = httpConnection.getOutputStream();
+			outputStream.write(logs.getBytes());
+			outputStream.flush();
+
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void getClientLogs() {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client/log";
+
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void deleteClientLogs() {
+
+		String targetURL = "http://127.0.0.1:8080/exam/client/log";
+
+		try {
+
+			URL restServiceURL = new URL(targetURL);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+			httpConnection.setRequestMethod("DELETE");
+			httpConnection.setRequestProperty("Content-Type", "application/json");
+			
+			if (httpConnection.getResponseCode() != 200) {
+				throw new RuntimeException(
+						"HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+			}
+
+			BufferedReader responseBuffer = new BufferedReader(
+					new InputStreamReader((httpConnection.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server:  \n");
+
+			while ((output = responseBuffer.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			httpConnection.disconnect();
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

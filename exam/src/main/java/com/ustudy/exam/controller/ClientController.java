@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -503,6 +504,62 @@ public class ClientController {
 		
 		result = new HashMap<>();
 		result.put("success", sas.deletePapers(csId, batchNum));
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.POST)
+	public Map addLog(@RequestBody String logs, HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		
+		result.put("success", false);
+		try {
+			if(cs.addLog(request, logs)){
+				result.put("success", true);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.GET)
+	public Map getLog(HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		result.put("success", false);
+		
+		try {
+			List<String> logFiles = cs.getLog(request);
+			result.put("success", true);
+			result.put("data", logFiles);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.DELETE)
+	public Map deleteLog(HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		result.put("success", false);
+		try {
+			if(cs.deleteLog(request)){
+				result.put("success", true);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
 		
 		return result;
 		
