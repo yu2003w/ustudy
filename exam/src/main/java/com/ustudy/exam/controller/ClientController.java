@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -162,11 +163,11 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeCode}/{markingStatus}", method = RequestMethod.GET)
-	public Map getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Integer gradeCode, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeId}/{markingStatus}", method = RequestMethod.GET)
+	public Map getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Long gradeId, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getSubject().");
-		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus);
 
 		String token = request.getHeader("token");
 		Map result = cs.login(token);
@@ -176,7 +177,7 @@ public class ClientController {
 
 		result = new HashMap<>();
 		result.put("success", true);
-		result.put("data", cs.getExamSubjectStatus(examId, templateStatus, gradeCode, markingStatus));
+		result.put("data", cs.getExamSubjectStatus(examId, templateStatus, gradeId, markingStatus));
 
 		return result;
 	}
@@ -503,6 +504,62 @@ public class ClientController {
 		
 		result = new HashMap<>();
 		result.put("success", sas.deletePapers(csId, batchNum));
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.POST)
+	public Map addLog(@RequestBody String logs, HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		
+		result.put("success", false);
+		try {
+			if(cs.addLog(request, logs)){
+				result.put("success", true);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.GET)
+	public Map getLog(HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		result.put("success", false);
+		
+		try {
+			List<String> logFiles = cs.getLog(request);
+			result.put("success", true);
+			result.put("data", logFiles);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
+		
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/log", method = RequestMethod.DELETE)
+	public Map deleteLog(HttpServletRequest request, HttpServletResponse responseonse) {
+		
+		Map result = new HashMap<>();
+		result.put("success", false);
+		try {
+			if(cs.deleteLog(request)){
+				result.put("success", true);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result.put("message", e.getMessage());
+		}
 		
 		return result;
 		

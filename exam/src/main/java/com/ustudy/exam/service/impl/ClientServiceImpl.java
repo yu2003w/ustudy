@@ -1,10 +1,18 @@
 package com.ustudy.exam.service.impl;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +51,7 @@ import net.sf.json.JSONObject;
 public class ClientServiceImpl implements ClientService {
 	
 	private static final Logger logger = LogManager.getLogger(ClientServiceImpl.class);
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Resource
 	private ClientDao clientDaoImpl;
@@ -222,14 +231,13 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 
-	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Integer gradeCode, String markingStatus){
+	public JSONArray getExamSubjectStatus(Long examId, String templateStatus, Long gradeId, String markingStatus){
 		
 		JSONArray resault = new JSONArray();
 		
-		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeCode: " + gradeCode + ",markingStatus: " + markingStatus);
-		String gradeName = getGradeName(gradeCode);
+		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus);
 		
-		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectStatus(examId, templateStatus, gradeName, markingStatus);
+		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectStatus(examId, templateStatus, gradeId, markingStatus);
 		Exam exam = examDaoImpl.getExamsById(examId);
 		List<School> schools = schoolDaoImpl.getSchoolsByExamId(examId);
 		
@@ -291,51 +299,76 @@ public class ClientServiceImpl implements ClientService {
 		return examDaoImpl.getExamsByStatus(examStatus);
 		
 	}
-	
-	private String getGradeName(Integer gradeCode){
-		String gradeName = "";
-		switch (gradeCode) {
-		case 1:
-			gradeName = "一年级";
-			break;
-		case 2:
-			gradeName = "二年级";
-			break;
-		case 3:
-			gradeName = "三年级";
-			break;
-		case 4:
-			gradeName = "四年级";
-			break;
-		case 5:
-			gradeName = "五年级";
-			break;
-		case 6:
-			gradeName = "六年级";
-			break;
-		case 7:
-			gradeName = "七年级";
-			break;
-		case 8:
-			gradeName = "八年级";
-			break;
-		case 9:
-			gradeName = "九年级";
-			break;
-		case 10:
-			gradeName = "高一";
-			break;
-		case 11:
-			gradeName = "高二";
-			break;
-		case 12:
-			gradeName = "高三";
-			break;
-		default:
-			break;
+
+	public boolean addLog(HttpServletRequest request, String logs) throws Exception {
+		
+		File logPath = new File(request.getSession().getServletContext().getRealPath("client/log/"));
+		
+		File currentLogFile = null;
+		
+		if (logPath.exists() && logPath.isDirectory()) {
+			File[] logFiles = logPath.listFiles();
+			for (File log : logFiles) {
+				if (log.isFile() && log.length() <= 1024*1024*10) {
+					currentLogFile = log;
+				}
+			}
 		}
 		
-		return gradeName;
+		if(null == currentLogFile){
+			currentLogFile = new File(logPath, "log_" + System.currentTimeMillis() + ".log"); 
+		}
+		
+		FileWriter writer = new FileWriter(currentLogFile, true);
+		writer.write(SDF.format(new Date()) + "  " + logs + "\n");
+		writer.close();
+		
+		return true;
+	}
+
+	public List<String> getLog(HttpServletRequest request) throws Exception{
+		
+		List<String> logFiles = new ArrayList<>();
+		
+		String ip = "127.0.0.1";
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		String requestURL = request.getRequestURL().toString().replace("localhost", ip);
+		if(!requestURL.endsWith("/")){
+			requestURL += "/";
+		}
+		
+		File logPath = new File(request.getSession().getServletContext().getRealPath("client/log/"));
+		
+		if (logPath.exists() && logPath.isDirectory()) {
+			File[] logs = logPath.listFiles();
+			for (File log : logs) {
+				if (log.isFile()) {
+					logFiles.add(requestURL + log.getName());
+				}
+			}
+		}
+		
+		return logFiles;
+	}
+
+	public boolean deleteLog(HttpServletRequest request) throws Exception{
+		
+		File logPath = new File(request.getSession().getServletContext().getRealPath("client/log/"));
+		
+		if (logPath.exists() && logPath.isDirectory()) {
+			File[] logs = logPath.listFiles();
+			for (File log : logs) {
+				if (log.isFile()) {
+					log.delete();
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 }

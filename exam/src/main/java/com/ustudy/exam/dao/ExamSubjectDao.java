@@ -16,7 +16,7 @@ public interface ExamSubjectDao {
 	
 	List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") Long examId, @Param("gradeId") Long gradeId);
 	
-	List<ExamSubject> getExamSubjectStatus(@Param("examId") Long examId, @Param("templateStatus") String templateStatus, @Param("gradeName") String gradeName, @Param("markingStatus") String markingStatus);
+	List<ExamSubject> getExamSubjectStatus(@Param("examId") Long examId, @Param("templateStatus") String templateStatus, @Param("gradeId") Long gradeId, @Param("markingStatus") String markingStatus);
 	
 	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") Long examId, @Param("gradeId") Long gradeId, @Param("subjectId") Long subjectId);
 	
