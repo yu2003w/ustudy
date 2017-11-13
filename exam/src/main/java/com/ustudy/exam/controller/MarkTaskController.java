@@ -9,10 +9,7 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
@@ -118,24 +115,13 @@ public class MarkTaskController {
 		return result;
 	}
 	
-	@RequestMapping(value="/marktasks/", method = RequestMethod.GET)
-	public List<MarkTask> getAllMarkTasks(@RequestBody @Valid ExamGradeSub egsReq, HttpServletResponse resp) {
-		
-		if (egsReq == null) {
-			logger.warn("getAllMarkTasks(), request parameter is not valid");
-			try {
-				resp.sendError(500, "getAllMarkTasks(), request parameter is not valid");
-			} catch (Exception e) {
-				logger.warn("getAllMarkTasks(), Failed to set error status in response");
-				return null;
-			}
-		}
-		else
-			logger.debug("getAllMarkTasks(), start to retrieving all assigned tasks for -> " + egsReq.toString());
-		
+	@RequestMapping(value="/marktasks", method = RequestMethod.GET)
+	public List<MarkTask> getAllMarkTasks(HttpServletResponse resp, @RequestParam("examId") String examId,
+										  @RequestParam("gradeId") String gradeId, @RequestParam("subjectId") String subjectId) {
+
 		List<MarkTask> mList = null;
 		try {
-			mList = stS.getMarkTasksBySub(egsReq);
+			mList = stS.getMarkTasksBySub(new ExamGradeSub(examId, gradeId, subjectId));
 		} catch (Exception e) {
 			logger.warn("getAllMarkTasks()" + e.getMessage());
 			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
