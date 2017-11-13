@@ -114,10 +114,10 @@ public class MarkTaskController {
 		
 		return result;
 	}
-	
-	@RequestMapping(value="/marktasks", method = RequestMethod.GET)
-	public List<MarkTask> getAllMarkTasks(HttpServletResponse resp, @RequestParam("examId") String examId,
-										  @RequestParam("gradeId") String gradeId, @RequestParam("subjectId") String subjectId) {
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	public List<MarkTask> getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
+										  @PathVariable String gradeId, @PathVariable String subjectId) {
 
 		List<MarkTask> mList = null;
 		try {
