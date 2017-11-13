@@ -211,6 +211,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			mt.setMetaInfo(id, egs);
 			if (mt.getMarkMode().compareTo("单评") == 0) {
 				mt.setTeachersIds(scoreTaskM.getTeachersByQid(id));
+				mt.setFinalMarkTeachersIds(new ArrayList<String>());
 			}
 			else if (mt.getMarkMode().compareTo("双评") == 0) {
 				// get teachers for first screen
