@@ -84,18 +84,18 @@ public interface MarkTaskMapper {
 	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
 	
 	@Select("select id from quesanswer where exam_grade_sub_id = (select id from examgradesub "
-			+ "where examid={examId} and grade_id=#{gradeId} and sub_id={subjectId})")
+			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")
 	public List<String> getQuesIdsByExamGradeSub(ExamGradeSub egs);
 	
-	@Select("select teac_owner as ownerId, assign_mode as type, duration as timeLimit, mark_mode as markMode"
+	@Select("select distinct teac_owner as ownerId, assign_mode as type, duration as timeLimit, mark_mode as markMode"
 			+ " from quesanswer join teacherscoretask on quesanswer.id = teacherscoretask.quesid where "
-			+ "quesanswer.id=#{pid}")
-	public MarkTask getAllMarkTasksByQuesId(@Param("pid") String pid);
+			+ "quesanswer.id=#{qid}")
+	public MarkTask getAllMarkTasksByQuesId(@Param("qid") String qid);
 	
 	@Select("select teacid from teacherscoretask where quesid = #{qid} and markrole = #{role}")
-	public List<String> getTeachersByQidRole(@Param("pid") String pid, @Param("role") String markRole);
+	public List<String> getTeachersByQidRole(@Param("qid") String qid, @Param("role") String markRole);
 	
 	@Select("select teacid from teacherscoretask where quesid = #{qid}")
-	public List<String> getTeachersByQid(@Param("pid") String pid);
+	public List<String> getTeachersByQid(@Param("qid") String qid);
 	
 }

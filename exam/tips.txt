@@ -1,1 +1,2 @@
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"questions":[{"id":1}, {"id":2}], "startSeq":-1, "endSeq":-1}' http://192.168.1.4:8080/exam/marktask/paper/view/
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X GET -d '{"examId": "1", "gradeId":"1", "subjectId":"1"}' http://192.168.31.86:8080/exam/marktasks/
