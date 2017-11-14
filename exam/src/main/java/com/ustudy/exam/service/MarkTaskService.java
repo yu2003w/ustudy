@@ -24,5 +24,7 @@ public interface MarkTaskService {
 	 * only certain roles could retrieve all mark tasks for certain subject
 	 */
 	public List<MarkTask> getMarkTasksBySub(ExamGradeSub examgs);
-	
+
+	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub examgs, String questionId);
+
 }

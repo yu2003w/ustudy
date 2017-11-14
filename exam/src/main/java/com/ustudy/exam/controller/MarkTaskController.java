@@ -1,7 +1,9 @@
 package com.ustudy.exam.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -116,23 +118,46 @@ public class MarkTaskController {
 	}
 
 	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
-	public List<MarkTask> getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
-										  @PathVariable String gradeId, @PathVariable String subjectId) {
+	public Map getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
+							   @PathVariable String gradeId, @PathVariable String subjectId) {
 
+		Map result = new HashMap<>();
 		List<MarkTask> mList = null;
 		try {
 			mList = stS.getMarkTasksBySub(new ExamGradeSub(examId, gradeId, subjectId));
 		} catch (Exception e) {
 			logger.warn("getAllMarkTasks()" + e.getMessage());
 			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
-			try {
-				resp.sendError(500, msg);
-			} catch (Exception re) {
-				logger.warn("getAllMarkTasks(), Failed to set error status in response");
-			}
-			
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
 		}
-		return mList;
+		result.put("success", true);
+		result.put("data", mList);
+		return result;
 	}
-	
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}/{questionId}", method = RequestMethod.GET)
+	public Map getMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
+						   @PathVariable String subjectId, @PathVariable String questionId) {
+
+		Map result = new HashMap<>();
+		MarkTask marktask = null;
+		try {
+			 marktask = stS.getMarkTaskByEGSQuestion(new ExamGradeSub(examId, gradeId, subjectId), questionId);
+		} catch (Exception e) {
+			logger.warn("getMarkTask()" + e.getMessage());
+			String msg = "Failed to retrieve mark task ->" + e.getMessage();
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
+		}
+
+		result.put("success", true);
+		result.put("data", marktask);
+		return result;
+	}
+
 }

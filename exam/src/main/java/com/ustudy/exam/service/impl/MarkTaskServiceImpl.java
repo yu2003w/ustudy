@@ -207,25 +207,29 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		List<MarkTask> taskL = new ArrayList<MarkTask>();
 		for (String id: quesIds) {
-			MarkTask mt = scoreTaskM.getAllMarkTasksByQuesId(id);
-			mt.setMetaInfo(id, egs);
-			if (mt.getMarkMode().compareTo("单评") == 0) {
-				mt.setTeachersIds(scoreTaskM.getTeachersByQid(id));
-				mt.setFinalMarkTeachersIds(new ArrayList<String>());
-			}
-			else if (mt.getMarkMode().compareTo("双评") == 0) {
-				// get teachers for first screen
-				mt.setTeachersIds(scoreTaskM.getTeachersByQidRole(id, "初评"));
-				// get teachers for final screen
-				mt.setFinalMarkTeachersIds(scoreTaskM.getTeachersByQidRole(id, "终评"));
-			}
-			else {
-				logger.warn("getMarkTasksBySub(), wrong type -> " + mt.getMarkMode());
-				continue;
-			}
+			MarkTask mt = getMarkTaskByEGSQuestion(egs, id);
 			taskL.add(mt);
 		}
 		return taskL;
 	}
 
+	@Override
+	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub egs, String questionId) {
+		MarkTask mt = scoreTaskM.getAllMarkTasksByQuesId(questionId);
+		mt.setMetaInfo(questionId, egs);
+		if (mt.getMarkMode().compareTo("单评") == 0) {
+			mt.setTeachersIds(scoreTaskM.getTeachersByQid(questionId));
+			mt.setFinalMarkTeachersIds(new ArrayList<String>());
+		}
+		else if (mt.getMarkMode().compareTo("双评") == 0) {
+			// get teachers for first screen
+			mt.setTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "初评"));
+			// get teachers for final screen
+			mt.setFinalMarkTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "终评"));
+		}
+		else {
+			logger.warn("getMarkTasksBySub(), wrong type -> " + mt.getMarkMode());
+		}
+		return mt;
+	}
 }
