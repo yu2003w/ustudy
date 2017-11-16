@@ -43,6 +43,7 @@ FOREIGN KEY (schid)
 
 create table if not exists ustudy.classsub (
 id INT NOT NULL AUTO_INCREMENT,
+sub_id int(11) DEFAULT NULL,
 sub_name VARCHAR(32) NOT NULL,
 cls_id INT NOT NULL,
 sub_owner VARCHAR(32),
@@ -53,6 +54,9 @@ FOREIGN KEY (cls_id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (sub_owner)
     REFERENCES ustudy.teacher(teacid)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+FOREIGN KEY (sub_id, sub_name)
+    REFERENCES ustudy.subject(id, name)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
@@ -86,34 +90,46 @@ FOREIGN KEY (sub_owner)
 
 create table if not exists ustudy.teachersub (
 id INT NOT NULL AUTO_INCREMENT,
+sub_id int(11) NOT NULL,
 sub_name varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
+grade_id int(11) NOT NULL,
 grade_name varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id, grade_name),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (grade_id)
+    REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teacherclass (
 id INT NOT NULL AUTO_INCREMENT,
+class_id int(11) NOT NULL,
 class_name varchar(32) NOT NULL,
 teac_id varchar(32) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (class_id)
+    REFERENCES ustudy.class(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
