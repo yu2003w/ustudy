@@ -8,7 +8,7 @@ import net.sf.json.JSONObject;
 
 public interface ExamSubjectService {
 	
-	List<ExamSubject> getExamSubjects();
+	List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName);
 	
 	List<ExamSubject> getExamSubjects(Long examId);
 	
