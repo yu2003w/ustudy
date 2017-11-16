@@ -20,6 +20,15 @@ if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   else
     echo "Created schema directory" ${WORK_DIR}/mysql/schema/
   fi
+else
+  # need to clean schema directory firstly
+  rm -rf ${WORK_DIR}/mysql/schema/*
+  if [ $? != 0 ];then
+    echo "Failed to clean schemas loaded previously"
+    exit 1
+  else
+    echo "clean previously loaded schemas successfully"
+  fi
 fi
 
 cp -Rf ${SCHEMA_DIR} ${WORK_DIR}/mysql/

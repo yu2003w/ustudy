@@ -22,32 +22,32 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	@Resource
 	private ExamSubjectDao daoImpl;
 	
-	public List<ExamSubject> getAllExamSubject(){
+	public List<ExamSubject> getExamSubjects(){
+		logger.debug("getExamSubjects");
 		return daoImpl.getAllExamSubject();
 	}
 	
-	public List<ExamSubject> getAllExamSubjectByExam(String examId){
-		logger.debug("getAllExamSubjectByExam -> examId:" + examId);
+	public List<ExamSubject> getExamSubjects(Long examId){
+		logger.debug("getExamSubjects -> examId:" + examId);
 		return daoImpl.getAllExamSubjectByExamId(examId);
 	}
 	
-	public List<ExamSubject> getAllExamSubjectByExamAndGrade(String examId, String gradeId) {
-		logger.debug("getAllExamSubjectByExamAndGrade -> examId:" + examId + ",gradeId:" + gradeId);
+	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId) {
+		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId);
 		return daoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
 	}
 	
-	public List<ExamSubject> getExamSubjectByExamAndGradeAndSubject(String examId, String gradeId, String subjectId) {
-		logger.debug("getExamSubjectByExamAndGradeAndSubject -> examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
+	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId) {
+		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
 		return daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 	}
 	
-	public List<ExamSubject> getExamSubjectById(String id) {
-		logger.debug("getExamSubjectById -> id:" + id);
+	public ExamSubject getExamSubject(Long id) {
+		logger.debug("getExamSubject -> id:" + id);
 		return daoImpl.getExamSubjectById(id);
 	}
 
-	@Override
-	public boolean saveBlankAnswerPaper(String id, String fileName) {
+	public boolean saveBlankAnswerPaper(Long id, String fileName) {
 		logger.debug("saveBlankAnswerPaper -> id:" + id + ",fileName:" + fileName);
 		try {
 			daoImpl.saveBlankAnswerPaper(id, fileName);
@@ -58,8 +58,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	@Override
-	public boolean saveBlankQuestionsPaper(String id, String fileName) {
+	public boolean saveBlankQuestionsPaper(Long id, String fileName) {
 		logger.debug("saveBlankQuestionsPaper -> id:" + id + ",fileName:" + fileName);
 		try {
 			daoImpl.saveBlankQuestionsPaper(id, fileName);
@@ -70,7 +69,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	@Override
 	public boolean saveStudentAnswers(JSONObject data) {
 		// TODO Auto-generated method stub
 		return false;

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.StudentPaperDao">
+
+	<resultMap type="com.ustudy.exam.model.StudentPaper" id="StudentPaperResult">
+        <id property="id" column="id"/>
+        <result property="stuNo" column="stuno"/>
+        <result property="stuExamNo" column="stuexamno"/>
+        <result property="examId" column="exam_id"/>
+        <result property="gradeId" column="grade_id"/>
+        <result property="subjectId" column="sub_id"/>        
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="batchNum" column="batch_num"/>
+        <result property="paperImg" column="paper_img"/>
+        <result property="paperStatus" column="paper_status"/>
+        <result property="errorStatus" column="error_status"/>
+    </resultMap>    
+
+	<select id="getStudentPapers" parameterType="long" resultMap="StudentPaperResult">
+		SELECT * from stupaper where exam_grade_sub_id=#{csId}
+	</select>
+
+	<!-- 查询得到全部Exam对象 -->
+	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
+		INSERT INTO stupaper (stuno, stuexamno, exam_id, grade_id, sub_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
+        VALUES (#{stuNo}, #{stuExamNo}, #{examId}, #{gradeId}, #{subjectId}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
+	</insert>
+	
+	<delete id="deleteStudentPapers" parameterType="java.util.Map">
+		DELETE from stupaper where exam_grade_sub_id=#{csId} and batch_num=#{batchNum}		
+	</delete>
+
+</mapper>

@@ -13,4 +13,9 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE ustudy.perms
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/subject.data' INTO TABLE ustudy.subject
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 

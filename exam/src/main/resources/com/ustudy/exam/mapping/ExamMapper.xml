@@ -21,7 +21,7 @@
 	</select>
 
 	<!-- 根据ID查询得到一个Exam对象-->
-	<select id="getExamsById" parameterType="string" resultMap="ExamResult">
+	<select id="getExamsById" parameterType="Long" resultMap="ExamResult">
 		SELECT * FROM exam where id=#{id}
 	</select>
 

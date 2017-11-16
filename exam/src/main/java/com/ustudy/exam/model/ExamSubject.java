@@ -6,11 +6,11 @@ public class ExamSubject implements Serializable {
 
 	private static final long serialVersionUID = -9022319462035362070L;
 	
-	private int id;
-	private int examid;
-	private int gradeId;
+	private Long id;
+	private Long examid;
+	private Long gradeId;
 	private String gradeName = null;
-	private int subId;
+	private Long subId;
 	private String subName = null;
 	private int stuNum;
 	private int teacNum;
@@ -25,38 +25,40 @@ public class ExamSubject implements Serializable {
 	private int uploadBathCount ;
 	private String blankAnswerPaper ;
 	private String blankQuestionsPaper ;
-	
+	private String xmlServerPath;
+	private String originalData;
+
 	public ExamSubject() {
 	}
 
-	public ExamSubject(int id, int examid, int gradeId, int subId) {
+	public ExamSubject(Long id, Long examid, Long gradeId, Long subId) {
 		this.id = id;
 		this.examid = examid;
 		this.gradeId = gradeId;
 		this.subId = subId;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public int getExamid() {
+	public Long getExamid() {
 		return examid;
 	}
 
-	public void setExamid(int examid) {
+	public void setExamid(Long examid) {
 		this.examid = examid;
 	}
 
-	public int getGradeId() {
+	public Long getGradeId() {
 		return gradeId;
 	}
 
-	public void setGradeId(int gradeId) {
+	public void setGradeId(Long gradeId) {
 		this.gradeId = gradeId;
 	}
 
@@ -68,11 +70,11 @@ public class ExamSubject implements Serializable {
 		this.gradeName = gradeName;
 	}
 
-	public int getSubId() {
+	public Long getSubId() {
 		return subId;
 	}
 
-	public void setSubId(int subId) {
+	public void setSubId(Long subId) {
 		this.subId = subId;
 	}
 
@@ -186,6 +188,22 @@ public class ExamSubject implements Serializable {
 
 	public void setBlankQuestionsPaper(String blankQuestionsPaper) {
 		this.blankQuestionsPaper = blankQuestionsPaper;
+	}
+	
+	public String getOriginalData() {
+		return originalData;
+	}
+
+	public void setOriginalData(String originalData) {
+		this.originalData = originalData;
+	}
+	
+	public String getXmlServerPath() {
+		return xmlServerPath;
+	}
+
+	public void setXmlServerPath(String xmlServerPath) {
+		this.xmlServerPath = xmlServerPath;
 	}
 	
 }

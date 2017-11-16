@@ -1,15 +1,20 @@
 package com.ustudy.exam.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.ustudy.exam.model.Exam;
 
 public interface ExamService {
 	
-	public List<Exam> getAllExams();
+	List<Exam> getAllExams();
 	
-	public List<Exam> getExamsByStatus(String status);
+	List<Exam> getExamsByStatus(String status);
 	
-	public List<Exam> getExamsById(String id);
-	
+	Exam getExamsById(Long id);
+
+	ArrayList<Map> getGrades();
+
+	ArrayList<Map> getSubjects();
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.MultipleScoreSetDao">
+
+	<resultMap type="com.ustudy.exam.model.MultipleScoreSet" id="MultipleScoreSetResult">
+        <id property="id" column="id"/>
+        <result property="examGradeSubId" column="exam_grade_sub_id"/>
+        <result property="correctAnswerCount" column="correct_answer_count"/>
+        <result property="studentCorrectCount" column="student_correct_count"/>
+        <result property="score" column="score"/>
+    </resultMap>
+
+	<select id="getAllMultipleScoreSets" parameterType="Long" resultMap="MultipleScoreSetResult">
+		SELECT * FROM multiple_score_set where exam_grade_sub_id=#{egsId}
+	</select>
+
+	<delete id="deleteMultipleScoreSets" parameterType="Long">
+		delete FROM multiple_score_set where exam_grade_sub_id=#{egsId}
+	</delete>
+
+	<insert id="insertMultipleScoreSets" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		insert into multiple_score_set (exam_grade_sub_id, correct_answer_count, student_correct_count, score) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.examGradeSubId},#{item.correctAnswerCount},#{item.studentCorrectCount},#{item.score})  
+	    </foreach>  
+	</insert>
+
+</mapper>

@@ -1,6 +1,8 @@
 package com.ustudy.exam.dao;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.annotation.MapperScan;
 
@@ -9,10 +11,14 @@ import com.ustudy.exam.model.Exam;
 @MapperScan
 public interface ExamDao {
 
-	public List<Exam> getAllExams();
+	List<Exam> getAllExams();
 	
-	public List<Exam> getExamsByStatus(String status);
+	List<Exam> getExamsByStatus(String status);
 	
-	public List<Exam> getExamsById(String id);
-	
+	Exam getExamsById(Long id);
+
+	ArrayList<Map> getGrades();
+
+	ArrayList<Map> getSubjects();
+
 }

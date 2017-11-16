@@ -1,22 +1,28 @@
 package com.ustudy.exam.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.model.MarkTaskBrife;
+import com.ustudy.exam.model.QuesComb;
+import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
 @RestController
+@RequestMapping(value="/exam/")
 public class MarkTaskController {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskController.class);
@@ -25,15 +31,15 @@ public class MarkTaskController {
 	private MarkTaskService stS; 
 	
 	@RequestMapping(value = "/marktask/list/", method = RequestMethod.GET)
-	public List<MarkTask> getMarkTask(HttpServletResponse resp) {
+	public List<MarkTaskBrife> getMarkTask(HttpServletResponse resp) {
 		logger.debug("getMarkTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
-		List<MarkTask> st = null;
+		List<MarkTaskBrife> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getMarkTask(teacid);
+			st = stS.getMarkTaskBrife(teacid);
 		} catch (Exception e) {
 			logger.warn("getMarkTask()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
@@ -47,26 +53,111 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value = "/marktask/view/", method = RequestMethod.GET)
-	public List<MarkTask> getMultipleTask(HttpServletResponse resp) {
-		logger.debug("getMultipleTask(), start to retrieving multiple tasks from examination result.");
+	@RequestMapping(value = "/marktask/paper/view/", method = RequestMethod.POST)
+	public MarkTaskBrife getTaskPapers(@RequestBody @Valid QuesComb quesR, HttpServletResponse resp) {
+		if (quesR == null) {
+			logger.warn("getTaskPapers(), request parameter is not valid");
+			try {
+				resp.sendError(500, "getTaskPapers(), request parameter is not valid");
+			} catch (Exception e) {
+				logger.warn("Failed to set error status in response");
+			}
+		}
+		else
+			logger.debug("getTaskPapers(), start to retrieving student papers per request -> \n" +  quesR);
 		
 		// fetch score task for currently logged in teacher
-		List<MarkTask> st = null;
+		MarkTaskBrife st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
-			st = stS.getMarkTask(teacid);
+			st = stS.getTaskPapers(teacid, quesR);
 		} catch (Exception e) {
-			logger.warn("getMultipleTask()" + e.getMessage());
+			logger.warn("getTaskPapers()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("Failed to set error status in response");
+				logger.warn("Failed to set error status in response," + re.getMessage());
 			}
 		}
 
 		return st;
 	}
+	
+	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
+	public String updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
+		if (up == null) {
+			logger.warn("updateMarkResult(), request parameter is not valid");
+			try {
+				resp.sendError(500, "updateMarkResult(), request parameter is not valid");
+			} catch (Exception e) {
+				logger.warn("Failed to set error status in response");
+			}
+		}
+		else
+			logger.debug("updateMarkResult(), update marked result ->" + up.toString());
+		
+		String result = null;
+		try {
+			if (stS.updateMarkResult(up)) {
+				result = "update mark result successully";
+			}
+			else
+				result = "update mark result failed";
+		} catch (Exception e) {
+			logger.warn("updateMarkResult()," + e.getMessage());
+			try {
+				resp.sendError(500, "updateMarkResult(), failed to update mark result.");
+			} catch (Exception re) {
+				logger.warn("updateMarkResult(), failed to set error status. " + re.getMessage());
+			}
+		}
+		
+		return result;
+	}
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	public Map getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
+							   @PathVariable String gradeId, @PathVariable String subjectId) {
+
+		Map result = new HashMap<>();
+		List<MarkTask> mList = null;
+		try {
+			mList = stS.getMarkTasksBySub(new ExamGradeSub(examId, gradeId, subjectId));
+		} catch (Exception e) {
+			logger.warn("getAllMarkTasks()" + e.getMessage());
+			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
+		}
+		result.put("success", true);
+		result.put("data", mList);
+		return result;
+	}
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}/{questionId}", method = RequestMethod.GET)
+	public Map getMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
+						   @PathVariable String subjectId, @PathVariable String questionId) {
+
+		Map result = new HashMap<>();
+		MarkTask marktask = null;
+		try {
+			 marktask = stS.getMarkTaskByEGSQuestion(new ExamGradeSub(examId, gradeId, subjectId), questionId);
+		} catch (Exception e) {
+			logger.warn("getMarkTask()" + e.getMessage());
+			String msg = "Failed to retrieve mark task ->" + e.getMessage();
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
+		}
+
+		result.put("success", true);
+		result.put("data", marktask);
+		return result;
+	}
+
 }
