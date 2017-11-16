@@ -10,7 +10,7 @@ import com.ustudy.exam.model.ExamSubject;
 @MapperScan
 public interface ExamSubjectDao {
 
-	List<ExamSubject> getAllExamSubject();
+	List<ExamSubject> getAllExamSubject(@Param("subjectId") Long subjectId, @Param("gradeId") Long gradeId, @Param("start") String start, @Param("end") String end, @Param("examName") String examName);
 	
 	List<ExamSubject> getAllExamSubjectByExamId(Long examId);
 	

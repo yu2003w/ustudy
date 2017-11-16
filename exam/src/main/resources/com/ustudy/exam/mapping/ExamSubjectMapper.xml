@@ -27,8 +27,23 @@
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getAllExamSubject" parameterType="string" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub
+	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT egs.* FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where 1=1
+		<if test="subjectId !=null and subjectId > 0">
+		 AND egs.sub_id=#{subjectId}
+		</if>
+		<if test="gradeId !=null and gradeId > 0">
+		 AND egs.grade_id=#{gradeId}
+		</if>
+		<if test="start !=null and start != ''">
+		 AND e.exam_date &gt;= #{start, jdbcType=VARCHAR}
+		</if>
+		<if test="end !=null and end != ''">
+		 AND e.exam_date &lt;= #{end, jdbcType=VARCHAR}
+		</if>
+		<if test="examName !=null and examName != ''">
+		 AND e.exam_name LIKE concat('%',#{examName},'%')
+		</if>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
