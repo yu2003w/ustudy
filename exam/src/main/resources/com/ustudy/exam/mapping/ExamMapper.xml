@@ -25,4 +25,11 @@
 		SELECT * FROM exam where id=#{id}
 	</select>
 
+	<select id="getGrades" resultType="java.util.Map">
+		select * from grade
+	</select>
+
+	<select id="getSubjects" resultType="java.util.Map">
+		select * from subject
+	</select>
 </mapper>
