@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.ExamSubject;
@@ -31,14 +32,18 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubjects", method = RequestMethod.GET)
-	public Map getExamSubjects() {
+	public Map getExamSubjects(@RequestParam(required=false) Long subjectId, 
+			@RequestParam(required=false) Long gradeId, 
+			@RequestParam(required=false) String start, 
+			@RequestParam(required=false) String end, 
+			@RequestParam(required=false) String examName) {
 		
 		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects());
+		result.put("data", service.getExamSubjects(subjectId, gradeId, start, end, examName));
 
 		return result;
 	}
@@ -105,7 +110,7 @@ public class ExamSubjectController {
 	 * @param subjectId 科目ID
 	 * @return
 	 */
-	@RequestMapping(value = "/gxamsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/examsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId) {
 		
 		logger.debug("getExamSubjects().");

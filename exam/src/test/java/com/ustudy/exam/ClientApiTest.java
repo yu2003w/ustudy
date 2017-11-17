@@ -21,16 +21,16 @@ public class ClientApiTest {
 		
 		long t1 =  System.currentTimeMillis();
 		
-//		 getQuestionType(token);
-//		 System.out.println();
-//		 System.out.println("--------------------getQuestionType-------------------");
-//		 System.out.println();
+		 getQuestionType(token);
+		 System.out.println();
+		 System.out.println("--------------------getQuestionType-------------------");
+		 System.out.println();
 
-		 saveTemplates(token);
-		 System.out.println();
-		 System.out.println("--------------------saveTemplates-------------------");
-		 System.out.println();
-		
+//		 saveTemplates(token);
+//		 System.out.println();
+//		 System.out.println("--------------------saveTemplates-------------------");
+//		 System.out.println();
+//		
 //		 getExamTemplate("123", "456", "789", token);
 //		 System.out.println();
 //		 System.out.println("--------------------getExamTemplate-------------------");

@@ -22,9 +22,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	@Resource
 	private ExamSubjectDao daoImpl;
 	
-	public List<ExamSubject> getExamSubjects(){
+	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName){
 		logger.debug("getExamSubjects");
-		return daoImpl.getAllExamSubject();
+		return daoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
 	}
 	
 	public List<ExamSubject> getExamSubjects(Long examId){
