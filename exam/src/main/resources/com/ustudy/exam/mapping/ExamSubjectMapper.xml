@@ -24,6 +24,7 @@
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
         <result property="xmlServerPath" column="xml_server_path"/>
         <result property="originalData" column="original_data"/>
+		<collection property="questions" javaType="ArrayList" column="id" ofType="com.ustudy.exam.model.QuesAnswer" select="com.ustudy.exam.dao.QuesAnswerDao.getQuesAnswers"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
