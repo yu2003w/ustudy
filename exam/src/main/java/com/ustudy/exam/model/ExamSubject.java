@@ -2,6 +2,8 @@ package com.ustudy.exam.model;
 
 import java.io.Serializable;
 
+import net.sf.json.JSONArray;
+
 public class ExamSubject implements Serializable {
 
 	private static final long serialVersionUID = -9022319462035362070L;
@@ -27,6 +29,8 @@ public class ExamSubject implements Serializable {
 	private String blankQuestionsPaper ;
 	private String xmlServerPath;
 	private String originalData;
+	
+	private JSONArray questions;
 
 	public ExamSubject() {
 	}
@@ -204,6 +208,14 @@ public class ExamSubject implements Serializable {
 
 	public void setXmlServerPath(String xmlServerPath) {
 		this.xmlServerPath = xmlServerPath;
+	}
+
+	public JSONArray getQuestions() {
+		return questions;
+	}
+
+	public void setQuestions(JSONArray questions) {
+		this.questions = questions;
 	}
 	
 }
