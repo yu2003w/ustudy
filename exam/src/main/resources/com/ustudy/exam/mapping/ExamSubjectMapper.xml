@@ -5,6 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.ExamSubject" id="ExamSubjectResult">
         <id property="id" column="id"/>
         <result property="examid" column="examid"/>
+		<result property="examName" column="exam_name"/>
         <result property="gradeId" column="grade_id"/>
         <result property="gradeName" column="grade_name"/>
         <result property="subId" column="sub_id"/>
