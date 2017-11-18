@@ -5,6 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.ExamSubject" id="ExamSubjectResult">
         <id property="id" column="id"/>
         <result property="examid" column="examid"/>
+		<result property="examName" column="exam_name"/>
         <result property="gradeId" column="grade_id"/>
         <result property="gradeName" column="grade_name"/>
         <result property="subId" column="sub_id"/>
@@ -24,6 +25,7 @@
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
         <result property="xmlServerPath" column="xml_server_path"/>
         <result property="originalData" column="original_data"/>
+		<collection property="questions" javaType="ArrayList" column="id" ofType="com.ustudy.exam.model.QuesAnswer" select="com.ustudy.exam.dao.QuesAnswerDao.getQuesAnswers"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->

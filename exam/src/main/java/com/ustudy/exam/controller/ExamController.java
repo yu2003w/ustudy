@@ -86,5 +86,20 @@ public class ExamController {
 
 		return result;
 	}
-	
+
+	@RequestMapping(value = "/exam/options", method = RequestMethod.GET)
+	public Map getOptions(HttpServletResponse response) {
+		logger.debug("getOptions().");
+
+		Map result = new HashMap<>();
+		Map data = new HashMap<>();
+
+		data.put("grades", service.getGrades());
+		data.put("subjects", service.getSubjects());
+
+		result.put("success", true);
+		result.put("data", data);
+
+		return result;
+    }
 }

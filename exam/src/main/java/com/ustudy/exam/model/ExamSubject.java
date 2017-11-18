@@ -1,6 +1,7 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class ExamSubject implements Serializable {
 
@@ -27,6 +28,8 @@ public class ExamSubject implements Serializable {
 	private String blankQuestionsPaper ;
 	private String xmlServerPath;
 	private String originalData;
+	private String examName;
+	private List<QuesAnswer> questions;
 
 	public ExamSubject() {
 	}
@@ -205,5 +208,12 @@ public class ExamSubject implements Serializable {
 	public void setXmlServerPath(String xmlServerPath) {
 		this.xmlServerPath = xmlServerPath;
 	}
-	
+
+	public List<QuesAnswer> getQuestions() { return questions; }
+
+	public void setQuestions(List<QuesAnswer> questions) { this.questions = questions; }
+
+	public String getExamName() { return examName; }
+
+	public void setExamName(String examName) { this.examName = examName; }
 }
