@@ -1,7 +1,9 @@
 package com.ustudy.exam.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -9,11 +11,10 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.ustudy.exam.model.ExamGradeSub;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
@@ -115,4 +116,48 @@ public class MarkTaskController {
 		
 		return result;
 	}
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	public Map getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
+							   @PathVariable String gradeId, @PathVariable String subjectId) {
+
+		Map result = new HashMap<>();
+		List<MarkTask> mList = null;
+		try {
+			mList = stS.getMarkTasksBySub(new ExamGradeSub(examId, gradeId, subjectId));
+		} catch (Exception e) {
+			logger.warn("getAllMarkTasks()" + e.getMessage());
+			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
+		}
+		result.put("success", true);
+		result.put("data", mList);
+		return result;
+	}
+
+	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}/{questionId}", method = RequestMethod.GET)
+	public Map getMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
+						   @PathVariable String subjectId, @PathVariable String questionId) {
+
+		Map result = new HashMap<>();
+		MarkTask marktask = null;
+		try {
+			 marktask = stS.getMarkTaskByEGSQuestion(new ExamGradeSub(examId, gradeId, subjectId), questionId);
+		} catch (Exception e) {
+			logger.warn("getMarkTask()" + e.getMessage());
+			String msg = "Failed to retrieve mark task ->" + e.getMessage();
+			result.put("success", false);
+			result.put("message", msg);
+			return result;
+
+		}
+
+		result.put("success", true);
+		result.put("data", marktask);
+		return result;
+	}
+
 }

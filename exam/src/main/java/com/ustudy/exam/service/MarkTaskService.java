@@ -2,6 +2,8 @@ package com.ustudy.exam.service;
 
 import java.util.List;
 
+import com.ustudy.exam.model.ExamGradeSub;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
@@ -18,4 +20,11 @@ public interface MarkTaskService {
 	 */
 	public boolean updateMarkResult(QuestionPaper qp);
 	
+	/*
+	 * only certain roles could retrieve all mark tasks for certain subject
+	 */
+	public List<MarkTask> getMarkTasksBySub(ExamGradeSub examgs);
+
+	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub examgs, String questionId);
+
 }

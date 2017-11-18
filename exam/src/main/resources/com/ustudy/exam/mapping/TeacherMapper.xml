@@ -7,6 +7,12 @@
 	    <result property="name" column="teacname" />          
 	</resultMap>
 
+	<resultMap id="TeacherResultWithGroups" type="HashMap">
+		<result property="id" column="teacid" />
+		<result property="name" column="teacname" />
+		<collection property="groups" javaType="ArrayList" column="teacid" ofType="java.lang.String" select="getSubjectsOfTeacher"/>
+	</resultMap>
+
 	<select id="getTeacherBySchoolIdType" parameterType="java.util.Map" resultMap="TeacherResult">
 		select t.teacid,t.teacname from teacher t left join teacherroles tr on t.teacid=tr.teac_id where t.orgid=#{schoolId,jdbcType=VARCHAR} and tr.role_name=#{type,jdbcType=VARCHAR} limit 1 
 	</select>
@@ -15,8 +21,12 @@
 		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR}
 	</select>
 	
-	<select id="getTeachersBySchoolInGradeName" parameterType="java.util.Map" resultMap="TeacherResult">
+	<select id="getTeachersBySchoolInGradeName" parameterType="java.util.Map" resultMap="TeacherResultWithGroups">
 		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR} and t.teacid in (SELECT tg.teac_id from teachergrade tg where tg.grade_name=#{gradeName,jdbcType=VARCHAR}); 
+	</select>
+
+	<select id="getSubjectsOfTeacher" parameterType="java.util.Map" resultType="string">
+		select sub_name from teachersub WHERE teac_id = #{teacid}
 	</select>
 
 </mapper>

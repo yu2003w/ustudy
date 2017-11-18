@@ -133,9 +133,9 @@ public class LoginController {
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;
 		} else {
-			// at this point, user information could be retrieved from session
+			// at this point, organization information could be retrieved from session
 			String uId = cUser.getPrincipal().toString();
-			//Session ses = cUser.getSession();
+			Session ses = cUser.getSession();
 			
 			/*
 			u = new Teacher(uId, ses.getAttribute("uname").toString(), 
@@ -144,7 +144,8 @@ public class LoginController {
 			// u.setRoles(userS.getRolesById(uId));
 			// only retrieve highest priority role for the logined user */
 			
-			u = new TeacRole(uId, userS.findPriRoleById(uId));
+			u = new TeacRole(uId, userS.findPriRoleById(uId), ses.getAttribute("orgType").toString(), 
+					ses.getAttribute("orgId").toString());
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}

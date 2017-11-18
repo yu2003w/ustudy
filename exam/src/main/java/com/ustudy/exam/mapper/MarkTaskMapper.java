@@ -12,6 +12,7 @@ import com.ustudy.exam.model.MetaScoreTask;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
+import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 
@@ -81,4 +82,20 @@ public interface MarkTaskMapper {
 	
 	@Select("select id from ustudy.stuanswer where quesid=#{qid} and paperid=#{pid}")
 	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
+	
+	@Select("select id from quesanswer where exam_grade_sub_id = (select id from examgradesub "
+			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")
+	public List<String> getQuesIdsByExamGradeSub(ExamGradeSub egs);
+	
+	@Select("select distinct teac_owner as ownerId, assign_mode as type, duration as timeLimit, mark_mode as markMode"
+			+ " from quesanswer join teacherscoretask on quesanswer.id = teacherscoretask.quesid where "
+			+ "quesanswer.id=#{qid}")
+	public MarkTask getAllMarkTasksByQuesId(@Param("qid") String qid);
+	
+	@Select("select teacid from teacherscoretask where quesid = #{qid} and markrole = #{role}")
+	public List<String> getTeachersByQidRole(@Param("qid") String qid, @Param("role") String markRole);
+	
+	@Select("select teacid from teacherscoretask where quesid = #{qid}")
+	public List<String> getTeachersByQid(@Param("qid") String qid);
+	
 }

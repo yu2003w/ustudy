@@ -17,6 +17,8 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
+import com.ustudy.exam.model.ExamGradeSub;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
@@ -192,4 +194,42 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return true;
 	}
 
+	@Override
+	public List<MarkTask> getMarkTasksBySub(ExamGradeSub egs) {
+		if (egs.getExamId().isEmpty() || egs.getGradeId().isEmpty() || egs.getSubjectId().isEmpty()) {
+			logger.warn("getMarkTasksBySub(), parameter is not valid");
+			return null;
+		}
+		List<String> quesIds = scoreTaskM.getQuesIdsByExamGradeSub(egs);
+		if (quesIds == null || quesIds.isEmpty()) {
+			logger.warn("getMarkTasksBySub(), no question ids retrieved for " + egs.toString());
+			return null;
+		}
+		List<MarkTask> taskL = new ArrayList<MarkTask>();
+		for (String id: quesIds) {
+			MarkTask mt = getMarkTaskByEGSQuestion(egs, id);
+			taskL.add(mt);
+		}
+		return taskL;
+	}
+
+	@Override
+	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub egs, String questionId) {
+		MarkTask mt = scoreTaskM.getAllMarkTasksByQuesId(questionId);
+		mt.setMetaInfo(questionId, egs);
+		if (mt.getMarkMode().compareTo("单评") == 0) {
+			mt.setTeachersIds(scoreTaskM.getTeachersByQid(questionId));
+			mt.setFinalMarkTeachersIds(new ArrayList<String>());
+		}
+		else if (mt.getMarkMode().compareTo("双评") == 0) {
+			// get teachers for first screen
+			mt.setTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "初评"));
+			// get teachers for final screen
+			mt.setFinalMarkTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "终评"));
+		}
+		else {
+			logger.warn("getMarkTasksBySub(), wrong type -> " + mt.getMarkMode());
+		}
+		return mt;
+	}
 }

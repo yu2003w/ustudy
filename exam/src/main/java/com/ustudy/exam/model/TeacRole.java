@@ -16,16 +16,22 @@ public class TeacRole implements Serializable {
 	
 	@JsonProperty("role")
 	private String priRole = null;
+	
+	private String orgType = null;
+	private String orgId = null;
+	
 
 	public TeacRole() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public TeacRole(String teacName, String priRole) {
+	public TeacRole(String teacName, String priRole, String orgType, String orgId) {
 		super();
 		this.teacName = teacName;
 		this.priRole = priRole;
+		this.orgType = orgType;
+		this.orgId = orgId;
 	}
 
 	public String getTeacName() {
@@ -44,9 +50,26 @@ public class TeacRole implements Serializable {
 		this.priRole = priRole;
 	}
 
+	public String getOrgType() {
+		return orgType;
+	}
+
+	public void setOrgType(String orgType) {
+		this.orgType = orgType;
+	}
+
+	public String getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(String orgId) {
+		this.orgId = orgId;
+	}
+
 	@Override
 	public String toString() {
-		return "TeacRole [teacName=" + teacName + ", priRole=" + priRole + "]";
+		return "TeacRole [teacName=" + teacName + ", priRole=" + priRole + ", orgType=" + orgType + ", orgId=" + orgId
+				+ "]";
 	}
 	
 }
