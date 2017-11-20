@@ -173,8 +173,8 @@ public class ClientServiceImpl implements ClientService {
 		
 		JSONObject originalData = JSONObject.fromObject(data);
 		String xmlServerPath = "";
-		if(null != originalData.get("xmlServerPath")){
-			xmlServerPath = originalData.getString("xmlServerPath");
+		if(null != originalData.get("AnswerSheetXmlPath")){
+			xmlServerPath = originalData.getString("AnswerSheetXmlPath");
 		}
 		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, data);
 		
@@ -397,9 +397,24 @@ public class ClientServiceImpl implements ClientService {
 		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
 		
 		if(null != examSubject){
+			JSONObject originalData = JSONObject.fromObject(examSubject.getOriginalData());
+			StringBuffer fileNames = new StringBuffer();
+			if(null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")){
+				JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
+				for (int i=0;i<pages.size();i++) {
+					JSONObject page = pages.getJSONObject(i);
+					if(null != page.get("fileName")){
+						if(fileNames.length() != 0){
+							fileNames.append(",");
+						}
+						fileNames.append(page.getString("fileName"));
+					}
+				}
+			}
+			
 			result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper());
 			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper());
-			result.put("AnswerSheetPicPath", examSubject.getBlankAnswerPaper());
+			result.put("AnswerSheetPicPath", fileNames.toString());
 			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath());
 			result.put("AnswerSheetXML", examSubject.getOriginalData());
 			result.put("Id", "" + examSubject.getId());

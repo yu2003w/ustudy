@@ -36,10 +36,10 @@ public class ClientApiTest {
 //		 System.out.println("--------------------getExamTemplate-------------------");
 //		 System.out.println();
 //		
-//		 getExamTemplate("1", token);
-//		 System.out.println();
-//		 System.out.println("--------------------getExamTemplate-------------------");
-//		 System.out.println();
+		 getExamTemplate("13", token);
+		 System.out.println();
+		 System.out.println("--------------------getExamTemplate-------------------");
+		 System.out.println();
 //		 
 //		 getExamSubjects("1", "1", token);
 //		 System.out.println();
@@ -51,7 +51,7 @@ public class ClientApiTest {
 		// System.out.println("--------------------getExamGrades-------------------");
 		// System.out.println();
 		//
-		 getExams("0", token);
+//		 getExams("0", token);
 		// System.out.println();
 		// System.out.println("--------------------getExams-------------------");
 		// System.out.println();
