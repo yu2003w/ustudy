@@ -159,5 +159,37 @@ public class MarkTaskController {
 		result.put("data", marktask);
 		return result;
 	}
+	
+	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
+	public String createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		if (mt == null) {
+			logger.warn("createMarkTask(), received parameter is not valid");
+			return "Parameter invalid";
+		}
+		
+		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
+		try {
+			if (!stS.createMarkTask(mt)) {
+				logger.warn("createMarkTask(), failed to create mark task");
+				return "Failed to create mark task";
+			}
+			logger.debug("createMarkTask(), mark task created.");
+		} catch (Exception e) {
+			logger.warn("createMarkTask(), failed to create mark task with exception " + e.getMessage());
+			return e.getMessage();
+		}
+		
+		return "mark task created";
+	}
 
+	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
+	public String updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		return null;
+	}
+	
+	@RequestMapping(value = "marktask/delete/", method = RequestMethod.GET)
+	public String deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		return null;
+	}
+	
 }

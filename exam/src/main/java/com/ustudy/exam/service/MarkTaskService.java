@@ -27,4 +27,9 @@ public interface MarkTaskService {
 
 	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub examgs, String questionId);
 
+        public boolean createMarkTask(MarkTask mt);
+
+        public boolean updateMarkTask(MarkTask mt);
+
+        public boolean deleteMarkTask(int id);
 }

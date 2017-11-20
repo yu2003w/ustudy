@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.mapper.MarkTaskMapper;
-import com.ustudy.exam.model.MetaScoreTask;
+import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuesId;
 import com.ustudy.exam.model.QuesMarkSum;
@@ -29,15 +29,15 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskServiceImpl.class);
 	@Autowired
-	private MarkTaskMapper scoreTaskM;
+	private MarkTaskMapper markTaskM;
 	
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
 		
-		List<MetaScoreTask> mstL = scoreTaskM.getMetaScoreTask(teacid);
+		List<MetaMarkTask> mstL = markTaskM.getMetaScoreTask(teacid);
 		List<MarkTaskBrife> stL = new ArrayList<MarkTaskBrife>();
 		
-		for (MetaScoreTask mst: mstL) {
+		for (MetaMarkTask mst: mstL) {
 			stL.add(assembleTaskBrife(mst));
 		}
 		
@@ -50,13 +50,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	 * 2, retrieve question summary info
 	 * 
 	 */
-	private MarkTaskBrife assembleTaskBrife(MetaScoreTask mst) {
+	private MarkTaskBrife assembleTaskBrife(MetaMarkTask mst) {
 		
-		MarkTaskBrife mt = scoreTaskM.getMarkTaskBrife(mst.getQuesid());
+		MarkTaskBrife mt = markTaskM.getMarkTaskBrife(mst.getQuesid());
 		mt.setTeacherId(mst.getTeacid());
 		mt.setTeacherName(ExamUtil.retrieveSessAttr("uname"));
 		mt.setId(mst.getId());
-		mt.setScoreType(mst.getScoreType());
+		mt.setScoreType(mst.getMarkType());
 		logger.debug("assembleTaskBrife()," + mt.toString());
 		// assemble question summary information
 		String quesN = null;
@@ -82,14 +82,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		 */
 		List<QuesId> qIds = comb.getQuesids();
 		//get basic information from first question id
-		MarkTaskBrife mt = scoreTaskM.getMetaTaskInfo(qIds.get(0).getId());
-		mt.setScoreType(scoreTaskM.getMarkType(teacid, qIds.get(0).getId()));
+		MarkTaskBrife mt = markTaskM.getMetaTaskInfo(qIds.get(0).getId());
+		mt.setScoreType(markTaskM.getMarkType(teacid, qIds.get(0).getId()));
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		for (QuesId id: qIds) {
 			// if there is multiple QuesId, they should be combined to retrieve student paper
 			// ids here must be belonged to the same subject in the same grade of exam
 			// assemble summary information here.
-			QuesMarkSum qs = scoreTaskM.getQuesSum(id.getId());
+			QuesMarkSum qs = markTaskM.getQuesSum(id.getId());
 			String quesN = null;
 			if (qs.getQuesno() == null || qs.getQuesno().isEmpty() || qs.getQuesno().compareTo("0") == 0) {
 				quesN = qs.getStartno() + "-" + qs.getEndno();
@@ -109,7 +109,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq) {
 		List<QuestionPaper> items = new ArrayList<QuestionPaper>();
 		
-		List<String> paperIds = scoreTaskM.getPapersByQuesId(queS.get(0).getQuesid());
+		List<String> paperIds = markTaskM.getPapersByQuesId(queS.get(0).getQuesid());
 		logger.debug("requestPapers()，number of retrieved paper is " + paperIds.size());
 		int i = 0;
 		for (String pId: paperIds) {
@@ -122,11 +122,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				stuP.setPaperSeq(startSeq + (++i));
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
-				BlockAnswer ba = scoreTaskM.getStuAnswer(mark.getQuesid(), pId);
+				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pId);
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), mark.getFullscore());
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
-					List<SingleAnswer> saL = scoreTaskM.getQuesDiv(mark.getQuesid());
+					List<SingleAnswer> saL = markTaskM.getQuesDiv(mark.getQuesid());
 					ba.setSteps(saL);
 				}
 				blA.add(ba);
@@ -148,9 +148,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			int realScore = 0, num = 0;
 			if (ba.getSteps().isEmpty() == false) {
 				List<SingleAnswer> saL = ba.getSteps();
-				String ansId = scoreTaskM.getStuanswerId(pid, ba.getQuesid());
+				String ansId = markTaskM.getStuanswerId(pid, ba.getQuesid());
 				for (SingleAnswer sa:saL) {
-					num = scoreTaskM.insertStuAnswerDiv(sa, ansId);
+					num = markTaskM.insertStuAnswerDiv(sa, ansId);
 					if (num != 1) {
 						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
 					}
@@ -184,7 +184,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			ba.setTeacid1(ExamUtil.getCurrentUserId());
 			if (realScore != 0)
 			    ba.setScore(realScore);
-			num = scoreTaskM.updateStuAnswer(ba);
+			num = markTaskM.updateStuAnswer(ba);
 			if (num != 1) {
 				logger.warn("updateMarkResult(), " + num + " records updated. It seemed something went wrong.");
 			}
@@ -200,7 +200,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			logger.warn("getMarkTasksBySub(), parameter is not valid");
 			return null;
 		}
-		List<String> quesIds = scoreTaskM.getQuesIdsByExamGradeSub(egs);
+		List<String> quesIds = markTaskM.getQuesIdsByExamGradeSub(egs);
 		if (quesIds == null || quesIds.isEmpty()) {
 			logger.warn("getMarkTasksBySub(), no question ids retrieved for " + egs.toString());
 			return null;
@@ -215,21 +215,77 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 	@Override
 	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub egs, String questionId) {
-		MarkTask mt = scoreTaskM.getAllMarkTasksByQuesId(questionId);
+		MarkTask mt = markTaskM.getAllMarkTasksByQuesId(questionId);
 		mt.setMetaInfo(questionId, egs);
 		if (mt.getMarkMode().compareTo("单评") == 0) {
-			mt.setTeachersIds(scoreTaskM.getTeachersByQid(questionId));
+			mt.setTeachersIds(markTaskM.getTeachersByQid(questionId));
 			mt.setFinalMarkTeachersIds(new ArrayList<String>());
 		}
 		else if (mt.getMarkMode().compareTo("双评") == 0) {
 			// get teachers for first screen
-			mt.setTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "初评"));
+			mt.setTeachersIds(markTaskM.getTeachersByQidRole(questionId, "初评"));
 			// get teachers for final screen
-			mt.setFinalMarkTeachersIds(scoreTaskM.getTeachersByQidRole(questionId, "终评"));
+			mt.setFinalMarkTeachersIds(markTaskM.getTeachersByQidRole(questionId, "终评"));
 		}
 		else {
 			logger.warn("getMarkTasksBySub(), wrong type -> " + mt.getMarkMode());
 		}
 		return mt;
+	}
+
+	@Override
+	public boolean createMarkTask(MarkTask mt) {
+		// for certain questions, assign teachers for mark, such as first round mark, final mark
+		
+		// populate first round mark teachers
+		List<String> teaL = mt.getTeachersIds();
+		int num = 0;
+		if (teaL != null && !teaL.isEmpty()) {
+			for (String id: teaL) {
+				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, "标准", "初评");
+				num = markTaskM.populateMetaMarkTask(mmt);
+				if (num != 1) {
+					logger.error("createMarkTask(), failed to populate record " + mmt.toString());
+					return false;
+				}
+			}
+		}
+		
+		teaL = mt.getFinalMarkTeachersIds();
+		if (teaL != null && !teaL.isEmpty()) {
+			for (String id: teaL) {
+				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, "标准", "终评");
+				num = markTaskM.populateMetaMarkTask(mmt);
+				if (num != 1) {
+					logger.error("createMarkTask(), failed to populate record " + mmt.toString());
+					return false;
+				}
+				logger.debug("createMarkTask(), populate record succeded -> " + mmt.toString());
+			}
+		}
+		
+		// update time limit for specified question id
+		if (mt.getTimeLimit() != 0) {
+			num = markTaskM.setTimeLimit(mt.getTimeLimit(), mt.getQuestionId());
+			if (num != 1) {
+				logger.error("createMarkTask(), failed to update time limit for " + mt.getQuestionId());
+				return false;
+			}
+			logger.debug("createMarkTask(), update time limit succeded");
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean updateMarkTask(MarkTask mt) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean deleteMarkTask(int id) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
