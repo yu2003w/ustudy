@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.SetAnswersService;
 
 import net.sf.json.JSONObject;
@@ -28,6 +29,9 @@ public class SetAnswersController {
 
 	@Autowired
 	private SetAnswersService service;
+	
+	@Autowired
+	private ExamSubjectService esService;
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
 	public Map getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
@@ -60,7 +64,7 @@ public class SetAnswersController {
 
 		try {
 			JSONObject data = JSONObject.fromObject(parameters);
-			if (service.saveQuesAnswers(egsId, data)) {
+			if (service.saveQuesAnswers(egsId, data) && esService.isAanswerSeted(egsId)) {
 				result.put("success", true);
 			} else {
 				result.put("success", false);

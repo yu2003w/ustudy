@@ -167,26 +167,34 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public boolean saveTemplates(Long id, String data) {
+	public boolean saveTemplates(Long id, String data) throws Exception{
+		
+		logger.debug("originalData: " + data);
 		
 		JSONObject originalData = JSONObject.fromObject(data);
-		logger.debug("originalData: " + originalData);
 		String xmlServerPath = "";
 		if(null != originalData.get("xmlServerPath")){
 			xmlServerPath = originalData.getString("xmlServerPath");
 		}
-		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, data.toString());
-		Map<String, Long> quesAnswersId = getQuesAnswer(originalData);
-		saveQuesareas(quesAnswersId, originalData);
-		return true;
+		examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, data);
+		
+		Map<String, Long> quesAnswersId = getQuesAnswer(id, originalData);
+		if(null != quesAnswersId && quesAnswersId.size()>0){
+			saveQuesareas(quesAnswersId, originalData);
+			return true;
+		}
+		
+		return false;
 	}
 	
-	private Map<String, Long> getQuesAnswer(JSONObject originalData){
+	private Map<String, Long> getQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception{
 		
 		List<QuesAnswer> quesAnswers = new ArrayList<>();
 		
-		if(null != originalData.get("TemplateInfo") && null != originalData.get("CSID") ){
-			Long examGradeSubId = originalData.getLong("CSID");
+		if(null != originalData.get("TemplateInfo")){
+			if(null != originalData.get("CSID")){
+				examGradeSubId = originalData.getLong("CSID");
+			}
 			JSONObject templateInfo = originalData.getJSONObject("TemplateInfo");
 			if(null != templateInfo.get("pages")){
 				JSONArray pages = templateInfo.getJSONArray("pages");
@@ -253,14 +261,15 @@ public class ClientServiceImpl implements ClientService {
 							}
 							
 							quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
-							
 						}
 					}
 				}
 			}
 		}
 		
-		quesAnswerDaoImpl.initQuesAnswers(quesAnswers);
+		if(null != quesAnswers && quesAnswers.size()>0){
+			quesAnswerDaoImpl.initQuesAnswers(quesAnswers);
+		}
 		
 		return getQuesAnswersId(quesAnswers);
 	}

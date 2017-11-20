@@ -28,4 +28,8 @@ public interface ExamSubjectDao {
 
 	void saveOriginalData(@Param("id")Long id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
+	void isAanswerSeted(Long id);
+	
+	void isTaskDispatch(Long id);
+	
 }

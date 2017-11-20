@@ -21,10 +21,10 @@ public class ClientApiTest {
 		
 		long t1 =  System.currentTimeMillis();
 		
-		 getQuestionType(token);
-		 System.out.println();
-		 System.out.println("--------------------getQuestionType-------------------");
-		 System.out.println();
+//		 getQuestionType(token);
+//		 System.out.println();
+//		 System.out.println("--------------------getQuestionType-------------------");
+//		 System.out.println();
 
 //		 saveTemplates(token);
 //		 System.out.println();
@@ -51,7 +51,7 @@ public class ClientApiTest {
 		// System.out.println("--------------------getExamGrades-------------------");
 		// System.out.println();
 		//
-		// getExams("0", token);
+		 getExams("0", token);
 		// System.out.println();
 		// System.out.println("--------------------getExams-------------------");
 		// System.out.println();
@@ -370,7 +370,8 @@ public class ClientApiTest {
 
 	public static void getExams(String examStatus, String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExams/" + examStatus;
+//		String targetURL = "http://127.0.0.1:8080/exam/client/getExams/" + examStatus;
+		String targetURL = "http://47.92.53.57/api/client/getExams/" + examStatus;
 
 		try {
 

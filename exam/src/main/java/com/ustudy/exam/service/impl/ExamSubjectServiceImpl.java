@@ -128,8 +128,25 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	public boolean saveStudentAnswers(JSONObject data) {
-		// TODO Auto-generated method stub
+	public boolean isAanswerSeted(Long id){
+		try {
+			daoImpl.isAanswerSeted(id);
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public boolean isTaskDispatch(Long id){
+		try {
+			daoImpl.isTaskDispatch(id);
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
 		return false;
 	}
 	

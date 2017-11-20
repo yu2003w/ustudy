@@ -89,5 +89,13 @@
 	<update id="saveOriginalData" parameterType="java.util.Map">
 		UPDATE examgradesub SET template=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
+	
+	<update id="isAanswerSeted" parameterType="Long">
+		UPDATE examgradesub SET answer_seted=1 where id=#{id}
+	</update>
+	
+	<update id="isTaskDispatch" parameterType="Long">
+		UPDATE examgradesub SET task_dispatch=1 where id=#{id}
+	</update>
 
 </mapper>

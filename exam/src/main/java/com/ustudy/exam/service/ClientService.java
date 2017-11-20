@@ -14,7 +14,7 @@ public interface ClientService {
 	
 	Map<String, Object> login(String token);
 
-	boolean saveTemplates(Long csId, String data);
+	boolean saveTemplates(Long csId, String data) throws Exception;
 	
 	Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId);
 	
