@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
@@ -234,6 +235,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	}
 
 	@Override
+	@Transactional
 	public boolean createMarkTask(MarkTask mt) {
 		// for certain questions, assign teachers for mark, such as first round mark, final mark
 		

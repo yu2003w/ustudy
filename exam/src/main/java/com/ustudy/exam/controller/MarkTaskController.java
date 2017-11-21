@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
@@ -161,35 +162,32 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
-	public Map createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
-		Map result = new HashMap<>();
-		String msg;
-		result.put("success", false);
+	public UResp createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		UResp res = new UResp();
 		if (mt == null) {
-			msg = "createMarkTask(), received parameter is not valid";
-			logger.warn(msg);
-			result.put("message", msg);
-			return result;
+			logger.warn("createMarkTask(), received parameter is not valid");
+			res.setMessage("parameter invalid");
+			return res;
 		}
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
 			if (!stS.createMarkTask(mt)) {
-				msg = "createMarkTask(), failed to create mark task";
-				logger.warn(msg);
-				result.put("message", msg);
-				return result;
+				logger.warn("createMarkTask(), failed to create mark task");
+				res.setMessage("Failed to create mark task");
+				resp.setStatus(500);
+				return res;
 			}
 			logger.debug("createMarkTask(), mark task created.");
 		} catch (Exception e) {
-			msg = "createMarkTask(), failed to create mark task with exception " + e.getMessage();
-			logger.warn(msg);
-			result.put("message", msg);
-			return result;
+			logger.warn("createMarkTask(), failed to create mark task with exception " + e.getMessage());
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
+			return res;
 		}
-
-		result.put("success", true);
-		return result;
+		
+		res.setRet(true);
+		return res;
 	}
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
