@@ -103,7 +103,7 @@ FOREIGN KEY (examsch)
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
-);
+) ENGINE=InnoDB;
 
 create table if not exists ustudy.marktask (
 id INT NOT NULL AUTO_INCREMENT,
@@ -114,8 +114,6 @@ threshold INT,
 scoretype ENUM ('标准','问题卷','终评'),
 # no need to set if mark style is single screen
 markrole ENUM ('初评', '终评'),
-# number of scored papers
-numOfsp INT,
 PRIMARY KEY (id),
 FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(teacid)

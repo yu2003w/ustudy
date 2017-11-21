@@ -284,14 +284,44 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	@Transactional
 	public boolean updateMarkTask(MarkTask mt) {
+		if (deleteMarkTask(mt)) {
+			if (!createMarkTask(mt)) {
+				logger.error("updateMarkTask(), failed to create mark task ->" + mt.toString());
+				return false;
+			}
+			logger.debug("updateMarkTask(), updateMarkTask successfully.");
+		}
+		else {
+			logger.error("updateMarkTask(), failed to delete mark task ->" + mt.toString());
+			return false;
+		}
 		
-		return false;
+		return true;
 	}
 
 	@Override
 	@Transactional
 	public boolean deleteMarkTask(MarkTask mt) {
+		List<String> teaL = mt.getTeachersIds();
+		int num = 0;
+		for (String id: teaL) {
+			num = markTaskM.deleteMetaMarkTask(id, mt.getQuestionId(), "初评");
+			if (num != 1) {
+				logger.error("deleteMarkTask(), delete failed with num ->" + num);
+				return false;
+			}
+			logger.debug("deleteMarkTask(), deleted mark task for " + id);
+		}
+		teaL = mt.getFinalMarkTeachersIds();
+		for (String id: teaL) {
+			num = markTaskM.deleteMetaMarkTask(id, mt.getQuestionId(), "终评");
+			if (num != 1) {
+				logger.error("deleteMarkTask(), delete failed with num ->" + num);
+				return false;
+			}
+			logger.debug("deleteMarkTask(), deleted mark task for " + id);
+		}
 		
-		return false;
+		return true;
 	}
 }

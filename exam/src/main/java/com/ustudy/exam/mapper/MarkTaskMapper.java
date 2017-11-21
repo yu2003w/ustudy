@@ -102,15 +102,15 @@ public interface MarkTaskMapper {
 	
 	// meta mark task related functions
 	
-	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, scoretype, markrole, numOfsp) "
-			+ "values(#{teacid}, #{quesid}, #{threshold}, #{markType}, #{markrole}, #{numOfMarkedPapers})")
+	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, scoretype, markrole) "
+			+ "values(#{teacid}, #{quesid}, #{threshold}, #{markType}, #{markrole})")
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 	
-	@Update("")
-	public int updateMetaMarkTask();
 	
-	@Delete("")
-	public int deleteMetaMarkTask();
+	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "
+			+ "markrole = #{markrole}")
+	public int deleteMetaMarkTask(@Param("teacid") String teac, @Param("quesid") String ques, 
+			@Param("markrole") String role);
 	
 	@Update("update ustudy.question set duration = #{tl} where id = #{qid}")
 	public int setTimeLimit(@Param("tl") int timeLimit, @Param("qid") String qid);

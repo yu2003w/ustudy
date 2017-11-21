@@ -44,9 +44,8 @@ FOREIGN KEY (schid)
 create table if not exists ustudy.classsub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_id int(11) DEFAULT NULL,
-sub_name VARCHAR(32) NOT NULL,
 cls_id INT NOT NULL,
-sub_owner VARCHAR(32),
+sub_owner INT(11),
 PRIMARY KEY(id),
 INDEX(cls_id, sub_owner),
 FOREIGN KEY (cls_id)
@@ -55,9 +54,9 @@ FOREIGN KEY (cls_id)
 FOREIGN KEY (sub_owner)
     REFERENCES ustudy.teacher(teacid)
     ON UPDATE CASCADE ON DELETE SET NULL,
-FOREIGN KEY (sub_id, sub_name)
-    REFERENCES ustudy.subject(id, name)
-    ON UPDATE CASCADE ON DELETE SET NULL
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
+    ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teacherroles (

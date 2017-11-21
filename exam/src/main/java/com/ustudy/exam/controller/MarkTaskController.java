@@ -198,7 +198,34 @@ public class MarkTaskController {
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
 	public UResp updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
-		return null;
+		UResp res = new UResp();
+		
+		if (mt == null) {
+			logger.warn("updateMarkTask(), received parameter is invalid");
+			res.setMessage("parameter invalid");
+			return res;
+		}
+		logger.debug("updateMarkTask(), item to be updated --> " + mt.toString());
+		
+		try {
+			if (!stS.updateMarkTask(mt)) {
+				logger.warn("updateMarkTask(), failed to update mark task.");
+				res.setMessage("failed to update mark task specified");
+				res.setData(mt);
+				resp.setStatus(500);
+				return res;
+			}
+			logger.debug("deleteMarkTask(), mark task updated");
+		} catch (Exception e) {
+			logger.warn("updateMarkTask(), failed to update mark task with exception -> " + e.getMessage());
+			res.setMessage("failed to update mark task with exception -> " + e.getMessage());
+			resp.setStatus(500);
+			return res;
+		} 
+		
+		res.setRet(true);
+		return res; 
+		
 	}
 	
 	@RequestMapping(value = "marktask/delete/", method = RequestMethod.GET)

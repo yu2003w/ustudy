@@ -1,89 +1,89 @@
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE ustudy.student
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stu.data' INTO TABLE ustudy.student
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE ustudy.users
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/users.data' INTO TABLE ustudy.users
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE ustudy.school
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/school.data' INTO TABLE ustudy.school
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/owners.data' INTO TABLE ustudy.orgowner
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/owners.data' INTO TABLE ustudy.orgowner
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teachers.data' INTO TABLE ustudy.teacher
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teachers.data' INTO TABLE ustudy.teacher
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teagrade.data' INTO TABLE ustudy.teachergrade
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teagrade.data' INTO TABLE ustudy.teachergrade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teasub.data' INTO TABLE ustudy.teachersub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teasub.data' INTO TABLE ustudy.teachersub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/tearoles.data' INTO TABLE ustudy.teacherroles
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/tearoles.data' INTO TABLE ustudy.teacherroles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/grade.data' INTO TABLE ustudy.grade
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/grade.data' INTO TABLE ustudy.grade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/gradesub.data' INTO TABLE ustudy.gradesub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/gradesub.data' INTO TABLE ustudy.gradesub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/exam.data' INTO TABLE ustudy.exam
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/exam.data' INTO TABLE ustudy.exam
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/examschool.data' INTO TABLE ustudy.examschool
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examschool.data' INTO TABLE ustudy.examschool
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/examgradesub.data' INTO TABLE ustudy.examgradesub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examgradesub.data' INTO TABLE ustudy.examgradesub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/quesanswer.data' INTO TABLE ustudy.quesanswer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/question.data' INTO TABLE ustudy.question
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/quesdiv.data' INTO TABLE ustudy.quesanswerdiv
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesdiv.data' INTO TABLE ustudy.quesanswerdiv
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teascoretask.data' INTO TABLE ustudy.teacherscoretask
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.data' INTO TABLE ustudy.marktask
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stupaper.data' INTO TABLE ustudy.stupaper
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stupaper.data' INTO TABLE ustudy.stupaper
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stuanswer.data' INTO TABLE ustudy.stuanswer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stuanswer.data' INTO TABLE ustudy.stuanswer
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
