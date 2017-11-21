@@ -161,25 +161,35 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
-	public String createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+	public Map createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		Map result = new HashMap<>();
+		String msg;
+		result.put("success", false);
 		if (mt == null) {
-			logger.warn("createMarkTask(), received parameter is not valid");
-			return "Parameter invalid";
+			msg = "createMarkTask(), received parameter is not valid";
+			logger.warn(msg);
+			result.put("message", msg);
+			return result;
 		}
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
 			if (!stS.createMarkTask(mt)) {
-				logger.warn("createMarkTask(), failed to create mark task");
-				return "Failed to create mark task";
+				msg = "createMarkTask(), failed to create mark task";
+				logger.warn(msg);
+				result.put("message", msg);
+				return result;
 			}
 			logger.debug("createMarkTask(), mark task created.");
 		} catch (Exception e) {
-			logger.warn("createMarkTask(), failed to create mark task with exception " + e.getMessage());
-			return e.getMessage();
+			msg = "createMarkTask(), failed to create mark task with exception " + e.getMessage();
+			logger.warn(msg);
+			result.put("message", msg);
+			return result;
 		}
-		
-		return "mark task created";
+
+		result.put("success", true);
+		return result;
 	}
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
