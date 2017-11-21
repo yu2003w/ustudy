@@ -1,9 +1,7 @@
 package com.ustudy.exam.controller;
 
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -119,46 +117,54 @@ public class MarkTaskController {
 	}
 
 	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
-	public Map getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
+	public UResp getAllMarkTasks(HttpServletResponse resp, @PathVariable String examId,
 							   @PathVariable String gradeId, @PathVariable String subjectId) {
 
-		Map result = new HashMap<>();
+		UResp res = new UResp();
+		
 		List<MarkTask> mList = null;
 		try {
 			mList = stS.getMarkTasksBySub(new ExamGradeSub(examId, gradeId, subjectId));
+			res.setRet(true);
+			res.setMessage("retrieved mark tasks successfully");
+			res.setData(mList);
 		} catch (Exception e) {
 			logger.warn("getAllMarkTasks()" + e.getMessage());
 			String msg = "Failed to retrieve mark tasks ->" + e.getMessage();
-			result.put("success", false);
-			result.put("message", msg);
-			return result;
+			res.setMessage(msg);
+			res.setRet(false);
+			resp.setStatus(500);
+			return res;
 
 		}
-		result.put("success", true);
-		result.put("data", mList);
-		return result;
+	
+		return res;
 	}
 
 	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}/{questionId}", method = RequestMethod.GET)
-	public Map getMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
+	public UResp getMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
 						   @PathVariable String subjectId, @PathVariable String questionId) {
 
-		Map result = new HashMap<>();
+		UResp res = new UResp();
+		
 		MarkTask marktask = null;
 		try {
 			 marktask = stS.getMarkTaskByEGSQuestion(new ExamGradeSub(examId, gradeId, subjectId), questionId);
+			 res.setData(marktask);
+			 res.setRet(true);
+			 res.setMessage("retrieved mark task successfully");
 		} catch (Exception e) {
 			logger.warn("getMarkTask()" + e.getMessage());
 			String msg = "Failed to retrieve mark task ->" + e.getMessage();
-			result.put("success", false);
-			result.put("message", msg);
-			return result;
+			res.setMessage(msg);
+			res.setRet(false);
+			resp.setStatus(500);
+			return res;
 
 		}
 
-		result.put("success", true);
-		result.put("data", marktask);
-		return result;
+		return res;
+		
 	}
 	
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
@@ -191,13 +197,39 @@ public class MarkTaskController {
 	}
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
-	public String updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+	public UResp updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		return null;
 	}
 	
 	@RequestMapping(value = "marktask/delete/", method = RequestMethod.GET)
-	public String deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
-		return null;
+	public UResp deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		if (mt == null) {
+			logger.warn("deleteMarkTask(), received parameter is invalid");
+			res.setMessage("parameter invalid");
+			return res;
+		}
+		logger.debug("deleteMarkTask(), item to be delete --> " + mt.toString());
+		
+		try {
+			if (!stS.deleteMarkTask(mt)) {
+				logger.warn("deleteMarkTask(), failed to delete mark task.");
+				res.setMessage("failed to delete mark task specified");
+				res.setData(mt);
+				resp.setStatus(500);
+				return res;
+			}
+			logger.debug("deleteMarkTask(), mark task deleted");
+		} catch (Exception e) {
+			logger.warn("deleteMarkTask(), failed to delete mark task with exception -> " + e.getMessage());
+			res.setMessage("failed to delete mark task with exception -> " + e.getMessage());
+			resp.setStatus(500);
+			return res;
+		} 
+		
+		res.setRet(true);
+		return res; 
 	}
 	
 }

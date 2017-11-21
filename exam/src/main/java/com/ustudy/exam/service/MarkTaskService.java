@@ -31,5 +31,5 @@ public interface MarkTaskService {
 
         public boolean updateMarkTask(MarkTask mt);
 
-        public boolean deleteMarkTask(int id);
+        public boolean deleteMarkTask(MarkTask mt);
 }

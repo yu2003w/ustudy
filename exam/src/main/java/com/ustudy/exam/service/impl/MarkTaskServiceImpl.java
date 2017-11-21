@@ -276,18 +276,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			logger.debug("createMarkTask(), update time limit succeded");
 		}
 		
+		// need to set owner here
+		
 		return true;
 	}
 
 	@Override
+	@Transactional
 	public boolean updateMarkTask(MarkTask mt) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
-	public boolean deleteMarkTask(int id) {
-		// TODO Auto-generated method stub
+	@Transactional
+	public boolean deleteMarkTask(MarkTask mt) {
+		
 		return false;
 	}
 }
