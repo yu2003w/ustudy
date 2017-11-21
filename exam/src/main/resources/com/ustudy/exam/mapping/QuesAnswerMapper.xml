@@ -20,6 +20,10 @@
 	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
 		SELECT * FROM quesanswer where exam_grade_sub_id=#{egsId}
 	</select>
+	
+	<select id="getQuesAnswersByIds" parameterType="string" resultMap="QuesAnswerResult">
+		SELECT * FROM quesanswer where exam_grade_sub_id in (#{egsIds})
+	</select>
 
 	<delete id="deleteQuesAnswers" parameterType="Long">
 		delete FROM quesanswer where exam_grade_sub_id=#{egsId}

@@ -69,7 +69,14 @@ public class ClientController {
 		}
 		
 		result = new HashMap<>();
-		result.put("success", cs.saveTemplates(csId, parameters));
+		try {
+			result.put("success", cs.saveTemplates(csId, parameters));
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+			logger.error(e);
+			e.printStackTrace();
+		}
 
 		return result;
 	}

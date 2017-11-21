@@ -2,13 +2,14 @@ package com.ustudy.exam.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.ustudy.exam.model.MetaScoreTask;
+import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
@@ -20,7 +21,7 @@ import com.ustudy.exam.model.MarkTaskBrife;
 public interface MarkTaskMapper {
 
 	@Select("select * from ustudy.teacherscoretask where teacid = #{tid}")
-	public List<MetaScoreTask> getMetaScoreTask(@Param("tid") String teacid);
+	public List<MetaMarkTask> getMetaScoreTask(@Param("tid") String teacid);
 	
 	@Select("select scoretype from ustudy.teacherscoretask where teacid = #{tid} and quesid = #{qid}")
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
@@ -97,5 +98,21 @@ public interface MarkTaskMapper {
 	
 	@Select("select teacid from teacherscoretask where quesid = #{qid}")
 	public List<String> getTeachersByQid(@Param("qid") String qid);
+	
+	
+	// meta mark task related functions
+	
+	@Insert("insert into ustudy.teacherscoretask(teacid, quesid, threshold, scoretype, markrole, numOfsp) "
+			+ "values(#{teacid}, #{quesid}, #{threshold}, #{markType}, #{markrole}, #{numOfMarkedPapers})")
+	public int populateMetaMarkTask(MetaMarkTask mmt);
+	
+	@Update("")
+	public int updateMetaMarkTask();
+	
+	@Delete("")
+	public int deleteMetaMarkTask();
+	
+	@Update("update ustudy.quesanswer set duration = #{tl} where id = #{qid}")
+	public int setTimeLimit(@Param("tl") int timeLimit, @Param("qid") String qid);
 	
 }

@@ -3,6 +3,8 @@ package com.ustudy.exam.model;
 import java.io.Serializable;
 import java.util.List;
 
+import net.sf.json.JSONArray;
+
 public class ExamSubject implements Serializable {
 
 	private static final long serialVersionUID = -9022319462035362070L;
@@ -28,8 +30,9 @@ public class ExamSubject implements Serializable {
 	private String blankQuestionsPaper ;
 	private String xmlServerPath;
 	private String originalData;
-	private String examName;
-	private List<QuesAnswer> questions;
+
+	private JSONArray questions;
+    private String examName;
 
 	public ExamSubject() {
 	}
@@ -209,11 +212,15 @@ public class ExamSubject implements Serializable {
 		this.xmlServerPath = xmlServerPath;
 	}
 
-	public List<QuesAnswer> getQuestions() { return questions; }
+	public JSONArray getQuestions() {
+		return questions;
+	}
 
-	public void setQuestions(List<QuesAnswer> questions) { this.questions = questions; }
+	public void setQuestions(JSONArray questions) {
+		this.questions = questions;
+	}
 
-	public String getExamName() { return examName; }
+    public String getExamName() { return examName; }
 
-	public void setExamName(String examName) { this.examName = examName; }
+    public void setExamName(String examName) { this.examName = examName; }
 }
