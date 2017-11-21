@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
@@ -161,25 +162,32 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
-	public String createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+	public UResp createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		UResp res = new UResp();
 		if (mt == null) {
 			logger.warn("createMarkTask(), received parameter is not valid");
-			return "Parameter invalid";
+			res.setMessage("parameter invalid");
+			return res;
 		}
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
 			if (!stS.createMarkTask(mt)) {
 				logger.warn("createMarkTask(), failed to create mark task");
-				return "Failed to create mark task";
+				res.setMessage("Failed to create mark task");
+				resp.setStatus(500);
+				return res;
 			}
 			logger.debug("createMarkTask(), mark task created.");
 		} catch (Exception e) {
 			logger.warn("createMarkTask(), failed to create mark task with exception " + e.getMessage());
-			return e.getMessage();
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
+			return res;
 		}
 		
-		return "mark task created";
+		res.setRet(true);
+		return res;
 	}
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
