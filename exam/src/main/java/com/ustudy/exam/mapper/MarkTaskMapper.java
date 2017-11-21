@@ -20,25 +20,25 @@ import com.ustudy.exam.model.MarkTaskBrife;
 @Mapper
 public interface MarkTaskMapper {
 
-	@Select("select * from ustudy.teacherscoretask where teacid = #{tid}")
+	@Select("select * from ustudy.marktask where teacid = #{tid}")
 	public List<MetaMarkTask> getMetaScoreTask(@Param("tid") String teacid);
 	
-	@Select("select scoretype from ustudy.teacherscoretask where teacid = #{tid} and quesid = #{qid}")
+	@Select("select scoretype from ustudy.marktask where teacid = #{tid} and quesid = #{qid}")
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
 	
 	//@Select("select exam_id as examId, exam_name as examName, sub_name as subject, grade_name as grade from "
-	//		+ "ustudy.examgradesub where id = (select exam_grade_sub_id from ustudy.quesanswer where id = #{qid}")
+	//		+ "ustudy.examgradesub where id = (select exam_grade_sub_id from ustudy.question where id = #{qid}")
 	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
 			+ "startno, endno, posx, posy, height, length, type as questionType, mark_mode as scoreMode from "
-			+ "ustudy.examgradesub join ustudy.quesanswer on ustudy.examgradesub.id = "
-			+ "ustudy.quesanswer.exam_grade_sub_id where ustudy.examgradesub.id = (select exam_grade_sub_id "
-			+ "from ustudy.quesanswer where id = #{qid})")
+			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = "
+			+ "ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = (select exam_grade_sub_id "
+			+ "from ustudy.question where id = #{qid})")
 	public MarkTask getScoreTask(@Param("qid") String quesid);
 	
 	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
-			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.quesanswer on "
-			+ "ustudy.examgradesub.id = ustudy.quesanswer.exam_grade_sub_id where ustudy.examgradesub.id "
-			+ "= (select exam_grade_sub_id from ustudy.quesanswer where id = #{qid}) and ustudy.quesanswer.id = #{qid}")
+			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.question on "
+			+ "ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id "
+			+ "= (select exam_grade_sub_id from ustudy.question where id = #{qid}) and ustudy.question.id = #{qid}")
 	public MarkTaskBrife getMarkTaskBrife(@Param("qid") String quesid);
 	
 	
@@ -49,18 +49,18 @@ public interface MarkTaskMapper {
 	 * 
 	 */
 	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade from "
-			+ "ustudy.examgradesub join ustudy.quesanswer on ustudy.examgradesub.id = "
-			+ "ustudy.quesanswer.exam_grade_sub_id where ustudy.examgradesub.id = "
-			+ "(select exam_grade_sub_id from ustudy.quesanswer where id = #{qid}) and ustudy.quesanswer.id = #{qid}")
+			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = "
+			+ "ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = "
+			+ "(select exam_grade_sub_id from ustudy.question where id = #{qid}) and ustudy.question.id = #{qid}")
 	public MarkTaskBrife getMetaTaskInfo(@Param("qid") String queid);
 	
 	@Select("select id as quesid, quesno, startno, endno, type as questionType, mark_mode as markMode, score as "
-			+ "fullscore from ustudy.quesanswer where id = #{qid}")
+			+ "fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 	
-	@Select("select ustudy.stupaper.id from ustudy.quesanswer join ustudy.stupaper on "
-			+ "ustudy.quesanswer.exam_grade_sub_id = ustudy.stupaper.exam_grade_sub_id "
-			+ "where ustudy.quesanswer.id = #{qid}")
+	@Select("select ustudy.stupaper.id from ustudy.question join ustudy.stupaper on "
+			+ "ustudy.question.exam_grade_sub_id = ustudy.stupaper.exam_grade_sub_id "
+			+ "where ustudy.question.id = #{qid}")
 	public List<String> getPapersByQuesId(@Param("qid") String quesid);
 	
 	@Select("select quesno, score as fullscore from quesanswerdiv where quesid = #{qid}")
@@ -84,25 +84,25 @@ public interface MarkTaskMapper {
 	@Select("select id from ustudy.stuanswer where quesid=#{qid} and paperid=#{pid}")
 	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
 	
-	@Select("select id from quesanswer where exam_grade_sub_id = (select id from examgradesub "
+	@Select("select id from question where exam_grade_sub_id = (select id from examgradesub "
 			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")
 	public List<String> getQuesIdsByExamGradeSub(ExamGradeSub egs);
 	
 	@Select("select distinct teac_owner as ownerId, assign_mode as type, duration as timeLimit, mark_mode as markMode"
-			+ " from quesanswer join teacherscoretask on quesanswer.id = teacherscoretask.quesid where "
-			+ "quesanswer.id=#{qid}")
+			+ " from question join ustudy.marktask on question.id = ustudy.marktask.quesid where "
+			+ "question.id=#{qid}")
 	public MarkTask getAllMarkTasksByQuesId(@Param("qid") String qid);
 	
-	@Select("select teacid from teacherscoretask where quesid = #{qid} and markrole = #{role}")
+	@Select("select teacid from ustudy.marktask where quesid = #{qid} and markrole = #{role}")
 	public List<String> getTeachersByQidRole(@Param("qid") String qid, @Param("role") String markRole);
 	
-	@Select("select teacid from teacherscoretask where quesid = #{qid}")
+	@Select("select teacid from ustudy.marktask where quesid = #{qid}")
 	public List<String> getTeachersByQid(@Param("qid") String qid);
 	
 	
 	// meta mark task related functions
 	
-	@Insert("insert into ustudy.teacherscoretask(teacid, quesid, threshold, scoretype, markrole, numOfsp) "
+	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, scoretype, markrole, numOfsp) "
 			+ "values(#{teacid}, #{quesid}, #{threshold}, #{markType}, #{markrole}, #{numOfMarkedPapers})")
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 	
@@ -112,7 +112,7 @@ public interface MarkTaskMapper {
 	@Delete("")
 	public int deleteMetaMarkTask();
 	
-	@Update("update ustudy.quesanswer set duration = #{tl} where id = #{qid}")
+	@Update("update ustudy.question set duration = #{tl} where id = #{qid}")
 	public int setTimeLimit(@Param("tl") int timeLimit, @Param("qid") String qid);
 	
 }

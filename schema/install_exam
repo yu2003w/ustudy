@@ -5,7 +5,7 @@ create database if not exists ustudy character set utf8;
 # tables for answer setting
 # actually each block defined by paper template contains one or multiple question no,
 # start position, height and length
-create table if not exists ustudy.quesanswer (
+create table if not exists ustudy.question (
 id INT NOT NULL AUTO_INCREMENT,
 # note, if questno is null, startno/endno should have value
 quesno INT,
@@ -44,7 +44,7 @@ answer VARCHAR(128),
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -70,7 +70,7 @@ answer varchar(128) DEFAULT NULL,
 PRIMARY KEY (id),
 INDEX(quesid),
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id) REFERENCES ustudy.examgradesub (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -85,7 +85,7 @@ quesid INT NOT NULL,
 exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 PRIMARY KEY (id),
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -101,11 +101,11 @@ FOREIGN KEY (examsch)
     REFERENCES ustudy.examschool(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table if not exists ustudy.teacherscoretask (
+create table if not exists ustudy.marktask (
 id INT NOT NULL AUTO_INCREMENT,
 teacid VARCHAR(32) NOT NULL,
 quesid INT NOT NULL,
@@ -121,7 +121,7 @@ FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -207,7 +207,7 @@ PRIMARY KEY(id),
 INDEX (quesid, paperid),
 UNIQUE KEY (quesid, paperid),
 FOREIGN KEY (quesid)
-    REFERENCES ustudy.quesanswer(id)
+    REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (paperid)
     REFERENCES ustudy.stupaper(id)
