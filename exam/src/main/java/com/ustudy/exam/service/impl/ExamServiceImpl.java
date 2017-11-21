@@ -1,6 +1,8 @@
 package com.ustudy.exam.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -33,5 +35,14 @@ public class ExamServiceImpl implements ExamService {
 		logger.debug("getExamsById -> id:" + id);
 		return examDaoImpl.getExamsById(id);
 	}
-	
+
+	@Override
+	public ArrayList<Map> getSubjects() {
+		return examDaoImpl.getSubjects();
+	}
+
+	@Override
+	public ArrayList<Map> getGrades() {
+		return examDaoImpl.getGrades();
+	}
 }
