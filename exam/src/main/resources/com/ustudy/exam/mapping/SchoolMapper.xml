@@ -2,9 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ustudy.exam.dao.SchoolDao">
 
-	<!-- 根据学校ID查询得到一个School对象-->
-	<select id="getSchoolById" parameterType="String" resultType="com.ustudy.exam.model.School">
+	<resultMap type="com.ustudy.exam.model.School" id="SchoolResult">
+        <id property="id" column="id"/>
+        <result property="schid" column="schid"/>
+        <result property="schname" column="schname"/>
+        <result property="type" column="type"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="district" column="district"/>
+    </resultMap>
+
+	<select id="getSchoolById" parameterType="String" resultMap="SchoolResult">
 		SELECT * from school where schid=#{schid}
+	</select>	
+
+	<select id="getSchoolsByExamId" parameterType="long" resultMap="SchoolResult">
+		SELECT * from school where schid in (SELECT schid from examschool where examid=#{examId});
 	</select>
 
 </mapper>

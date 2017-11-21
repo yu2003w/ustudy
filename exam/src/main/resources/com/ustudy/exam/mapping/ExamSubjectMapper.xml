@@ -5,6 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.ExamSubject" id="ExamSubjectResult">
         <id property="id" column="id"/>
         <result property="examid" column="examid"/>
+		<result property="examName" column="exam_name"/>
         <result property="gradeId" column="grade_id"/>
         <result property="gradeName" column="grade_name"/>
         <result property="subId" column="sub_id"/>
@@ -22,15 +23,33 @@
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
+        <result property="xmlServerPath" column="xml_server_path"/>
+        <result property="originalData" column="original_data"/>
+		<collection property="questions" javaType="ArrayList" column="id" ofType="com.ustudy.exam.model.QuesAnswer" select="com.ustudy.exam.dao.QuesAnswerDao.getQuesAnswers"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getAllExamSubject" parameterType="string" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub
+	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT egs.* FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where 1=1
+		<if test="subjectId !=null and subjectId > 0">
+		 AND egs.sub_id=#{subjectId}
+		</if>
+		<if test="gradeId !=null and gradeId > 0">
+		 AND egs.grade_id=#{gradeId}
+		</if>
+		<if test="start !=null and start != ''">
+		 AND e.exam_date &gt;= #{start, jdbcType=VARCHAR}
+		</if>
+		<if test="end !=null and end != ''">
+		 AND e.exam_date &lt;= #{end, jdbcType=VARCHAR}
+		</if>
+		<if test="examName !=null and examName != ''">
+		 AND e.exam_name LIKE concat('%',#{examName},'%')
+		</if>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getAllExamSubjectByExamId" parameterType="string" resultMap="ExamSubjectResult">
+	<select id="getAllExamSubjectByExamId" parameterType="Long" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where examid=#{examId}
 	</select>
 
@@ -39,24 +58,46 @@
 		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
 	</select>
 
+	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
+		SELECT * FROM examgradesub where examid=#{examId} AND grade_id=#{gradeId} AND exam_answer=#{markingStatus}
+		<choose>
+			<when test="templateStatus !=null and templateStatus != '-1'">
+			 AND template=#{templateStatus}
+			</when>
+		</choose>
+	</select>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="getExamSubjectById" parameterType="string" resultMap="ExamSubjectResult">
+	<select id="getExamSubjectById" parameterType="Long" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where id=#{id}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="saveBlankAnswerPaper" parameterType="java.util.Map">
+	<update id="saveBlankAnswerPaper" parameterType="java.util.Map">
 		UPDATE examgradesub SET blank_answer_paper=#{fileName} where id=#{id}
-	</select>
+	</update>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
-	<select id="saveBlankQuestionsPaper" parameterType="java.util.Map">
+	<update id="saveBlankQuestionsPaper" parameterType="java.util.Map">
 		UPDATE examgradesub SET blank_questions_paper=#{fileName} where id=#{id}
-	</select>
+	</update>
+
+	<!-- 保存原始模板信息-->
+	<update id="saveOriginalData" parameterType="java.util.Map">
+		UPDATE examgradesub SET template=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+	</update>
+	
+	<update id="isAanswerSeted" parameterType="Long">
+		UPDATE examgradesub SET answer_seted=1 where id=#{id}
+	</update>
+	
+	<update id="isTaskDispatch" parameterType="Long">
+		UPDATE examgradesub SET task_dispatch=1 where id=#{id}
+	</update>
 
 </mapper>

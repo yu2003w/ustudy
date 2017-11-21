@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.exam.model.TeacRole;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.TeacherService;
 
@@ -77,8 +78,8 @@ public class LoginController {
 				tea = userS.findUserById(currentUser.getPrincipal().toString());
 				if (tea != null) {
 					ses.setAttribute("uname", tea.getUname());
-					ses.setAttribute("orgtype", tea.getOrgtype());
-					ses.setAttribute("orgid", tea.getUid());
+					ses.setAttribute("orgType", tea.getOrgtype());
+					ses.setAttribute("orgId", tea.getOrgid());
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
 					response.setStatus(404);
@@ -116,10 +117,10 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/loginId", method = RequestMethod.GET)
-	public Teacher getLoginUser(HttpServletResponse resp) {
+	public TeacRole getLoginUser(HttpServletRequest request, HttpServletResponse resp) {
 		logger.debug("getLoginUser(), endpoint /loginId is visited");
 		Subject cUser = null;
-		Teacher u = null;
+		TeacRole u = null;
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
@@ -128,17 +129,23 @@ public class LoginController {
 		}
 		if (cUser.getPrincipal() == null) {
 			logger.warn("getLoginUser(), User didn't log in");
-			resp.setStatus(404);
+			resp.setStatus(530);
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;
 		} else {
-			// at this point, user information could be retrieved from session
+			// at this point, organization information could be retrieved from session
 			String uId = cUser.getPrincipal().toString();
 			Session ses = cUser.getSession();
+			
+			/*
 			u = new Teacher(uId, ses.getAttribute("uname").toString(), 
 					ses.getAttribute("orgtype").toString(), ses.getAttribute("orgid").toString());
 			// need to retrieve roles for the login teacher
-			u.setRoles(userS.getRolesById(uId));
+			// u.setRoles(userS.getRolesById(uId));
+			// only retrieve highest priority role for the logined user */
+			
+			u = new TeacRole(uId, userS.findPriRoleById(uId), ses.getAttribute("orgType").toString(), 
+					ses.getAttribute("orgId").toString());
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;
 		}

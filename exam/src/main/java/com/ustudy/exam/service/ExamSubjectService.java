@@ -4,23 +4,24 @@ import java.util.List;
 
 import com.ustudy.exam.model.ExamSubject;
 
-import net.sf.json.JSONObject;
-
 public interface ExamSubjectService {
 	
-	public List<ExamSubject> getAllExamSubject();
+	List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName);
 	
-	public List<ExamSubject> getAllExamSubjectByExam(String examId);
+	List<ExamSubject> getExamSubjects(Long examId);
 	
-	public List<ExamSubject> getAllExamSubjectByExamAndGrade(String examId, String gradeId);
+	List<ExamSubject> getExamSubjects(Long examId, Long gradeId);
 	
-	public List<ExamSubject> getExamSubjectByExamAndGradeAndSubject(String examId, String gradeId, String subjectId);
+	List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId);
 	
-	public List<ExamSubject> getExamSubjectById(String id);
+	ExamSubject getExamSubject(Long id);
 	
-	public boolean saveBlankAnswerPaper(String id, String fileName);
+	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
-	public boolean saveBlankQuestionsPaper(String id, String fileName);
+	boolean saveBlankQuestionsPaper(Long id, String fileName);
 
-	public boolean saveStudentAnswers(JSONObject data);
+	boolean isAanswerSeted(Long id);
+	
+	boolean isTaskDispatch(Long id);
+	
 }

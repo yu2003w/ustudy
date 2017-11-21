@@ -9,7 +9,7 @@ public class ExamResult implements Serializable {
 	 */
 	private static final long serialVersionUID = 7130294580790411728L;
 
-	private int id = 0;
+	private Long id;
 	private String stuname = null;
 	private String stuno = null;
 	
@@ -20,7 +20,7 @@ public class ExamResult implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ExamResult(int id, String stuname, String stuno, int score) {
+	public ExamResult(Long id, String stuname, String stuno, int score) {
 		super();
 		this.id = id;
 		this.stuname = stuname;
@@ -28,11 +28,11 @@ public class ExamResult implements Serializable {
 		this.score = score;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

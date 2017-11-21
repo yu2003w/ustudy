@@ -1,5 +1,7 @@
 package com.ustudy.exam.dao;
 
+import java.util.List;
+
 import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.School;
@@ -7,6 +9,8 @@ import com.ustudy.exam.model.School;
 @MapperScan
 public interface SchoolDao {
 
-	public School getSchoolById(String schid);
+	School getSchoolById(String schid);
+	
+	List<School> getSchoolsByExamId(Long examId);
 	
 }

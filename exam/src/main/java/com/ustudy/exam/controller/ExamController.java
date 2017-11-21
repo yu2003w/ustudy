@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.exam.service.ExamService;
 
 @RestController
-@RequestMapping(value = "/exam")
+@RequestMapping(value = "/")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExamController {
 	
@@ -32,10 +32,10 @@ public class ExamController {
 	 * @param response HttpServletResponse
 	 * @return Map
 	 */
-	@RequestMapping(value = "/getAllExams", method = RequestMethod.GET)
+	@RequestMapping(value = "/allexams", method = RequestMethod.GET)
 	public Map getAllExams(HttpServletRequest request, HttpServletResponse response) {
 		
-		logger.debug("getExams().");
+		logger.debug("getAllExams().");
 		
 		Map result = new HashMap<>();
 
@@ -52,7 +52,7 @@ public class ExamController {
 	 * @param response HttpServletResponse
 	 * @return Map
 	 */
-	@RequestMapping(value = "/getExams/{examStatus}", method = RequestMethod.GET)
+	@RequestMapping(value = "/exams/{examStatus}", method = RequestMethod.GET)
 	public Map getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("getExams().");
@@ -73,10 +73,10 @@ public class ExamController {
 	 * @param response HttpServletResponse
 	 * @return Map
 	 */
-	@RequestMapping(value = "/getExam/{examId}", method = RequestMethod.GET)
-	public Map getExam(@PathVariable String examId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/exam/{examId}", method = RequestMethod.GET)
+	public Map getExam(@PathVariable Long examId, HttpServletRequest request, HttpServletResponse response) {
 		
-		logger.debug("getExams().");
+		logger.debug("getExam().");
 		logger.debug("examId: " + examId);
 		
 		Map result = new HashMap<>();
@@ -86,5 +86,20 @@ public class ExamController {
 
 		return result;
 	}
-	
+
+	@RequestMapping(value = "/exam/options", method = RequestMethod.GET)
+	public Map getOptions(HttpServletResponse response) {
+		logger.debug("getOptions().");
+
+		Map result = new HashMap<>();
+		Map data = new HashMap<>();
+
+		data.put("grades", service.getGrades());
+		data.put("subjects", service.getSubjects());
+
+		result.put("success", true);
+		result.put("data", data);
+
+		return result;
+    }
 }

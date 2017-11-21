@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.QuesareaDao">
+
+	<resultMap type="com.ustudy.exam.model.Quesarea" id="QuesareaResult">
+        <id property="id" column="id"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="pageno" column="pageno"/>
+        <result property="fileName" column="file_name"/>
+        <result property="areaId" column="area_id"/>
+        <result property="posx" column="posx"/>
+        <result property="posy" column="posy"/>        
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="bottom" column="posbottom"/>
+        <result property="right" column="posright"/>
+        <result property="questionType" column="question_type"/>
+        <result property="startQuestionNo" column="start_question_no"/>
+        <result property="endQuestionNo" column="end_question_no"/>        
+        <result property="quesid" column="quesid"/>
+        <result property="answer" column="answer"/>
+    </resultMap>
+
+	<!-- 查询得到全部Exam对象 -->
+	<insert id="insertQuesarea" parameterType="com.ustudy.exam.model.Quesarea">
+		INSERT INTO quesarea (pageno, file_name, area_id, posx, posy, width, height, posbottom, posright, question_type, start_question_no, end_question_no, exam_grade_sub_id, quesid) VALUES 
+		(#{pageno}, #{fileName,jdbcType=VARCHAR}, #{areaId}, #{posx}, #{posy}, #{width}, #{height}, #{bottom}, #{right}, #{questionType,jdbcType=VARCHAR}, #{startQuestionNo}, #{endQuestionNo}, #{egsId}, #{quesid})
+	</insert>
+	
+	<insert id="insertQuesareas" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		INSERT INTO quesarea (pageno, file_name, area_id, posx, posy, width, height, posbottom, posright, question_type, start_question_no, end_question_no, exam_grade_sub_id, quesid) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.pageno}, #{item.fileName,jdbcType=VARCHAR}, #{item.areaId}, #{item.posx}, #{item.posy}, #{item.width}, #{item.height}, #{item.bottom}, #{item.right}, #{item.questionType,jdbcType=VARCHAR}, #{item.startQuestionNo}, #{item.endQuestionNo}, #{item.egsId}, #{item.quesid})
+	    </foreach>  
+	</insert>
+
+</mapper>

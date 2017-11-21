@@ -10,18 +10,26 @@ import com.ustudy.exam.model.ExamSubject;
 @MapperScan
 public interface ExamSubjectDao {
 
-	public List<ExamSubject> getAllExamSubject();
+	List<ExamSubject> getAllExamSubject(@Param("subjectId") Long subjectId, @Param("gradeId") Long gradeId, @Param("start") String start, @Param("end") String end, @Param("examName") String examName);
 	
-	public List<ExamSubject> getAllExamSubjectByExamId(String examId);
+	List<ExamSubject> getAllExamSubjectByExamId(Long examId);
 	
-	public List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") String examId, @Param("gradeId") String gradeId);
+	List<ExamSubject> getAllExamSubjectByExamIdAndGradeId(@Param("examId") Long examId, @Param("gradeId") Long gradeId);
 	
-	public List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") String examId, @Param("gradeId") String gradeId, @Param("subjectId") String subjectId);
+	List<ExamSubject> getExamSubjectStatus(@Param("examId") Long examId, @Param("templateStatus") String templateStatus, @Param("gradeId") Long gradeId, @Param("markingStatus") String markingStatus);
 	
-	public List<ExamSubject> getExamSubjectById(String id);
+	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") Long examId, @Param("gradeId") Long gradeId, @Param("subjectId") Long subjectId);
 	
-	public void saveBlankAnswerPaper(@Param("id")String id, @Param("fileName") String fileName);
+	ExamSubject getExamSubjectById(Long id);
 	
-	public void saveBlankQuestionsPaper(@Param("id")String id, @Param("fileName") String fileName);
+	void saveBlankAnswerPaper(@Param("id")Long id, @Param("fileName") String fileName);
+	
+	void saveBlankQuestionsPaper(@Param("id")Long id, @Param("fileName") String fileName);
+
+	void saveOriginalData(@Param("id")Long id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
+	
+	void isAanswerSeted(Long id);
+	
+	void isTaskDispatch(Long id);
 	
 }

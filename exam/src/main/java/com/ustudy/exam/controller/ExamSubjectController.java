@@ -11,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
 
 @RestController
-@RequestMapping(value = "/examsubject")
+@RequestMapping(value = "/")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExamSubjectController {
 	
@@ -30,15 +31,19 @@ public class ExamSubjectController {
 	 * 获取所有考试科目信息
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects", method = RequestMethod.GET)
-	public Map getAllExamSubject() {
+	@RequestMapping(value = "/examsubjects", method = RequestMethod.GET)
+	public Map getExamSubjects(@RequestParam(required=false) Long subjectId, 
+			@RequestParam(required=false) Long gradeId, 
+			@RequestParam(required=false) String start, 
+			@RequestParam(required=false) String end, 
+			@RequestParam(required=false) String examName) {
 		
-		logger.debug("getAllExamSubject().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getAllExamSubject());
+		result.put("data", service.getExamSubjects(subjectId, gradeId, start, end, examName));
 
 		return result;
 	}
@@ -48,16 +53,16 @@ public class ExamSubjectController {
 	 * @param examId 考试ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects/{examId}", method = RequestMethod.GET)
-	public Map getAllExamSubjectByExamId(@PathVariable String examId) {
+	@RequestMapping(value = "/examsubjects/{examId}", method = RequestMethod.GET)
+	public Map getExamSubjects(@PathVariable Long examId) {
 		
-		logger.debug("getAllExamSubjectByExamId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
 		
-		List<ExamSubject> examSubjects = service.getAllExamSubjectByExam(examId);
+		List<ExamSubject> examSubjects = service.getExamSubjects(examId);
 		Map<String, Map<String, Object>> grades = new HashMap<>();
 		for (ExamSubject examSubject : examSubjects) {
 			Map<String, Object> grade = grades.get("" + examSubject.getGradeId());
@@ -85,15 +90,15 @@ public class ExamSubjectController {
 	 * @param gradeId 年级ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.GET)
-	public Map getAllExamSubjectByExamIdAndGradeId(@PathVariable String examId, @PathVariable String gradeId) {
+	@RequestMapping(value = "/examsubjects/{examId}/{gradeId}", method = RequestMethod.GET)
+	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId) {
 		
-		logger.debug("getAllExamSubjectByExamIdAndGradeId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getAllExamSubjectByExamAndGrade(examId, gradeId));
+		result.put("data", service.getExamSubjects(examId, gradeId));
 
 		return result;
 	}
@@ -105,15 +110,15 @@ public class ExamSubjectController {
 	 * @param subjectId 科目ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
-	public Map getExamSubjectByExamIdAndGradeIdAndSubjectId(@PathVariable String examId, @PathVariable String gradeId, @PathVariable String subjectId) {
+	@RequestMapping(value = "/examsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
+	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId) {
 		
-		logger.debug("getExamSubjectByExamIdAndGradeIdAndSubjectId().");
+		logger.debug("getExamSubjects().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjectByExamAndGradeAndSubject(examId, gradeId, subjectId));
+		result.put("data", service.getExamSubjects(examId, gradeId, subjectId));
 
 		return result;
 	}
@@ -123,15 +128,15 @@ public class ExamSubjectController {
 	 * @param id 考试科目ID
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamSubject/{id}", method = RequestMethod.GET)
-	public Map getAllExamSubjectById(@PathVariable String id) {
+	@RequestMapping(value = "/examsubject/{id}", method = RequestMethod.GET)
+	public Map getExamSubject(@PathVariable Long id) {
 		
-		logger.debug("getAllExamSubjectById().");
+		logger.debug("getExamSubject().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjectById(id));
+		result.put("data", service.getExamSubject(id));
 
 		return result;
 	}

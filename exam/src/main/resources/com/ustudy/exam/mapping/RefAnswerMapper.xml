@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.RefAnswerDao">
+
+	<resultMap type="com.ustudy.exam.model.RefAnswer" id="RefAnswerResult">
+        <id property="id" column="id"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="quesid" column="quesid"/>
+        <result property="quesno" column="quesno"/>
+        <result property="branch" column="branch"/>
+        <result property="answer" column="answer"/>
+        <result property="type" column="type"/>
+        <result property="choiceNum" column="choice_num"/>
+    </resultMap>
+
+	<select id="getRefAnswers" parameterType="Long" resultMap="RefAnswerResult">
+		SELECT r.*, q.type, q.choice_num FROM refanswer r LEFT JOIN quesanswer q ON r.quesid = q.id WHERE r.exam_grade_sub_id = #{egsId} ORDER BY r.quesno
+	</select>
+
+	<delete id="deleteRefAnswers" parameterType="Long">
+		delete FROM refanswer where exam_grade_sub_id=#{egsId}
+	</delete>
+
+	<insert id="insertRefAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		insert into refanswer (quesid,quesno,answer,exam_grade_sub_id) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.quesid},#{item.quesno},#{item.answer},#{item.egsId})  
+	    </foreach>  
+	</insert>
+	
+	<update id="updateRefAnswer" parameterType="com.ustudy.exam.model.RefAnswer">  
+        UPDATE refanswer set quesid=#{quesid}, quesno=#{quesno}, branch=#{branch}, answer=#{answer}, type=#{type}, choice_num=#{choiceNum} WHERE id=#{id}
+	</update>
+
+</mapper>

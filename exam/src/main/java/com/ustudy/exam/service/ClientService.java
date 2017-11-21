@@ -3,22 +3,37 @@ package com.ustudy.exam.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
-import com.ustudy.exam.model.ExamSubject;
+
+import net.sf.json.JSONArray;
 
 public interface ClientService {
 	
-	public Map<String, Object> login(String token);
+	Map<String, Object> login(String token);
 
-	public boolean saveTemplates(String templates);
+	boolean saveTemplates(Long csId, String data) throws Exception;
 	
-	public Map<String, String> getTemplateById(String examId, String gradeId, String subjectId);
+	Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId);
 	
-	public List<ExamSubject> getExamSubjects(String examId, String gradeId);
+	Map<String, String> getTemplateById(Long csId);
 	
-	public List<ExamGrade> getExamGrades(String examId, String examStatus);
+	JSONArray getExamSubjects(Long examId, Long gradeId);
 	
-	public Map<String, List<Exam>> getExams(String examStatus);
+	JSONArray getExamSubjectStatus(Long examId, String templateStatus, Long gradeId, String markingStatus);
+	
+	List<ExamGrade> getExamGrades(Long examId, String examStatus);
+	
+	List<Exam> getExams(String examStatus);
+	
+	boolean addLog(HttpServletRequest request, String logs) throws Exception;
+	
+	List<String> getLog(HttpServletRequest request) throws Exception;
+	
+	boolean deleteLog(HttpServletRequest request) throws Exception;
+	
+	JSONArray getQuestionType();
 	
 }

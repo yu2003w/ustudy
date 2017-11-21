@@ -6,7 +6,7 @@ public class School implements Serializable {
 
 	private static final long serialVersionUID = 6046308116218434271L;
 	
-	private int id;
+	private Long id;
 	private String schid = null;
 	private String schname = null;
 	private String type = null;
@@ -14,11 +14,11 @@ public class School implements Serializable {
 	private String city = null;
 	private String district = null;
 	
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
