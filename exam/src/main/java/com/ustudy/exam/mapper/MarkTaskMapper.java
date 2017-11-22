@@ -21,19 +21,21 @@ import com.ustudy.exam.model.MarkTaskBrife;
 public interface MarkTaskMapper {
 
 	@Select("select * from ustudy.marktask where teacid = #{tid}")
-	public List<MetaMarkTask> getMetaScoreTask(@Param("tid") String teacid);
+	public List<MetaMarkTask> getMetaMarkTask(@Param("tid") String teacid);
 	
 	@Select("select scoretype from ustudy.marktask where teacid = #{tid} and quesid = #{qid}")
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
 	
-	//@Select("select exam_id as examId, exam_name as examName, sub_name as subject, grade_name as grade from "
-	//		+ "ustudy.examgradesub where id = (select exam_grade_sub_id from ustudy.question where id = #{qid}")
+	/*
+	 * this api is not needed any more.
+	 * keep it here in case it is required later.
 	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
 			+ "startno, endno, posx, posy, height, length, type as questionType, mark_mode as scoreMode from "
 			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = "
 			+ "ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = (select exam_grade_sub_id "
 			+ "from ustudy.question where id = #{qid})")
-	public MarkTask getScoreTask(@Param("qid") String quesid);
+	public MarkTask getMarkTask(@Param("qid") String quesid);
+	*/
 	
 	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
 			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.question on "

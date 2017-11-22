@@ -35,7 +35,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
 		
-		List<MetaMarkTask> mstL = markTaskM.getMetaScoreTask(teacid);
+		List<MetaMarkTask> mstL = markTaskM.getMetaMarkTask(teacid);
 		List<MarkTaskBrife> stL = new ArrayList<MarkTaskBrife>();
 		
 		for (MetaMarkTask mst: mstL) {
