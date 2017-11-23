@@ -8,6 +8,7 @@
         <result property="examid" column="examid"/>
         <result property="schid" column="schid"/>
         <result property="gradeid" column="gradeid"/>
+        <result property="classid" column="class_id"/>
         <result property="className" column="class_name"/>
         <result property="name" column="name"/>
         <result property="stuno" column="stuno"/>

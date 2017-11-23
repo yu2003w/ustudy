@@ -157,6 +157,7 @@ exam_code varchar(20) NOT NULL COMMENT '考号',
 examid int(11) NOT NULL COMMENT '考试ID',
 schid int(11) NOT NULL COMMENT '学校ID',
 gradeid int(11) NOT NULL COMMENT '年级ID',
+class_id int(11) NOT NULL COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',
 name varchar(100) NOT NULL COMMENT '学生姓名',
 stuno varchar(20) DEFAULT NULL COMMENT '学号',
@@ -164,9 +165,10 @@ room int(11) DEFAULT NULL COMMENT '考场',
 paper_status char(1) DEFAULT '1' COMMENT '考生状态（0：缺考，1：正常）',
 PRIMARY KEY (id),
 UNIQUE KEY stuno (exam_code),
-KEY name (name,exam_code,gradeid,schid),
+KEY name (name,exam_code,gradeid,schid,class_id),
 KEY gradeid (gradeid),
-KEY schid (schid)
+KEY schid (schid),
+KEY class_id (class_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
 create table if not exists ustudy.multiple_score_set (
