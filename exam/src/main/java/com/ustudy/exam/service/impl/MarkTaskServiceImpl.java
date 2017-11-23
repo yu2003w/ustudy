@@ -29,6 +29,7 @@ import com.ustudy.exam.utility.OSSUtil;
 public class MarkTaskServiceImpl implements MarkTaskService {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskServiceImpl.class);
+	
 	@Autowired
 	private MarkTaskMapper markTaskM;
 	
