@@ -6,7 +6,7 @@ id INT NOT NULL AUTO_INCREMENT,
 grade_id INT NOT NULL,
 cls_name VARCHAR(32) NOT NULL,
 cls_type ENUM ('art','sci','none') NOT NULL,
-cls_owner VARCHAR(32),
+cls_owner INT(11),
 PRIMARY KEY (id),
 INDEX(grade_id),
 FOREIGN KEY (grade_id)
@@ -62,7 +62,7 @@ FOREIGN KEY (sub_id)
 create table if not exists ustudy.teacherroles (
 id INT NOT NULL AUTO_INCREMENT,
 role_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+teac_id INT(11) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
@@ -73,8 +73,7 @@ FOREIGN KEY (teac_id)
 # subject leader at department level
 create table if not exists ustudy.departsub (
 id INT NOT NULL AUTO_INCREMENT,
-sub_name varchar(32) NOT NULL,
-sub_owner varchar(32),
+sub_owner INT(11),
 type ENUM('high','junior','primary','other'),
 schid varchar(32) NOT NULL,
 INDEX(sub_owner, schid, type),
@@ -90,8 +89,7 @@ FOREIGN KEY (sub_owner)
 create table if not exists ustudy.teachersub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_id int(11) NOT NULL,
-sub_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+teac_id INT(11) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
@@ -105,12 +103,11 @@ FOREIGN KEY (sub_id)
 create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id int(11) NOT NULL,
-grade_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
-INDEX(teac_id, grade_name),
+teac_id INT(11) NOT NULL,
+INDEX(teac_id, grade_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
-    REFERENCES ustudy.teacher(teacid)
+    REFERENCES ustudy.teacher(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
@@ -119,13 +116,12 @@ FOREIGN KEY (grade_id)
 
 create table if not exists ustudy.teacherclass (
 id INT NOT NULL AUTO_INCREMENT,
-class_id int(11) NOT NULL,
-class_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+class_id INT(11) NOT NULL,
+teac_id INT(11) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
-    REFERENCES ustudy.teacher(teacid)
+    REFERENCES ustudy.teacher(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (class_id)
     REFERENCES ustudy.class(id)
@@ -134,7 +130,7 @@ FOREIGN KEY (class_id)
 
 create table if not exists ustudy.teacherjob (
 id INT NOT NULL AUTO_INCREMENT,
-teacid varchar(32) NOT NULL,
+teacid INT(11) NOT NULL,
 subject varchar(16) NOT NULL,
 grade_id INT NOT NULL,
 class_id INT,
@@ -142,7 +138,7 @@ role varchar(16),
 PRIMARY KEY (id),
 INDEX(teacid, grade_id, subject),
 FOREIGN KEY(teacid)
-    REFERENCES ustudy.teacher(teacid)
+    REFERENCES ustudy.teacher(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)

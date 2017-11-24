@@ -10,7 +10,7 @@ CREATE TABLE if not exists ustudy.subject (
 
 create table if not exists ustudy.users (
 id INT NOT NULL AUTO_INCREMENT,
-loginname varchar(32) NOT NULL,
+loginname INT(11) NOT NULL,
 fullname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
 ugroup ENUM ('运维', '市场', '代理商', '临时') NOT NULL,
@@ -27,7 +27,7 @@ PRIMARY KEY (id)
 create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
 role_name varchar(32) NOT NULL,
-user_name varchar(32) NOT NULL,
+user_name INT(11) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
 FOREIGN KEY (user_name)
@@ -71,7 +71,7 @@ UNIQUE KEY (schid)
 
 create table if not exists ustudy.teacher (
 id INT NOT NULL AUTO_INCREMENT,
-teacid VARCHAR(32) NOT NULL,
+teacid INT(11) NOT NULL,
 teacname VARCHAR(32) NOT NULL,
 passwd VARCHAR(32) NOT NULL,
 orgtype ENUM ('学校','教研室') NOT NULL,
@@ -87,7 +87,7 @@ create table if not exists ustudy.grade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
-grade_owner VARCHAR(32),
+grade_owner INT(11),
 schid VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
 INDEX(schid, grade_name),
@@ -101,17 +101,20 @@ FOREIGN KEY (grade_owner)
 
 create table if not exists ustudy.gradesub (
 id INT NOT NULL AUTO_INCREMENT,
-sub_name VARCHAR(32) NOT NULL,
+sub_id INT(11) NOT NULL,
 grade_id INT NOT NULL,
-sub_owner VARCHAR(32),
+sub_owner INT(11),
 PRIMARY KEY(id),
-INDEX(grade_id, sub_name),
+INDEX(grade_id, sub_id),
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (sub_owner)
     REFERENCES ustudy.teacher(teacid)
-    ON UPDATE CASCADE ON DELETE SET NULL
+    ON UPDATE CASCADE ON DELETE SET NULL,
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
+    ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.exam (
@@ -128,43 +131,34 @@ UNIQUE KEY (exam_name)
 create table if not exists ustudy.examschool (
 id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
-schid VARCHAR(32) NOT NULL,
-schname VARCHAR(128) NOT NULL,
+schid INT(11) NOT NULL,
 PRIMARY KEY (id),
-INDEX(examid, schid, schname),
+INDEX(examid, schid),
 FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (schid)
-    REFERENCES ustudy.school(schid)
+    REFERENCES ustudy.school(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.examgradesub (
 id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
-exam_name VARCHAR(64) NOT NULL,
 grade_id INT NOT NULL,
-grade_name varchar(32) NOT NULL,
 sub_id int(11) NOT NULL,
-sub_name VARCHAR(32) NOT NULL,
-stu_num INT default 0,
-teac_num INT default 0,
-exam_paper BOOL default false,
-exam_answer BOOL default false,
-exam_paper_num INT default 0,
 template BOOL default false,
 obj_item_num INT default 0,
 sub_item_num INT default 0,
 task_dispatch BOOL default false,
-answer_seted varchar(1) DEFAULT '0' COMMENT '标准答案是否设置',
+answer_set tinyint(1) DEFAULT '0' COMMENT '标准答案是否设置',
 upload_bath_count int(11) DEFAULT '10' COMMENT '批量上传数量',
 blank_answer_paper varchar(360) DEFAULT NULL COMMENT '空白答题卡图片地址',
 blank_questions_paper varchar(360) DEFAULT NULL COMMENT '空白试卷图片地址',
 xml_server_path varchar(50) DEFAULT NULL COMMENT '模板数据文件阿里云地址',
 original_data blob COMMENT '原始json数据',
 PRIMARY KEY (id),
-INDEX (grade_id, grade_name),
+INDEX (grade_id),
 FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
