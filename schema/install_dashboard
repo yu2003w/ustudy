@@ -10,7 +10,7 @@ CREATE TABLE if not exists ustudy.subject (
 
 create table if not exists ustudy.users (
 id INT NOT NULL AUTO_INCREMENT,
-loginname INT(11) NOT NULL,
+loginname CHAR(11) NOT NULL,
 fullname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
 ugroup ENUM ('运维', '市场', '代理商', '临时') NOT NULL,
@@ -27,7 +27,7 @@ PRIMARY KEY (id)
 create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
 role_name varchar(32) NOT NULL,
-user_name INT(11) NOT NULL,
+user_name CHAR(11) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
 FOREIGN KEY (user_name)
@@ -71,7 +71,7 @@ UNIQUE KEY (schid)
 
 create table if not exists ustudy.teacher (
 id INT NOT NULL AUTO_INCREMENT,
-teacid INT(11) NOT NULL,
+teacid CHAR(11) NOT NULL,
 teacname VARCHAR(32) NOT NULL,
 passwd VARCHAR(32) NOT NULL,
 orgtype ENUM ('学校','教研室') NOT NULL,
@@ -87,7 +87,7 @@ create table if not exists ustudy.grade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
-grade_owner INT(11),
+grade_owner CHAR(11),
 schid VARCHAR(32) NOT NULL,
 PRIMARY KEY(id),
 INDEX(schid, grade_name),
@@ -103,7 +103,7 @@ create table if not exists ustudy.gradesub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_id INT(11) NOT NULL,
 grade_id INT NOT NULL,
-sub_owner INT(11),
+sub_owner CHAR(11),
 PRIMARY KEY(id),
 INDEX(grade_id, sub_id),
 FOREIGN KEY (grade_id)

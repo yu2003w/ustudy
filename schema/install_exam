@@ -19,7 +19,7 @@ assign_mode ENUM ('平均', '动态', '比例'),
 mark_mode ENUM ('单评', '双评'),
 #time out duration for screen this question
 duration INT,
-teac_owner INT(11),
+teac_owner CHAR(11),
 exam_grade_sub_id INT NOT NULL,
 INDEX(exam_grade_sub_id, quesno),
 UNIQUE KEY(exam_grade_sub_id, quesno, startno, endno),
@@ -107,7 +107,7 @@ FOREIGN KEY (quesid)
 
 create table if not exists ustudy.marktask (
 id INT NOT NULL AUTO_INCREMENT,
-teacid INT(11) NOT NULL,
+teacid CHAR(11) NOT NULL,
 quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
@@ -116,7 +116,7 @@ scoretype ENUM ('标准','问题卷','终评'),
 markrole ENUM ('初评', '终评'),
 PRIMARY KEY (id),
 FOREIGN KEY (teacid)
-    REFERENCES ustudy.teacher(id)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
@@ -202,9 +202,9 @@ answer_img2 VARCHAR(128),
 mark_img2 VARCHAR(128),
 answer_img3 VARCHAR(128),
 mark_img3 VARCHAR(128),
-teacid1 INT(11),
-teacid2 INT(11),
-teacid3 INT(11),
+teacid1 CHAR(11),
+teacid2 CHAR(11),
+teacid3 CHAR(11),
 PRIMARY KEY(id),
 INDEX (quesid, paperid),
 UNIQUE KEY (quesid, paperid),
