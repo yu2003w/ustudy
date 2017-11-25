@@ -79,8 +79,8 @@ FOREIGN KEY (exam_grade_sub_id)
 # tables for answer setting with sub questions
 create table if not exists ustudy.question_step (
 id INT NOT NULL AUTO_INCREMENT,
-quesid INT NOT NULL,
-ques_step_id varchar(16) NOT NULL,
+quesid INT(11) NOT NULL,
+quesno varchar(16) NOT NULL,
 branch varchar(16) default '不分科',
 score INT NOT NULL,
 PRIMARY KEY (id),
@@ -129,6 +129,7 @@ exam_code varchar(20) NOT NULL COMMENT '考号',
 examid int(11) NOT NULL COMMENT '考试ID',
 schid int(11) NOT NULL COMMENT '学校ID',
 gradeid int(11) NOT NULL COMMENT '年级ID',
+class_id INT(11) COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',
 name varchar(100) NOT NULL COMMENT '学生姓名',
 stuno varchar(20) DEFAULT NULL COMMENT '学号',
@@ -227,7 +228,7 @@ FOREIGN KEY (paperid)
 create table if not exists ustudy.answer_step (
 id INT NOT NULL AUTO_INCREMENT,
 answer_id INT NOT NULL,
-ques_step_id varchar(16) NOT NULL,
+ques_step_id INT(11) NOT NULL,
 score INT NOT NULL,
 PRIMARY KEY (id),
 INDEX(answer_id),
