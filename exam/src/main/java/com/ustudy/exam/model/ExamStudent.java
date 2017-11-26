@@ -11,6 +11,7 @@ public class ExamStudent implements Serializable {
 	private Long examid;
 	private Long schid;
 	private Long gradeid;
+	private Long classId;
 	private String className;
 	private String name;
 	private String stuno;
@@ -55,6 +56,14 @@ public class ExamStudent implements Serializable {
 	
 	public void setGradeid(Long gradeid) {
 		this.gradeid = gradeid;
+	}
+	
+	public Long getClassId() {
+		return classId;
+	}
+	
+	public void setClassId(Long classId) {
+		this.classId = classId;
 	}
 	
 	public String getClassName() {

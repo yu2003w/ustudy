@@ -32,15 +32,17 @@
 	</select>
 	
 	<select id="getGradesubBySchoolId" parameterType="String" resultMap="GradesubResult">
-		SELECT grade_id,sub_name,sub_owner from gradesub where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR})
+		SELECT gs.grade_id,s.name AS sub_name,gs.sub_owner FROM gradesub gs LEFT JOIN subject s ON gs.sub_id = s.id WHERE
+		 gs.grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR})
 	</select>
 	
 	<select id="getGradesubByGradeId" parameterType="long" resultMap="GradesubResult">
-		SELECT grade_id,sub_name,sub_owner from gradesub where grade_id=#{gradeId}
+		SELECT gs.grade_id,s.name AS sub_name,gs.sub_owner FROM gradesub gs LEFT JOIN subject s ON gs.sub_id = s.id WHERE gs.grade_id=#{gradeId}
 	</select>
 	
 	<select id="getGradeGroupsByGradeId" parameterType="long" resultMap="GradeGroupsResult">
-		SELECT g.id,g.sub_name,g.sub_owner,t.teacname from gradesub g LEFT JOIN teacher t on g.sub_owner=t.teacid where grade_id=#{gradeId}
+		SELECT g.id,s.name AS sub_name,g.sub_owner,t.teacname FROM gradesub g LEFT JOIN teacher t ON g.sub_owner = t.teacid 
+		LEFT JOIN subject s ON g.sub_id = s.id WHERE grade_id=#{gradeId}
 	</select>
 
 </mapper>
