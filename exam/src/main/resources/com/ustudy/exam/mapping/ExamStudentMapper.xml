@@ -8,6 +8,7 @@
         <result property="examid" column="examid"/>
         <result property="schid" column="schid"/>
         <result property="gradeid" column="gradeid"/>
+        <result property="classId" column="class_id"/>
         <result property="className" column="class_name"/>
         <result property="name" column="name"/>
         <result property="stuno" column="stuno"/>
@@ -16,7 +17,7 @@
     </resultMap>
 
 	<select id="getStudentInfoByExamIDAndGradeId" parameterType="java.util.Map" resultMap="ExamStudentResult">
-		SELECT * FROM examstudent where examid=#{examId} and gradeid=#{gradeId}
+		SELECT * FROM examinee where examid=#{examId} and gradeid=#{gradeId}
 	</select>
 
 </mapper>

@@ -21,7 +21,6 @@ public class Quesarea implements Serializable {
 	private int startQuestionNo ;
 	private int endQuestionNo ;
 	private Long quesid ;
-	private String answer ;
 	
 	public Quesarea(){}
 	
@@ -136,14 +135,6 @@ public class Quesarea implements Serializable {
 	
 	public void setRight(int right) {
 		this.right = right;
-	}
-	
-	public String getAnswer() {
-		return answer;
-	}
-	
-	public void setAnswer(String answer) {
-		this.answer = answer;
 	}
 	
 	public String getQuestionType() {

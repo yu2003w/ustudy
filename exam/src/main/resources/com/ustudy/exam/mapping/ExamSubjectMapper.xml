@@ -50,42 +50,39 @@
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamId" parameterType="Long" resultMap="ExamSubjectResult">
-		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
-		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id
-		 AND examgradesub.examid = exam.id
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamIdAndGradeId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
-		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.grade_id = grade.id 
-		AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId}
 	</select>
 
 	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
-		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.mark_status = #{markingStatus} 
-		AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId} AND egs.mark_status = #{markingStatus}
 		<choose>
 			<when test="templateStatus !=null and templateStatus != '-1'">
-			 AND examgradesub.template=#{templateStatus}
+			 AND egs.template=#{templateStatus}
 			</when>
 		</choose>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
-		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.sub_id = #{subjectId} 
-		AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId} AND egs.sub_id = #{subjectId}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectById" parameterType="Long" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where id=#{id}
-		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
-		WHERE examgradesub.id = #{id} AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id 
-		AND examgradesub.examid = exam.id
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.id = #{id}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
