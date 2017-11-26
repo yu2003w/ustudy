@@ -27,8 +27,7 @@ public class MarkTaskBrife implements Serializable {
 	private String teacherName = null;
 	private String subject = null;
 	private String grade = null;
-	@JsonProperty("markType")
-	private String scoreType = null;
+	private String markType = null;
 	private String progress = null;
 	@JsonIgnore
 	private String quesno = null;
@@ -50,7 +49,7 @@ public class MarkTaskBrife implements Serializable {
 	}
 
 	public MarkTaskBrife(String examId, String examName, String teacherId, String teacherName,
-			String subject, String grade, String scoreType, String quesno, String startno, String endno) {
+			String subject, String grade, String markType, String quesno, String startno, String endno) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
@@ -58,14 +57,14 @@ public class MarkTaskBrife implements Serializable {
 		this.teacherName = teacherName;
 		this.subject = subject;
 		this.grade = grade;
-		this.scoreType = scoreType;
+		this.markType = markType;
 		this.quesno = quesno;
 		this.startno = startno;
 		this.endno = endno;
 	}
 
 	public MarkTaskBrife(String examId, String examName, String teacherId, String teacherName,
-			String subject, String grade, String scoreType, String progress) {
+			String subject, String grade, String markType, String progress) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
@@ -73,7 +72,7 @@ public class MarkTaskBrife implements Serializable {
 		this.teacherName = teacherName;
 		this.subject = subject;
 		this.grade = grade;
-		this.scoreType = scoreType;
+		this.markType = markType;
 		this.progress = progress;
 	}
 
@@ -133,12 +132,12 @@ public class MarkTaskBrife implements Serializable {
 		this.grade = grade;
 	}
 
-	public String getScoreType() {
-		return scoreType;
+	public String getMarkType() {
+		return markType;
 	}
 
-	public void setScoreType(String scoreType) {
-		this.scoreType = scoreType;
+	public void setMarkType(String scoreType) {
+		this.markType = scoreType;
 	}
 
 	public String getProgress() {
@@ -200,8 +199,8 @@ public class MarkTaskBrife implements Serializable {
 	@Override
 	public String toString() {
 		return "MarkTaskBrife [id=" + id + ", examId=" + examId + ", examName=" + examName + ", teacherId=" + teacherId
-				+ ", teacherName=" + teacherName + ", subject=" + subject + ", grade=" + grade + ", scoreType="
-				+ scoreType + ", progress=" + progress + ", quesno=" + quesno + ", startno=" + startno + ", endno="
+				+ ", teacherName=" + teacherName + ", subject=" + subject + ", grade=" + grade + ", markType="
+				+ markType + ", progress=" + progress + ", quesno=" + quesno + ", startno=" + startno + ", endno="
 				+ endno + ", quesType=" + quesType + ", summary=" + summary + ", papers=" + papers + "]";
 	}
 	

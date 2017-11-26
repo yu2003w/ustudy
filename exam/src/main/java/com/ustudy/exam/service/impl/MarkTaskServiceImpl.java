@@ -58,7 +58,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		mt.setTeacherId(mst.getTeacid());
 		mt.setTeacherName(ExamUtil.retrieveSessAttr("uname"));
 		mt.setId(mst.getId());
-		mt.setScoreType(mst.getMarkType());
+		mt.setMarkType(mst.getMarktype());
 		logger.debug("assembleTaskBrife()," + mt.toString());
 		// assemble question summary information
 		String quesN = null;
@@ -85,7 +85,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		List<QuesId> qIds = comb.getQuesids();
 		//get basic information from first question id
 		MarkTaskBrife mt = markTaskM.getMetaTaskInfo(qIds.get(0).getId());
-		mt.setScoreType(markTaskM.getMarkType(teacid, qIds.get(0).getId()));
+		mt.setMarkType(markTaskM.getMarkType(teacid, qIds.get(0).getId()));
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		for (QuesId id: qIds) {
 			// if there is multiple QuesId, they should be combined to retrieve student paper

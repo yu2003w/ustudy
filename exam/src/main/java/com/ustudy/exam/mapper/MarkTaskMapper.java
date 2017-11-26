@@ -23,7 +23,7 @@ public interface MarkTaskMapper {
 	@Select("select * from ustudy.marktask where teacid = #{tid}")
 	public List<MetaMarkTask> getMetaMarkTask(@Param("tid") String teacid);
 	
-	@Select("select scoretype from ustudy.marktask where teacid = #{tid} and quesid = #{qid}")
+	@Select("select marktype from ustudy.marktask where teacid = #{tid} and quesid = #{qid}")
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
 	
 	/*
@@ -37,10 +37,12 @@ public interface MarkTaskMapper {
 	public MarkTask getMarkTask(@Param("qid") String quesid);
 	*/
 	
-	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
+	@Select("select examid as examId, (select exam_name from ustudy.exam where ustudy.exam.id = examid) as "
+			+ "examName, (select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
+			+ "(select grade_name from ustudy.grade where ustudy.grade.id = grade_id) as grade, quesno, "
 			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.question on "
-			+ "ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id "
-			+ "= (select exam_grade_sub_id from ustudy.question where id = #{qid}) and ustudy.question.id = #{qid}")
+			+ "ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = "
+			+ "(select exam_grade_sub_id from ustudy.question where id = #{qid}) and ustudy.question.id = #{qid}")
 	public MarkTaskBrife getMarkTaskBrife(@Param("qid") String quesid);
 	
 	
@@ -50,40 +52,43 @@ public interface MarkTaskMapper {
 	 * 2, combine question information into summary
 	 * 
 	 */
-	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade from "
-			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = "
-			+ "ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = "
-			+ "(select exam_grade_sub_id from ustudy.question where id = #{qid}) and ustudy.question.id = #{qid}")
+	@Select("select examid as examId, (select exam_name from ustudy.exam where ustudy.exam.id = examid) "
+			+ "as examName, (select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
+			+ "(select grade_name from ustudy.grade where ustudy.grade.id = grade_id) as grade from "
+			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id"
+			+ " where ustudy.examgradesub.id = (select exam_grade_sub_id from ustudy.question where id = #{qid}) "
+			+ "and ustudy.question.id = #{qid}")
 	public MarkTaskBrife getMetaTaskInfo(@Param("qid") String queid);
 	
-	@Select("select id as quesid, quesno, startno, endno, type as questionType, mark_mode as markMode, score as "
-			+ "fullscore from ustudy.question where id = #{qid}")
+	@Select("select id as quesid, quesno, startno, endno, type as questionType, mark_mode as markMode, score as"
+			+ " fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 	
-	@Select("select ustudy.stupaper.id from ustudy.question join ustudy.stupaper on "
-			+ "ustudy.question.exam_grade_sub_id = ustudy.stupaper.exam_grade_sub_id "
+	@Select("select ustudy.paper.id from ustudy.question join ustudy.paper on "
+			+ "ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
 			+ "where ustudy.question.id = #{qid}")
 	public List<String> getPapersByQuesId(@Param("qid") String quesid);
 	
-	@Select("select quesno, score as fullscore from quesanswerdiv where quesid = #{qid}")
+	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
-	@Select("select isviewed as isMarked, mflag, paper_img as paperImg, answer_img1 as answerImg1, mark_img1 as "
-			+ "markImg1, answer_img2 as answerImg2, mark_img2 as markImg2, answer_img3 as answerImg3, mark_img3 as "
-			+ "markImg3, quesid, paperid as paperId from ustudy.stuanswer where quesid = #{qid} and paperid = #{pid};")
+	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid)"
+			+ " as paperImg, answer_img1 as answerImg1, mark_img1 as markImg1, answer_img2 as answerImg2, "
+			+ "mark_img2 as markImg2, answer_img3 as answerImg3, mark_img3 as markImg3, quesid, paperid as "
+			+ "paperId from ustudy.answer where quesid = #{qid} and paperid = #{pid};")
 	public BlockAnswer getStuAnswer(@Param("qid") String quesid, @Param("pid") String pid);
 	
 	
-	@Update("update ustudy.stuanswer set mflag=#{mflag}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
+	@Update("update ustudy.answer set mflag=#{mflag}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
 			+ "isviewed=true, answer_img1=#{answerImg1}, mark_img1=#{markImg1}, answer_img2=#{answerImg2}, "
 			+ "mark_img2=#{markImg2}, answer_img3=#{answerImg3}, mark_img3=#{markImg3}, teacid1=#{teacid1}, "
 			+ "teacid2=#{teacid2}, teacid3=#{teacid3} where id=#{quesid}")
 	public int updateStuAnswer(BlockAnswer ba);
 	
-	@Insert("insert into ustudy.stuanswerdiv(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid})")
+	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid})")
 	public int insertStuAnswerDiv(@Param("sa") SingleAnswer sa, @Param("aid") String aid);
 	
-	@Select("select id from ustudy.stuanswer where quesid=#{qid} and paperid=#{pid}")
+	@Select("select id from ustudy.answer where quesid=#{qid} and paperid=#{pid}")
 	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
 	
 	@Select("select id from question where exam_grade_sub_id = (select id from examgradesub "

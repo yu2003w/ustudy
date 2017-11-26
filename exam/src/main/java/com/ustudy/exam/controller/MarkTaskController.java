@@ -73,7 +73,7 @@ public class MarkTaskController {
 			st = stS.getTaskPapers(teacid, quesR);
 		} catch (Exception e) {
 			logger.warn("getTaskPapers()" + e.getMessage());
-			String msg = "Failed to retrieve score task for teacher " + teacid;
+			String msg = "Failed to retrieve mark task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {

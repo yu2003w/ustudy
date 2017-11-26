@@ -20,7 +20,7 @@ public class MetaMarkTask implements Serializable {
 	private String teacid = null;
 	private String quesid = null;
 	private int threshold = 0;
-	private String markType = null;
+	private String marktype = null;
 	private String markrole = null;
 	private int numOfMarkedPapers = 0;
 	
@@ -29,23 +29,23 @@ public class MetaMarkTask implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MetaMarkTask(String id, String teacid, String quesid, int numOfScoredPapers, String scoreType) {
+	public MetaMarkTask(String id, String teacid, String quesid, int numOfScoredPapers, String mtype) {
 		super();
 		this.id = id;
 		this.teacid = teacid;
 		this.quesid = quesid;
 		this.numOfMarkedPapers = numOfScoredPapers;
-		this.markType = scoreType;
+		this.marktype = mtype;
 		this.markrole = "初评";
 		this.threshold = 0;
 	}
 
-	public MetaMarkTask(String teacid, String quesid, int threshold, String scoreType, String markrole) {
+	public MetaMarkTask(String teacid, String quesid, int threshold, String mtype, String markrole) {
 		super();
 		this.teacid = teacid;
 		this.quesid = quesid;
 		this.threshold = threshold;
-		this.markType = scoreType;
+		this.marktype = mtype;
 		this.markrole = markrole;
 		this.numOfMarkedPapers = 0;
 	}
@@ -82,12 +82,12 @@ public class MetaMarkTask implements Serializable {
 		this.numOfMarkedPapers = numOfScoredPapers;
 	}
 	
-	public String getMarkType() {
-		return markType;
+	public String getMarktype() {
+		return marktype;
 	}
 
-	public void setMarkType(String markType) {
-		this.markType = markType;
+	public void setMarktype(String markType) {
+		this.marktype = markType;
 	}
 
 	public int getThreshold() {
@@ -109,7 +109,7 @@ public class MetaMarkTask implements Serializable {
 	@Override
 	public String toString() {
 		return "MetaMarkTask [id=" + id + ", teacid=" + teacid + ", quesid=" + quesid + ", threshold=" + threshold
-				+ ", markType=" + markType + ", markrole=" + markrole + ", numOfMarkedPapers=" + numOfMarkedPapers
+				+ ", marktype=" + marktype + ", markrole=" + markrole + ", numOfMarkedPapers=" + numOfMarkedPapers
 				+ "]";
 	}
 

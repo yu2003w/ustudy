@@ -111,7 +111,7 @@ teacid CHAR(11) NOT NULL,
 quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
-scoretype ENUM ('标准','问题卷','终评'),
+marktype ENUM ('标准','问题卷','终评'),
 # no need to set if mark style is single screen
 markrole ENUM ('初评', '终评'),
 PRIMARY KEY (id),
