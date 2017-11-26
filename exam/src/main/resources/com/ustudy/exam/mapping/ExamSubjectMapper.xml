@@ -13,13 +13,13 @@
         <result property="stuNum" column="stu_num"/>
         <result property="teacNum" column="teac_num"/>
         <result property="examPaper" column="exam_paper"/>
-        <result property="examAnswer" column="exam_answer"/>
+        <result property="examAnswer" column="mark_status"/>
         <result property="examPaperNum" column="exam_paper_num"/>
         <result property="template" column="template"/>
         <result property="objItemNum" column="obj_item_num"/>
         <result property="subItemNum" column="sub_item_num"/>
         <result property="taskDispatch" column="task_dispatch"/>
-        <result property="answerSeted" column="answer_seted"/>
+        <result property="answerSeted" column="answer_set"/>
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
@@ -50,31 +50,42 @@
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamId" parameterType="Long" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId}
+		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
+		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id
+		 AND examgradesub.examid = exam.id
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamIdAndGradeId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
+		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
+		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.grade_id = grade.id 
+		AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
 	</select>
 
 	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} AND grade_id=#{gradeId} AND exam_answer=#{markingStatus}
+		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
+		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.mark_status = #{markingStatus} 
+		AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
 		<choose>
 			<when test="templateStatus !=null and templateStatus != '-1'">
-			 AND template=#{templateStatus}
+			 AND examgradesub.template=#{templateStatus}
 			</when>
 		</choose>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId}
+		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
+		WHERE examgradesub.examid = #{examId} AND examgradesub.grade_id = #{gradeId} AND examgradesub.sub_id = #{subjectId} 
+		AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id AND examgradesub.examid = exam.id
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectById" parameterType="Long" resultMap="ExamSubjectResult">
 		SELECT * FROM examgradesub where id=#{id}
+		SELECT examgradesub.*, exam.exam_name, grade.grade_name, subject.name AS sub_name FROM examgradesub, exam, grade, subject 
+		WHERE examgradesub.id = #{id} AND examgradesub.grade_id = grade.id AND examgradesub.sub_id = subject.id 
+		AND examgradesub.examid = exam.id
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
@@ -93,7 +104,7 @@
 	</update>
 	
 	<update id="isAanswerSeted" parameterType="Long">
-		UPDATE examgradesub SET answer_seted=1 where id=#{id}
+		UPDATE examgradesub SET answer_set=1 where id=#{id}
 	</update>
 	
 	<update id="isTaskDispatch" parameterType="Long">
