@@ -285,7 +285,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	@Transactional
 	public boolean updateMarkTask(MarkTask mt) {
-		if (deleteMarkTask(mt)) {
+		if (deleteMarkTaskByQues(mt)) {
 			if (!createMarkTask(mt)) {
 				logger.error("updateMarkTask(), failed to create mark task ->" + mt.toString());
 				return false;
@@ -300,13 +300,37 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return true;
 	}
 
+	@Transactional
+	private boolean deleteMarkTaskByQues(MarkTask mt) {
+		int num = 0;
+		if (mt.getTeachersIds() != null && !mt.getTeachersIds().isEmpty()) {
+			num = markTaskM.deleteMetaMarkTaskByQues(mt.getQuestionId(), "初评");
+			if (num <= 0) {
+				logger.error("deleteMarkTaskByQues(), mark task delete failed -> " + mt.getTeachersIds());
+				return false;
+			}
+			logger.debug("deleteMarkTaskByQues(), mark task deleted -> " + mt.getTeachersIds());
+		}
+		
+		if (mt.getFinalMarkTeachersIds() != null && !mt.getFinalMarkTeachersIds().isEmpty()) {
+			num = markTaskM.deleteMetaMarkTaskByQues(mt.getQuestionId(), "终评");
+			if (num <= 0) {
+				logger.error("deleteMarkTaskByQues(), mark task delete failed -> " + mt.getFinalMarkTeachersIds());
+				return false;
+			}
+			logger.debug("deleteMarkTaskByQues(), mark task deleted -> " + mt.getFinalMarkTeachersIds());
+		}
+		
+		return true;
+	}
+	
 	@Override
 	@Transactional
 	public boolean deleteMarkTask(MarkTask mt) {
 		List<String> teaL = mt.getTeachersIds();
 		int num = 0;
 		for (String id: teaL) {
-			num = markTaskM.deleteMetaMarkTask(id, mt.getQuestionId(), "初评");
+			num = markTaskM.deleteMetaMarkTaskByTeacher(id, mt.getQuestionId(), "初评");
 			if (num != 1) {
 				logger.error("deleteMarkTask(), delete failed with num ->" + num);
 				return false;
@@ -315,7 +339,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		teaL = mt.getFinalMarkTeachersIds();
 		for (String id: teaL) {
-			num = markTaskM.deleteMetaMarkTask(id, mt.getQuestionId(), "终评");
+			num = markTaskM.deleteMetaMarkTaskByTeacher(id, mt.getQuestionId(), "终评");
 			if (num != 1) {
 				logger.error("deleteMarkTask(), delete failed with num ->" + num);
 				return false;

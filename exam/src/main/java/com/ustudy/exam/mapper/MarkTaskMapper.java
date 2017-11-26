@@ -111,8 +111,11 @@ public interface MarkTaskMapper {
 	
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "
 			+ "markrole = #{markrole}")
-	public int deleteMetaMarkTask(@Param("teacid") String teac, @Param("quesid") String ques, 
+	public int deleteMetaMarkTaskByTeacher(@Param("teacid") String teac, @Param("quesid") String ques, 
 			@Param("markrole") String role);
+	
+	@Delete("delete from ustudy.marktask where quesid = #{qid} and markrole = #{markrole}")
+	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("markrole") String role);
 	
 	@Update("update ustudy.question set duration = #{tl} where id = #{qid}")
 	public int setTimeLimit(@Param("tl") int timeLimit, @Param("qid") String qid);
