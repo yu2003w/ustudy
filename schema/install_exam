@@ -140,7 +140,7 @@ UNIQUE KEY stuno (exam_code),
 KEY name (name,exam_code,gradeid,schid),
 KEY gradeid (gradeid),
 KEY schid (schid)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='考生信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
 # tables for student paper
 create table if not exists ustudy.paper (

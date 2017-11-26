@@ -23,6 +23,11 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teachers.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/grade.data' INTO TABLE ustudy.grade
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teagrade.data' INTO TABLE ustudy.teachergrade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
@@ -34,11 +39,6 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teasub.data' INTO TABLE ustudy
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/tearoles.data' INTO TABLE ustudy.teacherroles
-  CHARACTER SET UTF8
-  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
-  LINES TERMINATED BY '\n'
-  IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/grade.data' INTO TABLE ustudy.grade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
@@ -68,7 +68,7 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/question.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesdiv.data' INTO TABLE ustudy.question_step
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesstep.data' INTO TABLE ustudy.question_step
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
@@ -78,12 +78,17 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stupaper.data' INTO TABLE ustudy.paper
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examinee.data' INTO TABLE ustudy.examinee
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stuanswer.data' INTO TABLE ustudy.answer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/paper.data' INTO TABLE ustudy.paper
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/answer.data' INTO TABLE ustudy.answer
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
