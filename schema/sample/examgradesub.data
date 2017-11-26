@@ -1,2 +1,2 @@
-id,examid,exam_name,grade_id,grade_name,sub_id,sub_name,stu_num,teac_num,exam_paper,exam_answer,exam_paper_num,template,obj_item_num,sub_item_num,task_dispatch,answer_setted,upload_batch_count,blank_answer_paper,blank_questions_paper,xml_server_path,original_data
-null,1,曲江一中校考,1,高一,1,英语,50,10,null,null,50,null,10,20,null,1,50,null,null,null,null
+id,examid,grade_id,template,obj_item_num,sub_item_num,task_dispatch,answer_set,upload_batch_count,blank_answer_paper,blank_questions_paper,xml_server_path,original_data
+null,1,1,3,null,10,20,null,1,50,null,null,null,null

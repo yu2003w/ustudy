@@ -68,7 +68,7 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/question.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesdiv.data' INTO TABLE ustudy.quesanswerdiv
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesdiv.data' INTO TABLE ustudy.question_step
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
@@ -78,12 +78,12 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stupaper.data' INTO TABLE ustudy.stupaper
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stupaper.data' INTO TABLE ustudy.paper
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stuanswer.data' INTO TABLE ustudy.stuanswer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/stuanswer.data' INTO TABLE ustudy.answer
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

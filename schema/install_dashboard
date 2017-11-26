@@ -46,7 +46,7 @@ PRIMARY KEY(id)
 create table if not exists ustudy.orgowner (
 id INT NOT NULL AUTO_INCREMENT,
 name varchar(32) NOT NULL,
-loginname varchar(32) NOT NULL,
+loginname CHAR(11) NOT NULL,
 passwd varchar(32) NOT NULL,
 orgtype ENUM ('学校','教研室') NOT NULL,
 orgid varchar(32) NOT NULL,
