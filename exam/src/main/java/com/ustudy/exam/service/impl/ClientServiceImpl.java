@@ -26,6 +26,7 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.ClientDao;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamGradeDao;
@@ -82,15 +83,15 @@ public class ClientServiceImpl implements ClientService {
 	@Autowired
 	private QuesAnswerDao quesAnswerDaoImpl;
 	
-	public Map<String, Object> login(String token){
+	public UResp login(String token){
 		
-		Map<String, Object> result = new HashMap<>();
+		UResp result = new UResp();
 		
 		if(null != token && token.trim().length()>0){
 			token = Base64Util.encode(token);			
 		}else {
-			result.put("success", false);
-			result.put("message", "用户名、密码未提供");
+			result.setRet(false);
+			result.setMessage("用户名、密码未提供");
 			return result;
 		}
 		
@@ -134,7 +135,7 @@ public class ClientServiceImpl implements ClientService {
 
 			}
 			
-			result.put("success", status);
+			result.setRet(status);
 			if (status) {
 				logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
 				
@@ -148,20 +149,20 @@ public class ClientServiceImpl implements ClientService {
 					teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
 					logger.debug("login()," + teacher.toString());
 					
-					result.put("teacher", teacher);
+					result.setData(teacher);
 				} catch (Exception e) {
 					logger.warn("login(), session failed -> " + e.getMessage());
-					result.put("success", status);
-					result.put("message", "用户信息有误");
+					result.setRet(status);
+					result.setMessage("用户信息有误");
 				}
 			} else {
-				result.put("message", msg);
+				result.setMessage(msg);
 			}
 			
 			
 		}else {
-			result.put("success", false);
-			result.put("message", "用户名、密码有误");
+			result.setRet(false);
+			result.setMessage("用户名、密码有误");
 		}
 		
 		return result;
@@ -374,30 +375,20 @@ public class ClientServiceImpl implements ClientService {
 		return resault;
 	}
 
-	public Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId){
+	public JSONObject getTemplateById(Long examId, Long gradeId, Long subjectId){
 		
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId );
-		Map<String, String> result = new HashMap<>();
+		JSONObject result = new JSONObject();
 		
-		result.put("ExamQAPicPath", "标准答案图片名称,多个用‘,’分隔");
-		result.put("ExamPaperPicPath", "试卷原卷图片名称，多个用‘,’分隔");
-		result.put("AnswerSheetPicPath", "试卷答题卡原图 ,多张图片用 ',' 分隔");
-		result.put("AnswerSheetXMLPath", "试卷答题卡xml模版地址");
-		result.put("AnswerSheetXML", "试卷答题卡xml模版,json格式存储");
-		result.put("Id", "模板保存的数据库主键ID");
+		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 		
-		return result;
-	}
-	
-	public Map<String, String> getTemplateById(Long csId){
-		
-		logger.debug("csId: " + csId);
-		Map<String, String> result = new HashMap<>();
-		
-		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
-		
-		if(null != examSubject){
-			JSONObject originalData = JSONObject.fromObject(examSubject.getOriginalData());
+		if(null != examSubjects && examSubjects.size()>0){
+			ExamSubject examSubject = examSubjects.get(0);
+			String data = examSubject.getOriginalData();
+			if(data.indexOf("null") >= 0){
+				data = data.replace("null", "\"\"");
+			}
+			JSONObject originalData = JSONObject.fromObject(data);
 			StringBuffer fileNames = new StringBuffer();
 			if(null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")){
 				JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
@@ -412,11 +403,49 @@ public class ClientServiceImpl implements ClientService {
 				}
 			}
 			
-			result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper());
-			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper());
+			result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper().equals("null")?"":examSubject.getBlankAnswerPaper());
+			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null")?"":examSubject.getBlankQuestionsPaper());
 			result.put("AnswerSheetPicPath", fileNames.toString());
-			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath());
-			result.put("AnswerSheetXML", examSubject.getOriginalData());
+			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null")?"":examSubject.getXmlServerPath());
+			result.put("AnswerSheetXML", originalData);
+			result.put("Id", "" + examSubject.getId());
+		}
+		
+		return result;
+	}
+	
+	public JSONObject getTemplateById(Long csId){
+		
+		logger.debug("csId: " + csId);
+		JSONObject result = new JSONObject();
+		
+		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
+		
+		if(null != examSubject){
+			String data = examSubject.getOriginalData();
+			if(data.indexOf("null") >= 0){
+				data = data.replace("null", "\"\"");
+			}
+			JSONObject originalData = JSONObject.fromObject(data);
+			StringBuffer fileNames = new StringBuffer();
+			if(null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")){
+				JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
+				for (int i=0;i<pages.size();i++) {
+					JSONObject page = pages.getJSONObject(i);
+					if(null != page.get("fileName")){
+						if(fileNames.length() != 0){
+							fileNames.append(",");
+						}
+						fileNames.append(page.getString("fileName"));
+					}
+				}
+			}
+			
+			result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper().equals("null")?"":examSubject.getBlankAnswerPaper());
+			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null")?"":examSubject.getBlankQuestionsPaper());
+			result.put("AnswerSheetPicPath", fileNames.toString());
+			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null")?"":examSubject.getXmlServerPath());
+			result.put("AnswerSheetXML", originalData);
 			result.put("Id", "" + examSubject.getId());
 		}
 		
@@ -515,15 +544,15 @@ public class ClientServiceImpl implements ClientService {
 	public boolean addLog(HttpServletRequest request, String logs) throws Exception {
 		
 		File logPath = new File(request.getSession().getServletContext().getRealPath("client/log/"));
-		
 		File currentLogFile = null;
+		if(!logPath.exists() || !logPath.isDirectory()){
+			logPath.mkdirs();
+		}
 		
-		if (logPath.exists() && logPath.isDirectory()) {
-			File[] logFiles = logPath.listFiles();
-			for (File log : logFiles) {
-				if (log.isFile() && log.length() <= 1024*1024*10) {
-					currentLogFile = log;
-				}
+		File[] logFiles = logPath.listFiles();
+		for (File log : logFiles) {
+			if (log.isFile() && log.length() <= 1024*1024*10) {
+				currentLogFile = log;
 			}
 		}
 		
