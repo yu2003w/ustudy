@@ -1,5 +1,5 @@
-id,quesid,paperid,mflag,isviewed,score1,score2,score3,answer_img1,mark_img1,answer_img2,mark_img2,answer_img3,mark_img3,teacid1,teacid2,teacid3
-null,1,1,none,false,0,0,0,null,null,null,null,null,null,null,null,null
-null,2,1,none,false,0,0,0,null,null,null,null,null,null,null,null,null
-null,1,2,none,false,0,0,0,null,null,null,null,null,null,null,null,null
-null,2,2,none,false,0,0,0,null,null,null,null,null,null,null,null,null
+id,quesid,paperid,mflag,problem_paper,isviewed,score1,score2,score3,answer_img1,mark_img1,answer_img2,mark_img2,answer_img3,mark_img3,teacid1,teacid2,teacid3
+null,1,1,NONE,false,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,2,1,NONE,false,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,1,2,NONE,false,false,0,0,0,null,null,null,null,null,null,null,null,null
+null,2,2,NONE,false,false,0,0,0,null,null,null,null,null,null,null,null,null
