@@ -29,7 +29,7 @@
 	</insert>
 	
 	<update id="updateRefAnswer" parameterType="com.ustudy.exam.model.RefAnswer">  
-        UPDATE refanswer set quesid=#{quesid}, quesno=#{quesno}, branch=#{branch}, answer=#{answer}, type=#{type}, choice_num=#{choiceNum} WHERE id=#{id}
+        UPDATE refanswer set quesid=#{quesid}, quesno=#{quesno}, branch=#{branch}, answer=#{answer} WHERE id=#{id}
 	</update>
 
 </mapper>

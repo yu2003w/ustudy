@@ -145,16 +145,16 @@ KEY schid (schid)
 # tables for student paper
 create table if not exists ustudy.paper (
 id int(11) NOT NULL AUTO_INCREMENT,
-examinee_id INT (11) NOT NULL,
+exam_code varchar (20) NOT NULL,
 exam_grade_sub_id int(11) NOT NULL,
 batch_num int(11) DEFAULT NULL COMMENT '试卷所属扫描批次',
 paper_img varchar(360) DEFAULT NULL COMMENT '试卷图片地址,多个图片用'',''隔开',
 paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常',
 error_status varchar(5) DEFAULT NULL COMMENT '错误代码',
 PRIMARY KEY(id),
-INDEX (examinee_id, exam_grade_sub_id),
-FOREIGN KEY (examinee_id)
-    REFERENCES ustudy.examinee(id)
+INDEX (exam_code, exam_grade_sub_id),
+FOREIGN KEY (exam_code)
+    REFERENCES ustudy.examinee(exam_code)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)
