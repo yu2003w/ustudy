@@ -30,7 +30,7 @@
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT egs.* FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where 1=1
+		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
 		<if test="subjectId !=null and subjectId > 0">
 		 AND egs.sub_id=#{subjectId}
 		</if>
