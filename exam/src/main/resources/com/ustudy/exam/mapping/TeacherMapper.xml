@@ -22,11 +22,11 @@
 	</select>
 	
 	<select id="getTeachersBySchoolInGradeName" parameterType="java.util.Map" resultMap="TeacherResultWithGroups">
-		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR} and t.teacid in (SELECT tg.teac_id from teachergrade tg where tg.grade_name=#{gradeName,jdbcType=VARCHAR}); 
+		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR} and t.teacid in (SELECT tg.teac_id from teachergrade tg left join grade g on tg.grade_id=g.id where g.grade_name=#{gradeName,jdbcType=VARCHAR});
 	</select>
 
 	<select id="getSubjectsOfTeacher" parameterType="java.util.Map" resultType="string">
-		select sub_name from teachersub WHERE teac_id = #{teacid}
+		select s.name from teachersub ts left join subject s on ts.sub_id=s.id WHERE teac_id = #{teacid}
 	</select>
 
 </mapper>
