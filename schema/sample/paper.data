@@ -1,3 +1,3 @@
-id,examinee_id,exam_grade_sub_id,batch_num,paper_img,paper_status,error_status
-null,1,1,1,/ustudy/exam/a10001.img,0,null
-null,2,1,1,/ustudy/exam/a10002.img,0,null
+id,exam_code,exam_grade_sub_id,batch_num,paper_img,paper_status,error_status
+null,10001,1,1,/ustudy/exam/a10001.img,0,null
+null,10002,1,1,/ustudy/exam/a10002.img,0,null

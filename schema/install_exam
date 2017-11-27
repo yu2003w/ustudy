@@ -188,7 +188,8 @@ create table if not exists ustudy.answer (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT NOT NULL,
 paperid INT NOT NULL,
-mflag ENUM ('none','excellent','faq','weird', 'problem'),
+mflag ENUM ('NONE','BEST','FAQ','BAD'),
+problem_paper boolean default false,
 isviewed boolean default false,
 score1 INT default 0,
 score2 INT default 0,
@@ -228,11 +229,11 @@ FOREIGN KEY (paperid)
 create table if not exists ustudy.answer_step (
 id INT NOT NULL AUTO_INCREMENT,
 answer_id INT NOT NULL,
-ques_step_id INT(11) NOT NULL,
+quesno INT NOT NULL,
 score INT NOT NULL,
 PRIMARY KEY (id),
 INDEX(answer_id),
-UNIQUE KEY (ques_step_id, answer_id),
+UNIQUE KEY (quesno, answer_id),
 FOREIGN KEY (answer_id)
     REFERENCES ustudy.answer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
