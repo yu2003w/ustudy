@@ -37,7 +37,9 @@ public class BlockAnswer implements Serializable {
 	private int fullscore = 0;
 	// real score for this question block
 	private int score = 0;
-	List<SingleAnswer> steps = null;
+	private List<SingleAnswer> steps = null;
+	
+	private List <QuesRegion> regions = null;
 	
 	private String paperImg = null;
 	
@@ -244,6 +246,14 @@ public class BlockAnswer implements Serializable {
 		this.markImgData = markImgData;
 	}
 
+	public List<QuesRegion> getRegions() {
+		return regions;
+	}
+
+	public void setRegions(List<QuesRegion> regions) {
+		this.regions = regions;
+	}
+
 	public String getPaperImg() {
 		return paperImg;
 	}
@@ -352,8 +362,9 @@ public class BlockAnswer implements Serializable {
 	public String toString() {
 		return "BlockAnswer [questionName=" + questionName + ", questionType=" + questionType + ", markMode=" + markMode
 				+ ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid + ", mflag=" + mflag
-				+ ", fullscore=" + fullscore + ", score=" + score + ", steps=" + steps + ", paperImg=" + paperImg
-				+ ", answerImg=" + answerImg + ", markImg=" + markImg + ", score1=" + score1 + ", score2=" + score2
+				+ ", fullscore=" + fullscore + ", score=" + score + ", steps=" + steps + ", regions=" + regions
+				+ ", paperImg=" + paperImg + ", answerImg=" + answerImg + ", answerImgData=" + answerImgData
+				+ ", markImg=" + markImg + ", markImgData=" + markImgData + ", score1=" + score1 + ", score2=" + score2
 				+ ", score3=" + score3 + ", answerImg1=" + answerImg1 + ", markImg1=" + markImg1 + ", answerImg2="
 				+ answerImg2 + ", markImg2=" + markImg2 + ", answerImg3=" + answerImg3 + ", markImg3=" + markImg3
 				+ ", teacid1=" + teacid1 + ", teacid2=" + teacid2 + ", teacid3=" + teacid3 + "]";

@@ -160,5 +160,14 @@ public class Quesarea implements Serializable {
 	public void setEndQuestionNo(int endQuestionNo) {
 		this.endQuestionNo = endQuestionNo;
 	}
+
+	@Override
+	public String toString() {
+		return "Quesarea [id=" + id + ", egsId=" + egsId + ", pageno=" + pageno + ", fileName=" + fileName + ", areaId="
+				+ areaId + ", posx=" + posx + ", posy=" + posy + ", width=" + width + ", height=" + height + ", bottom="
+				+ bottom + ", right=" + right + ", questionType=" + questionType + ", startQuestionNo="
+				+ startQuestionNo + ", endQuestionNo=" + endQuestionNo + ", quesid=" + quesid + "]";
+	}
+	
 	
 }

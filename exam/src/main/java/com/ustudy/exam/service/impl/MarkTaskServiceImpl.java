@@ -15,6 +15,7 @@ import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuesId;
 import com.ustudy.exam.model.QuesMarkSum;
+import com.ustudy.exam.model.QuesRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
@@ -131,6 +132,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					List<SingleAnswer> saL = markTaskM.getQuesDiv(mark.getQuesid());
 					ba.setSteps(saL);
 				}
+				//set region informations for this question id
+				List<QuesRegion> qreL = markTaskM.getQuesRegion(mark.getQuesid());
+				ba.setRegions(qreL);
 				blA.add(ba);
 			}
 			stuP.setBlocks(blA);

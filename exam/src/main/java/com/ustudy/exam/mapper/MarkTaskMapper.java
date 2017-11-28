@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Update;
 
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
+import com.ustudy.exam.model.QuesRegion;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
@@ -71,6 +72,9 @@ public interface MarkTaskMapper {
 	
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
+	
+	@Select("select file_name as fileName, posx, posy, width, height from ustudy.quesarea where quesid = #{qid}")
+	public List<QuesRegion> getQuesRegion(@Param("qid") String quesid);
 	
 	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid)"
 			+ " as paperImg, answer_img1 as answerImg1, mark_img1 as markImg1, answer_img2 as answerImg2, "

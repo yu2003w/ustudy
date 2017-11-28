@@ -73,6 +73,11 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesstep.data' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesarea.data' INTO TABLE ustudy.quesarea
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.data' INTO TABLE ustudy.marktask
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
