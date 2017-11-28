@@ -5,7 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.StudentPaper" id="StudentPaperResult">
         <id property="id" column="id"/>
         <result property="stuNo" column="stuno"/>
-        <result property="stuExamNo" column="examinee_id"/>
+        <result property="stuExamNo" column="exam_code"/>
         <result property="examId" column="exam_id"/>
         <result property="gradeId" column="grade_id"/>
         <result property="subjectId" column="sub_id"/>        
@@ -19,12 +19,12 @@
 	<select id="getStudentPapers" parameterType="long" resultMap="StudentPaperResult">
 		SELECT p.*, e.stuno, egs.examid AS exam_id, egs.grade_id, egs.sub_id
 		 FROM paper p LEFT JOIN examgradesub egs ON p.exam_grade_sub_id=egs.id 
-		LEFT JOIN examinee e ON e.id=p.examinee_id WHERE p.exam_grade_sub_id=#{csId}
+		LEFT JOIN examinee e ON e.exam_code=p.exam_code WHERE p.exam_grade_sub_id=#{csId}
 	</select>
 
 	<!-- 查询得到全部Exam对象 -->
 	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
-		INSERT INTO paper (examinee_id, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
+		INSERT INTO paper (exam_code, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
         VALUES (#{stuExamNo}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
 	</insert>
 	
