@@ -36,7 +36,7 @@ public class ClientApiTest {
 //		 System.out.println("--------------------getExamTemplate-------------------");
 //		 System.out.println();
 		
-		 getExamTemplate("2", token);
+		 getExamTemplate("1", token);
 		 System.out.println();
 		 System.out.println("--------------------getExamTemplate-------------------");
 		 System.out.println();
@@ -221,7 +221,8 @@ public class ClientApiTest {
 
 	public static void getExamTemplate(String csId, String token) {
 
-		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
+//		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
+		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + csId;
 
 		try {
 

@@ -375,10 +375,10 @@ public class ClientServiceImpl implements ClientService {
 		return resault;
 	}
 
-	public JSONObject getTemplateById(Long examId, Long gradeId, Long subjectId){
+	public Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId){
 		
 		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId );
-		JSONObject result = new JSONObject();
+		Map<String, String> result = new HashMap<>();
 		
 		List<ExamSubject> examSubjects = examSubjectDaoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 		
@@ -414,10 +414,10 @@ public class ClientServiceImpl implements ClientService {
 		return result;
 	}
 	
-	public JSONObject getTemplateById(Long csId){
+	public Map<String, String> getTemplateById(Long csId){
 		
 		logger.debug("csId: " + csId);
-		JSONObject result = new JSONObject();
+		Map<String, String> result = new HashMap<>();
 		
 		ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
 		
