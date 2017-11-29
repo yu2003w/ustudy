@@ -227,11 +227,13 @@ public class MarkTaskController {
 		return res; 
 		
 	}
-	
-	@RequestMapping(value = "marktask/delete/", method = RequestMethod.GET)
-	public UResp deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+
+	@RequestMapping(value = "/marktask/delete/{examId}/{gradeId}/{subjectId}/{questionId}", method = RequestMethod.POST)
+	public UResp deleteMarkTask(HttpServletResponse resp, @PathVariable String examId, @PathVariable String gradeId,
+							 @PathVariable String subjectId, @PathVariable String questionId) {
 		UResp res = new UResp();
-		
+		MarkTask mt = stS.getMarkTaskByEGSQuestion(new ExamGradeSub(examId, gradeId, subjectId), questionId);
+
 		if (mt == null) {
 			logger.warn("deleteMarkTask(), received parameter is invalid");
 			res.setMessage("parameter invalid");
