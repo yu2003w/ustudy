@@ -130,6 +130,24 @@ public class MarkTask implements Serializable {
 		this.markMode = markMode;
 	}
 
+	
+	/**
+	 * check whether parameter is valid, for example, quesid is valid or not, 
+	 * teachers set or not
+	 * @return
+	 * 
+	 */
+	public boolean isvalid() {
+		if (this.questionId == null || this.questionId.isEmpty()) {
+			return false;
+		}
+		if ((this.teachersIds == null || this.teachersIds.isEmpty()) && (this.finalMarkTeachersIds == null ||
+				this.finalMarkTeachersIds.isEmpty())) {
+			return false;
+		}
+		
+		return true;
+	}
 	@Override
 	public String toString() {
 		return "MarkTask [examId=" + examId + ", gradeId=" + gradeId + ", subjectId=" + subjectId + ", questionId="

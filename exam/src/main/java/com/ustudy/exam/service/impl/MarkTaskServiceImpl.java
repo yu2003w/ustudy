@@ -155,6 +155,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	}
 	
 	@Override
+	@Transactional
 	public boolean updateMarkResult(QuestionPaper up) {
 		// here only one student paper need to be handled
 		int pid = up.getPaperSeq();
@@ -205,6 +206,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 			else
 				logger.debug("updateMarkResult(), updated -> " + ba.toString());
+		}
+		
+		// need to update statics here, make sure this is called only after database operations are completed
+		for (BlockAnswer ba:blocks) {
+			paperC.updateMarkStaticsCache(ba.getQuesid());
 		}
 		return true;
 	}

@@ -178,7 +178,7 @@ public class MarkTaskController {
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
-			if (!stS.createMarkTask(mt)) {
+			if (mt.isvalid() && !stS.createMarkTask(mt)) {
 				logger.warn("createMarkTask(), failed to create mark task");
 				res.setMessage("Failed to create mark task");
 				resp.setStatus(500);
