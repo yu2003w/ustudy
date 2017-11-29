@@ -113,8 +113,8 @@ public interface MarkTaskMapper {
 	
 	// meta mark task related functions
 	
-	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, scoretype, markrole) "
-			+ "values(#{teacid}, #{quesid}, #{threshold}, #{markType}, #{markrole})")
+	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, marktype, markrole) "
+			+ "values(#{teacid}, #{quesid}, #{threshold}, #{marktype}, #{markrole})")
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 	
 	
