@@ -61,8 +61,8 @@ public interface MarkTaskMapper {
 			+ "and ustudy.question.id = #{qid}")
 	public MarkTaskBrife getMetaTaskInfo(@Param("qid") String queid);
 	
-	@Select("select id as quesid, quesno, startno, endno, type as questionType, mark_mode as markMode, score as"
-			+ " fullscore from ustudy.question where id = #{qid}")
+	@Select("select id as quesid, quesno, startno, endno, type as questionType, assign_mode as assignMode,"
+			+ "mark_mode as markMode, score as fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 	
 	@Select("select ustudy.paper.id from ustudy.question join ustudy.paper on "

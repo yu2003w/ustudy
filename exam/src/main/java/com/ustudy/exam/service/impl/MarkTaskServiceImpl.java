@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.cache.PaperCache;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesComb;
@@ -33,6 +34,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Autowired
 	private MarkTaskMapper markTaskM;
+	
+	@Autowired
+	private PaperCache paperC;
 	
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
@@ -112,7 +116,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq) {
 		List<QuestionPaper> items = new ArrayList<QuestionPaper>();
 		
-		List<String> paperIds = markTaskM.getPapersByQuesId(queS.get(0).getQuesid());
+		// List<String> paperIds = markTaskM.getPapersByQuesId();
+		if (queS.isEmpty()) {
+			logger.error("requestPapers(), question parameter is invalid -> " + queS.toString());
+			return null;
+		}
+		List<String> paperIds = paperC.retrievePapers(queS.get(0).getQuesid(), queS.get(0).getAssignMode());
 		logger.debug("requestPapers()，number of retrieved paper is " + paperIds.size());
 		int i = 0;
 		for (String pId: paperIds) {

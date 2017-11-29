@@ -30,6 +30,8 @@ public class QuesMarkSum implements Serializable {
 	@JsonIgnore
 	private String endno = null;
 	@JsonIgnore
+	private String assignMode = null;
+	@JsonIgnore
 	private String markMode = null;
 	@JsonIgnore
 	private int fullscore = 0;
@@ -49,7 +51,7 @@ public class QuesMarkSum implements Serializable {
 	}
 
 	public QuesMarkSum(String quesid, String quesno, String startno, String endno, String questionType, 
-			String markMode, int score) {
+			String assign, String markMode, int score) {
 		super();
 		this.questionType = questionType;
 		this.quesid = quesid;
@@ -57,6 +59,7 @@ public class QuesMarkSum implements Serializable {
 		this.startno = startno;
 		this.endno = endno;
 		this.markMode = markMode;
+		this.assignMode = assign;
 		this.fullscore = score;
 	}
 
@@ -124,6 +127,14 @@ public class QuesMarkSum implements Serializable {
 		this.endno = endno;
 	}
 
+	public String getAssignMode() {
+		return assignMode;
+	}
+
+	public void setAssignMode(String assignMode) {
+		this.assignMode = assignMode;
+	}
+
 	public String getMarkMode() {
 		return markMode;
 	}
@@ -144,7 +155,8 @@ public class QuesMarkSum implements Serializable {
 	public String toString() {
 		return "QuesMarkSum [questionName=" + questionName + ", questionType=" + questionType + ", avgScore=" + avgScore
 				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", quesno=" + quesno + ", startno=" + startno
-				+ ", endno=" + endno + ", markMode=" + markMode + ", fullscore=" + fullscore + "]";
+				+ ", endno=" + endno + ", assignMode=" + assignMode + ", markMode=" + markMode + ", fullscore="
+				+ fullscore + "]";
 	}
 	
 }
