@@ -14,7 +14,7 @@ public class ClientApiTest {
 
 	public static void main(String[] args) {
 
-		String username = "13810001341";
+		String username = "13810001340";
 		String password = "123456";
 		password = Base64Util.getMd5Pwd(password);
 		String token = Base64Util.decode(username + ":" + password);
@@ -36,10 +36,10 @@ public class ClientApiTest {
 //		 System.out.println("--------------------getExamTemplate-------------------");
 //		 System.out.println();
 		
-//		 getExamTemplate("1", token);
-//		 System.out.println();
-//		 System.out.println("--------------------getExamTemplate-------------------");
-//		 System.out.println();
+		 getExamTemplate("2", token);
+		 System.out.println();
+		 System.out.println("--------------------getExamTemplate-------------------");
+		 System.out.println();
 		 
 //		 getExamSubjects("1", "1", token);
 //		 System.out.println();
@@ -116,16 +116,16 @@ public class ClientApiTest {
 //		System.out.println("--------------------getExamSubjectStatus-------------------");
 //		System.out.println();
 		
-		StringBuffer logs = new StringBuffer();
-		for (int i = 0; i < 1000; i++) {
-			logs.append("--------------------addClientLogs-------------------\n");
-		}
-		for (int i = 0; i < 1; i++) {
-			addClientLogs(logs.toString());
-		}
-		System.out.println();
-		System.out.println("--------------------addClientLogs-------------------");
-		System.out.println();
+//		StringBuffer logs = new StringBuffer();
+//		for (int i = 0; i < 1000; i++) {
+//			logs.append("--------------------addClientLogs-------------------\n");
+//		}
+//		for (int i = 0; i < 1; i++) {
+//			addClientLogs(logs.toString());
+//		}
+//		System.out.println();
+//		System.out.println("--------------------addClientLogs-------------------");
+//		System.out.println();
 		
 //		getClientLogs();
 //		System.out.println();
@@ -221,7 +221,7 @@ public class ClientApiTest {
 
 	public static void getExamTemplate(String csId, String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + csId;
+		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
 
 		try {
 
@@ -295,7 +295,7 @@ public class ClientApiTest {
 
 	public static void getExamTemplate(Integer csId, String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + csId;
+		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
 
 		try {
 
@@ -446,7 +446,8 @@ public class ClientApiTest {
 
 	public static void getPermissions(String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/getPermissions";
+//		String targetURL = "http://127.0.0.1:8080/exam/client/getPermissions";
+		String targetURL = "http://47.92.53.57/api/client/getPermissions";
 
 		try {
 
@@ -485,7 +486,8 @@ public class ClientApiTest {
 
 	public static void login(String token) {
 
-		String targetURL = "http://127.0.0.1:8080/exam/client/login";
+//		String targetURL = "http://127.0.0.1:8080/exam/client/login";
+		String targetURL = "http://47.92.53.57/api/client/login";
 
 		try {
 

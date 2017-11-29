@@ -407,7 +407,7 @@ public class ClientServiceImpl implements ClientService {
 			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null")?"":examSubject.getBlankQuestionsPaper());
 			result.put("AnswerSheetPicPath", fileNames.toString());
 			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null")?"":examSubject.getXmlServerPath());
-			result.put("AnswerSheetXML", originalData);
+			result.put("AnswerSheetXML", data);
 			result.put("Id", "" + examSubject.getId());
 		}
 		
@@ -445,7 +445,7 @@ public class ClientServiceImpl implements ClientService {
 			result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null")?"":examSubject.getBlankQuestionsPaper());
 			result.put("AnswerSheetPicPath", fileNames.toString());
 			result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null")?"":examSubject.getXmlServerPath());
-			result.put("AnswerSheetXML", originalData);
+			result.put("AnswerSheetXML", data);
 			result.put("Id", "" + examSubject.getId());
 		}
 		
