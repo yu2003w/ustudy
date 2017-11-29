@@ -214,7 +214,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		List<MarkTask> taskL = new ArrayList<MarkTask>();
 		for (String id: quesIds) {
 			MarkTask mt = getMarkTaskByEGSQuestion(egs, id);
-			taskL.add(mt);
+			if (mt != null) {
+				taskL.add(mt);
+			}
 		}
 		return taskL;
 	}
@@ -222,6 +224,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub egs, String questionId) {
 		MarkTask mt = markTaskM.getAllMarkTasksByQuesId(questionId);
+		if (mt==null) {
+			return mt;
+		}
 		mt.setMetaInfo(questionId, egs);
 		if (mt.getMarkMode().compareTo("单评") == 0) {
 			mt.setTeachersIds(markTaskM.getTeachersByQid(questionId));
