@@ -135,6 +135,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
 				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pId);
+				if (ba == null) {
+					// first time to view this paper
+					ba = new BlockAnswer();
+				}
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), mark.getFullscore());
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block

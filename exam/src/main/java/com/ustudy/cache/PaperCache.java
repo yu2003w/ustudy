@@ -59,10 +59,15 @@ public class PaperCache {
 	}
 	
 	public synchronized List<String> retrievePapers(String quesid, String assmode) {
+		if (assmode == null || assmode.isEmpty()) {
+			logger.error("retrievePapers(), assign mode is not set for question " + quesid);
+			return null;
+		}
 		if (!cachePapers(quesid)) {
 			logger.error("retrievePapers(), failed to cache papers for question " + quesid);
 			return null;
 		}
+		
 		String teacid = ExamUtil.getCurrentUserId();
 		List<MarkTaskCache> mtcL = paperC.opsForValue().get("ques" + quesid);
 		logger.debug("retrievePapers(), papers retrieved ->" + mtcL.toString());
@@ -117,7 +122,7 @@ public class PaperCache {
 		
 	}
 	
-	public synchronized boolean updateMarkStaticsCache(String quesid) {
+	public boolean updateMarkStaticsCache(String quesid) {
 		String teacid = ExamUtil.getCurrentUserId();
 		Map<String, MarkStaticsCache> quesSta = teaPaperC.opsForValue().get(teacid);
 		if (quesSta == null || quesSta.isEmpty()) {
