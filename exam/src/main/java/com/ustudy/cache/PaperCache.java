@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.cache.MarkStaticsCache;
 import com.ustudy.exam.model.cache.MarkTaskCache;
+import com.ustudy.exam.model.cache.PaperImgCache;
 import com.ustudy.exam.utility.ExamUtil;
 
 @Service
@@ -31,6 +32,7 @@ public class PaperCache {
 	@Autowired
 	private MarkTaskMapper mtM;
 	
+	private final int MAX_THRES = 20;
 	/**
 	 * cache papers in memory
 	 * Maybe not all parameters are needed, only cache basic info here
@@ -42,34 +44,33 @@ public class PaperCache {
 	
 	private synchronized boolean cachePapers(String quesid) {
 		logger.debug("retrievePapers(), start retrieving papers for quesid -> " + quesid);
-		List<String> paperL = mtM.getPapersByQuesId(quesid);
-		if (paperL.isEmpty()) {
+		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(quesid);
+		if (mtcL == null || mtcL.isEmpty()) {
 			logger.info("cachePapers(), no papers available for question " + quesid);
 			return false;
 		}
 		
-		List<MarkTaskCache> mtcL = new ArrayList<MarkTaskCache>();
-		for (String id: paperL) {
-			MarkTaskCache mtc = new MarkTaskCache(id, 0);
-			mtcL.add(mtc);
-		}
-		paperC.opsForValue().set("ques" + quesid, mtcL);
+		paperC.opsForValue().set("ques-" + quesid, mtcL);
 		logger.debug("cachePapers(), papers cached for question{" + quesid + "} -> " + mtcL.toString());
 		return true;
 	}
 	
-	public synchronized List<String> retrievePapers(String quesid, String assmode) {
+	public synchronized List<PaperImgCache> retrievePapers(String quesid, String assmode) {
 		if (assmode == null || assmode.isEmpty()) {
 			logger.error("retrievePapers(), assign mode is not set for question " + quesid);
 			return null;
 		}
-		if (!cachePapers(quesid)) {
-			logger.error("retrievePapers(), failed to cache papers for question " + quesid);
-			return null;
+		List<MarkTaskCache> mtcL = paperC.opsForValue().get("ques" + quesid);
+		if (mtcL == null || mtcL.isEmpty()) {
+			if (!cachePapers(quesid)) {
+				logger.error("retrievePapers(), failed to cache papers for question " + quesid);
+				return null;
+			}
+			logger.debug("retrievePapers(), cached again for question " + quesid);
+			mtcL = paperC.opsForValue().get("ques" + quesid);
 		}
 		
 		String teacid = ExamUtil.getCurrentUserId();
-		List<MarkTaskCache> mtcL = paperC.opsForValue().get("ques" + quesid);
 		logger.debug("retrievePapers(), papers retrieved ->" + mtcL.toString());
 		
 		List<String> firstTeaL = mtM.getTeachersByQidRole(quesid, "初评");
@@ -82,15 +83,19 @@ public class PaperCache {
 		}
 		if ((firstTeaL.contains(teacid) || finalTeaL.contains(teacid)) && assmode.compareTo("平均") == 0) {
 			thres = amount/factor;
+			if (thres > MAX_THRES) {
+				thres = MAX_THRES;
+			}
+			logger.debug("retrievePapers(), threshold is " + thres);
 		}
-		else {
+		else { 
 			logger.warn("retrievePapers(), teacher " + teacid + 
 					" is not assigned to mark papers for question " + quesid);
 			return null;
 		}
 		
 		// get allocated papers here
-		List<String> pList = new ArrayList<String>();
+		List<PaperImgCache> pList = new ArrayList<PaperImgCache>();
 		Map<String, MarkStaticsCache> quesSta = teaPaperC.opsForValue().get(teacid);
 		if ( quesSta == null) {
 			quesSta = new HashMap<String, MarkStaticsCache>();
@@ -101,7 +106,7 @@ public class PaperCache {
 			if (paper.getStatus() == 0 && count < thres) {
 				paper.setStatus(1);
 				paper.setTeacid(teacid);
-				pList.add(paper.getPaperid());
+				pList.add(new PaperImgCache(paper.getPaperid(), paper.getImg()));
 				count++;
 			}
 			else if (paper.getStatus() == 2) {

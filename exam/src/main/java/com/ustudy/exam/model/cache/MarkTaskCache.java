@@ -15,6 +15,16 @@ public class MarkTaskCache implements Serializable {
 	private static final long serialVersionUID = -541260350542180987L;
 	
 	private String paperid = null;
+	// paper image corresponding to the paper id
+	private String img = null;
+	public String getImg() {
+		return img;
+	}
+
+	public void setImg(String img) {
+		this.img = img;
+	}
+
 	private String teacid = null;
 	
 	/*
@@ -29,10 +39,10 @@ public class MarkTaskCache implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MarkTaskCache(String paperid, int status) {
+	public MarkTaskCache(String paperid, String img) {
 		super();
 		this.paperid = paperid;
-		this.status = status;
+		this.img = img;
 	}
 
 	public MarkTaskCache(String paperid, String teacid, int status) {
@@ -68,7 +78,7 @@ public class MarkTaskCache implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MarkTaskCache [paperid=" + paperid + ", teacid=" + teacid + ", status=" + status + "]";
+		return "MarkTaskCache [paperid=" + paperid + ", img=" + img + ", teacid=" + teacid + ", status=" + status + "]";
 	}
 
 }

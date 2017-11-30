@@ -42,6 +42,14 @@ public class QuesRegion implements Serializable {
 		this.height = height;
 	}
 
+	public QuesRegion(int posx, int posy, int width, int height) {
+		super();
+		this.posx = posx;
+		this.posy = posy;
+		this.width = width;
+		this.height = height;
+	}
+
 	public String getFileName() {
 		return fileName;
 	}

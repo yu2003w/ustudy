@@ -13,6 +13,7 @@ import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.QuesRegion;
 import com.ustudy.exam.model.SingleAnswer;
+import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
@@ -65,16 +66,17 @@ public interface MarkTaskMapper {
 			+ "mark_mode as markMode, score as fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 	
-	@Select("select ustudy.paper.id from ustudy.question join ustudy.paper on "
-			+ "ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
+	@Select("select ustudy.paper.id as paperid, ustudy.paper.paper_img as img from ustudy.question join "
+			+ "ustudy.paper on ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
 			+ "where ustudy.question.id = #{qid}")
-	public List<String> getPapersByQuesId(@Param("qid") String quesid);
+	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
 	
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
-	@Select("select file_name as fileName, posx, posy, width, height from ustudy.quesarea where quesid = #{qid}")
-	public List<QuesRegion> getQuesRegion(@Param("qid") String quesid);
+	@Select("select file_name as fileName, posx, posy, width, height from ustudy.quesarea where "
+			+ "quesid = #{qid} order by pageno")
+	public List<QuesRegion> getPaperRegion(@Param("qid") String quesid);
 	
 	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid)"
 			+ " as paperImg, answer_img1 as answerImg1, mark_img1 as markImg1, answer_img2 as answerImg2, "

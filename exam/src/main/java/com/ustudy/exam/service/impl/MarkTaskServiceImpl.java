@@ -19,6 +19,7 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.QuesRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
+import com.ustudy.exam.model.cache.PaperImgCache;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
@@ -121,10 +122,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			logger.error("requestPapers(), question parameter is invalid -> " + queS.toString());
 			return null;
 		}
-		List<String> paperIds = paperC.retrievePapers(queS.get(0).getQuesid(), queS.get(0).getAssignMode());
+		
+		// a little tricky here, get papers based the first question block meta information
+		List<PaperImgCache> paperIds = paperC.retrievePapers(queS.get(0).getQuesid(), queS.get(0).getAssignMode());
 		logger.debug("requestPapers()，number of retrieved paper is " + paperIds.size());
 		int i = 0;
-		for (String pId: paperIds) {
+		for (PaperImgCache pImg: paperIds) {
 			//fetch question info from each paper and group them together
 			QuestionPaper stuP = new QuestionPaper();
 			// need to set paper sequences here
@@ -134,10 +137,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				stuP.setPaperSeq(startSeq + (++i));
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
-				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pId);
+				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pImg.getPaperid());
 				if (ba == null) {
-					// first time to view this paper
+					// first time to view this paper, need set basic information
 					ba = new BlockAnswer();
+					ba.setBasicInfo(pImg.getPaperid(), mark.getQuesid(), pImg.getImg());
 				}
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), mark.getFullscore());
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
@@ -146,7 +150,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba.setSteps(saL);
 				}
 				//set region informations for this question id
-				List<QuesRegion> qreL = markTaskM.getQuesRegion(mark.getQuesid());
+				List<QuesRegion> qreL = markTaskM.getPaperRegion(mark.getQuesid());
 				ba.setRegions(qreL);
 				blA.add(ba);
 			}
