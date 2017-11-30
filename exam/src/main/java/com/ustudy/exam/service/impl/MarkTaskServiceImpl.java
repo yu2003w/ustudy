@@ -143,16 +143,15 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba = new BlockAnswer();
 					ba.setBasicInfo(pImg.getPaperid(), mark.getQuesid(), pImg.getImg());
 				}
-				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), mark.getFullscore());
+				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
+						mark.getFullscore());
+				List<SingleAnswer> saL = new ArrayList<SingleAnswer>();
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
-					List<SingleAnswer> saL = markTaskM.getQuesDiv(mark.getQuesid());
-					if (saL == null) {
-						// if steps is null, need to set to empty to make frontend process more easily
-						saL = new ArrayList<SingleAnswer>();
-					}
-					ba.setSteps(saL);
+					saL = markTaskM.getQuesDiv(mark.getQuesid());
 				}
+				ba.setSteps(saL);
+				
 				// set region informations for this question id
 				// need to set answer image,
 				List<QuesRegion> qreL = markTaskM.getPaperRegion(mark.getQuesid());
@@ -163,15 +162,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 				else {
 					imgs = paperImg.split(",");
-					if (imgs.length != qreL.size()) {
-						logger.error("requestPapers(), number of answer images not matched with that of regions "
-								+ "for " + pImg.toString());
-					}
-					else {
-						int tmpNo = 0;
-						for (QuesRegion re: qreL) {
-							re.setAnsImg(imgs[tmpNo++]);
+					for (QuesRegion re: qreL) {
+						if (re.getPageno() + 1 > imgs.length) {
+							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
 						}
+						else
+						    re.setAnsImg(imgs[re.getPageno()]);
 					}
 				}
 				
