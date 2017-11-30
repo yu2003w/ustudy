@@ -45,7 +45,8 @@ public class MarkStaticsCache implements Serializable {
 		this.completed = completed;
 	}
 
-	public float getProgress() {
+	// noted: function name should not be get/set for non class members
+	public float calProgress() {
 		if (this.total != 0) {
 			return (float) this.completed/this.total;
 		}

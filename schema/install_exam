@@ -115,6 +115,7 @@ marktype ENUM ('标准','问题卷','终评'),
 # no need to set if mark style is single screen
 markrole ENUM ('初评', '终评'),
 PRIMARY KEY (id),
+UNIQUE KEY (teacid, quesid, markrole),
 FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE,
