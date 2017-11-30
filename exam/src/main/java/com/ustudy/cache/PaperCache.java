@@ -33,6 +33,9 @@ public class PaperCache {
 	private MarkTaskMapper mtM;
 	
 	private final int MAX_THRES = 20;
+	private final String QUES_CACHE_PREFIX = "ques-";
+	private final String TEA_CACHE_PREFIX = "tea-";
+	
 	/**
 	 * cache papers in memory
 	 * Maybe not all parameters are needed, only cache basic info here
@@ -50,7 +53,7 @@ public class PaperCache {
 			return false;
 		}
 		
-		paperC.opsForValue().set("ques-" + quesid, mtcL);
+		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcL);
 		logger.debug("cachePapers(), papers cached for question{" + quesid + "} -> " + mtcL.toString());
 		return true;
 	}
@@ -60,14 +63,14 @@ public class PaperCache {
 			logger.error("retrievePapers(), assign mode is not set for question " + quesid);
 			return null;
 		}
-		List<MarkTaskCache> mtcL = paperC.opsForValue().get("ques" + quesid);
+		List<MarkTaskCache> mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + quesid);
 		if (mtcL == null || mtcL.isEmpty()) {
 			if (!cachePapers(quesid)) {
 				logger.error("retrievePapers(), failed to cache papers for question " + quesid);
 				return null;
 			}
 			logger.debug("retrievePapers(), cached again for question " + quesid);
-			mtcL = paperC.opsForValue().get("ques" + quesid);
+			mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + quesid);
 		}
 		
 		String teacid = ExamUtil.getCurrentUserId();
@@ -117,10 +120,10 @@ public class PaperCache {
 		//update statics information
 		MarkStaticsCache ms = new MarkStaticsCache(marked, thres);
 		quesSta.put(quesid, ms);
-		teaPaperC.opsForValue().set(teacid, quesSta);
+		teaPaperC.opsForValue().set(TEA_CACHE_PREFIX + teacid, quesSta);
 		
 		//write back changes to redis
-		paperC.opsForValue().set("ques" + quesid, mtcL);
+		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcL);
 		logger.debug("retrievePapers(), assigned tasks for teacher " + teacid + " -> " + pList.toString());
 		
 		return pList;
@@ -129,7 +132,7 @@ public class PaperCache {
 	
 	public boolean updateMarkStaticsCache(String quesid) {
 		String teacid = ExamUtil.getCurrentUserId();
-		Map<String, MarkStaticsCache> quesSta = teaPaperC.opsForValue().get(teacid);
+		Map<String, MarkStaticsCache> quesSta = teaPaperC.opsForValue().get(TEA_CACHE_PREFIX + teacid);
 		if (quesSta == null || quesSta.isEmpty()) {
 			logger.error("updateMarkStaticsCache(), statics cache is not initialized for teacher " + teacid);
 			return false;
@@ -142,7 +145,7 @@ public class PaperCache {
 		}
 		msc.incrCompleted();
 		quesSta.put(quesid, msc);
-		teaPaperC.opsForValue().set(teacid, quesSta);
+		teaPaperC.opsForValue().set(TEA_CACHE_PREFIX + teacid, quesSta);
 		return true;
 	}
 }
