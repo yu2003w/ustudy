@@ -91,6 +91,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		List<QuesId> qIds = comb.getQuesids();
 		//get basic information from first question id
 		MarkTaskBrife mt = markTaskM.getMetaTaskInfo(qIds.get(0).getId());
+		mt.setTeacherId(teacid);
+		mt.setTeacherName(ExamUtil.retrieveSessAttr("uname"));
 		mt.setMarkType(markTaskM.getMarkType(teacid, qIds.get(0).getId()));
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		for (QuesId id: qIds) {
@@ -117,7 +119,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq) {
 		List<QuestionPaper> items = new ArrayList<QuestionPaper>();
 		
-		// List<String> paperIds = markTaskM.getPapersByQuesId();
 		if (queS.isEmpty()) {
 			logger.error("requestPapers(), question parameter is invalid -> " + queS.toString());
 			return null;
