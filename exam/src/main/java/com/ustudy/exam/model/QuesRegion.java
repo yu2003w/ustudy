@@ -2,6 +2,7 @@ package com.ustudy.exam.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -17,7 +18,14 @@ public class QuesRegion implements Serializable {
 	 */
 	private static final long serialVersionUID = -4273191630745702664L;
 
-	private String fileName = null;
+	// origin images corresponding to the question block
+	private String quesImg = null;
+	
+	// answer images corresponding to the pageno in the quesion block
+	private String ansImg = null;
+	
+	@JsonIgnore
+	private int pageno = 0;
 	
 	@JsonProperty("x")
 	private int posx = -1;
@@ -33,9 +41,10 @@ public class QuesRegion implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public QuesRegion(String fileName, int posx, int posy, int width, int height) {
+	public QuesRegion(String quesImg, int pageno, int posx, int posy, int width, int height) {
 		super();
-		this.fileName = fileName;
+		this.quesImg = quesImg;
+		this.pageno = pageno;
 		this.posx = posx;
 		this.posy = posy;
 		this.width = width;
@@ -50,12 +59,12 @@ public class QuesRegion implements Serializable {
 		this.height = height;
 	}
 
-	public String getFileName() {
-		return fileName;
+	public String getQuesImg() {
+		return quesImg;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setQuesImg(String fileName) {
+		this.quesImg = fileName;
 	}
 
 	public int getPosx() {
@@ -90,11 +99,26 @@ public class QuesRegion implements Serializable {
 		this.height = height;
 	}
 
+	public String getAnsImg() {
+		return ansImg;
+	}
+
+	public void setAnsImg(String ansImg) {
+		this.ansImg = ansImg;
+	}
+
+	public int getPageno() {
+		return pageno;
+	}
+
+	public void setPageno(int pageno) {
+		this.pageno = pageno;
+	}
+
 	@Override
 	public String toString() {
-		return "QuesRegion [fileName=" + fileName + ", posx=" + posx + ", posy=" + posy + ", width=" + width
-				+ ", height=" + height + "]";
+		return "QuesRegion [quesImg=" + quesImg + ", ansImg=" + ansImg + ", pageno=" + pageno + ", posx=" + posx
+				+ ", posy=" + posy + ", width=" + width + ", height=" + height + "]";
 	}
-	
-	
+
 }

@@ -147,10 +147,34 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
 					List<SingleAnswer> saL = markTaskM.getQuesDiv(mark.getQuesid());
+					if (saL == null) {
+						// if steps is null, need to set to empty to make frontend process more easily
+						saL = new ArrayList<SingleAnswer>();
+					}
 					ba.setSteps(saL);
 				}
-				//set region informations for this question id
+				// set region informations for this question id
+				// need to set answer image,
 				List<QuesRegion> qreL = markTaskM.getPaperRegion(mark.getQuesid());
+				String paperImg = ba.getPaperImg();
+				String [] imgs = null;
+				if (paperImg == null || paperImg.isEmpty()) {
+					logger.warn("requestPapers(), paper image is empty from quesid " + mark.getQuesid() + pImg.toString());
+				}
+				else {
+					imgs = paperImg.split(",");
+					if (imgs.length != qreL.size()) {
+						logger.error("requestPapers(), number of answer images not matched with that of regions "
+								+ "for " + pImg.toString());
+					}
+					else {
+						int tmpNo = 0;
+						for (QuesRegion re: qreL) {
+							re.setAnsImg(imgs[tmpNo++]);
+						}
+					}
+				}
+				
 				ba.setRegions(qreL);
 				blA.add(ba);
 			}
@@ -179,14 +203,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
 					}
 					else
-						realScore += sa.getScore();
+						realScore += Float.valueOf(sa.getScore());
 				}
 			}
 			
 			String answer = ba.getAnswerImgData();
 			String mark = ba.getMarkImgData();
 			
-			if (answer == "" || mark == "") {
+			if (answer == null || answer.isEmpty() || mark == null || mark.isEmpty()) {
 				return false;
 			}
 			

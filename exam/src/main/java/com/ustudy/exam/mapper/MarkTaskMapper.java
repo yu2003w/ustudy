@@ -74,7 +74,7 @@ public interface MarkTaskMapper {
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
-	@Select("select file_name as fileName, posx, posy, width, height from ustudy.quesarea where "
+	@Select("select file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
 			+ "quesid = #{qid} order by pageno")
 	public List<QuesRegion> getPaperRegion(@Param("qid") String quesid);
 	
