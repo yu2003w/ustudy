@@ -106,13 +106,15 @@ public class PaperCache {
 		}
 
 		for (MarkTaskCache paper : mtcL) {
-			if (paper.getStatus() == 0 && count < thres) {
+			if (count < thres &&
+				(paper.getStatus() == 0 || 
+				(paper.getStatus() == 1 && paper.getTeacid().compareTo(teacid) == 0))) {
 				paper.setStatus(1);
 				paper.setTeacid(teacid);
 				pList.add(new PaperImgCache(paper.getPaperid(), paper.getImg()));
 				count++;
 			}
-			else if (paper.getStatus() == 2) {
+			else if (paper.getStatus() == 2 && paper.getTeacid().compareTo(teacid) == 0) {
 				marked++;
 			}
 		}
