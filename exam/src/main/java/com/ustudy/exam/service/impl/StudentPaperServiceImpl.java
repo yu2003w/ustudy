@@ -11,7 +11,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.dao.StudentPaperDao;
+import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.StudentPaper;
 import com.ustudy.exam.service.StudentPaperService;
 
@@ -24,7 +26,10 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 	private static final Logger logger = LogManager.getLogger(StudentPaperServiceImpl.class);
 
 	@Resource
-	private StudentPaperDao daoImpl;
+	private StudentPaperDao papersDao;
+	
+	@Resource
+	private QuesareaDao quesareaDao;
 
 	public JSONArray getStudentPapers(Long csId) {
 		logger.debug("getStudentPapers -> csId:" + csId);
@@ -63,7 +68,7 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 
 		Map<Integer, List<StudentPaper>> resault = new HashMap<>();
 
-		List<StudentPaper> papers = daoImpl.getStudentPapers(csId);
+		List<StudentPaper> papers = papersDao.getStudentPapers(csId);
 		if (null != papers && papers.size() > 0) {
 			for (StudentPaper paper : papers) {
 				List<StudentPaper> oneBatchPaper = resault.get(paper.getBatchNum());
@@ -76,6 +81,29 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 		}
 
 		return resault;
+	}
+	
+	public List<StudentPaper> getAnswerPapers(JSONObject parameter) throws Exception {
+		logger.info("getAnswerPapers -> parameter=" + parameter);
+		
+		if(null == parameter.get("question_id") && null == parameter.get("class_id")){
+			throw new Exception("Parameters Exception, question_id and class_id is null.");
+		}else{
+			
+			if(null != parameter.get("question_id")){
+				List<Quesarea> quesareas = quesareaDao.getQuesareas(parameter.getLong("question_id"));
+				if(null != quesareas && quesareas.size()>0){
+					parameter.put("egsId", quesareas.get(0).getEgsId());
+				}
+				List<StudentPaper> papers = papersDao.getAnswerPapers(parameter);
+				
+				return papers;
+			}else{
+				return papersDao.getAnswerPapers(parameter);
+			}
+			
+		}
+		
 	}
 
 }

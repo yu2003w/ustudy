@@ -140,4 +140,21 @@ public class ExamSubjectController {
 
 		return result;
 	}
+	
+	/**
+	 * 获取最新一次考试信息
+	 * @return
+	 */
+	@RequestMapping(value = "/last/examsubjects", method = RequestMethod.GET)
+	public Map getLastExamSubjects() {
+		
+		logger.debug("getLastExamSubject().");
+		
+		Map result = new HashMap<>();
+
+		result.put("success", true);
+		result.put("data", service.getLastExamSubjects());
+
+		return result;
+	}
 }

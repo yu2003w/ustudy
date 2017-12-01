@@ -8,7 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
 
@@ -20,6 +22,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Resource
 	private ExamSubjectDao daoImpl;
+	
+	@Resource
+	private ExamDao examDao;
 	
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName){
 		logger.debug("getExamSubjects");
@@ -89,6 +94,17 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public List<ExamSubject> getLastExamSubjects() {
+		
+		Exam exam = examDao.getLastExam();		
+		if(null != exam && exam.getId() > 0){
+			return getExamSubjects(exam.getId());
+		}else{
+			return null;
+		}
+		
 	}
 	
 }

@@ -20,6 +20,13 @@
 		SELECT p.*, e.stuno, egs.examid AS exam_id, egs.grade_id, egs.sub_id
 		 FROM paper p LEFT JOIN examgradesub egs ON p.exam_grade_sub_id=egs.id 
 		LEFT JOIN examinee e ON e.exam_code=p.exam_code WHERE p.exam_grade_sub_id=#{csId}
+	</select>	
+
+	<select id="getAnswerPapers" parameterType="java.util.Map" resultMap="StudentPaperResult">
+		SELECT * FROM paper WHERE 1=1
+		<if test="egsId !=null and egsId > 0">
+		 AND egs.exam_grade_sub_id=#{egsId}
+		</if>
 	</select>
 
 	<!-- 查询得到全部Exam对象 -->

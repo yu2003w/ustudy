@@ -32,4 +32,8 @@
 	<select id="getSubjects" resultType="java.util.Map">
 		select * from subject
 	</select>
+	
+	<select id="getLastExam" resultMap="ExamResult">
+		SELECT * FROM exam ORDER BY exam_date DESC LIMIT 1 
+	</select>
 </mapper>

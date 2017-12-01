@@ -16,6 +16,8 @@ public interface ExamDao {
 	List<Exam> getExamsByStatus(String status);
 	
 	Exam getExamsById(Long id);
+	
+	Exam getLastExam();
 
 	ArrayList<Map> getGrades();
 

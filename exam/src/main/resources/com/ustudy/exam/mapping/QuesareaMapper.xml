@@ -32,5 +32,9 @@
 	        (#{item.pageno}, #{item.fileName,jdbcType=VARCHAR}, #{item.areaId}, #{item.posx}, #{item.posy}, #{item.width}, #{item.height}, #{item.bottom}, #{item.right}, #{item.questionType,jdbcType=VARCHAR}, #{item.startQuestionNo}, #{item.endQuestionNo}, #{item.egsId}, #{item.quesid})
 	    </foreach>  
 	</insert>
+	
+	<select id="getQuesareas" parameterType="Long" resultMap="QuesareaResult">
+		SELECT * FROM quesarea where quesid = #{quesid} order by file_name
+	</select>
 
 </mapper>

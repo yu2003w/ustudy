@@ -7,6 +7,8 @@ import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.StudentPaper;
 
+import net.sf.json.JSONObject;
+
 @MapperScan
 public interface StudentPaperDao {
 
@@ -15,4 +17,6 @@ public interface StudentPaperDao {
 	void deleteStudentPapers(@Param("csId")Long csId, @Param("batchNum")Integer batchNum);
 	
 	List<StudentPaper> getStudentPapers(@Param("csId")Long csId);
+	
+	List<StudentPaper> getAnswerPapers(JSONObject parameter);
 }
