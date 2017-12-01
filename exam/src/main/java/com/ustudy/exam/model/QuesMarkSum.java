@@ -19,7 +19,7 @@ public class QuesMarkSum implements Serializable {
 
 	private String questionName = null;
 	private String questionType = null;
-	private float avgScore = 0;
+	private String avgScore = "";
 	private int markedNum = 0;
 	private String quesid = null;
 	
@@ -34,14 +34,14 @@ public class QuesMarkSum implements Serializable {
 	@JsonIgnore
 	private String markMode = null;
 	@JsonIgnore
-	private int fullscore = 0;
+	private String fullscore = "";
 	
 	public QuesMarkSum() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public QuesMarkSum(String questionName, String questionType, float avgScore, int markedNum, String quesid) {
+	public QuesMarkSum(String questionName, String questionType, String avgScore, int markedNum, String quesid) {
 		super();
 		this.questionName = questionName;
 		this.questionType = questionType;
@@ -51,7 +51,7 @@ public class QuesMarkSum implements Serializable {
 	}
 
 	public QuesMarkSum(String quesid, String quesno, String startno, String endno, String questionType, 
-			String assign, String markMode, int score) {
+			String assign, String markMode, String score) {
 		super();
 		this.questionType = questionType;
 		this.quesid = quesid;
@@ -79,11 +79,11 @@ public class QuesMarkSum implements Serializable {
 		this.questionType = questionType;
 	}
 
-	public float getAvgScore() {
+	public String getAvgScore() {
 		return avgScore;
 	}
 
-	public void setAvgScore(float avgScore) {
+	public void setAvgScore(String avgScore) {
 		this.avgScore = avgScore;
 	}
 
@@ -143,11 +143,11 @@ public class QuesMarkSum implements Serializable {
 		this.markMode = markMode;
 	}
 
-	public int getFullscore() {
+	public String getFullscore() {
 		return fullscore;
 	}
 
-	public void setFullscore(int fullscore) {
+	public void setFullscore(String fullscore) {
 		this.fullscore = fullscore;
 	}
 

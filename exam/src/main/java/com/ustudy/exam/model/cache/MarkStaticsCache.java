@@ -1,6 +1,7 @@
 package com.ustudy.exam.model.cache;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author jared
@@ -17,6 +18,7 @@ public class MarkStaticsCache implements Serializable {
 
 	private int total = 0;
 	private int completed = 0;
+	private Map<String, PaperImgCache> curAssign = null;
 	
 	public MarkStaticsCache() {
 		super();
@@ -54,13 +56,21 @@ public class MarkStaticsCache implements Serializable {
 			return 0;
 	}
 	
-	public void incrCompleted() {
-		this.completed++;
+	public void incrCompleted(int num) {
+		this.completed += num;
 	}
 	
+	public Map<String, PaperImgCache> getCurAssign() {
+		return curAssign;
+	}
+
+	public void setCurAssign(Map<String, PaperImgCache> curAssign) {
+		this.curAssign = curAssign;
+	}
+
 	@Override
 	public String toString() {
-		return "MarkStatics [total=" + total + ", completed=" + completed + "]";
+		return "MarkStaticsCache [total=" + total + ", completed=" + completed + ", curAssign=" + curAssign + "]";
 	}
 	
 }

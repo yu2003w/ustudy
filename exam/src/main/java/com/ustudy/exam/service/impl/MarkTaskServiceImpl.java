@@ -2,6 +2,9 @@ package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.io.ByteArrayInputStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -73,7 +76,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else
 			quesN = mt.getQuesno();
-		QuesMarkSum sum = new QuesMarkSum(quesN, mt.getQuesType(), 0, 0, mst.getQuesid());
+		QuesMarkSum sum = new QuesMarkSum(quesN, mt.getQuesType(), "", 0, mst.getQuesid());
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		sumL.add(sum);
 		mt.setSummary(sumL);
@@ -125,10 +128,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		// a little tricky here, get papers based the first question block meta information
-		List<PaperImgCache> paperIds = paperC.retrievePapers(queS.get(0).getQuesid(), queS.get(0).getAssignMode());
-		logger.debug("requestPapers()，number of retrieved paper is " + paperIds.size());
+		Map<String, PaperImgCache> papers = paperC.retrievePapers(queS.get(0).getQuesid(), 
+				queS.get(0).getAssignMode());
+		logger.debug("requestPapers()，number of retrieved paper is " + papers.size());
 		int i = 0;
-		for (PaperImgCache pImg: paperIds) {
+
+		Set<Entry<String, PaperImgCache>> entries = papers.entrySet();
+		for (Entry<String, PaperImgCache> pImg: entries) {
 			//fetch question info from each paper and group them together
 			QuestionPaper stuP = new QuestionPaper();
 			// need to set paper sequences here
@@ -138,11 +144,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				stuP.setPaperSeq(startSeq + (++i));
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
-				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pImg.getPaperid());
+				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pImg.getValue().getPaperid());
 				if (ba == null) {
 					// first time to view this paper, need set basic information
 					ba = new BlockAnswer();
-					ba.setBasicInfo(pImg.getPaperid(), mark.getQuesid(), pImg.getImg());
+					ba.setBasicInfo(pImg.getValue().getPaperid(), mark.getQuesid(), pImg.getValue().getImg());
 				}
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
 						mark.getFullscore());
@@ -228,7 +234,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			ba.setMarkImg1(ba.getMarkImg());
 			ba.setTeacid1(ExamUtil.getCurrentUserId());
 			if (realScore != 0)
-			    ba.setScore(realScore);
+			    ba.setScore(String.valueOf(realScore));
 			num = markTaskM.updateStuAnswer(ba);
 			if (num != 1) {
 				logger.warn("updateMarkResult(), " + num + " records updated. It seemed something went wrong.");
@@ -239,7 +245,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		// need to update statics here, make sure this is called only after database operations are completed
 		for (BlockAnswer ba:blocks) {
-			paperC.updateMarkStaticsCache(ba.getQuesid());
+			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId());
 		}
 		return true;
 	}
