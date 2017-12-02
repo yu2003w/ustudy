@@ -20,6 +20,9 @@ public class BlockAnswer implements Serializable {
 	 */
 	private static final long serialVersionUID = 7140959037803707897L;
 
+	@JsonIgnore
+	private int id;
+	
 	private String questionName = null;
 	private String questionType = null;
 	
@@ -32,7 +35,7 @@ public class BlockAnswer implements Serializable {
 	private String quesid = null;
 	
 	@JsonProperty("answerType")
-	private String mflag = null;
+	private String mflag = "NONE";
 	
 	private boolean isProblemPaper = false;
 	
@@ -41,15 +44,9 @@ public class BlockAnswer implements Serializable {
 	private String score = "";
 	private List<SingleAnswer> steps = null;
 	
-	private List <QuesRegion> regions = null;
+	private List <ImgRegion> regions = null;
 	
 	private String paperImg = null;
-	
-	private String answerImg = null;
-	private String answerImgData = null;
-	
-	private String markImg = null;
-	private String markImgData = null;
 	
 	@JsonIgnore
 	private int score1 = 0;
@@ -57,19 +54,6 @@ public class BlockAnswer implements Serializable {
 	private int score2 = 0;
 	@JsonIgnore
 	private int score3 = 0;
-	
-	@JsonIgnore
-	private String answerImg1 = null;
-	@JsonIgnore
-	private String markImg1 = null;
-	@JsonIgnore
-	private String answerImg2 = null;
-	@JsonIgnore
-	private String markImg2 = null;
-	@JsonIgnore
-	private String answerImg3 = null;
-	@JsonIgnore
-	private String markImg3 = null;
 
 	@JsonIgnore
 	private String teacid1 = null;
@@ -97,36 +81,11 @@ public class BlockAnswer implements Serializable {
 		this.score = score;
 	}
 
-	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String answerImgData, String markImg,
-			String markImgData, String answerImg1, String markImg1, String answerImg2, String markImg2, String answerImg3,
-			String markImg3) {
+	public BlockAnswer(boolean isMarked, String mflag, String paperImg) {
 		super();
 		this.isMarked = isMarked;
 		this.mflag = mflag;
 		this.paperImg = paperImg;
-		this.answerImg = answerImg;
-		this.answerImgData = answerImgData;
-		this.markImgData = markImgData;
-		this.markImg = markImg;
-		this.answerImg1 = answerImg1;
-		this.markImg1 = markImg1;
-		this.answerImg2 = answerImg2;
-		this.markImg2 = markImg2;
-		this.answerImg3 = answerImg3;
-		this.markImg3 = markImg3;
-		this.answerImg = this.answerImg1;
-		this.markImg = this.markImg1;
-	}
-
-	public BlockAnswer(boolean isMarked, String mflag, String paperImg, String answerImg, String answerImgData, String markImg, String markImgData) {
-		super();
-		this.isMarked = isMarked;
-		this.mflag = mflag;
-		this.paperImg = paperImg;
-		this.answerImg = answerImg;
-		this.answerImgData = answerImgData;
-		this.markImg = markImg;
-		this.markImgData = markImgData;
 	}
 
 	public void setMetaInfo(String questionName, String questionType, String markMode, String score) {
@@ -142,6 +101,14 @@ public class BlockAnswer implements Serializable {
 		this.paperImg = paperimg;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getQuestionName() {
 		return questionName;
 	}
@@ -230,43 +197,11 @@ public class BlockAnswer implements Serializable {
 		this.paperId = paperId;
 	}
 
-	public String getAnswerImg() {
-		return answerImg;
-	}
-
-	public void setAnswerImg(String answerImg) {
-		this.answerImg = answerImg;
-	}
-
-	public String getAnswerImgData() {
-		return answerImgData;
-	}
-
-	public void setAnswerImgData(String answerImgData) {
-		this.answerImgData = answerImgData;
-	}
-
-	public String getMarkImg() {
-		return markImg;
-	}
-
-	public void setMarkImg(String markImg) {
-		this.markImg = markImg;
-	}
-	
-	public String getMarkImgData() {
-		return markImgData;
-	}
-
-	public void setMarkImgData(String markImgData) {
-		this.markImgData = markImgData;
-	}
-
-	public List<QuesRegion> getRegions() {
+	public List<ImgRegion> getRegions() {
 		return regions;
 	}
 
-	public void setRegions(List<QuesRegion> regions) {
+	public void setRegions(List<ImgRegion> regions) {
 		this.regions = regions;
 	}
 
@@ -276,54 +211,6 @@ public class BlockAnswer implements Serializable {
 
 	public void setPaperImg(String paperImg) {
 		this.paperImg = paperImg;
-	}
-
-	public String getAnswerImg1() {
-		return answerImg1;
-	}
-
-	public void setAnswerImg1(String answerImg1) {
-		this.answerImg1 = answerImg1;
-	}
-
-	public String getMarkImg1() {
-		return markImg1;
-	}
-
-	public void setMarkImg1(String markImg1) {
-		this.markImg1 = markImg1;
-	}
-
-	public String getAnswerImg2() {
-		return answerImg2;
-	}
-
-	public void setAnswerImg2(String answerImg2) {
-		this.answerImg2 = answerImg2;
-	}
-
-	public String getMarkImg2() {
-		return markImg2;
-	}
-
-	public void setMarkImg2(String markImg2) {
-		this.markImg2 = markImg2;
-	}
-
-	public String getAnswerImg3() {
-		return answerImg3;
-	}
-
-	public void setAnswerImg3(String answerImg3) {
-		this.answerImg3 = answerImg3;
-	}
-
-	public String getMarkImg3() {
-		return markImg3;
-	}
-
-	public void setMarkImg3(String markImg3) {
-		this.markImg3 = markImg3;
 	}
 
 	public int getScore1() {
@@ -376,15 +263,12 @@ public class BlockAnswer implements Serializable {
 
 	@Override
 	public String toString() {
-		return "BlockAnswer [questionName=" + questionName + ", questionType=" + questionType + ", markMode=" + markMode
-				+ ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid + ", mflag=" + mflag
-				+ ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score=" + score + ", steps="
-				+ steps + ", regions=" + regions + ", paperImg=" + paperImg + ", answerImg=" + answerImg
-				+ ", answerImgData=" + answerImgData + ", markImg=" + markImg + ", markImgData=" + markImgData
-				+ ", score1=" + score1 + ", score2=" + score2 + ", score3=" + score3 + ", answerImg1=" + answerImg1
-				+ ", markImg1=" + markImg1 + ", answerImg2=" + answerImg2 + ", markImg2=" + markImg2 + ", answerImg3="
-				+ answerImg3 + ", markImg3=" + markImg3 + ", teacid1=" + teacid1 + ", teacid2=" + teacid2 + ", teacid3="
-				+ teacid3 + "]";
+		return "BlockAnswer [id=" + id + ", questionName=" + questionName + ", questionType=" + questionType
+				+ ", markMode=" + markMode + ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid
+				+ ", mflag=" + mflag + ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score="
+				+ score + ", steps=" + steps + ", regions=" + regions + ", paperImg=" + paperImg + ", score1=" + score1
+				+ ", score2=" + score2 + ", score3=" + score3 + ", teacid1=" + teacid1 + ", teacid2=" + teacid2
+				+ ", teacid3=" + teacid3 + "]";
 	}
 	
 }

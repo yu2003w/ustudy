@@ -127,7 +127,7 @@ public class PaperCache {
 
 		Set<Entry<String, MarkTaskCache>> entries = mtcL.entrySet();
 		for (Entry<String, MarkTaskCache> en: entries) {
-			if (count < thres && en.getValue().getStatus() == 0) {
+			if (count++ < thres && en.getValue().getStatus() == 0) {
 				en.getValue().setStatus(1);
 				en.getValue().setTeacid(teacid);
 				paperM.put(en.getKey(), new PaperImgCache(en.getKey(), en.getValue().getImg()));

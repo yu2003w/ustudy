@@ -5,17 +5,18 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
-import com.ustudy.exam.model.QuesRegion;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
+import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 
@@ -27,17 +28,6 @@ public interface MarkTaskMapper {
 	
 	@Select("select marktype from ustudy.marktask where teacid = #{tid} and quesid = #{qid}")
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
-	
-	/*
-	 * this api is not needed any more.
-	 * keep it here in case it is required later.
-	@Select("select examid as examId, exam_name as examName, sub_name as subject, grade_name as grade, quesno, "
-			+ "startno, endno, posx, posy, height, length, type as questionType, mark_mode as scoreMode from "
-			+ "ustudy.examgradesub join ustudy.question on ustudy.examgradesub.id = "
-			+ "ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = (select exam_grade_sub_id "
-			+ "from ustudy.question where id = #{qid})")
-	public MarkTask getMarkTask(@Param("qid") String quesid);
-	*/
 	
 	@Select("select examid as examId, (select exam_name from ustudy.exam where ustudy.exam.id = examid) as "
 			+ "examName, (select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
@@ -76,7 +66,7 @@ public interface MarkTaskMapper {
 	
 	@Select("select file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
 			+ "quesid = #{qid} order by pageno")
-	public List<QuesRegion> getPaperRegion(@Param("qid") String quesid);
+	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 	
 	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid)"
 			+ " as paperImg, answer_img1 as answerImg1, mark_img1 as markImg1, answer_img2 as answerImg2, "
@@ -85,17 +75,21 @@ public interface MarkTaskMapper {
 	public BlockAnswer getStuAnswer(@Param("qid") String quesid, @Param("pid") String pid);
 	
 	
-	@Update("update ustudy.answer set mflag=#{mflag}, score1=#{score1}, score1=#{score2}, score1=#{score3}, "
-			+ "isviewed=true, answer_img1=#{answerImg1}, mark_img1=#{markImg1}, answer_img2=#{answerImg2}, "
-			+ "mark_img2=#{markImg2}, answer_img3=#{answerImg3}, mark_img3=#{markImg3}, teacid1=#{teacid1}, "
-			+ "teacid2=#{teacid2}, teacid3=#{teacid3} where id=#{quesid}")
-	public int updateStuAnswer(BlockAnswer ba);
+	@Insert("insert into ustudy.answer (quesid, paperid, mflag, score1, score2, score3, isviewed, teacid1, "
+			+ "teacid2, teacid3) values (#{quesid}, #{paperId}, #{mflag}, #{score1}, #{score2}, #{score3}, true,"
+			+ " #{teacid1}, #{teacid2}, #{teacid3}) on duplicate key update mflag=#{mflag}, score1=#{score1}, "
+			+ "score2=#{score2}, score3=#{score3}, teacid1=#{teacid1}, teacid2=#{teacid2} teacid3=#{teacid3}")
+	@Options(useGeneratedKeys=true)
+	public int insertAnswer(BlockAnswer ba);
 	
-	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid})")
-	public int insertStuAnswerDiv(@Param("sa") SingleAnswer sa, @Param("aid") String aid);
+	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id, teacid) values (#{ir.markImg}, "
+			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}, #{teacid}) on duplicate key update mark_img=#{ir.markImg}, "
+			+ "ans_mark_img=#{ir.ansMarkImg}")
+	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") String ansid, @Param("teacid") String teacid);
 	
-	@Select("select id from ustudy.answer where quesid=#{qid} and paperid=#{pid}")
-	public String getStuanswerId(@Param("pid") int pid, @Param("qid") String qid);
+	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid}) "
+			+ "on duplicate key update score=#{sa.score}")
+	public int insertAnswerStep(@Param("sa") SingleAnswer sa, @Param("aid") int aid);
 	
 	@Select("select id from question where exam_grade_sub_id = (select id from examgradesub "
 			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")
@@ -112,6 +106,8 @@ public interface MarkTaskMapper {
 	@Select("select teacid from ustudy.marktask where quesid = #{qid}")
 	public List<String> getTeachersByQid(@Param("qid") String qid);
 	
+	@Select("select markrole from ustudy.marktask where quesid=#{qid} and teacid=#{teacid}")
+	public String getMarkRole(@Param("qid") String quesid, @Param("teacid") String teacid);
 	
 	// meta mark task related functions
 	

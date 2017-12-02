@@ -19,7 +19,7 @@ import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuesId;
 import com.ustudy.exam.model.QuesMarkSum;
-import com.ustudy.exam.model.QuesRegion;
+import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.PaperImgCache;
@@ -161,7 +161,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				
 				// set region informations for this question id
 				// need to set answer image,
-				List<QuesRegion> qreL = markTaskM.getPaperRegion(mark.getQuesid());
+				List<ImgRegion> qreL = markTaskM.getPaperRegion(mark.getQuesid());
 				String paperImg = ba.getPaperImg();
 				String [] imgs = null;
 				if (paperImg == null || paperImg.isEmpty()) {
@@ -169,7 +169,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 				else {
 					imgs = paperImg.split(",");
-					for (QuesRegion re: qreL) {
+					for (ImgRegion re: qreL) {
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
 						}
@@ -193,54 +193,49 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Transactional
 	public boolean updateMarkResult(QuestionPaper up) {
 		// here only one student paper need to be handled
-		int pid = up.getPaperSeq();
+		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();
 		for (BlockAnswer ba:blocks) {
 			int realScore = 0, num = 0;
-			if (ba.getSteps().isEmpty() == false) {
+			
+			if (!ba.getSteps().isEmpty()) {
 				List<SingleAnswer> saL = ba.getSteps();
-				String ansId = markTaskM.getStuanswerId(pid, ba.getQuesid());
 				for (SingleAnswer sa:saL) {
-					num = markTaskM.insertStuAnswerDiv(sa, ansId);
-					if (num != 1) {
-						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
-					}
-					else
-						realScore += Float.valueOf(sa.getScore());
+					realScore += Float.valueOf(sa.getScore());
 				}
 			}
-			
-			String answer = ba.getAnswerImgData();
-			String mark = ba.getMarkImgData();
-			
-			if (answer == null || answer.isEmpty() || mark == null || mark.isEmpty()) {
-				return false;
-			}
-			
-			try{
-				String b64AnswerImg = answer.split(",")[1];
-				byte[] answerBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64AnswerImg);
-				OSSUtil.putObject(ba.getAnswerImg(), new ByteArrayInputStream(answerBytes));
-				String b64MarkImg = mark.split(",")[1];
-				byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
-				OSSUtil.putObject(ba.getMarkImg(), new ByteArrayInputStream(markBytes));
-			} catch (Exception e) {
-				logger.error("updateMarkResult(), failed to upload image to oss -> " + e.getMessage());
-				return false;
-			}
-			
-			// score, answerType, markImg, and isMarked should be set to true
-			ba.setAnswerImg1(ba.getAnswerImg());
-			ba.setMarkImg1(ba.getMarkImg());
-			ba.setTeacid1(ExamUtil.getCurrentUserId());
 			if (realScore != 0)
-			    ba.setScore(String.valueOf(realScore));
-			num = markTaskM.updateStuAnswer(ba);
-			if (num != 1) {
-				logger.warn("updateMarkResult(), " + num + " records updated. It seemed something went wrong.");
+				ba.setScore(String.valueOf(realScore));
+			// need to find out which score should be updated
+			String teacid = ExamUtil.getCurrentUserId();
+			if (!setScore(ba, teacid)) {
+				logger.error("updateMarkResult(), failed to set score.");
+				return false;
+			}
+			num = markTaskM.insertAnswer(ba);
+			if (num != 1 || ba.getId() < 1) {
+				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
+						",pri key->" + ba.getId());
+				throw new RuntimeException("updateMarkResult(), set answer record failed.");
 			}
 			else
-				logger.debug("updateMarkResult(), updated -> " + ba.toString());
+				logger.debug("updateMarkResult(), answer updated " + ba.getId());
+
+			if (!ba.getSteps().isEmpty()) {
+				List<SingleAnswer> saL = ba.getSteps();
+				for (SingleAnswer sa:saL) {
+					num = markTaskM.insertAnswerStep(sa, ba.getId());
+					if (num != 1) {
+						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
+						throw new RuntimeException("updateMarkResult(), insertAnswerStep() returned " + num);
+					}
+				}
+			}
+						
+			if (!saveAnsImgByPage(ba.getRegions(), ba.getId(), teacid)) {
+				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
+				throw new RuntimeException("updateMarkResult(), save answer images failed");
+			}
 		}
 		
 		// need to update statics here, make sure this is called only after database operations are completed
@@ -250,6 +245,88 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return true;
 	}
 
+	private boolean saveAnsImgByPage(List<ImgRegion> irs, int id, String teacid) {
+		
+		if (irs == null || irs.isEmpty()) {
+			logger.error("saveAnsImgByPage(), regions are absent.");
+			return false;
+		}
+		
+		for (ImgRegion ir: irs) {
+			String ansmark = ir.getAnsMarkImgData();
+			String mark = ir.getMarkImgData();
+			if (ansmark != null && !ansmark.isEmpty() && mark != null && !mark.isEmpty()) {
+				try{
+					String b64AnsMarkImg = ansmark.split(",")[1];
+					byte[] answerBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64AnsMarkImg);
+					OSSUtil.putObject(ir.getAnsMarkImg(), new ByteArrayInputStream(answerBytes));
+					String b64MarkImg = mark.split(",")[1];
+					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
+					OSSUtil.putObject(ir.getMarkImg(), new ByteArrayInputStream(markBytes));
+				} catch (Exception e) {
+					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
+					return false;
+				}
+			}
+			else {
+				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private boolean setScore(BlockAnswer ba, String teacid) {
+		// check whether score has been set by this teacher before
+		String role = markTaskM.getMarkRole(ba.getQuesid(), teacid);
+		if (role == null || role.isEmpty()) {
+			logger.error("setScore(), failed to get valid role for teacher[" + teacid + "] when marking "
+					+ "question[" + ba.getQuesid() + "]");
+			return false;
+		}
+		
+		if (role.compareTo("初评") == 0) {
+			// set as teac1
+			if (((ba.getTeacid1() == null || ba.getTeacid1().isEmpty()) &&
+					(ba.getTeacid2() == null || ba.getTeacid2().isEmpty())) ||
+					(ba.getTeacid1() != null && !ba.getTeacid1().isEmpty() && 
+					ba.getTeacid1().compareTo(teacid) == 0)) {
+				ba.setTeacid1(teacid);
+				ba.setScore1(Integer.valueOf(ba.getScore()));
+			}
+		    // set as teac2 or update as teac2
+			else if ((ba.getTeacid1() != null && !ba.getTeacid1().isEmpty() && 
+					ba.getTeacid1().compareTo(teacid) != 0)) {
+				if (ba.getTeacid2() == null || ba.getTeacid2().isEmpty() || 
+						(ba.getTeacid2() != null && !ba.getTeacid2().isEmpty() && 
+						ba.getTeacid2().compareTo(teacid) == 0)) {
+					ba.setTeacid1(teacid);
+					ba.setScore1(Integer.valueOf(ba.getScore()));
+				}
+				else {
+					logger.error("setScore(), failed to find vacant " + role + " space for " + teacid);
+					return false;
+				}
+			}
+		}
+		else if (role.compareTo("终评") == 0) {
+			if (ba.getTeacid3() != null && !ba.getTeacid3().isEmpty()) {
+				if (ba.getTeacid3().compareTo(teacid) == 0) {
+					ba.setScore3(Integer.valueOf(ba.getScore()));
+				}
+				else {
+					logger.error("setScore(), teacid3 is " + ba.getTeacid3() + ", current teacid " + teacid);
+					return false;
+				}
+			}
+			else {
+				ba.setTeacid3(teacid);
+				ba.setScore3(Integer.valueOf(ba.getScore()));
+			}
+		}
+		return true;
+	}
 	@Override
 	public List<MarkTask> getMarkTasksBySub(ExamGradeSub egs) {
 		if (egs.getExamId().isEmpty() || egs.getGradeId().isEmpty() || egs.getSubjectId().isEmpty()) {

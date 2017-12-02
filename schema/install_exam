@@ -195,15 +195,6 @@ isviewed boolean default false,
 score1 INT default 0,
 score2 INT default 0,
 score3 INT default 0,
-# for subjective question, maybe two image layers needed for each teacher
-# this layer includes answer and comments
-answer_img1 VARCHAR(128),
-# this layer includes only comments
-mark_img1 VARCHAR(128),
-answer_img2 VARCHAR(128),
-mark_img2 VARCHAR(128),
-answer_img3 VARCHAR(128),
-mark_img3 VARCHAR(128),
 teacid1 CHAR(11),
 teacid2 CHAR(11),
 teacid3 CHAR(11),
@@ -225,6 +216,24 @@ FOREIGN KEY (paperid)
 #FOREIGN KEY (teacid3)
 #    REFERENCES ustudy.teacher(teacid)
 #    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.answer_img (
+id INT NOT NULL AUTO_INCREMENT,
+mark_img VARCHAR(128),
+ans_mark_img VARCHAR(128),
+pageno int(11) NOT NULL, 
+ans_id INT NOT NULL,
+teacid char(11) NOT NULL,
+INDEX(ans_id, teacid),
+PRIMARY KEY (id),
+UNIQUE KEY (ans_id, pageno, teacid),
+FOREIGN KEY(ans_id)
+    REFERENCES ustudy.answer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (teacid)
+    REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.answer_step (

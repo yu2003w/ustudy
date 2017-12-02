@@ -110,6 +110,11 @@ public class LoginController {
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
 
 		Subject currentUser = SecurityUtils.getSubject();
+		if (currentUser == null || currentUser.getPrincipal() == null) {
+			logger.info("logout(), no user logged in. Perhaps that server restarted.");
+			return;
+		}
+
 		logger.info("user " + currentUser.getPrincipal().toString() + " logged out");
 
 		currentUser.logout();
