@@ -3,8 +3,6 @@ package com.ustudy.exam.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.io.ByteArrayInputStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.cache.PaperCache;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
+import com.ustudy.exam.model.PaperRequest;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuesId;
 import com.ustudy.exam.model.QuesMarkSum;
@@ -127,14 +126,23 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			return null;
 		}
 		
-		// a little tricky here, get papers based the first question block meta information
-		Map<String, PaperImgCache> papers = paperC.retrievePapers(queS.get(0).getQuesid(), 
-				queS.get(0).getAssignMode());
-		logger.debug("requestPapers()，number of retrieved paper is " + papers.size());
+		List<PaperRequest> prS = new ArrayList<PaperRequest>();
+		for (QuesMarkSum que: queS) {
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode()));
+		}
+		
+		// need to initialize cache for each question ids
+		Map<String, List<PaperImgCache>> papers = paperC.retrievePapers(prS);
+		int maxSize = 0;
+		for (List<PaperImgCache> ppC: papers.values()) {
+			if (maxSize < ppC.size())
+				maxSize = ppC.size();
+		}
+		logger.info("requestPapers()，max number of retrieved paper for certain question id is " + maxSize);
+		
 		int i = 0;
 
-		Set<Entry<String, PaperImgCache>> entries = papers.entrySet();
-		for (Entry<String, PaperImgCache> pImg: entries) {
+		for (int j=0; j<maxSize; j++) {
 			//fetch question info from each paper and group them together
 			QuestionPaper stuP = new QuestionPaper();
 			// need to set paper sequences here
@@ -144,11 +152,15 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				stuP.setPaperSeq(startSeq + (++i));
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
-				BlockAnswer ba = markTaskM.getStuAnswer(mark.getQuesid(), pImg.getValue().getPaperid());
+				List<PaperImgCache> pImg = papers.get(mark.getQuesid());
+				if (j < pImg.size()) {
+					continue;
+				}
+				BlockAnswer ba = markTaskM.getAnswer(mark.getQuesid(), pImg.get(j).getPaperid());
 				if (ba == null) {
 					// first time to view this paper, need set basic information
 					ba = new BlockAnswer();
-					ba.setBasicInfo(pImg.getValue().getPaperid(), mark.getQuesid(), pImg.getValue().getImg());
+					ba.setBasicInfo(pImg.get(j).getPaperid(), mark.getQuesid(), pImg.get(j).getImg());
 				}
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
 						mark.getFullscore());
@@ -165,7 +177,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				String paperImg = ba.getPaperImg();
 				String [] imgs = null;
 				if (paperImg == null || paperImg.isEmpty()) {
-					logger.warn("requestPapers(), paper image is empty from quesid " + mark.getQuesid() + pImg.toString());
+					logger.warn("requestPapers(), paper image is vacant from quesid " + mark.getQuesid() + 
+							pImg.get(j).toString());
 				}
 				else {
 					imgs = paperImg.split(",");
@@ -219,7 +232,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				throw new RuntimeException("updateMarkResult(), set answer record failed.");
 			}
 			else
-				logger.debug("updateMarkResult(), answer updated " + ba.getId());
+				logger.debug("updateMarkResult(), answer updated and primary key->" + ba.getId());
 
 			if (!ba.getSteps().isEmpty()) {
 				List<SingleAnswer> saL = ba.getSteps();
@@ -267,6 +280,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
+				markTaskM.insertAnsImg(ir, id, teacid);
 			}
 			else {
 				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");

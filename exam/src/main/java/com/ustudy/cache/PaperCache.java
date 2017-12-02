@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.mapper.MarkTaskMapper;
+import com.ustudy.exam.model.PaperRequest;
 import com.ustudy.exam.model.cache.MarkStaticsCache;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.cache.PaperImgCache;
@@ -37,15 +38,6 @@ public class PaperCache {
 	private final String QUES_CACHE_PREFIX = "ques-";
 	private final String TEA_CACHE_PREFIX = "tea-";
 	
-	/**
-	 * cache papers in memory
-	 * Maybe not all parameters are needed, only cache basic info here
-	 * @return
-	 */
-	public boolean cachePapers() {
-		return false;
-	}
-	
 	private synchronized boolean cachePapers(String quesid) {
 		logger.debug("retrievePapers(), start retrieving papers for quesid -> " + quesid);
 		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(quesid);
@@ -55,7 +47,15 @@ public class PaperCache {
 		}
 		
 		Map<String, MarkTaskCache> mtcHM = new HashMap<String, MarkTaskCache>();
+		// get viewed papers list
+		List<String> viewedP = mtM.getViewedPapersByQuesId(quesid);
+		if (viewedP != null) {
+			logger.debug("cachePapers(), " + viewedP.size() + " papers already viewed." + viewedP.toString());
+		}
 		for (MarkTaskCache mtc: mtcL) {
+			if (viewedP != null && viewedP.contains(mtc.getPaperid())) {
+				mtc.setStatus(2);
+			}
 			mtcHM.put(mtc.getPaperid(), mtc);
 		}
 		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcHM);
@@ -63,7 +63,20 @@ public class PaperCache {
 		return true;
 	}
 	
-	public synchronized Map<String, PaperImgCache> retrievePapers(String quesid, String assmode) {
+	public synchronized Map<String, List<PaperImgCache>> retrievePapers(List<PaperRequest> prs) {
+		// key is question id
+		Map<String, List<PaperImgCache>> paperM = new HashMap<String, List<PaperImgCache>>();
+		for (PaperRequest pr: prs) {
+			List<PaperImgCache> pImgCache = this.getPapersForSingleQues(pr.getQid(), pr.getAssmode());
+			if (pImgCache == null || pImgCache.isEmpty()) {
+				logger.warn("retrievePapers(), no papers retrieved for " + pr.toString());
+			}
+			paperM.put(pr.getQid(), pImgCache);
+		}
+		return paperM;
+	}
+	
+	private List<PaperImgCache> getPapersForSingleQues(String quesid, String assmode) {
 		if (assmode == null || assmode.isEmpty()) {
 			logger.error("retrievePapers(), assign mode is not set for question " + quesid);
 			return null;
@@ -79,7 +92,7 @@ public class PaperCache {
 				paperM = msc.getCurAssign();
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("retrievePapers(), maybe user refreshed pages, return already assigned tasks");
-					return paperM;
+					return (List<PaperImgCache>) paperM.values();
 				}	
 			}
 		}
@@ -103,7 +116,7 @@ public class PaperCache {
 			logger.error("retrievePapers(), mark task is not assigned for question -> " + quesid);
 			return null;
 		}
-		int amount = mtcL.size()/factor, thres = 0, count = 0, marked = 0;
+		int amount = mtcL.size()/factor, thres = 0, marked = 0;
 		if ((firstTeaL.contains(teacid) || finalTeaL.contains(teacid)) && assmode.compareTo("平均") == 0) {
 			if (amount > MAX_THRES) {
 				thres = MAX_THRES;
@@ -126,23 +139,15 @@ public class PaperCache {
 		}
 
 		Set<Entry<String, MarkTaskCache>> entries = mtcL.entrySet();
+		int count = 0;
 		for (Entry<String, MarkTaskCache> en: entries) {
-			if (count++ < thres && en.getValue().getStatus() == 0) {
+			if (count < thres && en.getValue().getStatus() == 0) {
 				en.getValue().setStatus(1);
 				en.getValue().setTeacid(teacid);
 				paperM.put(en.getKey(), new PaperImgCache(en.getKey(), en.getValue().getImg()));
-			}
-		}
-		
-		/*
-		for (MarkTaskCache paper : mtcL) {
-			if (count < thres && paper.getStatus() == 0) {
-				paper.setStatus(1);
-				paper.setTeacid(teacid);
-				pList.add(new PaperImgCache(paper.getPaperid(), paper.getImg()));
 				count++;
 			}
-		} */
+		}
 		
 		//update statics information
 		MarkStaticsCache ms = new MarkStaticsCache(marked, amount);
@@ -154,7 +159,7 @@ public class PaperCache {
 		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcL);
 		logger.debug("retrievePapers(), assigned tasks for teacher " + teacid + " -> " + paperM.toString());
 		
-		return paperM;
+		return (List<PaperImgCache>) paperM.values();
 		
 	}
 	

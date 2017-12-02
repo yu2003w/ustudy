@@ -61,6 +61,9 @@ public interface MarkTaskMapper {
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
 	
+	@Select("select paperid from ustudy.answer where quesid=#{qid} and isviewed=true")
+	public List<String> getViewedPapersByQuesId(@Param("qid") String quesid);
+	
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
@@ -68,24 +71,21 @@ public interface MarkTaskMapper {
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 	
-	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid)"
-			+ " as paperImg, answer_img1 as answerImg1, mark_img1 as markImg1, answer_img2 as answerImg2, "
-			+ "mark_img2 as markImg2, answer_img3 as answerImg3, mark_img3 as markImg3, quesid, paperid as "
-			+ "paperId from ustudy.answer where quesid = #{qid} and paperid = #{pid};")
-	public BlockAnswer getStuAnswer(@Param("qid") String quesid, @Param("pid") String pid);
-	
+	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid) as "
+			+ "paperImg, quesid, paperid as paperId from ustudy.answer where quesid = #{qid} and paperid = #{pid}")
+	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid);
 	
 	@Insert("insert into ustudy.answer (quesid, paperid, mflag, score1, score2, score3, isviewed, teacid1, "
 			+ "teacid2, teacid3) values (#{quesid}, #{paperId}, #{mflag}, #{score1}, #{score2}, #{score3}, true,"
 			+ " #{teacid1}, #{teacid2}, #{teacid3}) on duplicate key update mflag=#{mflag}, score1=#{score1}, "
-			+ "score2=#{score2}, score3=#{score3}, teacid1=#{teacid1}, teacid2=#{teacid2} teacid3=#{teacid3}")
+			+ "score2=#{score2}, score3=#{score3}, teacid1=#{teacid1}, teacid2=#{teacid2}, teacid3=#{teacid3}")
 	@Options(useGeneratedKeys=true)
 	public int insertAnswer(BlockAnswer ba);
 	
 	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id, teacid) values (#{ir.markImg}, "
 			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}, #{teacid}) on duplicate key update mark_img=#{ir.markImg}, "
 			+ "ans_mark_img=#{ir.ansMarkImg}")
-	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") String ansid, @Param("teacid") String teacid);
+	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid, @Param("teacid") String teacid);
 	
 	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid}) "
 			+ "on duplicate key update score=#{sa.score}")

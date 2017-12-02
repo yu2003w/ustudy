@@ -1,5 +1,5 @@
 id,quesno,startno,endno,type,branch,choice_num,score,assign_mode,mark_mode,duration,teac_owner,exam_grade_sub_id
-null,0,31,40,多选题,不分科,0,0,"","","","",1
-null,0,1,30,单选题,不分科,0,0,"","","","",1
-null,41,41,41,判断题,不分科,0,0,"","","","",1
-null,42,42,42,判断题,不分科,0,0,"","","","",1
+null,0,31,40,多选题,不分科,0,0,null,null,null,null,1
+null,0,1,30,单选题,不分科,0,0,null,null,null,null,1
+null,41,0,0,判断题,不分科,0,0,null,null,null,null,1
+null,42,0,0,判断题,不分科,0,0,null,null,null,null,1
