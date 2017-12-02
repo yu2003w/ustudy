@@ -37,16 +37,16 @@
 	</delete>
 
 	<insert id="insertQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into question (quesno,startno,endno,type,branch,choice_num,score,exam_grade_sub_id) values  
+		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score,branch) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.branch},#{item.choiceNum},#{item.score},#{item.examGradeSubId})  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score},#{item.branch})  
 	    </foreach>  
 	</insert>
 
 	<insert id="initQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})
 	    </foreach>  
 	</insert>
 	
