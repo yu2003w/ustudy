@@ -34,6 +34,6 @@
 	</select>
 	
 	<select id="getLastExam" resultMap="ExamResult">
-		SELECT * FROM exam ORDER BY exam_date DESC LIMIT 1 
+		SELECT e.* from examgradesub egs LEFT JOIN exam e on egs.examid=e.id ORDER BY e.exam_date DESC LIMIT 1 
 	</select>
 </mapper>

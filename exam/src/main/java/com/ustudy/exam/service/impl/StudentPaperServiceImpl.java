@@ -83,25 +83,23 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 		return resault;
 	}
 	
-	public List<StudentPaper> getAnswerPapers(JSONObject parameter) throws Exception {
-		logger.info("getAnswerPapers -> parameter=" + parameter);
+	public Map<String, Object> getAnswerPapers(Long egsId, Long questionId,	Long classId, String type, String text,	Boolean viewAnswerPaper) throws Exception {
+		logger.debug("egsId: " + egsId + ",questionId: " + questionId + ",classId: " + classId + ",type: " + type + ",text: " + text + ",viewAnswerPaper: " + viewAnswerPaper);
 		
-		if(null == parameter.get("question_id") && null == parameter.get("class_id")){
-			throw new Exception("Parameters Exception, question_id and class_id is null.");
+		Map<String, Object> resault = new HashMap<>();
+		if(null == questionId && null == classId){
+			throw new Exception("Parameters Exception, questionId and classId is null.");
 		}else{
 			
-			if(null != parameter.get("question_id")){
-				List<Quesarea> quesareas = quesareaDao.getQuesareas(parameter.getLong("question_id"));
-				if(null != quesareas && quesareas.size()>0){
-					parameter.put("egsId", quesareas.get(0).getEgsId());
-				}
-				List<StudentPaper> papers = papersDao.getAnswerPapers(parameter);
-				
-				return papers;
-			}else{
-				return papersDao.getAnswerPapers(parameter);
+			List<StudentPaper> papers = papersDao.getAnswerPapers(egsId, questionId, classId, type, text);
+			resault.put("papers", papers);
+			
+			if(null != questionId && questionId > 0 && !viewAnswerPaper){
+				List<Quesarea> quesareas = quesareaDao.getQuesareas(questionId);
+				resault.put("quesareas", quesareas);
 			}
 			
+			return resault;			
 		}
 		
 	}
