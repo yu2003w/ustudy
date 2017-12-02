@@ -23,9 +23,25 @@
 	</select>	
 
 	<select id="getAnswerPapers" parameterType="java.util.Map" resultMap="StudentPaperResult">
-		SELECT * FROM paper WHERE 1=1
-		<if test="egsId !=null and egsId > 0">
-		 AND egs.exam_grade_sub_id=#{egsId}
+		SELECT * FROM paper p 
+		<if test="type !=null and type != ''">
+		 LEFT JOIN answer a on p.id=a.paperid 
+		</if>
+		<if test="text !=null and text != '' or classId > 0">
+		 LEFT JOIN examinee ee on p.exam_code=ee.exam_code
+		</if>
+		WHERE p.exam_grade_sub_id=#{egsId}
+		<if test="type !=null and type != ''">
+		 AND a.mflag=#{type,jdbcType=VARCHAR}
+		 	<if test="questionId !=null and questionId > 0">
+			 AND a.quesid=#{questionId}
+			</if>
+		</if>
+		<if test="classId > 0">
+		 AND ee.class_id=#{classId}
+		</if>
+		<if test="text !=null and text != ''">
+		 AND (ee.exam_code LIKE CONCAT('%',#{text},'%') OR ee.name LIKE CONCAT('%',#{text},'%'))
 		</if>
 	</select>
 
