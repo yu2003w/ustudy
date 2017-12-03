@@ -138,7 +138,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			if (maxSize < ppC.size())
 				maxSize = ppC.size();
 		}
-		logger.info("requestPapers()，max number of retrieved paper for certain question id is " + maxSize);
+		logger.info("requestPapers()，max number of retrieved papers is " + maxSize);
 		
 		int i = 0;
 
@@ -153,7 +153,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
 				List<PaperImgCache> pImg = papers.get(mark.getQuesid());
-				if (j < pImg.size()) {
+				if (j >= pImg.size()) {
 					continue;
 				}
 				BlockAnswer ba = markTaskM.getAnswer(mark.getQuesid(), pImg.get(j).getPaperid());
@@ -249,6 +249,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
 				throw new RuntimeException("updateMarkResult(), save answer images failed");
 			}
+		
 		}
 		
 		// need to update statics here, make sure this is called only after database operations are completed
@@ -280,7 +281,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
-				markTaskM.insertAnsImg(ir, id, teacid);
+				if (markTaskM.insertAnsImg(ir, id, teacid) != 1) {
+					logger.error("saveAnsImgByPage(), failed to save answer image recoreds." + ir.toString());
+					return false;
+				}
+				
 			}
 			else {
 				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");
@@ -288,6 +293,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 		}
 		
+		logger.debug("updateMarkResult(), save answer image succeed. " + irs.toString());
 		return true;
 	}
 	
@@ -417,17 +423,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 		}
 		
-		// update time limit for specified question id
-		if (mt.getTimeLimit() != 0) {
-			num = markTaskM.setTimeLimit(mt.getTimeLimit(), mt.getQuestionId());
-			if (num != 1) {
-				logger.error("createMarkTask(), failed to update time limit for " + mt.getQuestionId());
-				return false;
-			}
-			logger.debug("createMarkTask(), update time limit succeded");
+		// update time limit, assign mode, mark mode, teac_owner for specified question id
+		num = markTaskM.updateQuestionMeta(mt);
+		if (num != 1) {
+			logger.error("createMarkTask(), failed to update corresponding question information. " + mt.toString());
+			return false;
 		}
-		
-		// need to set owner here
+		logger.info("createMarkTask(), marktask created successfully.");
 		
 		return true;
 	}

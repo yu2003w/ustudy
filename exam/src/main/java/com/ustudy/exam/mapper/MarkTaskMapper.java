@@ -115,6 +115,9 @@ public interface MarkTaskMapper {
 			+ "values(#{teacid}, #{quesid}, #{threshold}, #{marktype}, #{markrole})")
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 	
+	@Update("update ustudy.question set assign_mode=#{type}, mark_mode=#{markMode}, duration=#{timeLimit}, "
+			+ "teac_owner=#{ownerId} where id={questionId}")
+	public int updateQuestionMeta(MarkTask mt);
 	
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "
 			+ "markrole = #{markrole}")
@@ -123,8 +126,5 @@ public interface MarkTaskMapper {
 	
 	@Delete("delete from ustudy.marktask where quesid = #{qid} and markrole = #{markrole}")
 	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("markrole") String role);
-	
-	@Update("update ustudy.question set duration = #{tl} where id = #{qid}")
-	public int setTimeLimit(@Param("tl") int timeLimit, @Param("qid") String qid);
 	
 }

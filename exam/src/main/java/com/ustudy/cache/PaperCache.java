@@ -1,5 +1,6 @@
 package com.ustudy.cache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class PaperCache {
 				paperM = msc.getCurAssign();
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("retrievePapers(), maybe user refreshed pages, return already assigned tasks");
-					return (List<PaperImgCache>) paperM.values();
+					return new ArrayList<PaperImgCache>(paperM.values());
 				}	
 			}
 		}
@@ -159,7 +160,7 @@ public class PaperCache {
 		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcL);
 		logger.debug("retrievePapers(), assigned tasks for teacher " + teacid + " -> " + paperM.toString());
 		
-		return (List<PaperImgCache>) paperM.values();
+		return new ArrayList<PaperImgCache>(paperM.values());
 		
 	}
 	
