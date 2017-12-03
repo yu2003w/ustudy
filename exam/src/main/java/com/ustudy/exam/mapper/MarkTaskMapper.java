@@ -90,10 +90,10 @@ public interface MarkTaskMapper {
 	@Options(useGeneratedKeys=true)
 	public int insertAnswer(BlockAnswer ba);
 	
-	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id, teacid) values (#{ir.markImg}, "
-			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}, #{teacid}) on duplicate key update mark_img=#{ir.markImg}, "
+	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id) values (#{ir.markImg}, "
+			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
 			+ "ans_mark_img=#{ir.ansMarkImg}")
-	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid, @Param("teacid") String teacid);
+	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid);
 	
 	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid}) "
 			+ "on duplicate key update score=#{sa.score}")

@@ -282,7 +282,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
-				if (markTaskM.insertAnsImg(ir, id, teacid) != 1) {
+				if (markTaskM.insertAnsImg(ir, id) != 1) {
 					logger.error("saveAnsImgByPage(), failed to save answer image recoreds." + ir.toString());
 					return false;
 				}
