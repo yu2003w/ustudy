@@ -11,16 +11,18 @@ public class PaperRequest implements Serializable {
 	
 	private String qid = null;
 	private String assmode = null;
+	private String markmode = null;
 	
 	public PaperRequest() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public PaperRequest(String qid, String assmode) {
+	public PaperRequest(String qid, String assmode, String markmode) {
 		super();
 		this.qid = qid;
 		this.assmode = assmode;
+		this.markmode = markmode;
 	}
 
 	public String getQid() {
@@ -39,9 +41,17 @@ public class PaperRequest implements Serializable {
 		this.assmode = assmode;
 	}
 
+	public String getMarkmode() {
+		return markmode;
+	}
+
+	public void setMarkmode(String markmode) {
+		this.markmode = markmode;
+	}
+
 	@Override
 	public String toString() {
-		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + "]";
+		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + ", markmode=" + markmode + "]";
 	}
 
 }

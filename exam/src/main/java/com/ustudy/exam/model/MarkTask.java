@@ -3,6 +3,8 @@ package com.ustudy.exam.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class MarkTask implements Serializable {
 
 	/**
@@ -24,6 +26,7 @@ public class MarkTask implements Serializable {
 	// duration for specific question
 	private int timeLimit = 0;
 	
+	@JsonIgnore
 	private String markMode = null;
 	
 	public MarkTask() {

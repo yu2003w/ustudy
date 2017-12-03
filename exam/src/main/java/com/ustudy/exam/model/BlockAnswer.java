@@ -48,19 +48,7 @@ public class BlockAnswer implements Serializable {
 	
 	private String paperImg = null;
 	
-	@JsonIgnore
-	private int score1 = 0;
-	@JsonIgnore
-	private int score2 = 0;
-	@JsonIgnore
-	private int score3 = 0;
-
-	@JsonIgnore
-	private String teacid1 = null;
-	@JsonIgnore
-	private String teacid2 = null;
-	@JsonIgnore
-	private String teacid3 = null;
+	private String teacid = null;
 	
 	public BlockAnswer() {
 		super();
@@ -213,52 +201,12 @@ public class BlockAnswer implements Serializable {
 		this.paperImg = paperImg;
 	}
 
-	public int getScore1() {
-		return score1;
+	public String getTeacid() {
+		return teacid;
 	}
 
-	public void setScore1(int score1) {
-		this.score1 = score1;
-	}
-
-	public int getScore2() {
-		return score2;
-	}
-
-	public void setScore2(int score2) {
-		this.score2 = score2;
-	}
-
-	public int getScore3() {
-		return score3;
-	}
-
-	public void setScore3(int score3) {
-		this.score3 = score3;
-	}
-
-	public String getTeacid1() {
-		return teacid1;
-	}
-
-	public void setTeacid1(String teacid1) {
-		this.teacid1 = teacid1;
-	}
-
-	public String getTeacid2() {
-		return teacid2;
-	}
-
-	public void setTeacid2(String teacid2) {
-		this.teacid2 = teacid2;
-	}
-
-	public String getTeacid3() {
-		return teacid3;
-	}
-
-	public void setTeacid3(String teacid3) {
-		this.teacid3 = teacid3;
+	public void setTeacid(String teacid) {
+		this.teacid = teacid;
 	}
 
 	@Override
@@ -266,9 +214,7 @@ public class BlockAnswer implements Serializable {
 		return "BlockAnswer [id=" + id + ", questionName=" + questionName + ", questionType=" + questionType
 				+ ", markMode=" + markMode + ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid
 				+ ", mflag=" + mflag + ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score="
-				+ score + ", steps=" + steps + ", regions=" + regions + ", paperImg=" + paperImg + ", score1=" + score1
-				+ ", score2=" + score2 + ", score3=" + score3 + ", teacid1=" + teacid1 + ", teacid2=" + teacid2
-				+ ", teacid3=" + teacid3 + "]";
+				+ score + ", steps=" + steps + ", regions=" + regions + ", paperImg=" + paperImg + "]";
 	}
 	
 }

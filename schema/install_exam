@@ -111,9 +111,9 @@ teacid CHAR(11) NOT NULL,
 quesid INT NOT NULL,
 # for certain teacher, number of task is limited
 threshold INT,
-marktype ENUM ('标准','问题卷','终评'),
+marktype ENUM ('标准','问题卷','终评') NOT NULL,
 # no need to set if mark style is single screen
-markrole ENUM ('初评', '终评'),
+markrole ENUM ('初评', '终评') NOT NULL,
 PRIMARY KEY (id),
 UNIQUE KEY (teacid, quesid, markrole),
 FOREIGN KEY (teacid)
@@ -192,30 +192,20 @@ paperid INT NOT NULL,
 mflag ENUM ('NONE','BEST','FAQ','BAD'),
 problem_paper boolean default false,
 isviewed boolean default false,
-score1 INT default 0,
-score2 INT default 0,
-score3 INT default 0,
-teacid1 CHAR(11),
-teacid2 CHAR(11),
-teacid3 CHAR(11),
+score float default 0,
+teacid CHAR(11),
 PRIMARY KEY(id),
 INDEX (quesid, paperid),
-UNIQUE KEY (quesid, paperid),
+UNIQUE KEY (quesid, paperid, teacid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (paperid)
     REFERENCES ustudy.paper(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (teacid)
+    REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE
-#FOREIGN KEY (teacid1)
-#    REFERENCES ustudy.teacher(teacid)
-#    ON DELETE SET NULL ON UPDATE CASCADE,
-#FOREIGN KEY (teacid2)
-#    REFERENCES ustudy.teacher(teacid)
-#    ON DELETE SET NULL ON UPDATE CASCADE,
-#FOREIGN KEY (teacid3)
-#    REFERENCES ustudy.teacher(teacid)
-#    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.answer_img (
@@ -224,15 +214,11 @@ mark_img VARCHAR(128),
 ans_mark_img VARCHAR(128),
 pageno int(11) NOT NULL, 
 ans_id INT NOT NULL,
-teacid char(11) NOT NULL,
-INDEX(ans_id, teacid),
+INDEX(ans_id),
 PRIMARY KEY (id),
-UNIQUE KEY (ans_id, pageno, teacid),
+UNIQUE KEY (ans_id, pageno),
 FOREIGN KEY(ans_id)
     REFERENCES ustudy.answer(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (teacid)
-    REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

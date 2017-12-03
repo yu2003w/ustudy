@@ -14,6 +14,7 @@ import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.MarkTaskCache;
+import com.ustudy.exam.model.cache.PaperScoreCache;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.ImgRegion;
@@ -61,24 +62,31 @@ public interface MarkTaskMapper {
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
 	
-	@Select("select paperid from ustudy.answer where quesid=#{qid} and isviewed=true")
-	public List<String> getViewedPapersByQuesId(@Param("qid") String quesid);
+	@Select("select paperid from ustudy.answer where quesid=#{qid} and isviewed=true and teacid=#{tid}")
+	public List<String> getViewedPapersByQuesId(@Param("qid") String quesid, @Param("tid") String tid);
+	
+	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true and "
+			+ "teacid=#{tid}")
+	public List<PaperScoreCache> getPaperScoreByQuesId(@Param("qid") String quesid, @Param("tid") String tid);
 	
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
+	
+	@Select("select mark_mode from ustudy.question where id = #{qid}")
+	public String getMarkMode(@Param("qid") String qid);
 	
 	@Select("select file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 	
-	@Select("select isviewed as isMarked, mflag, (select paper_img from ustudy.paper where paper.id = paperid) as "
-			+ "paperImg, quesid, paperid as paperId from ustudy.answer where quesid = #{qid} and paperid = #{pid}")
-	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid);
+	@Select("select mflag, problem_paper as isProblemPaper, isviewed as isMarked, score, "
+			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
+			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
+	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid, @Param("tid") String teacid);
 	
-	@Insert("insert into ustudy.answer (quesid, paperid, mflag, score1, score2, score3, isviewed, teacid1, "
-			+ "teacid2, teacid3) values (#{quesid}, #{paperId}, #{mflag}, #{score1}, #{score2}, #{score3}, true,"
-			+ " #{teacid1}, #{teacid2}, #{teacid3}) on duplicate key update mflag=#{mflag}, score1=#{score1}, "
-			+ "score2=#{score2}, score3=#{score3}, teacid1=#{teacid1}, teacid2=#{teacid2}, teacid3=#{teacid3}")
+	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, score) "
+			+ "values (#{quesid}, #{paperId}, #{teacid}, #{mflag}, #{isProblemPaper}, true, #{score}) on "
+			+ "duplicate key update mflag=#{mflag}, problem_paper=#{isProblemPaper}, score=#{score}")
 	@Options(useGeneratedKeys=true)
 	public int insertAnswer(BlockAnswer ba);
 	
@@ -116,7 +124,7 @@ public interface MarkTaskMapper {
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 	
 	@Update("update ustudy.question set assign_mode=#{type}, mark_mode=#{markMode}, duration=#{timeLimit}, "
-			+ "teac_owner=#{ownerId} where id={questionId}")
+			+ "teac_owner=#{ownerId} where id=#{questionId}")
 	public int updateQuestionMeta(MarkTask mt);
 	
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "

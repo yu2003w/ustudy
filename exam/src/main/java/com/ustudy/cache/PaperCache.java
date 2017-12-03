@@ -18,6 +18,7 @@ import com.ustudy.exam.model.PaperRequest;
 import com.ustudy.exam.model.cache.MarkStaticsCache;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.cache.PaperImgCache;
+import com.ustudy.exam.model.cache.PaperScoreCache;
 import com.ustudy.exam.utility.ExamUtil;
 
 @Service
@@ -37,30 +38,48 @@ public class PaperCache {
 	
 	private final int MAX_THRES = 20;
 	private final String QUES_CACHE_PREFIX = "ques-";
+	private final String QUES_CACHE_PREFIX_FINAL = "ques_f_";
 	private final String TEA_CACHE_PREFIX = "tea-";
 	
-	private synchronized boolean cachePapers(String quesid) {
-		logger.debug("retrievePapers(), start retrieving papers for quesid -> " + quesid);
-		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(quesid);
+	private synchronized boolean cachePapers(PaperRequest pr, String teacid, String role) {
+		logger.debug("retrievePapers(), start retrieving papers for quesid -> " + pr.getQid());
+		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(pr.getQid());
 		if (mtcL == null || mtcL.isEmpty()) {
-			logger.info("cachePapers(), no papers available for question " + quesid);
+			logger.info("cachePapers(), no papers available for question " + pr.getQid());
 			return false;
 		}
 		
+		// for double mark, to double papers ids in the cache, when dispatch the task, should avoid assign 
+		// same paper to the same teacher twice
+		// Thanks Li Qi for the idea.
+		if (role.compareTo("初评") == 0 && pr.getMarkmode().compareTo("双评") == 0) {
+			for (MarkTaskCache mtc: mtcL) {
+				mtcL.add(new MarkTaskCache(mtc));
+			}
+		}
+				
 		Map<String, MarkTaskCache> mtcHM = new HashMap<String, MarkTaskCache>();
 		// get viewed papers list
-		List<String> viewedP = mtM.getViewedPapersByQuesId(quesid);
+		List<String> viewedP = mtM.getViewedPapersByQuesId(pr.getQid(), teacid);
 		if (viewedP != null) {
 			logger.debug("cachePapers(), " + viewedP.size() + " papers already viewed." + viewedP.toString());
 		}
+		// List<PaperScoreCache> pcC = mtM.getPaperScoreByQuesId(pr.getQid(), teacid);
+		
 		for (MarkTaskCache mtc: mtcL) {
 			if (viewedP != null && viewedP.contains(mtc.getPaperid())) {
 				mtc.setStatus(2);
+				mtc.setTeacid(teacid);
 			}
 			mtcHM.put(mtc.getPaperid(), mtc);
 		}
-		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcHM);
-		logger.debug("cachePapers(), papers cached for question{" + quesid + "} -> " + mtcHM.toString());
+		if (role.compareTo("初评") == 0) {
+			paperC.opsForValue().set(QUES_CACHE_PREFIX + pr.getQid(), mtcHM);
+		}
+		else
+			paperC.opsForValue().set(QUES_CACHE_PREFIX_FINAL + pr.getQid(), mtcHM);
+		
+		logger.debug("cachePapers(), papers cached for question{" + pr.getQid() + "} -> " + mtcHM.toString());
 		return true;
 	}
 	
@@ -68,7 +87,7 @@ public class PaperCache {
 		// key is question id
 		Map<String, List<PaperImgCache>> paperM = new HashMap<String, List<PaperImgCache>>();
 		for (PaperRequest pr: prs) {
-			List<PaperImgCache> pImgCache = this.getPapersForSingleQues(pr.getQid(), pr.getAssmode());
+			List<PaperImgCache> pImgCache = this.getPapersForSingleQues(pr);
 			if (pImgCache == null || pImgCache.isEmpty()) {
 				logger.warn("retrievePapers(), no papers retrieved for " + pr.toString());
 			}
@@ -77,9 +96,14 @@ public class PaperCache {
 		return paperM;
 	}
 	
-	private List<PaperImgCache> getPapersForSingleQues(String quesid, String assmode) {
-		if (assmode == null || assmode.isEmpty()) {
-			logger.error("retrievePapers(), assign mode is not set for question " + quesid);
+	private List<PaperImgCache> getPapersForSingleQues(PaperRequest pr) {
+		if (pr.getAssmode() == null || pr.getAssmode().isEmpty()) {
+			logger.error("getPapersForSingleQues(), assign mode is not set for question " + pr.getQid());
+			return null;
+		}
+		
+		if (pr.getMarkmode() == null || pr.getMarkmode().isEmpty()) {
+			logger.error("getPapersForSingleQues(), mark mode is not set for question " + pr.getQid());
 			return null;
 		}
 		
@@ -88,7 +112,7 @@ public class PaperCache {
 		Map<String, MarkStaticsCache> teaSta = teaPaperC.opsForValue().get(TEA_CACHE_PREFIX + teacid);
 		
 		if (teaSta != null && !teaSta.isEmpty()) {
-			MarkStaticsCache msc = teaSta.get(quesid);
+			MarkStaticsCache msc = teaSta.get(pr.getQid());
 			if (msc != null) {
 				paperM = msc.getCurAssign();
 				if (paperM != null && !paperM.isEmpty()) {
@@ -97,28 +121,31 @@ public class PaperCache {
 				}	
 			}
 		}
-				
-		Map<String, MarkTaskCache> mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + quesid);
+		
+		// database design to make sure role is valid
+		String role = mtM.getMarkRole(pr.getQid(), teacid);
+		
+		Map<String, MarkTaskCache> mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + pr.getQid());
 		if (mtcL == null || mtcL.isEmpty()) {
-			if (!cachePapers(quesid)) {
-				logger.error("retrievePapers(), failed to cache papers for question " + quesid);
+			if (!cachePapers(pr, teacid, role)) {
+				logger.error("retrievePapers(), failed to cache papers for question " + pr.getQid());
 				return null;
 			}
-			logger.debug("retrievePapers(), cached again for question " + quesid);
-			mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + quesid);
+			logger.debug("retrievePapers(), cached again for question " + pr.getQid());
+			mtcL = paperC.opsForValue().get(QUES_CACHE_PREFIX + pr.getQid());
 		}
 		logger.debug("retrievePapers(), " + mtcL.size() + " papers retrieved.");
 		
-		List<String> firstTeaL = mtM.getTeachersByQidRole(quesid, "初评");
-		List<String> finalTeaL = mtM.getTeachersByQidRole(quesid, "终评");
+		List<String> firstTeaL = mtM.getTeachersByQidRole(pr.getQid(), "初评");
+		List<String> finalTeaL = mtM.getTeachersByQidRole(pr.getQid(), "终评");
 		int factor = 1;
 		factor = firstTeaL.size();
 		if (factor < 1) {
-			logger.error("retrievePapers(), mark task is not assigned for question -> " + quesid);
+			logger.error("retrievePapers(), mark task is not assigned for question -> " + pr.getQid());
 			return null;
 		}
 		int amount = mtcL.size()/factor, thres = 0, marked = 0;
-		if ((firstTeaL.contains(teacid) || finalTeaL.contains(teacid)) && assmode.compareTo("平均") == 0) {
+		if ((firstTeaL.contains(teacid) || finalTeaL.contains(teacid)) && pr.getAssmode().compareTo("平均") == 0) {
 			if (amount > MAX_THRES) {
 				thres = MAX_THRES;
 			}
@@ -128,7 +155,7 @@ public class PaperCache {
 		}
 		else { 
 			logger.warn("retrievePapers(), teacher " + teacid + 
-					" is not assigned to mark papers for question " + quesid);
+					" is not assigned to mark papers for question " + pr.getQid());
 			return null;
 		}
 		
@@ -153,11 +180,11 @@ public class PaperCache {
 		//update statics information
 		MarkStaticsCache ms = new MarkStaticsCache(marked, amount);
 		ms.setCurAssign(paperM);
-		teaSta.put(quesid, ms);
+		teaSta.put(pr.getQid(), ms);
 		teaPaperC.opsForValue().set(TEA_CACHE_PREFIX + teacid, teaSta);
 		
 		//write back changes to redis
-		paperC.opsForValue().set(QUES_CACHE_PREFIX + quesid, mtcL);
+		paperC.opsForValue().set(QUES_CACHE_PREFIX + pr.getQid(), mtcL);
 		logger.debug("retrievePapers(), assigned tasks for teacher " + teacid + " -> " + paperM.toString());
 		
 		return new ArrayList<PaperImgCache>(paperM.values());

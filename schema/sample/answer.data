@@ -1,5 +1,5 @@
-id,quesid,paperid,mflag,problem_paper,isviewed,score1,score2,score3,teacid1,teacid2,teacid3
-null,1,1,NONE,false,false,0,0,0,null,null,null
-null,2,1,NONE,false,false,0,0,0,null,null,null
-null,1,2,NONE,false,false,0,0,0,null,null,null
-null,2,2,NONE,false,false,0,0,0,null,null,null
+id,quesid,paperid,mflag,problem_paper,isviewed,score,teacid
+null,1,1,NONE,false,false,0,13810001341
+null,2,1,NONE,false,false,0,13810001341
+null,1,2,NONE,false,false,0,13810001341
+null,2,2,NONE,false,false,0,13810001341

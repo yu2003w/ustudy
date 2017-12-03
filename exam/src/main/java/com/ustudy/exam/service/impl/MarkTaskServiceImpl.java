@@ -113,12 +113,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		mt.setSummary(sumL);
 		// retrieve corresponding students' papers
-		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq()));
+		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq(), teacid));
 		logger.debug("getTaskPapers()," + mt.toString());
 		return mt;
 	}
 
-	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq) {
+	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq, String teacid) {
 		List<QuestionPaper> items = new ArrayList<QuestionPaper>();
 		
 		if (queS.isEmpty()) {
@@ -128,7 +128,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		List<PaperRequest> prS = new ArrayList<PaperRequest>();
 		for (QuesMarkSum que: queS) {
-			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode()));
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode()));
 		}
 		
 		// need to initialize cache for each question ids
@@ -156,7 +156,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				if (j >= pImg.size()) {
 					continue;
 				}
-				BlockAnswer ba = markTaskM.getAnswer(mark.getQuesid(), pImg.get(j).getPaperid());
+				BlockAnswer ba = markTaskM.getAnswer(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
 				if (ba == null) {
 					// first time to view this paper, need set basic information
 					ba = new BlockAnswer();
@@ -209,7 +209,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();
 		for (BlockAnswer ba:blocks) {
-			int realScore = 0, num = 0;
+			float realScore = 0, num = 0;
 			
 			if (!ba.getSteps().isEmpty()) {
 				List<SingleAnswer> saL = ba.getSteps();
@@ -221,10 +221,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				ba.setScore(String.valueOf(realScore));
 			// need to find out which score should be updated
 			String teacid = ExamUtil.getCurrentUserId();
-			if (!setScore(ba, teacid)) {
-				logger.error("updateMarkResult(), failed to set score.");
+			if (teacid == null || teacid.isEmpty()) {
+				logger.error("updateMarkResult(), failed to get login user, maybe service restarted.");
 				return false;
 			}
+			ba.setTeacid(teacid);
 			num = markTaskM.insertAnswer(ba);
 			if (num != 1 || ba.getId() < 1) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
@@ -296,57 +297,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		logger.debug("updateMarkResult(), save answer image succeed. " + irs.toString());
 		return true;
 	}
-	
-	private boolean setScore(BlockAnswer ba, String teacid) {
-		// check whether score has been set by this teacher before
-		String role = markTaskM.getMarkRole(ba.getQuesid(), teacid);
-		if (role == null || role.isEmpty()) {
-			logger.error("setScore(), failed to get valid role for teacher[" + teacid + "] when marking "
-					+ "question[" + ba.getQuesid() + "]");
-			return false;
-		}
-		
-		if (role.compareTo("初评") == 0) {
-			// set as teac1
-			if (((ba.getTeacid1() == null || ba.getTeacid1().isEmpty()) &&
-					(ba.getTeacid2() == null || ba.getTeacid2().isEmpty())) ||
-					(ba.getTeacid1() != null && !ba.getTeacid1().isEmpty() && 
-					ba.getTeacid1().compareTo(teacid) == 0)) {
-				ba.setTeacid1(teacid);
-				ba.setScore1(Integer.valueOf(ba.getScore()));
-			}
-		    // set as teac2 or update as teac2
-			else if ((ba.getTeacid1() != null && !ba.getTeacid1().isEmpty() && 
-					ba.getTeacid1().compareTo(teacid) != 0)) {
-				if (ba.getTeacid2() == null || ba.getTeacid2().isEmpty() || 
-						(ba.getTeacid2() != null && !ba.getTeacid2().isEmpty() && 
-						ba.getTeacid2().compareTo(teacid) == 0)) {
-					ba.setTeacid1(teacid);
-					ba.setScore1(Integer.valueOf(ba.getScore()));
-				}
-				else {
-					logger.error("setScore(), failed to find vacant " + role + " space for " + teacid);
-					return false;
-				}
-			}
-		}
-		else if (role.compareTo("终评") == 0) {
-			if (ba.getTeacid3() != null && !ba.getTeacid3().isEmpty()) {
-				if (ba.getTeacid3().compareTo(teacid) == 0) {
-					ba.setScore3(Integer.valueOf(ba.getScore()));
-				}
-				else {
-					logger.error("setScore(), teacid3 is " + ba.getTeacid3() + ", current teacid " + teacid);
-					return false;
-				}
-			}
-			else {
-				ba.setTeacid3(teacid);
-				ba.setScore3(Integer.valueOf(ba.getScore()));
-			}
-		}
-		return true;
-	}
+
 	@Override
 	public List<MarkTask> getMarkTasksBySub(ExamGradeSub egs) {
 		if (egs.getExamId().isEmpty() || egs.getGradeId().isEmpty() || egs.getSubjectId().isEmpty()) {
@@ -421,7 +372,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 				logger.debug("createMarkTask(), populate record succeded -> " + mmt.toString());
 			}
+			mt.setMarkMode("双评");
 		}
+		else
+			mt.setMarkMode("单评");
 		
 		// update time limit, assign mode, mark mode, teac_owner for specified question id
 		num = markTaskM.updateQuestionMeta(mt);

@@ -17,14 +17,7 @@ public class MarkTaskCache implements Serializable {
 	private String paperid = null;
 	// paper image corresponding to the paper id
 	private String img = null;
-	public String getImg() {
-		return img;
-	}
-
-	public void setImg(String img) {
-		this.img = img;
-	}
-
+	
 	private String teacid = null;
 	
 	/*
@@ -33,6 +26,8 @@ public class MarkTaskCache implements Serializable {
 	 * 2 -- marked
 	 */
 	private int status = 0;
+	
+	private float score = 0;
 	
 	public MarkTaskCache() {
 		super();
@@ -45,6 +40,15 @@ public class MarkTaskCache implements Serializable {
 		this.img = img;
 	}
 
+	public MarkTaskCache(String paperid, String img, String teacid, int status, float score) {
+		super();
+		this.paperid = paperid;
+		this.img = img;
+		this.teacid = teacid;
+		this.status = status;
+		this.score = score;
+	}
+
 	public MarkTaskCache(String paperid, String teacid, int status) {
 		super();
 		this.paperid = paperid;
@@ -52,6 +56,13 @@ public class MarkTaskCache implements Serializable {
 		this.status = status;
 	}
 
+	public MarkTaskCache(MarkTaskCache mt) {
+		this.paperid = mt.getPaperid();
+		this.teacid = mt.getTeacid();
+		this.status = mt.getStatus();
+		this.score = mt.getScore();
+	}
+	
 	public String getPaperid() {
 		return paperid;
 	}
@@ -76,9 +87,27 @@ public class MarkTaskCache implements Serializable {
 		this.status = status;
 	}
 
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+	
+	public String getImg() {
+		return img;
+	}
+
+	public void setImg(String img) {
+		this.img = img;
+	}
+
+
 	@Override
 	public String toString() {
-		return "MarkTaskCache [paperid=" + paperid + ", img=" + img + ", teacid=" + teacid + ", status=" + status + "]";
+		return "MarkTaskCache [paperid=" + paperid + ", img=" + img + ", teacid=" + teacid + ", status=" + status
+				+ ", score=" + score + "]";
 	}
 
 }
