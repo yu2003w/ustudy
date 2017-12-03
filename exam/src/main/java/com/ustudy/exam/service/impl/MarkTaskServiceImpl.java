@@ -268,16 +268,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		for (ImgRegion ir: irs) {
-			String ansmark = ir.getAnsMarkImgData();
 			String mark = ir.getMarkImgData();
-			if (ansmark != null && !ansmark.isEmpty() && mark != null && !mark.isEmpty()) {
+			
+			if (mark != null && !mark.isEmpty()) {
 				try{
-					String b64AnsMarkImg = ansmark.split(",")[1];
-					byte[] answerBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64AnsMarkImg);
-					OSSUtil.putObject(ir.getAnsMarkImg(), new ByteArrayInputStream(answerBytes));
+					String x = String.valueOf(ir.getPosx());
+					String y = String.valueOf(ir.getPosy());
+					String w = String.valueOf(ir.getWidth());
+					String h = String.valueOf(ir.getHeight());
+					
+					// upload mark image
 					String b64MarkImg = mark.split(",")[1];
 					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
 					OSSUtil.putObject(ir.getMarkImg(), new ByteArrayInputStream(markBytes));
+					
+					// upload answer&mark image
+					OSSUtil.putObject(ir.getAnsImg(), ir.getMarkImg(), ir.getAnsMarkImg(), x, y, w, h);
 				} catch (Exception e) {
 					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
 					return false;
@@ -285,8 +291,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				if (markTaskM.insertAnsImg(ir, id) != 1) {
 					logger.error("saveAnsImgByPage(), failed to save answer image recoreds." + ir.toString());
 					return false;
-				}
-				
+				}				
 			}
 			else {
 				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");
