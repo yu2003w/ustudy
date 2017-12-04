@@ -6,7 +6,7 @@ import net.sf.json.JSONArray;
 
 public interface StudentPaperService {
 	
-	JSONArray getStudentPapers(Long csId);
+	JSONArray getStudentPapers(Long egsId);
 	
-	Map<String, Object> getAnswerPapers(Long egsId, Long questionId,	Long classId, String type, String text,	Boolean viewAnswerPaper) throws Exception;
+	Map<String, Object> getAnswerPapers(Long egsId, Long questionId, Long classId, String type, String text, Boolean viewAnswerPaper) throws Exception;
 }

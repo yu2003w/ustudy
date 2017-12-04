@@ -57,11 +57,11 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/saveExamTemplate/{csId}", method = RequestMethod.POST)
-	public UResp saveExamTemplate(@PathVariable Long csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
+	@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
+	public UResp saveExamTemplate(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
 		logger.debug("saveTemplate().");
-		logger.debug("csId: " + csId + ",parameters: " + parameters);
+		logger.debug("egsId: " + egsId + ",parameters: " + parameters);
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);		
@@ -71,7 +71,7 @@ public class ClientController {
 		
 		result = new UResp();
 		try {
-			result.setRet(cs.saveTemplates(csId, parameters));
+			result.setRet(cs.saveTemplates(egsId, parameters));
 		} catch (Exception e) {
 			result.setRet(false);
 			result.setMessage(e.getMessage());
@@ -112,15 +112,15 @@ public class ClientController {
 	
 	/**
 	 * 获取模板
-	 * @param csId 考试、年级、科目
+	 * @param egsId 考试、年级、科目
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/getExamTemplate/{csId}", method = RequestMethod.POST)
-	public UResp getExamTemplateByCsid(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/getExamTemplate/{egsId}", method = RequestMethod.POST)
+	public UResp getExamTemplateByEgsId(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
 
 		logger.debug("getTemplates().");
-		logger.debug("examId: " + csId);
+		logger.debug("egsId: " + egsId);
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -131,7 +131,7 @@ public class ClientController {
 		result = new UResp();
 
 		result.setRet(true);
-		result.setData(cs.getTemplateById(csId));
+		result.setData(cs.getTemplateById(egsId));
 
 		return result;
 	}
@@ -444,15 +444,15 @@ public class ClientController {
 	
 	/**
 	 * 保存学生考试信息
-	 * @param egId
-	 * @param csId
+	 * @param examId
+	 * @param egsId
 	 * @param parameters
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/save/answers/{egId}/{csId}", method = RequestMethod.POST)
-	public UResp saveStudentsAnswers(@PathVariable Long egId, @PathVariable Long csId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
+	@RequestMapping(value = "/save/answers/{examId}/{egsId}", method = RequestMethod.POST)
+	public UResp saveStudentsAnswers(@PathVariable Long examId, @PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -463,7 +463,7 @@ public class ClientController {
 		JSONObject data  = JSONObject.fromObject(parameters);
 		
 		result = new UResp();
-		result.setRet(sas.saveStudentsAnswers(egId, csId, data));
+		result.setRet(sas.saveStudentsAnswers(examId, egsId, data));
 		
 		return result;
 		
@@ -471,13 +471,13 @@ public class ClientController {
 	
 	/**
 	 * 获取所有考卷名称
-	 * @param csId
+	 * @param egsId
 	 * @param request
 	 * @param responseonse
 	 * @return
 	 */
-	@RequestMapping(value = "/exam/papers/{csId}", method = RequestMethod.GET)
-	public UResp getStudentPapers(@PathVariable Long csId, HttpServletRequest request, HttpServletResponse responseonse) {
+	@RequestMapping(value = "/exam/papers/{egsId}", method = RequestMethod.GET)
+	public UResp getStudentPapers(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -487,14 +487,14 @@ public class ClientController {
 		
 		result = new UResp();
 		result.setRet(true);
-		result.setData(sps.getStudentPapers(csId));
+		result.setData(sps.getStudentPapers(egsId));
 		
 		return result;
 		
 	}
 	
-	@RequestMapping(value = "/delete/papers/{csId}/{batchNum}", method = RequestMethod.DELETE)
-	public UResp deleteStudentsPapers(@PathVariable Long csId, @PathVariable Integer batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
+	@RequestMapping(value = "/delete/papers/{egsId}/{batchNum}", method = RequestMethod.DELETE)
+	public UResp deleteStudentsPapers(@PathVariable Long egsId, @PathVariable Integer batchNum, HttpServletRequest request, HttpServletResponse responseonse) {
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -503,7 +503,7 @@ public class ClientController {
 		}
 		
 		result = new UResp();
-		result.setRet(sas.deletePapers(csId, batchNum));
+		result.setRet(sas.deletePapers(egsId, batchNum));
 		
 		return result;
 		

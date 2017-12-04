@@ -18,7 +18,7 @@
 	</insert>
 	
 	<delete id="deleteStudentObjectAnswers" parameterType="java.util.Map">
-		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{csId} and batch_num=#{batchNum});
+		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and batch_num=#{batchNum});
 	</delete>
 
 </mapper>

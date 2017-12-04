@@ -9,9 +9,9 @@ public interface StudentInfoService {
 	
 	List getStudentsInfo(Long examId, Long gradeId);
 	
-	boolean saveStudentsAnswers(Long egId, Long csId, JSONObject data);
+	boolean saveStudentsAnswers(Long examId, Long egsId, JSONObject data);
 	
-	JSONArray getStudentPapers(Long csId);
+	JSONArray getStudentPapers(Long egsId);
 	
-	boolean deleteAnswers(Long csId, String batchNum);
+	boolean deleteAnswers(Long egsId, String batchNum);
 }

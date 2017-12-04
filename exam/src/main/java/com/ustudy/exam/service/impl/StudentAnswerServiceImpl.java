@@ -89,9 +89,9 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 		}
 	}
 	
-	public boolean deletePapers(Long csId, Integer batchNum){
-		answerDaoImpl.deleteStudentObjectAnswers(csId, batchNum);
-		paperDaoImpl.deleteStudentPapers(csId, batchNum);
+	public boolean deletePapers(Long egsId, Integer batchNum){
+		answerDaoImpl.deleteStudentObjectAnswers(egsId, batchNum);
+		paperDaoImpl.deleteStudentPapers(egsId, batchNum);
 		return true;
 	}
 	

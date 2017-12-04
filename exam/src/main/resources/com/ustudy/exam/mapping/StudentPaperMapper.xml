@@ -19,7 +19,7 @@
 	<select id="getStudentPapers" parameterType="long" resultMap="StudentPaperResult">
 		SELECT p.*, e.stuno, egs.examid AS exam_id, egs.grade_id, egs.sub_id
 		 FROM paper p LEFT JOIN examgradesub egs ON p.exam_grade_sub_id=egs.id 
-		LEFT JOIN examinee e ON e.exam_code=p.exam_code WHERE p.exam_grade_sub_id=#{csId}
+		LEFT JOIN examinee e ON e.exam_code=p.exam_code WHERE p.exam_grade_sub_id=#{egsId}
 	</select>	
 
 	<select id="getAnswerPapers" parameterType="java.util.Map" resultMap="StudentPaperResult">
@@ -52,7 +52,7 @@
 	</insert>
 	
 	<delete id="deleteStudentPapers" parameterType="java.util.Map">
-		DELETE from paper where exam_grade_sub_id=#{csId} and batch_num=#{batchNum}		
+		DELETE from paper where exam_grade_sub_id=#{egsId} and batch_num=#{batchNum}		
 	</delete>
 
 </mapper>

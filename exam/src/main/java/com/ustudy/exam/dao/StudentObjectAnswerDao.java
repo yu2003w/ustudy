@@ -10,6 +10,6 @@ public interface StudentObjectAnswerDao {
 
 	void insertStudentObjectAnswer(StudentObjectAnswer answer);
 	
-	void deleteStudentObjectAnswers(@Param("csId")Long csId, @Param("batchNum")Integer batchNum);
+	void deleteStudentObjectAnswers(@Param("egsId")Long egsId, @Param("batchNum")Integer batchNum);
 	
 }

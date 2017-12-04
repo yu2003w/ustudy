@@ -31,17 +31,17 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 	@Resource
 	private QuesareaDao quesareaDao;
 
-	public JSONArray getStudentPapers(Long csId) {
-		logger.debug("getStudentPapers -> csId:" + csId);
+	public JSONArray getStudentPapers(Long egsId) {
+		logger.debug("getStudentPapers -> egsId:" + egsId);
 		JSONArray paperArray = new JSONArray();
 
-		Map<Integer, List<StudentPaper>> papers = getStudentPapersByEgsId(csId);
+		Map<Integer, List<StudentPaper>> papers = getStudentPapersByEgsId(egsId);
 		if (null != papers && papers.size() > 0) {
 
 			for (Integer batchNum : papers.keySet()) {
 				JSONObject paperObject = new JSONObject();
 
-				paperObject.put("CsID", csId);
+				paperObject.put("CsID", egsId);
 				paperObject.put("BatchNum", batchNum);
 
 				List<StudentPaper> oneBatchPaper = papers.get(batchNum);
@@ -64,11 +64,11 @@ public class StudentPaperServiceImpl implements StudentPaperService {
 		return paperArray;
 	}
 
-	private Map<Integer, List<StudentPaper>> getStudentPapersByEgsId(Long csId) {
+	private Map<Integer, List<StudentPaper>> getStudentPapersByEgsId(Long egsId) {
 
 		Map<Integer, List<StudentPaper>> resault = new HashMap<>();
 
-		List<StudentPaper> papers = papersDao.getStudentPapers(csId);
+		List<StudentPaper> papers = papersDao.getStudentPapers(egsId);
 		if (null != papers && papers.size() > 0) {
 			for (StudentPaper paper : papers) {
 				List<StudentPaper> oneBatchPaper = resault.get(paper.getBatchNum());

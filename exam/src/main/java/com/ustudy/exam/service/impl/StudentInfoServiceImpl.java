@@ -29,20 +29,20 @@ public class StudentInfoServiceImpl implements StudentInfoService {
 	}
 
 	@Override
-	public boolean saveStudentsAnswers(Long egId, Long csId, JSONObject data) {
-		logger.debug("saveStudentsAnswers -> egId:" + egId + ", csId:" + csId + ", data:" + data);
+	public boolean saveStudentsAnswers(Long examId, Long egsId, JSONObject data) {
+		logger.debug("saveStudentsAnswers -> examId:" + examId + ", egsId:" + egsId + ", data:" + data);
 		return false;
 	}
 
 	@Override
-	public JSONArray getStudentPapers(Long csId) {
-		logger.debug("getStudentPapers -> csId:" + csId);
+	public JSONArray getStudentPapers(Long egsId) {
+		logger.debug("getStudentPapers -> egsId:" + egsId);
 		return null;
 	}
 
 	@Override
-	public boolean deleteAnswers(Long csId, String batchNum) {
-		logger.debug("deleteAnswers -> csId:" + csId + ", batchNum:" + batchNum);
+	public boolean deleteAnswers(Long egsId, String batchNum) {
+		logger.debug("deleteAnswers -> egsId:" + egsId + ", batchNum:" + batchNum);
 		return false;
 	}
 	
