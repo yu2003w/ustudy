@@ -364,7 +364,7 @@ public class ClientServiceImpl implements ClientService {
      */
     private boolean saveQuesareas(Map<String, Long> quesAnswersId, JSONObject originalData) {
         if (null != originalData.get("TemplateInfo") && null != originalData.get("CSID")) {
-            Long csId = originalData.getLong("CSID");
+            Long egsId = originalData.getLong("CSID");
             JSONObject templateInfo = originalData.getJSONObject("TemplateInfo");
             if (null != templateInfo.get("pages")) {
                 JSONArray pages = templateInfo.getJSONArray("pages");
@@ -374,7 +374,7 @@ public class ClientServiceImpl implements ClientService {
                         JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
                         for (int j = 0; j < subjectives.size(); j++) {
                             JSONObject subjective = subjectives.getJSONObject(j);
-                            quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, csId, page, subjective));
+                            quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, egsId, page, subjective));
                         }
                     }
                 }
@@ -392,12 +392,12 @@ public class ClientServiceImpl implements ClientService {
      *
      * @Title: getQuesareas
      * @param quesAnswersId
-     * @param csId
+     * @param egsId
      * @param page
      * @param subjective
      * @return
      */
-    private List<Quesarea> getQuesareas(Map<String, Long> quesAnswersId, Long csId, JSONObject page, JSONObject subjective) {
+    private List<Quesarea> getQuesareas(Map<String, Long> quesAnswersId, Long egsId, JSONObject page, JSONObject subjective) {
 
         List<Quesarea> resault = new ArrayList<>();
 
@@ -458,7 +458,7 @@ public class ClientServiceImpl implements ClientService {
                     right = region.getInt("right");
                 }
 
-                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, questionType, startQuestionNo, endQuestionNo, csId, quesid));
+                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, questionType, startQuestionNo, endQuestionNo, egsId, quesid));
             }
         }
 
@@ -504,12 +504,12 @@ public class ClientServiceImpl implements ClientService {
         return result;
     }
 
-    public Map<String, String> getTemplateById(Long csId) {
+    public Map<String, String> getTemplateById(Long egsId) {
 
-        logger.debug("csId: " + csId);
+        logger.debug("egsId: " + egsId);
         Map<String, String> result = new HashMap<>();
 
-        ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(csId);
+        ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(egsId);
 
         if (null != examSubject) {
             String data = examSubject.getOriginalData();

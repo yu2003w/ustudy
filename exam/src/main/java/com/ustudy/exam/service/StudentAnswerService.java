@@ -4,8 +4,8 @@ import net.sf.json.JSONObject;
 
 public interface StudentAnswerService {
 	
-	boolean saveStudentsAnswers(Long egId, Long csId, JSONObject data);
+	boolean saveStudentsAnswers(Long examId, Long egsId, JSONObject data);
 	
-	boolean deletePapers(Long csId, Integer batchNum);
+	boolean deletePapers(Long egsId, Integer batchNum);
 	
 }

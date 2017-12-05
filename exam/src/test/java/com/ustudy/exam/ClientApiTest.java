@@ -219,10 +219,10 @@ public class ClientApiTest {
 
 	}
 
-	public static void getExamTemplate(String csId, String token) {
+	public static void getExamTemplate(String egsId, String token) {
 
-//		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
-		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + csId;
+//		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + egsId;
+		String targetURL = "http://127.0.0.1:8080/exam/client/getExamTemplate/" + egsId;
 
 		try {
 
@@ -294,9 +294,9 @@ public class ClientApiTest {
 
 	}
 
-	public static void getExamTemplate(Integer csId, String token) {
+	public static void getExamTemplate(Integer egsId, String token) {
 
-		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + csId;
+		String targetURL = "http://47.92.53.57/api/client/getExamTemplate/" + egsId;
 
 		try {
 

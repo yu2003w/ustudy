@@ -12,9 +12,9 @@ public interface StudentPaperDao {
 
 	void insertStudentPaper(StudentPaper paper);
 	
-	void deleteStudentPapers(@Param("csId")Long csId, @Param("batchNum")Integer batchNum);
+	void deleteStudentPapers(@Param("egsId")Long egsId, @Param("batchNum")Integer batchNum);
 	
-	List<StudentPaper> getStudentPapers(@Param("csId")Long csId);
+	List<StudentPaper> getStudentPapers(@Param("egsId")Long egsId);
 	
 	List<StudentPaper> getAnswerPapers(@Param("egsId")Long egsId, @Param("questionId")Long questionId, @Param("classId")Long classId, @Param("type")String type, @Param("text")String text);
 }
