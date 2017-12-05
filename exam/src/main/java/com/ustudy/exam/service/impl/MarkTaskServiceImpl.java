@@ -111,9 +111,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			qs.setQuestionName(quesN);
 			sumL.add(qs);
 		}
-		mt.setSummary(sumL);
+		
 		// retrieve corresponding students' papers
 		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq(), teacid));
+		for (QuesMarkSum qm: sumL) {
+			qm.setProgress(paperC.getProgress(qm.getQuesid(), teacid));
+			qm.setAvgScore(paperC.getAveScore(qm.getQuesid(), teacid));
+		}
+		mt.setSummary(sumL);
 		logger.debug("getTaskPapers()," + mt.toString());
 		return mt;
 	}

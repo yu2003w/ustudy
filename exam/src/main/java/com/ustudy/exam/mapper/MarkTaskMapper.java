@@ -62,8 +62,8 @@ public interface MarkTaskMapper {
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
 	
-	@Select("select paperid from ustudy.answer where quesid=#{qid} and isviewed=true and teacid=#{tid}")
-	public List<String> getViewedPapersByQuesId(@Param("qid") String quesid, @Param("tid") String tid);
+	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true")
+	public List<PaperScoreCache> getViewedPapersByQuesId(@Param("qid") String quesid);
 	
 	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true and "
 			+ "teacid=#{tid}")

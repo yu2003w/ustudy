@@ -23,6 +23,8 @@ public class QuesMarkSum implements Serializable {
 	private int markedNum = 0;
 	private String quesid = null;
 	
+	private String progress = null;
+	
 	@JsonIgnore
 	private String quesno = null;
 	@JsonIgnore
@@ -151,12 +153,20 @@ public class QuesMarkSum implements Serializable {
 		this.fullscore = fullscore;
 	}
 
+	public String getProgress() {
+		return progress;
+	}
+
+	public void setProgress(String progress) {
+		this.progress = progress;
+	}
+
 	@Override
 	public String toString() {
 		return "QuesMarkSum [questionName=" + questionName + ", questionType=" + questionType + ", avgScore=" + avgScore
-				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", quesno=" + quesno + ", startno=" + startno
-				+ ", endno=" + endno + ", assignMode=" + assignMode + ", markMode=" + markMode + ", fullscore="
-				+ fullscore + "]";
+				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", progress=" + progress + ", quesno=" + quesno
+				+ ", startno=" + startno + ", endno=" + endno + ", assignMode=" + assignMode + ", markMode=" + markMode
+				+ ", fullscore=" + fullscore + "]";
 	}
 	
 }
