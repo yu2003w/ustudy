@@ -62,7 +62,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					mtb.getSummary().get(0).setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
 				}
 			}
-			mtb.setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
+			mtb.setProgress(String.valueOf(marked) + "/" + String.valueOf(total));
 			stL.add(mtb);
 		}
 		
@@ -90,11 +90,18 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else
 			quesN = mt.getQuesno();
-		QuesMarkSum sum = new QuesMarkSum(quesN, mt.getQuesType(), null, null, mst.getQuesid());
+		QuesMarkSum sum = markTaskM.getQuesSum(mst.getQuesid());
+		sum.setQuestionName(quesN);
+		sum.setQuestionType(mt.getQuesType());
+		// new QuesMarkSum(quesN, mt.getQuesType(), null, null, mst.getQuesid());
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		sumL.add(sum);
 		// initialize paper cache here to get number of allocated numbers
-		requestPapers(sumL, 0, 0, mst.getTeacid());
+		List<PaperRequest> prS = new ArrayList<PaperRequest>();
+		for (QuesMarkSum que: sumL) {
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode()));
+		}
+		paperC.retrievePapers(prS);
 		mt.setSummary(sumL);
 		
 		logger.debug("assembleTaskBrife(), " + mt.toString());
@@ -136,12 +143,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		for (QuesMarkSum qm: sumL) {
 			int to = paperC.getTotal(qm.getQuesid(), teacid);
 			int ma = paperC.getMarked(qm.getQuesid(), teacid);
-			qm.setProgress(String.valueOf(to) + "/" + String.valueOf(ma));
+			qm.setProgress(String.valueOf(ma) + "/" + String.valueOf(to));
 			qm.setAvgScore(paperC.getAveScore(qm.getQuesid(), teacid));
 			total += to;
 			marked += ma;
 		}
-		mt.setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
+		mt.setProgress(String.valueOf(marked) + "/" + String.valueOf(total));
 		mt.setSummary(sumL);
 		logger.debug("getTaskPapers()," + mt.toString());
 		return mt;

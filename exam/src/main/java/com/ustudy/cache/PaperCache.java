@@ -45,7 +45,7 @@ public class PaperCache {
 	private final String TEA_PAPER_PREFIX = "t-";
 	
 	private synchronized boolean cachePapers(PaperRequest pr, String role) {
-		logger.debug("cachePapers(), start caching papers for quesid -> " + pr.getQid());
+		logger.debug("cachePapers(), start caching papers for -> " + pr.toString());
 		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(pr.getQid());
 		if (mtcL == null || mtcL.isEmpty()) {
 			logger.info("cachePapers(), no papers available for question " + pr.getQid());
@@ -57,9 +57,7 @@ public class PaperCache {
 		// Thanks Li Qi for the idea.
 		if (pr.getMarkmode().compareTo("双评") == 0) {
 			if (role.compareTo("初评") == 0) {
-				for (MarkTaskCache mtc: mtcL) {
-					mtcL.add(new MarkTaskCache(mtc));
-				}
+				mtcL.addAll(mtcL);
 			}
 			else if (role.compareTo("终评") == 0) {
 				// TODO: add logic for final mark
@@ -122,9 +120,7 @@ public class PaperCache {
 		
 		String teacid = ExamUtil.getCurrentUserId();
 		Map<String, MarkStaticsCache> teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
-		if (teaTask == null) {
-			logger.debug("");
-		}
+		
 		List<PaperImgCache> paperM = null;
 		if (teaTask != null && !teaTask.isEmpty()) {
 			MarkStaticsCache msc = teaTask.get(pr.getQid());
@@ -207,6 +203,10 @@ public class PaperCache {
 				ms.getCurAssign().add(mt);
 				count++;
 			}
+			else if (mt.getTeacid().compareTo(teacid) == 0) {
+				// added already marked items into list
+				ms.getCurAssign().add(mt);
+			}
 		}
 		
 		ms.setTotal(amount);
@@ -252,7 +252,7 @@ public class PaperCache {
 		for (MarkTaskCache mt: task) {
 			if (seq == 0) {
 				// get unmarked papers
-				if (mt.getStatus() == 0 && count < MAX_THRES) {
+				if (mt.getStatus() != 2 && count < MAX_THRES) {
 					piC.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
 					count++;
 				}
