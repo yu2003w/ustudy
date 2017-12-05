@@ -20,7 +20,7 @@ public class QuesMarkSum implements Serializable {
 	private String questionName = null;
 	private String questionType = null;
 	private String avgScore = "";
-	private int markedNum = 0;
+	private String markedNum = null;
 	private String quesid = null;
 	
 	private String progress = null;
@@ -43,7 +43,7 @@ public class QuesMarkSum implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public QuesMarkSum(String questionName, String questionType, String avgScore, int markedNum, String quesid) {
+	public QuesMarkSum(String questionName, String questionType, String avgScore, String markedNum, String quesid) {
 		super();
 		this.questionName = questionName;
 		this.questionType = questionType;
@@ -89,11 +89,11 @@ public class QuesMarkSum implements Serializable {
 		this.avgScore = avgScore;
 	}
 
-	public int getMarkedNum() {
+	public String getMarkedNum() {
 		return markedNum;
 	}
 
-	public void setMarkedNum(int markedNum) {
+	public void setMarkedNum(String markedNum) {
 		this.markedNum = markedNum;
 	}
 	

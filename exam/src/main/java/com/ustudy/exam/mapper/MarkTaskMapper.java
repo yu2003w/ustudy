@@ -15,6 +15,7 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.cache.PaperScoreCache;
+import com.ustudy.exam.model.statics.TeaStatics;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.ImgRegion;
@@ -134,5 +135,11 @@ public interface MarkTaskMapper {
 	
 	@Delete("delete from ustudy.marktask where quesid = #{qid} and markrole = #{markrole}")
 	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("markrole") String role);
+	
+	
+	// get information for statics
+	@Select("select count(*) as marked, sum(score) as score, quesid from answer where isviewed=true and "
+			+ "teacid=#{tid} group by quesid")
+	public List<TeaStatics> getMarkStaticsByTeaId(@Param("tid") String tid);
 	
 }

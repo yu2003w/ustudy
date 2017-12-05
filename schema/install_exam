@@ -115,6 +115,7 @@ marktype ENUM ('标准','问题卷','终评') NOT NULL,
 # no need to set if mark style is single screen
 markrole ENUM ('初评', '终评') NOT NULL,
 PRIMARY KEY (id),
+INDEX(quesid,teacid),
 UNIQUE KEY (teacid, quesid, markrole),
 FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(teacid)
@@ -192,10 +193,11 @@ paperid INT NOT NULL,
 mflag ENUM ('NONE','BEST','FAQ','BAD'),
 problem_paper boolean default false,
 isviewed boolean default false,
+isfinal boolean default false,
 score float default 0,
 teacid CHAR(11),
 PRIMARY KEY(id),
-INDEX (quesid, paperid),
+INDEX (quesid, paperid, isviewed, isfinal),
 UNIQUE KEY (quesid, paperid, teacid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)

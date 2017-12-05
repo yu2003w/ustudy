@@ -181,12 +181,15 @@ public class PaperCache {
 		if (teaTask == null) {
 			teaTask = new ConcurrentHashMap<String, MarkStaticsCache>();
 			ms = new MarkStaticsCache();
+			ms.setCurAssign(new ArrayList<MarkTaskCache>());
 			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
 		}
 		else {
 			ms = teaTask.get(teacid);
-			if (ms == null)
+			if (ms == null) {
 				ms = new MarkStaticsCache();
+				ms.setCurAssign(new ArrayList<MarkTaskCache>());
+			}
 			else {
 				if (ms.getCurAssign() == null) {
 					ms.setCurAssign(new ArrayList<MarkTaskCache>());;
@@ -195,7 +198,7 @@ public class PaperCache {
 		}
 		
 		// allocated tasks
-		int count = 0, marked = 0;
+		int count = 0;
 		for (MarkTaskCache mt: mtcL) {
 			if (count < thres && mt.getStatus() == 0) {
 				mt.setStatus(1);
@@ -204,18 +207,15 @@ public class PaperCache {
 				ms.getCurAssign().add(mt);
 				count++;
 			}
-			else
-				marked++;
 		}
 		
-		ms.setCompleted(marked);
 		ms.setTotal(amount);
 		teaTask.put(pr.getQid(), ms);
 		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid, teaTask);
 		
 		//write back changes to redis
 		paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
-		logger.debug("getPapersForSingleQues(),, assigned tasks for teacher " + teacid + " -> " + paperM.toString());
+		logger.debug("getPapersForSingleQues(), assigned tasks for teacher " + teacid + " -> " + paperM.toString());
 		
 		return paperM;
 		
@@ -283,8 +283,12 @@ public class PaperCache {
 		return true;
 	}
 	
-	public String getProgress(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).calProgress();
+	public int getTotal(String quesid, String tid) {
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getTotal();
+	}
+	
+	public int getMarked(String quesid, String tid) {
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getCompleted();
 	}
 	
 	public String getAveScore(String quesid, String tid) {

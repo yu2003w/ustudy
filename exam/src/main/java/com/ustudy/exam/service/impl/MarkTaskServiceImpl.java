@@ -22,6 +22,7 @@ import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.PaperImgCache;
+import com.ustudy.exam.model.statics.TeaStatics;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
@@ -47,8 +48,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		List<MetaMarkTask> mstL = markTaskM.getMetaMarkTask(teacid);
 		List<MarkTaskBrife> stL = new ArrayList<MarkTaskBrife>();
 		
-		for (MetaMarkTask mst: mstL) {
-			stL.add(assembleTaskBrife(mst));
+		List<TeaStatics> sta = markTaskM.getMarkStaticsByTeaId(teacid);
+
+		for (MetaMarkTask mmt: mstL) {
+			MarkTaskBrife mtb = assembleTaskBrife(mmt);
+			int total = paperC.getTotal(mmt.getQuesid(), mmt.getTeacid());
+			int marked = paperC.getMarked(mmt.getQuesid(), mmt.getTeacid());
+			// need to set marked number and average score for question
+			for (TeaStatics ts: sta) {
+				if (ts.getQuesid().compareTo(mmt.getQuesid()) == 0) {
+					mtb.getSummary().get(0).setAvgScore(ts.calAverageS());
+					mtb.getSummary().get(0).setMarkedNum(ts.getMarked());
+					mtb.getSummary().get(0).setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
+				}
+			}
+			mtb.setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
+			stL.add(mtb);
 		}
 		
 		return stL;
@@ -75,10 +90,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else
 			quesN = mt.getQuesno();
-		QuesMarkSum sum = new QuesMarkSum(quesN, mt.getQuesType(), "", 0, mst.getQuesid());
+		QuesMarkSum sum = new QuesMarkSum(quesN, mt.getQuesType(), null, null, mst.getQuesid());
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		sumL.add(sum);
+		// initialize paper cache here to get number of allocated numbers
+		requestPapers(sumL, 0, 0, mst.getTeacid());
 		mt.setSummary(sumL);
+		
 		logger.debug("assembleTaskBrife(), " + mt.toString());
 		return mt;
 	}
@@ -114,10 +132,16 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		// retrieve corresponding students' papers
 		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq(), teacid));
+		int total = 0, marked = 0;
 		for (QuesMarkSum qm: sumL) {
-			qm.setProgress(paperC.getProgress(qm.getQuesid(), teacid));
+			int to = paperC.getTotal(qm.getQuesid(), teacid);
+			int ma = paperC.getMarked(qm.getQuesid(), teacid);
+			qm.setProgress(String.valueOf(to) + "/" + String.valueOf(ma));
 			qm.setAvgScore(paperC.getAveScore(qm.getQuesid(), teacid));
+			total += to;
+			marked += ma;
 		}
+		mt.setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
 		mt.setSummary(sumL);
 		logger.debug("getTaskPapers()," + mt.toString());
 		return mt;
