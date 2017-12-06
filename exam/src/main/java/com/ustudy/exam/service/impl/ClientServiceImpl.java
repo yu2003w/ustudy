@@ -267,7 +267,7 @@ public class ClientServiceImpl implements ClientService {
                             int endno = 1;
                             int quesno = 0;
                             if (null != subjective.get("TopicType")) {
-                                type = subjective.getString("TopicType");
+                                type = initType(subjective.getString("TopicType"));
                             }
                             if (null != subjective.get("StartQid")) {
                                 startno = subjective.getInt("StartQid");
@@ -292,7 +292,7 @@ public class ClientServiceImpl implements ClientService {
                             int endno = 0;
                             int quesno = 0;
                             if (null != objective.get("topicType")) {
-                                type = objective.getString("topicType");
+                                type = initType(objective.getString("topicType"));
                             }
 
                             if (null != objective.get("objectiveItems")) {
@@ -329,6 +329,21 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return getQuesAnswersId(quesAnswers);
+    }
+    
+    private String initType(String type){
+        
+        if(null != type){
+            if(type.equals("客观题")){
+                type = "单选题";
+            }else if(type.equals("主观题")){
+                type = "填空题";
+            }
+        }else{
+            type = "单选题";
+        }
+        
+        return type;
     }
 
     /**
@@ -418,7 +433,7 @@ public class ClientServiceImpl implements ClientService {
             areaId = subjective.getInt("AreaID");
         }
         if (null != subjective.get("TopicType")) {
-            questionType = subjective.getString("TopicType");
+            questionType = initType(subjective.getString("TopicType"));
         }
         if (null != subjective.get("StartQid")) {
             startQuestionNo = subjective.getInt("StartQid");
@@ -722,8 +737,8 @@ public class ClientServiceImpl implements ClientService {
         questionType.add(object2);
 
         JSONObject object3 = new JSONObject();
-        object3.put("code", "作文题");
-        object3.put("name", "作文题");
+        object3.put("code", "填空题");
+        object3.put("name", "填空题");
         object3.put("type", 2);
         questionType.add(object3);
 
