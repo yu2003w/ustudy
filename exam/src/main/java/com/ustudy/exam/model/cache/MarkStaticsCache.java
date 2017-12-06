@@ -18,6 +18,7 @@ public class MarkStaticsCache implements Serializable {
 
 	private int total = 0;
 	private int completed = 0;
+	private String avescore = null;
 	private List<MarkTaskCache> curAssign = null;
 	
 	public MarkStaticsCache() {
@@ -29,6 +30,12 @@ public class MarkStaticsCache implements Serializable {
 		super();
 		this.total = total;
 		this.completed = completed;
+	}
+
+	public MarkStaticsCache(int completed, String avescore) {
+		super();
+		this.completed = completed;
+		this.avescore = avescore;
 	}
 
 	public int getTotal() {
@@ -64,9 +71,18 @@ public class MarkStaticsCache implements Serializable {
 		this.curAssign = curAssign;
 	}
 
+	public String getAvescore() {
+		return avescore;
+	}
+
+	public void setAvescore(String avescore) {
+		this.avescore = avescore;
+	}
+
 	@Override
 	public String toString() {
-		return "MarkStaticsCache [total=" + total + ", completed=" + completed + ", curAssign=" + curAssign + "]";
+		return "MarkStaticsCache [total=" + total + ", completed=" + completed + ", avescore=" + avescore
+				+ ", curAssign=" + curAssign + "]";
 	}
 	
 }

@@ -12,7 +12,7 @@ public class TeaStatics implements Serializable {
     // score for all marked papers	
 	private String score = null;
 	
-	private String marked = null;
+	private int marked = 0;
 	
 	private String quesid = null;
 
@@ -21,18 +21,18 @@ public class TeaStatics implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public TeaStatics(String score, String marked, String quesid) {
+	public TeaStatics(String score, int marked, String quesid) {
 		super();
 		this.score = score;
 		this.marked = marked;
 		this.quesid = quesid;
 	}
 
-	public String getMarked() {
+	public int getMarked() {
 		return marked;
 	}
 
-	public void setMarked(String marked) {
+	public void setMarked(int marked) {
 		this.marked = marked;
 	}
 
@@ -45,7 +45,8 @@ public class TeaStatics implements Serializable {
 	}
 
 	public String calAverageS() {
-		return String.valueOf(Float.valueOf(score)/Integer.valueOf(marked));
+		Float ret = Float.valueOf(score)/Integer.valueOf(marked);
+		return String.format("%.1f", ret);
 	}
 
 	@Override

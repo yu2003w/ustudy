@@ -18,6 +18,7 @@ import com.ustudy.exam.model.cache.MarkStaticsCache;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.cache.PaperImgCache;
 import com.ustudy.exam.model.cache.PaperScoreCache;
+import com.ustudy.exam.model.statics.TeaStatics;
 import com.ustudy.exam.utility.ExamUtil;
 
 @Service
@@ -91,10 +92,28 @@ public class PaperCache {
 			paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
 		
 		logger.debug("cachePapers(), papers cached for question{" + pr.getQid() + "} -> " + mtcL.toString());
+		
 		return true;
 	}
 	
-	public synchronized Map<String, List<PaperImgCache>> retrievePapers(List<PaperRequest> prs) {
+	/**
+	 * Retrieve metrics information about average score, marked number of questions assigned to teacher
+	 * @param teacid
+	 * @return
+	 */
+	private boolean initMetricsByTeaId(String teacid) {
+		List<TeaStatics> tsL = mtM.getMarkStaticsByTeaId(teacid);
+		Map<String, MarkStaticsCache> teaQCache = new HashMap<String, MarkStaticsCache>();
+		for (TeaStatics ts: tsL) {
+			MarkStaticsCache ms = new MarkStaticsCache(ts.getMarked(), ts.calAverageS());
+			teaQCache.put(ts.getQuesid(), ms);
+		}
+		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid, teaQCache);
+		logger.info("initMetricsByTeacId(), statics cache for " + teacid + " is " + teaQCache.toString());
+		return true;
+	}
+	
+	public synchronized Map<String, List<PaperImgCache>> retrievePapers(List<PaperRequest> prs) {		
 		// key is question id
 		Map<String, List<PaperImgCache>> paperM = new HashMap<String, List<PaperImgCache>>();
 		for (PaperRequest pr: prs) {
@@ -143,6 +162,7 @@ public class PaperCache {
 				return null;
 			}
 			logger.debug("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
+
 			// get all papers for certain question, need to dispatch to teachers
 			mtcL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
 		}
@@ -175,22 +195,12 @@ public class PaperCache {
 		MarkStaticsCache ms = null;
 		paperM = new ArrayList<PaperImgCache>();
 		if (teaTask == null) {
-			teaTask = new ConcurrentHashMap<String, MarkStaticsCache>();
-			ms = new MarkStaticsCache();
-			ms.setCurAssign(new ArrayList<MarkTaskCache>());
+			// initialize statics cache for teacher
+			initMetricsByTeaId(teacid);
+			teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
+			teaTask.get(pr.getQid()).setCurAssign(new ArrayList<MarkTaskCache>());
+			ms = teaTask.get(pr.getQid());
 			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
-		}
-		else {
-			ms = teaTask.get(teacid);
-			if (ms == null) {
-				ms = new MarkStaticsCache();
-				ms.setCurAssign(new ArrayList<MarkTaskCache>());
-			}
-			else {
-				if (ms.getCurAssign() == null) {
-					ms.setCurAssign(new ArrayList<MarkTaskCache>());;
-				}
-			}
 		}
 		
 		// allocated tasks
@@ -203,7 +213,7 @@ public class PaperCache {
 				ms.getCurAssign().add(mt);
 				count++;
 			}
-			else if (mt.getTeacid().compareTo(teacid) == 0) {
+			else if (mt.getTeacid() !=null && mt.getTeacid().compareTo(teacid) == 0) {
 				// added already marked items into list
 				ms.getCurAssign().add(mt);
 			}
@@ -302,6 +312,6 @@ public class PaperCache {
 			}
 		}
 		ave = count==0? count:ave/count;
-		return String.valueOf(ave);
+		return String.format("%.1f", ave);
 	}
 }

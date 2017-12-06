@@ -22,7 +22,6 @@ import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.PaperImgCache;
-import com.ustudy.exam.model.statics.TeaStatics;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
@@ -47,21 +46,16 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		List<MetaMarkTask> mstL = markTaskM.getMetaMarkTask(teacid);
 		List<MarkTaskBrife> stL = new ArrayList<MarkTaskBrife>();
-		
-		List<TeaStatics> sta = markTaskM.getMarkStaticsByTeaId(teacid);
 
 		for (MetaMarkTask mmt: mstL) {
 			MarkTaskBrife mtb = assembleTaskBrife(mmt);
 			int total = paperC.getTotal(mmt.getQuesid(), mmt.getTeacid());
 			int marked = paperC.getMarked(mmt.getQuesid(), mmt.getTeacid());
-			// need to set marked number and average score for question
-			for (TeaStatics ts: sta) {
-				if (ts.getQuesid().compareTo(mmt.getQuesid()) == 0) {
-					mtb.getSummary().get(0).setAvgScore(ts.calAverageS());
-					mtb.getSummary().get(0).setMarkedNum(ts.getMarked());
-					mtb.getSummary().get(0).setProgress(String.valueOf(total) + "/" + String.valueOf(marked));
-				}
-			}
+			
+			mtb.getSummary().get(0).setAvgScore(paperC.getAveScore(mmt.getQuesid(), mmt.getTeacid()));
+			mtb.getSummary().get(0).setMarkedNum(String.valueOf(marked));
+			mtb.getSummary().get(0).setProgress(String.valueOf(marked) + "/" + String.valueOf(total));
+
 			mtb.setProgress(String.valueOf(marked) + "/" + String.valueOf(total));
 			stL.add(mtb);
 		}
