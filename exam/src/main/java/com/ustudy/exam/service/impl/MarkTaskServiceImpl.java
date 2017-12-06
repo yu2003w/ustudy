@@ -21,6 +21,7 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
+import com.ustudy.exam.model.cache.MarkUpdateResult;
 import com.ustudy.exam.model.cache.PaperImgCache;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
@@ -234,10 +235,16 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Override
 	@Transactional
-	public boolean updateMarkResult(QuestionPaper up) {
+	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up) {
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();
+		// need to find out which score should be updated
+		String teacid = ExamUtil.getCurrentUserId();
+		if (teacid == null || teacid.isEmpty()) {
+			logger.error("updateMarkResult(), failed to get login user, maybe service restarted.");
+			throw new RuntimeException("updateMarkResult(), failed to get login user");
+		}
 		for (BlockAnswer ba:blocks) {
 			float realScore = 0, num = 0;
 			
@@ -249,12 +256,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 			if (realScore != 0)
 				ba.setScore(String.valueOf(realScore));
-			// need to find out which score should be updated
-			String teacid = ExamUtil.getCurrentUserId();
-			if (teacid == null || teacid.isEmpty()) {
-				logger.error("updateMarkResult(), failed to get login user, maybe service restarted.");
-				return false;
-			}
 			ba.setTeacid(teacid);
 			num = markTaskM.insertAnswer(ba);
 			if (num != 1 || ba.getId() < 1) {
@@ -284,10 +285,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		// need to update statics here, make sure this is called only after database operations are completed
+		List<MarkUpdateResult> murL = new ArrayList<MarkUpdateResult>();
 		for (BlockAnswer ba:blocks) {
-			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId());
+			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId(), ba.getScore());
+			murL.add(new MarkUpdateResult(ba.getQuesid(), paperC.getProgress(ba.getQuesid(), teacid), 
+					paperC.getAveScore(ba.getQuesid(), teacid)));
 		}
-		return true;
+		return murL;
 	}
 
 	private boolean saveAnsImgByPage(List<ImgRegion> irs, int id, String teacid) {

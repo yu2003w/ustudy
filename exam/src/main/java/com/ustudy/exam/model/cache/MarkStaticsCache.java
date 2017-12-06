@@ -59,8 +59,10 @@ public class MarkStaticsCache implements Serializable {
 		return completed + "/" + total;
 	}
 	
-	public void incrCompleted(int num) {
+	public void incrCompleted(int num, String score) {
+		Float ts = this.completed*Float.valueOf(this.avescore);
 		this.completed += num;
+		this.avescore = String.format("%.1f", ts/this.completed);
 	}
 	
 	public List<MarkTaskCache> getCurAssign() {
@@ -78,7 +80,7 @@ public class MarkStaticsCache implements Serializable {
 	public void setAvescore(String avescore) {
 		this.avescore = avescore;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "MarkStaticsCache [total=" + total + ", completed=" + completed + ", avescore=" + avescore
