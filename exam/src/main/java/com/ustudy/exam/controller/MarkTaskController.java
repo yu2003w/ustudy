@@ -17,6 +17,7 @@ import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
+import com.ustudy.exam.model.cache.MarkUpdateResult;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
@@ -85,7 +86,7 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
-	public String updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
+	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
 		if (up == null) {
 			logger.warn("updateMarkResult(), request parameter is not valid");
 			try {
@@ -97,13 +98,13 @@ public class MarkTaskController {
 		else
 			logger.debug("updateMarkResult(), update marked result ->" + up.toString());
 		
-		String result = null;
+		List<MarkUpdateResult> mur= null;
 		try {
-			if (stS.updateMarkResult(up)) {
-				result = "update mark result successully";
+			mur = stS.updateMarkResult(up);
+			if (mur != null && !mur.isEmpty()){
+				logger.error("updateMarkResult(), update mark result failed");
 			}
-			else
-				result = "update mark result failed";
+			logger.debug("updateMarkResult(), update mark result succeed");
 		} catch (Exception e) {
 			logger.warn("updateMarkResult()," + e.getMessage());
 			try {
@@ -113,7 +114,7 @@ public class MarkTaskController {
 			}
 		}
 		
-		return result;
+		return mur;
 	}
 
 	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)

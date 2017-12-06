@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -143,7 +142,7 @@ public class PaperCache {
 		List<PaperImgCache> paperM = null;
 		if (teaTask != null && !teaTask.isEmpty()) {
 			MarkStaticsCache msc = teaTask.get(pr.getQid());
-			if (msc != null) {
+			if (msc != null && msc.getCurAssign() != null) {
 				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0);
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned tasks");
@@ -198,10 +197,13 @@ public class PaperCache {
 			// initialize statics cache for teacher
 			initMetricsByTeaId(teacid);
 			teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
-			teaTask.get(pr.getQid()).setCurAssign(new ArrayList<MarkTaskCache>());
-			ms = teaTask.get(pr.getQid());
 			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
 		}
+		
+		ms = teaTask.get(pr.getQid());
+		if (ms == null) 
+			ms = new MarkStaticsCache();
+		ms.setCurAssign(new ArrayList<MarkTaskCache>());
 		
 		// allocated tasks
 		int count = 0;
@@ -231,7 +233,7 @@ public class PaperCache {
 		
 	}
 	
-	public boolean updateMarkStaticsCache(String quesid, String pid) {
+	public boolean updateMarkStaticsCache(String quesid, String pid, String score) {
 		String teacid = ExamUtil.getCurrentUserId();
 		Map<String, MarkStaticsCache> teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
 		if (teaTask == null || teaTask.isEmpty()) {
@@ -244,7 +246,7 @@ public class PaperCache {
 					+ " assigned to teacher " + teacid);
 			return false;
 		}
-		msc.incrCompleted(1);
+		msc.incrCompleted(1, score);
 		msc.getCurAssign().get(msc.getCompleted()).setStatus(2);
 		teaTask.put(quesid, msc);
 		updatePaperCache(quesid, pid);
@@ -301,17 +303,11 @@ public class PaperCache {
 		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getCompleted();
 	}
 	
+	public String getProgress(String quesid, String tid) {
+		return String.valueOf(this.getMarked(quesid, tid)) + "/" + String.valueOf(this.getTotal(quesid, tid));
+	}
+	
 	public String getAveScore(String quesid, String tid) {
-		List<MarkTaskCache> mtS = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getCurAssign();
-		float ave = 0;
-		int count = 0;
-		for (MarkTaskCache mt: mtS) {
-			if (mt.getStatus() == 2) {
-				ave += mt.getScore();
-				count++;
-			}
-		}
-		ave = count==0? count:ave/count;
-		return String.format("%.1f", ave);
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getAvescore();
 	}
 }
