@@ -60,7 +60,7 @@ public class MarkStaticsCache implements Serializable {
 	}
 	
 	public void incrCompleted(int num, String score) {
-		Float ts = this.completed*Float.valueOf(this.avescore);
+		Float ts = this.completed*Float.valueOf(this.avescore) + Float.valueOf(score);
 		this.completed += num;
 		this.avescore = String.format("%.1f", ts/this.completed);
 	}

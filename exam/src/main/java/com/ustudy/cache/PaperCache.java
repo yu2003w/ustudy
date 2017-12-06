@@ -30,11 +30,11 @@ public class PaperCache {
 	@Autowired
 	private RedisTemplate<String, List<MarkTaskCache>> paperC;
 	
-	// caching papers for teacher, key is teacher id
-	// Map<String, List<MarkStaticsCache>>, key is question id which is assigned to the teacher
+	// <String, MarkStaticsCache>, key is teacher id combined with quesion id
+	// similar as t-13810001341-q-17
 	// value MartStaticsCache contains all papers assigned to the teacher including already marked
 	@Autowired
-	private RedisTemplate<String, Map<String, MarkStaticsCache>> teaPaperC;
+	private RedisTemplate<String, MarkStaticsCache> teaPaperC;
 	
 	@Autowired
 	private MarkTaskMapper mtM;
@@ -43,6 +43,7 @@ public class PaperCache {
 	private final String QUES_PAPER_PREFIX = "q-";
 	private final String QUES_PAPER_PREFIX_FINAL = "qf_";
 	private final String TEA_PAPER_PREFIX = "t-";
+	private final String TEA_QUES_PREFIX = "-q-";
 	
 	private synchronized boolean cachePapers(PaperRequest pr, String role) {
 		logger.debug("cachePapers(), start caching papers for -> " + pr.toString());
@@ -102,13 +103,11 @@ public class PaperCache {
 	 */
 	private boolean initMetricsByTeaId(String teacid) {
 		List<TeaStatics> tsL = mtM.getMarkStaticsByTeaId(teacid);
-		Map<String, MarkStaticsCache> teaQCache = new HashMap<String, MarkStaticsCache>();
 		for (TeaStatics ts: tsL) {
 			MarkStaticsCache ms = new MarkStaticsCache(ts.getMarked(), ts.calAverageS());
-			teaQCache.put(ts.getQuesid(), ms);
+			teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + ts.getQuesid(), ms);
+			logger.info("initMetricsByTeacId(), statics cache for " + teacid + " is " + ms.toString());
 		}
-		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid, teaQCache);
-		logger.info("initMetricsByTeacId(), statics cache for " + teacid + " is " + teaQCache.toString());
 		return true;
 	}
 	
@@ -137,18 +136,17 @@ public class PaperCache {
 		}
 		
 		String teacid = ExamUtil.getCurrentUserId();
-		Map<String, MarkStaticsCache> teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
-		
+		String cacheKey = TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + pr.getQid();
+		MarkStaticsCache msc = teaPaperC.opsForValue().get(cacheKey);
 		List<PaperImgCache> paperM = null;
-		if (teaTask != null && !teaTask.isEmpty()) {
-			MarkStaticsCache msc = teaTask.get(pr.getQid());
-			if (msc != null && msc.getCurAssign() != null) {
-				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0);
-				if (paperM != null && !paperM.isEmpty()) {
-					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned tasks");
-					return paperM;
-				}	
-			}
+		if (msc != null && msc.getCurAssign() != null) {
+			int wanted = msc.getTotal() - msc.getCompleted();
+			paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0, wanted);
+			if (paperM != null && !paperM.isEmpty()) {
+				logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
+						+ "tasks, size ->" + paperM.size() + "," + paperM.toString());
+				return paperM;
+			}	
 		}
 		
 		// database design to make sure role is valid
@@ -167,22 +165,36 @@ public class PaperCache {
 		}
 		logger.debug("getPapersForSingleQues(), " + mtcL.size() + " papers retrieved.");
 		
+		// prepare information for teacher's cache
+		paperM = new ArrayList<PaperImgCache>();
+		if (msc == null) {
+			// initialize statics cache for teacher
+			initMetricsByTeaId(teacid);
+			msc = teaPaperC.opsForValue().get(cacheKey);
+			if (msc == null) 
+				msc = new MarkStaticsCache();
+			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
+		}
+				
+		if (msc.getCurAssign() == null)
+			msc.setCurAssign(new ArrayList<MarkTaskCache>());
+		
 		List<String> teaL = mtM.getTeachersByQidRole(pr.getQid(), role); 
 		int factor = teaL.size();
 		if (factor < 1) {
 			logger.error("getPapersForSingleQues(), mark task is not assigned for question -> " + pr.getQid());
 			return null;
 		}
-		int amount = mtcL.size()/factor, thres = 0;
-		
+		int amount = mtcL.size()/factor, batch = 0;
 		if (teaL.contains(teacid) && pr.getAssmode().compareTo("平均") == 0) {
-			if (amount > MAX_THRES) {
-				thres = MAX_THRES;
+			int wanted = amount - msc.getCompleted();
+			if (wanted > MAX_THRES) {
+				batch = MAX_THRES;
 			}
 			else
-				thres = amount;
+				batch = wanted;
 			logger.debug("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
-					" , threshold is " + thres);
+					" , threshold is " + batch);
 		}
 		else { 
 			logger.warn("getPapersForSingleQues(), teacher " + teacid + 
@@ -190,40 +202,24 @@ public class PaperCache {
 			return null;
 		}
 		
-		// prepare information for teacher's cache
-		MarkStaticsCache ms = null;
-		paperM = new ArrayList<PaperImgCache>();
-		if (teaTask == null) {
-			// initialize statics cache for teacher
-			initMetricsByTeaId(teacid);
-			teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
-			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
-		}
-		
-		ms = teaTask.get(pr.getQid());
-		if (ms == null) 
-			ms = new MarkStaticsCache();
-		ms.setCurAssign(new ArrayList<MarkTaskCache>());
-		
 		// allocated tasks
 		int count = 0;
 		for (MarkTaskCache mt: mtcL) {
-			if (count < thres && mt.getStatus() == 0) {
+			if (count < batch && mt.getStatus() == 0) {
 				mt.setStatus(1);
 				mt.setTeacid(teacid);
 				paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
-				ms.getCurAssign().add(mt);
+				msc.getCurAssign().add(mt);
 				count++;
 			}
 			else if (mt.getTeacid() !=null && mt.getTeacid().compareTo(teacid) == 0) {
 				// added already marked items into list
-				ms.getCurAssign().add(mt);
+				msc.getCurAssign().add(mt);
 			}
 		}
 		
-		ms.setTotal(amount);
-		teaTask.put(pr.getQid(), ms);
-		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid, teaTask);
+		msc.setTotal(amount);
+		teaPaperC.opsForValue().set(cacheKey, msc);
 		
 		//write back changes to redis
 		paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
@@ -235,22 +231,18 @@ public class PaperCache {
 	
 	public boolean updateMarkStaticsCache(String quesid, String pid, String score) {
 		String teacid = ExamUtil.getCurrentUserId();
-		Map<String, MarkStaticsCache> teaTask = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid);
-		if (teaTask == null || teaTask.isEmpty()) {
-			logger.error("updateMarkStaticsCache(), statics cache is not initialized for teacher " + teacid);
-			return false;
-		}
-		MarkStaticsCache msc = teaTask.get(quesid);
+		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid + 
+				TEA_QUES_PREFIX + quesid);
 		if (msc == null) {
 			logger.error("updateMarkStaticsCache(), statics cache is not initialized for question " + quesid 
 					+ " assigned to teacher " + teacid);
 			return false;
 		}
+		
 		msc.incrCompleted(1, score);
 		msc.getCurAssign().get(msc.getCompleted()).setStatus(2);
-		teaTask.put(quesid, msc);
 		updatePaperCache(quesid, pid);
-		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid, teaTask);
+		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + quesid, msc);
 		return true;
 	}
 	
@@ -258,13 +250,13 @@ public class PaperCache {
 	 * get papers from teacher's cache for the question
 	 * if no papers wanted retrieved, need to get from the questions' cache
 	 */
-	private List<PaperImgCache> getPapersFromTeaCache(List<MarkTaskCache> task, int seq) {
+	private List<PaperImgCache> getPapersFromTeaCache(List<MarkTaskCache> task, int seq, int wanted) {
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
 		int i = 0, count = 0;
 		for (MarkTaskCache mt: task) {
 			if (seq == 0) {
 				// get unmarked papers
-				if (mt.getStatus() != 2 && count < MAX_THRES) {
+				if (mt.getStatus() != 2 && count < wanted) {
 					piC.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
 					count++;
 				}
@@ -296,11 +288,11 @@ public class PaperCache {
 	}
 	
 	public int getTotal(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getTotal();
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid +	TEA_QUES_PREFIX + quesid).getTotal();
 	}
 	
 	public int getMarked(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getCompleted();
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid +	TEA_QUES_PREFIX + quesid).getCompleted();
 	}
 	
 	public String getProgress(String quesid, String tid) {
@@ -308,6 +300,6 @@ public class PaperCache {
 	}
 	
 	public String getAveScore(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid).get(quesid).getAvescore();
+		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid +	TEA_QUES_PREFIX + quesid).getAvescore();
 	}
 }

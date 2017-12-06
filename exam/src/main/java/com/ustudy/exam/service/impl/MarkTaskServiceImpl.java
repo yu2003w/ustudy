@@ -258,19 +258,19 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				ba.setScore(String.valueOf(realScore));
 			ba.setTeacid(teacid);
 			num = markTaskM.insertAnswer(ba);
-			if (num != 1 || ba.getId() < 1) {
+			if (num < 0 || num > 2 || ba.getId() < 1) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
 						",pri key->" + ba.getId());
 				throw new RuntimeException("updateMarkResult(), set answer record failed.");
 			}
 			else
-				logger.debug("updateMarkResult(), answer updated and primary key->" + ba.getId());
+				logger.debug("updateMarkResult(), answer updated and primary key->" + ba.getId() + " returned " + num);
 
 			if (!ba.getSteps().isEmpty()) {
 				List<SingleAnswer> saL = ba.getSteps();
 				for (SingleAnswer sa:saL) {
 					num = markTaskM.insertAnswerStep(sa, ba.getId());
-					if (num != 1) {
+					if (num < 0 || num > 2) {
 						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
 						throw new RuntimeException("updateMarkResult(), insertAnswerStep() returned " + num);
 					}
@@ -322,8 +322,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
-				if (markTaskM.insertAnsImg(ir, id) != 1) {
-					logger.error("saveAnsImgByPage(), failed to save answer image recoreds." + ir.toString());
+				int ret = markTaskM.insertAnsImg(ir, id);
+				if (ret > 2 || ret < 0) {
+					logger.error("saveAnsImgByPage(), failed to save answer images, returned " + ret);
 					return false;
 				}				
 			}
