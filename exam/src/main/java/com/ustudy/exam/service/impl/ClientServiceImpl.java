@@ -710,52 +710,22 @@ public class ClientServiceImpl implements ClientService {
         JSONArray questionType = new JSONArray();
 
         JSONObject object1 = new JSONObject();
-        object1.put("code", "单选题");
-        object1.put("name", "单选题");
+        object1.put("code", "客观题");
+        object1.put("name", "客观题");
         object1.put("type", 1);
         questionType.add(object1);
 
         JSONObject object2 = new JSONObject();
-        object2.put("code", "多选题");
-        object2.put("name", "多选题");
-        object2.put("type", 1);
+        object2.put("code", "主观题");
+        object2.put("name", "主观题");
+        object2.put("type", 2);
         questionType.add(object2);
 
         JSONObject object3 = new JSONObject();
-        object3.put("code", "判断题");
-        object3.put("name", "判断题");
-        object3.put("type", 1);
+        object3.put("code", "作文题");
+        object3.put("name", "作文题");
+        object3.put("type", 2);
         questionType.add(object3);
-
-        JSONObject object4 = new JSONObject();
-        object4.put("code", "填空题");
-        object4.put("name", "填空题");
-        object4.put("type", 2);
-        questionType.add(object4);
-
-        JSONObject object5 = new JSONObject();
-        object5.put("code", "解答题");
-        object5.put("name", "解答题");
-        object5.put("type", 2);
-        questionType.add(object5);
-
-        JSONObject object6 = new JSONObject();
-        object6.put("code", "证明题");
-        object6.put("name", "证明题");
-        object6.put("type", 2);
-        questionType.add(object6);
-
-        JSONObject object7 = new JSONObject();
-        object7.put("code", "作文题");
-        object7.put("name", "作文题");
-        object7.put("type", 2);
-        questionType.add(object7);
-
-        JSONObject object8 = new JSONObject();
-        object8.put("code", "论述题");
-        object8.put("name", "论述题");
-        object8.put("type", 2);
-        questionType.add(object8);
 
         return questionType;
     }
