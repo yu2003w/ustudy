@@ -9,7 +9,7 @@ public class MarkUpdateResult implements Serializable {
 	 */
 	private static final long serialVersionUID = 2616516209679771646L;
 	
-	private String quesid = null;
+	private String questionName = null;
 	private String progress = null;
 	private String avgScore = null;
 	
@@ -20,16 +20,16 @@ public class MarkUpdateResult implements Serializable {
 	
 	public MarkUpdateResult(String quesid, String progress, String avgScore) {
 		super();
-		this.quesid = quesid;
+		this.questionName = quesid;
 		this.progress = progress;
 		this.avgScore = avgScore;
 	}
 
-	public String getQuesid() {
-		return quesid;
+	public String getQuestionName() {
+		return questionName;
 	}
-	public void setQuesid(String quesid) {
-		this.quesid = quesid;
+	public void setQuestionName(String quesid) {
+		this.questionName = quesid;
 	}
 	public String getProgress() {
 		return progress;
@@ -45,7 +45,7 @@ public class MarkUpdateResult implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "MarkUpdateResult [quesid=" + quesid + ", progress=" + progress + ", avgScore=" + avgScore + "]";
+		return "MarkUpdateResult [quesid=" + questionName + ", progress=" + progress + ", avgScore=" + avgScore + "]";
 	}
 
 }

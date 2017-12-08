@@ -60,6 +60,10 @@ public class MarkStaticsCache implements Serializable {
 	}
 	
 	public void incrCompleted(int num, String score) {
+		if (this.avescore == null) {
+			// first time to calculate average score
+			this.avescore = "0";
+		}
 		Float ts = this.completed*Float.valueOf(this.avescore) + Float.valueOf(score);
 		this.completed += num;
 		this.avescore = String.format("%.1f", ts/this.completed);

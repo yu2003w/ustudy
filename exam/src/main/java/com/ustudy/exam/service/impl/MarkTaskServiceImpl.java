@@ -258,7 +258,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				ba.setScore(String.valueOf(realScore));
 			ba.setTeacid(teacid);
 			num = markTaskM.insertAnswer(ba);
-			if (num < 0 || num > 2 || ba.getId() < 1) {
+			if (num < 0 || num > 2 || ba.getId() < 0) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
 						",pri key->" + ba.getId());
 				throw new RuntimeException("updateMarkResult(), set answer record failed.");
@@ -288,7 +288,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		List<MarkUpdateResult> murL = new ArrayList<MarkUpdateResult>();
 		for (BlockAnswer ba:blocks) {
 			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId(), ba.getScore());
-			murL.add(new MarkUpdateResult(ba.getQuesid(), paperC.getProgress(ba.getQuesid(), teacid), 
+			murL.add(new MarkUpdateResult(ba.getQuestionName(), paperC.getProgress(ba.getQuesid(), teacid), 
 					paperC.getAveScore(ba.getQuesid(), teacid)));
 		}
 		return murL;

@@ -63,6 +63,9 @@ public interface MarkTaskMapper {
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
 	
+	@Select("")
+	public List<MarkTaskCache> getFinalPapersByQuesId(@Param("qid") String quesid);
+ 	
 	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true")
 	public List<PaperScoreCache> getViewedPapersByQuesId(@Param("qid") String quesid);
 	
@@ -87,7 +90,8 @@ public interface MarkTaskMapper {
 	
 	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, score) "
 			+ "values (#{quesid}, #{paperId}, #{teacid}, #{mflag}, #{isProblemPaper}, true, #{score}) on "
-			+ "duplicate key update mflag=#{mflag}, problem_paper=#{isProblemPaper}, score=#{score}")
+			+ "duplicate key update mflag=#{mflag}, problem_paper=#{isProblemPaper}, score=#{score}, "
+			+ "id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys=true)
 	public int insertAnswer(BlockAnswer ba);
 	

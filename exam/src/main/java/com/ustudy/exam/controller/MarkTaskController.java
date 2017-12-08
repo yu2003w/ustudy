@@ -101,10 +101,11 @@ public class MarkTaskController {
 		List<MarkUpdateResult> mur= null;
 		try {
 			mur = stS.updateMarkResult(up);
-			if (mur != null && !mur.isEmpty()){
+			if (mur == null || mur.isEmpty()){
 				logger.error("updateMarkResult(), update mark result failed");
 			}
-			logger.debug("updateMarkResult(), update mark result succeed");
+			else
+				logger.debug("updateMarkResult(), update mark result succeed");
 		} catch (Exception e) {
 			logger.warn("updateMarkResult()," + e.getMessage());
 			try {

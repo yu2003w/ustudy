@@ -61,9 +61,9 @@ public class PaperCache {
 				mtcL.addAll(mtcL);
 			}
 			else if (role.compareTo("终评") == 0) {
-				// TODO: add logic for final mark
+				// need to get items for final mark
+				List<MarkTaskCache> mtfL = mtM.getFinalPapersByQuesId(pr.getQid());
 			}
-			
 		}
 
 		// get viewed papers list
@@ -141,12 +141,18 @@ public class PaperCache {
 		List<PaperImgCache> paperM = null;
 		if (msc != null && msc.getCurAssign() != null) {
 			int wanted = msc.getTotal() - msc.getCompleted();
-			paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0, wanted);
-			if (paperM != null && !paperM.isEmpty()) {
-				logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
-						+ "tasks, size ->" + paperM.size() + "," + paperM.toString());
-				return paperM;
-			}	
+			if (wanted > 0) {
+				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0, wanted);
+				if (paperM != null && !paperM.isEmpty()) {
+					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
+							+ "tasks, size ->" + paperM.size() + "," + paperM.toString());
+					return paperM;
+				}
+			}
+			else if (pr.getAssmode().compareTo("平均") == 0) {
+				logger.info("getPapersForSingleQues(), all assigned papers are marked for " + teacid);
+				return null;
+			}
 		}
 		
 		// database design to make sure role is valid
@@ -179,28 +185,24 @@ public class PaperCache {
 		if (msc.getCurAssign() == null)
 			msc.setCurAssign(new ArrayList<MarkTaskCache>());
 		
-		List<String> teaL = mtM.getTeachersByQidRole(pr.getQid(), role); 
-		int factor = teaL.size();
-		if (factor < 1) {
-			logger.error("getPapersForSingleQues(), mark task is not assigned for question -> " + pr.getQid());
-			return null;
-		}
-		int amount = mtcL.size()/factor, batch = 0;
-		if (teaL.contains(teacid) && pr.getAssmode().compareTo("平均") == 0) {
-			int wanted = amount - msc.getCompleted();
-			if (wanted > MAX_THRES) {
-				batch = MAX_THRES;
+		int amount = 0;
+		if (msc.getTotal() <= 0 || pr.getAssmode().compareTo("平均") != 0) {
+			// not assigned yet
+			amount = calAssignedAmount(pr, mtcL.size(), role, teacid);
+			if (amount == -1) {
+				logger.error("getPapersForSingleQues(), failed to calculate assinged amount for " + teacid);
+				return null;
 			}
-			else
-				batch = wanted;
-			logger.debug("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
-					" , threshold is " + batch);
 		}
-		else { 
-			logger.warn("getPapersForSingleQues(), teacher " + teacid + 
-					" is not assigned to mark papers for question " + pr.getQid());
-			return null;
+		
+		int batch = 0, wanted = amount - msc.getCompleted();
+		if (wanted > MAX_THRES) {
+			batch = MAX_THRES;
 		}
+		else
+			batch = wanted;
+		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
+				" , current batch is " + batch);
 		
 		// allocated tasks
 		int count = 0;
@@ -229,6 +231,46 @@ public class PaperCache {
 		
 	}
 	
+	/**
+	 * @param pr  --- PaperRequest basic information
+	 * @param total --- total papers needs to be dispatched
+	 * @param role --- role for teacher
+	 * @return --- amount needs to be assigned to the teacher
+	 */
+	private int calAssignedAmount(PaperRequest pr, int total, String role, String teacid) {
+		List<String> teaL = mtM.getTeachersByQidRole(pr.getQid(), role); 
+		int factor = teaL.size();
+		if (factor < 1) {
+			logger.error("calAssignedAmount(), mark task is not set for question -> " + pr.getQid());
+			return -1;
+		}
+		int amount = 0, assigned = 0, teaN = 0;
+		if (pr.getAssmode().compareTo("平均") == 0) {
+			for (String tid: teaL) {
+				String cacheK = TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + pr.getQid();
+				if (tid.compareTo(teacid) != 0) {
+					MarkStaticsCache msc = teaPaperC.opsForValue().get(cacheK);
+					if (msc != null && msc.getTotal() > 0) {
+						assigned += msc.getTotal();
+						teaN++;
+					}
+				}	
+			}
+			if (teaN > factor - 1) {
+				logger.error("calAssignedAmount(), cache goes wrong, need to reconstruct that. teacher "
+						+ "number is " + teaN);
+				return -1;
+			}
+			amount = (total - assigned)/(factor - teaN);
+			logger.debug("calAssignedAmount(), assigned papers for " + teacid + " is " + amount);
+		}
+		else {
+			logger.error("calAssignedAmount(), " + pr.getAssmode() + " is not supported");
+			return -1;
+		}
+		return amount;
+	}
+	
 	public boolean updateMarkStaticsCache(String quesid, String pid, String score) {
 		String teacid = ExamUtil.getCurrentUserId();
 		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid + 
@@ -239,8 +281,8 @@ public class PaperCache {
 			return false;
 		}
 		
-		msc.incrCompleted(1, score);
 		msc.getCurAssign().get(msc.getCompleted()).setStatus(2);
+		msc.incrCompleted(1, score);
 		updatePaperCache(quesid, pid);
 		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + quesid, msc);
 		return true;
