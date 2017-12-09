@@ -98,6 +98,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		paperC.retrievePapers(prS);
 		mt.setSummary(sumL);
+		//here, set paper to empty array to make frontend more easy
+		mt.setPapers(new ArrayList<QuestionPaper>());
 		
 		logger.debug("assembleTaskBrife(), " + mt.toString());
 		return mt;
@@ -226,7 +228,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				blA.add(ba);
 			}
 			stuP.setBlocks(blA);
-			logger.debug("requestPapers()," + stuP);
+			//logger.debug("requestPapers()," + stuP);
 			items.add(stuP);
 		}
 		

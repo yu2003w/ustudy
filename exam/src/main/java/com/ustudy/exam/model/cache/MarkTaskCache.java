@@ -61,6 +61,7 @@ public class MarkTaskCache implements Serializable {
 		this.teacid = mt.getTeacid();
 		this.status = mt.getStatus();
 		this.score = mt.getScore();
+		this.img = mt.getImg();
 	}
 	
 	public String getPaperid() {
