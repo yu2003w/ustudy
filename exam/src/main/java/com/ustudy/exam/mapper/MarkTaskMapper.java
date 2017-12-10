@@ -62,9 +62,6 @@ public interface MarkTaskMapper {
 			+ "ustudy.paper on ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
-	
-	@Select("")
-	public List<MarkTaskCache> getFinalPapersByQuesId(@Param("qid") String quesid);
  	
 	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true")
 	public List<PaperScoreCache> getViewedPapersByQuesId(@Param("qid") String quesid);

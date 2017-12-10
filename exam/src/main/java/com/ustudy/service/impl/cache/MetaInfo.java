@@ -1,4 +1,4 @@
-package com.ustudy.cache;
+package com.ustudy.service.impl.cache;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

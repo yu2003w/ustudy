@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ustudy.cache.PaperCache;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.PaperRequest;
@@ -30,6 +29,7 @@ import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.OSSUtil;
+import com.ustudy.service.impl.cache.PaperCache;
 
 @Service
 public class MarkTaskServiceImpl implements MarkTaskService {

@@ -1,4 +1,4 @@
-package com.ustudy.cache;
+package com.ustudy.service.impl.cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +48,13 @@ public class PaperCache {
 	private final String TEA_PAPER_PREFIX = "t-";
 	private final String TEA_QUES_PREFIX = "-q-";
 	
-	private synchronized boolean cachePapers(PaperRequest pr, String role) {
+	/**
+	 * Cached papers for specified question, place related paper ids into memory for first round mark
+	 * final round mark should be calculated based on first round
+	 * @param --- information contains paper id, assign mode and mark mode
+	 * @return
+	 */
+	private synchronized boolean cachePapers(PaperRequest pr) {
 		logger.debug("cachePapers(), start caching papers for -> " + pr.toString());
 		List<MarkTaskCache> mtcL = mtM.getPapersByQuesId(pr.getQid());
 		if (mtcL == null || mtcL.isEmpty()) {
@@ -60,18 +66,12 @@ public class PaperCache {
 		// same paper to the same teacher twice
 		// Thanks Li Qi for the idea.
 		if (pr.getMarkmode().compareTo("双评") == 0) {
-			if (role.compareTo("初评") == 0) {
-				//noted: here, mctL.addAll(mtcL) should not be used, it's not right usage for list copy
-				List<MarkTaskCache> dt = new ArrayList<MarkTaskCache>();
-				for (MarkTaskCache mt:mtcL) {
-					dt.add(new MarkTaskCache(mt));
-				}
-				mtcL.addAll(dt);
+			//noted: here, mctL.addAll(mtcL) should not be used, it's not right usage for list copy
+			List<MarkTaskCache> dt = new ArrayList<MarkTaskCache>();
+			for (MarkTaskCache mt:mtcL) {
+				dt.add(new MarkTaskCache(mt));
 			}
-			else if (role.compareTo("终评") == 0) {
-				// need to get items for final mark
-				List<MarkTaskCache> mtfL = mtM.getFinalPapersByQuesId(pr.getQid());
-			}
+			mtcL.addAll(dt);
 		}
 		logger.info("cachePapers(), total paper size -> " + mtcL.size());
 
@@ -122,17 +122,35 @@ public class PaperCache {
 				}				
 			}
 		}
-		if (role.compareTo("终评") == 0) {
-			paperC.opsForValue().set(QUES_PAPER_PREFIX_FINAL + pr.getQid(), mtcL);
-		}
-		else
-			paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
+		
+		paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
 		
 		logger.debug("cachePapers(), papers cached for question{" + pr.getQid() + "} -> ");
 		for (MarkTaskCache mt:mtcL) {
 			logger.debug(mt.toString());
 		}
 		
+		return true;
+	}
+	
+	private boolean popFinalMarkIds(String quesid) {
+		String cacheK = this.QUES_PAPER_PREFIX + quesid;
+		List<MarkTaskCache> mtcL = paperC.opsForValue().get(cacheK);
+		if (mtcL == null || mtcL.isEmpty()) {
+			logger.error("popFinalMarkIds(), no cached papers for question " + quesid);
+			return false;
+		}
+		int num = mtcL.size()/2;
+		List<MarkTaskCache> mfL = new ArrayList<MarkTaskCache>();
+		for (int i = 0; i < num; i++) {
+			if (Math.abs(mtcL.get(i).getScore() - mtcL.get(i+num).getScore()) >= 5) {
+				logger.debug("popFinalMarkIds(),  mtcL[" + i +"] -> " + mtcL.get(i).toString() + 
+						", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
+				mfL.add(new MarkTaskCache(mtcL.get(i).getPaperid(), mtcL.get(i).getImg()));
+			}
+		}
+		
+		paperC.opsForValue().set(QUES_PAPER_PREFIX_FINAL + quesid, mfL);
 		return true;
 	}
 	
@@ -198,17 +216,31 @@ public class PaperCache {
 		
 		// database design to make sure role is valid
 		String role = mtM.getMarkRole(pr.getQid(), teacid);
+		String paperCacheKey = null;
+		List<MarkTaskCache> mtcL = null;
+		if (role.compareTo("终评") == 0) {
+			paperCacheKey = QUES_PAPER_PREFIX_FINAL + pr.getQid();
+		}
+		else {
+			paperCacheKey = QUES_PAPER_PREFIX + pr.getQid();
+		}
+		mtcL = paperC.opsForValue().get(paperCacheKey);
 		
-		List<MarkTaskCache> mtcL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
 		if (mtcL == null || mtcL.isEmpty()) {
-			if (!cachePapers(pr, role)) {
+			if (!cachePapers(pr)) {
 				logger.error("getPapersForSingleQues(), failed to cache papers for question " + pr.getQid());
 				return null;
 			}
-			logger.debug("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
+			logger.info("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
+			
+			// for final mark, paper ids should be caculated from first round mark 
+			if (role.compareTo("终评") == 0 && !popFinalMarkIds(pr.getQid())) {
+				logger.warn("getPapersForSingleQues(), papers for final mark is not ready");
+				return null;
+			}
 
 			// get all papers for certain question, need to dispatch to teachers
-			mtcL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
+			mtcL = paperC.opsForValue().get(paperCacheKey);
 		}
 		logger.debug("getPapersForSingleQues(), " + mtcL.size() + " papers retrieved.");
 		
