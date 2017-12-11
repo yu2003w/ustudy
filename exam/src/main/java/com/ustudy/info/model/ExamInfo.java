@@ -14,7 +14,7 @@ public class ExamInfo implements Serializable {
 	private String examName = null;
 	private String examDate = null;
 	private String type = "校考";
-	private int status = 0;
+	private String status = null;
 	private List<String> schIds = null;
 	
 	private List<GradeSubs> grades = null;
@@ -83,11 +83,11 @@ public class ExamInfo implements Serializable {
 		this.grades = grades;
 	}
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

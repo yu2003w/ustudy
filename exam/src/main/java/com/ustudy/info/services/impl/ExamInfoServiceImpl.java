@@ -4,6 +4,7 @@ package com.ustudy.info.services.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.info.mapper.ExamInfoMapper;
@@ -11,6 +12,7 @@ import com.ustudy.info.model.ExamInfo;
 import com.ustudy.info.model.GradeSubs;
 import com.ustudy.info.services.ExamInfoService;
 
+@Service
 public class ExamInfoServiceImpl implements ExamInfoService {
 	
 	private final static Logger logger = LogManager.getLogger(ExamInfoServiceImpl.class);

@@ -2,3 +2,6 @@ curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X GET -d '{"examId": "1", "gradeId":"1", "subjectId":"1"}' http://192.168.31.86:8080/exam/marktasks/
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"examId":"1", "questionId":"5", "gradeId":1, "subjectId":3, "timeLimit":"33", "ownerId":"13811345","teachersIds":[13810001343, 13810001342], "finalMarkTeachersIds":[13810001345]}' http://192.168.0.105:8080/exam/marktask/create/
 curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X GET -d '{"examId":"1", "questionId":"5", "gradeId":1, "subjectId":3, "timeLimit":"33", "ownerId":"13811345","teachersIds":[13810001343, 13810001342], "finalMarkTeachersIds":[13810001345]}' http://192.168.0.105:8080/exam/marktask/delete/
+
+# create exam
+curl -i -H "Accept: application/json" -H  "Content-Type: application/json" -v -X POST -d '{"examName":"123","examDate":"2017-12-17","type":"校考","status": "0","schIds":["001"], "grades":[{"id":1, "subjectIds":[1,2,3]}]}' http://192.168.31.86:8080/info/exam/create/

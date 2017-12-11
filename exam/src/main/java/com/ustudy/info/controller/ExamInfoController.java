@@ -1,5 +1,8 @@
 package com.ustudy.info.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.UResp;
 import com.ustudy.info.model.ExamInfo;
 import com.ustudy.info.services.ExamInfoService;
+import com.ustudy.info.util.InfoUtil;
 
 @RestController
 @RequestMapping("info/exam/")
@@ -34,9 +38,17 @@ public class ExamInfoController {
 		}
 		
 		if (ex.getSchIds() == null || ex.getSchIds().isEmpty()) {
-			logger.warn("createExam(), no schools specified in request parameter");
-			res.setMessage("parameter invalid");
-			return res;
+			if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+				List<String> schL = new ArrayList<String>();
+				schL.add(InfoUtil.retrieveSessAttr("orgId"));
+				ex.setSchIds(schL);
+				logger.debug("createExam(), " + ex.getSchIds().toString());
+			}
+			else {
+				logger.warn("createExam(), no schools specified in request parameter");
+				res.setMessage("parameter invalid");
+				return res;
+			}
 		}
 		
 		if (ex.getGrades() == null || ex.getGrades().isEmpty()) {
