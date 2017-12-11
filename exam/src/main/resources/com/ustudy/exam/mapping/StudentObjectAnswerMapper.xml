@@ -25,7 +25,19 @@
 	</insert>
 	
 	<delete id="deleteStudentObjectAnswers" parameterType="java.util.Map">
-		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and batch_num=#{batchNum});
+		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and batch_num=#{batchNum})
 	</delete>
+	
+	<select id="getQuestionAnswer" parameterType="java.util.Map" resultMap="StudentObjectAnswerResult">
+		SELECT a.* from obj_answer a LEFT JOIN paper p ON a.paperid=p.id where p.exam_grade_sub_id=#{egsId} and a.quesno=#{quesno}
+	</select>
+	
+	<select id="getQuestionsAnswer" parameterType="Long" resultMap="StudentObjectAnswerResult">
+		SELECT a.* from obj_answer a LEFT JOIN paper p ON a.paperid=p.id where p.exam_grade_sub_id=#{egsId} limit 1
+	</select>
+	
+	<update id="updateStudentObjectAnswer" parameterType="java.util.Map">
+		UPDATE obj_answer SET score=#{score} where id=#{id}
+	</update>
 
 </mapper>
