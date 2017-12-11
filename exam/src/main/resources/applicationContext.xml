@@ -75,7 +75,15 @@
 		<!-- By default the servlet container sessions will be used. Uncomment 
 			this line to use shiro's native sessions (see the JavaDoc for more): -->
 		<!-- <property name="sessionMode" value="native"/> -->
+		<!-- <property name="sessionManager" ref="sesManager"/> -->
 	</bean>
+	
+	<!-- 
+	<bean id="sesManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+	    <property name="globalSessionTimeout" value="600000"/>
+	</bean>
+	-->
+	
 	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
 
 	<!-- Define the Shiro Realm implementation you want to use to connect to 
@@ -123,7 +131,7 @@
 	</bean>
 
 	<!-- scan for mappers and make them autowired -->
-	<mybatis:scan base-package="com.ustudy.exam.mapper" />
+	<mybatis:scan base-package="com.ustudy.exam.mapper,com.ustudy.info.mapper" />
 	<!-- DAO接口所在包名，Spring会自动查找其下的类 ,包下的类需要使用@MapperScan注解,否则容器注入会失败 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ustudy.exam.dao" />

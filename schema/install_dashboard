@@ -6,7 +6,7 @@ CREATE TABLE if not exists ustudy.subject (
   name varchar(20) DEFAULT NULL,
   type varchar(1) DEFAULT '0' COMMENT '是否分科，0：不分科，1：文综，2：理综',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB;
 
 create table if not exists ustudy.users (
 id INT NOT NULL AUTO_INCREMENT,
@@ -147,8 +147,10 @@ id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
 grade_id INT NOT NULL,
 sub_id int(11) NOT NULL,
-mark_status BOOL default false,
-template BOOL default false,
+# 0 - marking not started,  1 - marking in progress, 2 - mark finished
+status ENUM('0', '1', '2') NOT NULL,
+# whether template uploaded or not
+temp_upload BOOL default false,
 obj_item_num INT default 0,
 sub_item_num INT default 0,
 task_dispatch BOOL default false,
@@ -160,12 +162,15 @@ xml_server_path varchar(50) DEFAULT NULL COMMENT '模板数据文件阿里云地
 original_data blob COMMENT '原始json数据',
 PRIMARY KEY (id),
 INDEX (grade_id),
+UNIQUE KEY (examid, grade_id, sub_id),
 FOREIGN KEY (examid)
     REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
+    on DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
-
 
