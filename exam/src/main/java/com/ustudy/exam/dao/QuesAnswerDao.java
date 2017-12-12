@@ -12,6 +12,8 @@ public interface QuesAnswerDao {
 
 	List<QuesAnswer> getQuesAnswers(Long egsId);
 	
+	QuesAnswer getQuesAnswer(@Param("egsId")Long egsId, @Param("quesId")Long quesId);
+	
 	List<QuesAnswer> getQuesAnswersByIds(String egsIds);
 	
 	boolean deleteQuesAnswers(Long egsId);

@@ -1,7 +1,6 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Exam implements Serializable {
 
@@ -9,7 +8,7 @@ public class Exam implements Serializable {
 	
 	private Long id;
 	private String examName = null;
-	private Date examDate = null;
+	private String examDate = null;
 	private String type = null;
 	private String status = null;
 	
@@ -17,7 +16,7 @@ public class Exam implements Serializable {
 		super();
 	}
 
-	public Exam(Long id, String examName, Date examDate, String type, String status) {
+	public Exam(Long id, String examName, String examDate, String type, String status) {
 		super();
 		this.id = id;
 		this.examName = examName;
@@ -42,11 +41,11 @@ public class Exam implements Serializable {
 		this.examName = examName;
 	}
 
-	public Date getExamDate() {
+	public String getExamDate() {
 		return examDate;
 	}
 
-	public void setExamDate(Date examDate) {
+	public void setExamDate(String examDate) {
 		this.examDate = examDate;
 	}
 

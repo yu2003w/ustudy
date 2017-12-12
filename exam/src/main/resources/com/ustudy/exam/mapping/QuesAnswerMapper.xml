@@ -21,6 +21,10 @@
 		SELECT * FROM question where exam_grade_sub_id=#{egsId}
 	</select>
 	
+	<select id="getQuesAnswer" parameterType="java.util.Map" resultMap="QuesAnswerResult">
+		SELECT * FROM question where id=#{quesId} and exam_grade_sub_id=#{egsId} limit 1
+	</select>
+	
 	<select id="getQuesAnswersByIds" parameterType="string" resultMap="QuesAnswerResult">
 		SELECT * FROM question where exam_grade_sub_id in (#{egsIds})
 	</select>

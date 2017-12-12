@@ -16,6 +16,10 @@
 	<select id="getRefAnswers" parameterType="Long" resultMap="RefAnswerResult">
 		SELECT r.*, q.type, q.choice_num FROM refanswer r LEFT JOIN question q ON r.quesid = q.id WHERE r.exam_grade_sub_id = #{egsId} ORDER BY r.quesno
 	</select>
+	
+	<select id="getRefAnswer" parameterType="java.util.Map" resultMap="RefAnswerResult">
+		SELECT * FROM refanswer WHERE exam_grade_sub_id=#{egsId} and quesno=#{quesno} limit 1
+	</select>
 
 	<delete id="deleteRefAnswers" parameterType="Long">
 		delete FROM refanswer where exam_grade_sub_id=#{egsId}

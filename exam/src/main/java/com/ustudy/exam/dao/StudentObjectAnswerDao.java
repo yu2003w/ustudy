@@ -12,8 +12,14 @@ public interface StudentObjectAnswerDao {
 
 	void insertStudentObjectAnswer(StudentObjectAnswer answer);
 	
+	void updateStudentObjectAnswer(@Param("id")Long id, @Param("score")Integer score);
+	
 	void insertStudentObjectAnswers(List<StudentObjectAnswer> answers);
 	
 	void deleteStudentObjectAnswers(@Param("egsId")Long egsId, @Param("batchNum")Integer batchNum);
+	
+	List<StudentObjectAnswer> getQuestionAnswer(@Param("egsId")Long egsId, @Param("quesno")Integer quesno);
+	
+	List<StudentObjectAnswer> getQuestionsAnswer(@Param("egsId")Long egsId);
 	
 }
