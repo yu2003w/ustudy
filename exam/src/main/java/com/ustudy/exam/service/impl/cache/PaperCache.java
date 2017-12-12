@@ -1,4 +1,4 @@
-package com.ustudy.service.impl.cache;
+package com.ustudy.exam.service.impl.cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,7 +146,9 @@ public class PaperCache {
 			if (Math.abs(mtcL.get(i).getScore() - mtcL.get(i+num).getScore()) >= 5) {
 				logger.debug("popFinalMarkIds(),  mtcL[" + i +"] -> " + mtcL.get(i).toString() + 
 						", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
-				mfL.add(new MarkTaskCache(mtcL.get(i).getPaperid(), mtcL.get(i).getImg()));
+				MarkTaskCache mt = new MarkTaskCache(mtcL.get(i).getPaperid(), mtcL.get(i).getImg());
+				mt.setSeq(i);
+				mfL.add(mt);
 			}
 		}
 		
@@ -218,7 +220,8 @@ public class PaperCache {
 		String role = mtM.getMarkRole(pr.getQid(), teacid);
 		String paperCacheKey = null;
 		List<MarkTaskCache> mtcL = null;
-		if (role.compareTo("终评") == 0) {
+		boolean isFinalMark = (role.compareTo("终评") == 0);
+		if (isFinalMark) {
 			paperCacheKey = QUES_PAPER_PREFIX_FINAL + pr.getQid();
 		}
 		else {
@@ -234,7 +237,7 @@ public class PaperCache {
 			logger.info("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
 			
 			// for final mark, paper ids should be caculated from first round mark 
-			if (role.compareTo("终评") == 0 && !popFinalMarkIds(pr.getQid())) {
+			if (isFinalMark && !popFinalMarkIds(pr.getQid())) {
 				logger.warn("getPapersForSingleQues(), papers for final mark is not ready");
 				return null;
 			}
@@ -279,12 +282,31 @@ public class PaperCache {
 				" , current batch is " + batch);
 		
 		// allocated tasks
-		int count = 0;
+		int count = 0, mid = 0;
+		List<MarkTaskCache> firstMarkL = null;
+		if (isFinalMark) {
+			firstMarkL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
+			if (firstMarkL != null && !firstMarkL.isEmpty()) {
+				mid = firstMarkL.size()/2;
+			}
+		}
+		 
 		for (MarkTaskCache mt: mtcL) {
 			if (count < batch && mt.getStatus() == 0 && !msc.getCurAssign().containsKey(mt.getPaperid())) {
 				mt.setStatus(1);
 				mt.setTeacid(teacid);
-				paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
+				if (isFinalMark) {
+					paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
+					// for final marks, number of returned records should be times of triple
+					// 1, final mark element 2, first mark element  3, first mark element
+					MarkTaskCache fm = firstMarkL.get(mt.getSeq());
+					paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+					fm = firstMarkL.get(mt.getSeq() + mid);
+					paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+				}
+				else 
+					paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));	
+				
 				msc.getCurAssign().put(mt.getPaperid(), mt);
 				count++;
 			}

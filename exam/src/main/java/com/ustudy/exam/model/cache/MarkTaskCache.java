@@ -29,6 +29,9 @@ public class MarkTaskCache implements Serializable {
 	
 	private float score = 0;
 	
+	// index of papers in cache should be finally marked
+	private int seq = 0;
+	
 	public MarkTaskCache() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -104,11 +107,18 @@ public class MarkTaskCache implements Serializable {
 		this.img = img;
 	}
 
+	public int getSeq() {
+		return seq;
+	}
+
+	public void setSeq(int seq) {
+		this.seq = seq;
+	}
 
 	@Override
 	public String toString() {
 		return "MarkTaskCache [paperid=" + paperid + ", img=" + img + ", teacid=" + teacid + ", status=" + status
-				+ ", score=" + score + "]";
+				+ ", score=" + score + ", seq=" + seq + "]";
 	}
 
 }

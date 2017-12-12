@@ -1,8 +1,10 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ustudy.exam.model.cache.FirstMarkImgRecord;
 
 /**
  * @author jared
@@ -41,9 +43,13 @@ public class ImgRegion implements Serializable {
 	private String markImg = null;
 	private String markImgData = null;
 	
+	@JsonProperty("markImgRecords")
+	private FirstMarkImgRecord[] firstMarkImgs = null;
+	
 	public ImgRegion() {
 		super();
 		// TODO Auto-generated constructor stub
+		firstMarkImgs = new FirstMarkImgRecord[2];
 	}
 
 	public ImgRegion(String quesImg, int pageno, int posx, int posy, int width, int height) {
@@ -160,12 +166,20 @@ public class ImgRegion implements Serializable {
 		this.markImgData = markImgData;
 	}
 
+	public FirstMarkImgRecord[] getFirstMarkImgs() {
+		return firstMarkImgs;
+	}
+
+	public void setFirstMarkImgs(FirstMarkImgRecord[] firstMarkImgs) {
+		this.firstMarkImgs = firstMarkImgs;
+	}
+
 	@Override
 	public String toString() {
-		return "QuesRegion [quesImg=" + quesImg + ", ansImg=" + ansImg + ", ansMarkImg=" + ansMarkImg
+		return "ImgRegion [quesImg=" + quesImg + ", ansImg=" + ansImg + ", pageno=" + pageno + ", posx=" + posx
+				+ ", posy=" + posy + ", width=" + width + ", height=" + height + ", ansMarkImg=" + ansMarkImg
 				+ ", ansMarkImgData=" + ansMarkImgData + ", markImg=" + markImg + ", markImgData=" + markImgData
-				+ ", pageno=" + pageno + ", posx=" + posx + ", posy=" + posy + ", width=" + width + ", height=" + height
-				+ "]";
+				+ ", firstMarkImgs=" + Arrays.toString(firstMarkImgs) + "]";
 	}
 
 }

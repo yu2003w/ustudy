@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Update;
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.SingleAnswer;
+import com.ustudy.exam.model.cache.FirstMarkImgRecord;
 import com.ustudy.exam.model.cache.MarkTaskCache;
 import com.ustudy.exam.model.cache.PaperScoreCache;
 import com.ustudy.exam.model.statics.TeaStatics;
@@ -80,17 +81,22 @@ public interface MarkTaskMapper {
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 	
+	@Select("select teacid, pageno, mark_img as img from ustudy.answer join ustudy.answer_img on "
+			+ "ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and paperid=#{pid} and "
+			+ "ustudy.answer.isfinal = false order by pageno")
+	public List<FirstMarkImgRecord> getFirstMarkImgs(@Param("qid") String quesid, @Param("pid") String paperid);
+	
 	@Select("select mflag, problem_paper as isProblemPaper, isviewed as isMarked, score, "
 			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
 			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
 	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid, @Param("tid") String teacid);
 	
-	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, score) "
-			+ "values (#{quesid}, #{paperId}, #{teacid}, #{mflag}, #{isProblemPaper}, true, #{score}) on "
-			+ "duplicate key update mflag=#{mflag}, problem_paper=#{isProblemPaper}, score=#{score}, "
-			+ "id=LAST_INSERT_ID(id)")
+	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, isfinal, "
+			+ "score) values (#{ba.quesid}, #{ba.paperId}, #{tid}, #{ba.mflag}, #{ba.isProblemPaper}, true, "
+			+ "#{ba.isfinal}, #{ba.score}) on duplicate key update mflag=#{ba.mflag}, "
+			+ "problem_paper=#{ba.isProblemPaper}, score=#{ba.score}, id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys=true)
-	public int insertAnswer(BlockAnswer ba);
+	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 	
 	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id) values (#{ir.markImg}, "
 			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "

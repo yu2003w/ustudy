@@ -12,6 +12,10 @@ public class PaperImgCache implements Serializable {
 	private String paperid = null;
 	
 	private String img = null;
+	
+	// for final check, need to get score and teacid of first marks
+	private float score = -1;
+	private String teacid = null;
 
 	public PaperImgCache() {
 		super();
@@ -22,6 +26,14 @@ public class PaperImgCache implements Serializable {
 		super();
 		this.paperid = paperid;
 		this.img = img;
+	}
+
+	// for final marks, only score and teacid needed
+	public PaperImgCache(String paperid, float score, String teacid) {
+		super();
+		this.paperid = paperid;
+		this.score = score;
+		this.teacid = teacid;
 	}
 
 	public String getPaperid() {
@@ -40,9 +52,25 @@ public class PaperImgCache implements Serializable {
 		this.img = img;
 	}
 
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+
+	public String getTeacid() {
+		return teacid;
+	}
+
+	public void setTeacid(String teacid) {
+		this.teacid = teacid;
+	}
+
 	@Override
 	public String toString() {
-		return "PaperImgCache [paperid=" + paperid + ", img=" + img + "]";
+		return "PaperImgCache [paperid=" + paperid + ", img=" + img + ", score=" + score + ", teacid=" + teacid + "]";
 	}
 
 }

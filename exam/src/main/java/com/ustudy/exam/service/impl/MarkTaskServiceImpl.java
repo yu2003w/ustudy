@@ -20,6 +20,8 @@ import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.ImgRegion;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
+import com.ustudy.exam.model.cache.FirstMarkImgRecord;
+import com.ustudy.exam.model.cache.FirstMarkRecord;
 import com.ustudy.exam.model.cache.MarkUpdateResult;
 import com.ustudy.exam.model.cache.PaperImgCache;
 import com.ustudy.exam.model.BlockAnswer;
@@ -27,9 +29,9 @@ import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
+import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.OSSUtil;
-import com.ustudy.service.impl.cache.PaperCache;
 
 @Service
 public class MarkTaskServiceImpl implements MarkTaskService {
@@ -135,7 +137,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		// retrieve corresponding students' papers
-		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq(), teacid));
+		mt.setPapers(requestPapers(sumL, comb.getStartSeq(), comb.getEndSeq(), teacid, 
+				(mt.getMarkType().compareTo("终评") == 0)));
 		int total = 0, marked = 0;
 		for (QuesMarkSum qm: sumL) {
 			int to = paperC.getTotal(qm.getQuesid(), teacid);
@@ -151,7 +154,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return mt;
 	}
 
-	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq, String teacid) {
+	private List<QuestionPaper> requestPapers(List<QuesMarkSum> queS, int startSeq, int endSeq, 
+			String teacid, boolean isfinal) {
 		List<QuestionPaper> items = new ArrayList<QuestionPaper>();
 		
 		if (queS.isEmpty()) {
@@ -198,11 +202,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
 						mark.getFullscore());
 				List<SingleAnswer> saL = new ArrayList<SingleAnswer>();
-				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
+				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || 
+						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
 					saL = markTaskM.getQuesDiv(mark.getQuesid());
 				}
 				ba.setSteps(saL);
+				
+				// if final mark, need to process following two elements
+				if (isfinal) {
+					FirstMarkRecord[] recs = new FirstMarkRecord[2];
+					recs[0] = new FirstMarkRecord(pImg.get(j+1).getTeacid(), null, 
+							String.valueOf(pImg.get(j+1).getScore()));
+					recs[1] = new FirstMarkRecord(pImg.get(j+2).getTeacid(), null, 
+							String.valueOf(pImg.get(j+2).getScore()));
+					ba.setMarkRec(recs);
+				}
 				
 				// set region informations for this question id
 				// need to set answer image,
@@ -210,19 +225,41 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				String paperImg = ba.getPaperImg();
 				String [] imgs = null;
 				if (paperImg == null || paperImg.isEmpty()) {
-					logger.warn("requestPapers(), paper image is vacant from quesid " + mark.getQuesid() + 
+					logger.warn("requestPapers(), paper image is vacant for quesid " + mark.getQuesid() + 
 							pImg.get(j).toString());
 				}
 				else {
+					List<FirstMarkImgRecord> fMImgs = null;
+					if (isfinal) 
+						fMImgs = markTaskM.getFirstMarkImgs(mark.getQuesid(), pImg.get(j).getPaperid());
 					imgs = paperImg.split(",");
 					for (ImgRegion re: qreL) {
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
+							throw new RuntimeException("requestPapers(), pageno " + re.getPageno() + 
+									" not matched with " + paperImg.toString());
 						}
-						else
-						    re.setAnsImg(imgs[re.getPageno()]);
+					
+					    re.setAnsImg(imgs[re.getPageno()]);
+						// for final marks, need to add marked papers here
+						if (isfinal) {
+							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];
+							if (fMImgs.get(re.getPageno()*2).getTeacid().compareTo(
+									pImg.get(j+1).getTeacid()) == 0) {
+								fmRec[0] = fMImgs.get(re.getPageno()*2);
+								fmRec[1] = fMImgs.get(re.getPageno()*2 +1);
+							}
+							else {
+								fmRec[0] = fMImgs.get(re.getPageno()*2 + 1);
+								fmRec[1] = fMImgs.get(re.getPageno()*2);
+							}
+							
+							re.setFirstMarkImgs(fmRec);
+						}
 					}
 				}
+				
+				// need to populate and set mark img for first marks
 				
 				ba.setRegions(qreL);
 				blA.add(ba);
@@ -247,6 +284,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			logger.error("updateMarkResult(), failed to get login user, maybe service restarted.");
 			throw new RuntimeException("updateMarkResult(), failed to get login user");
 		}
+		
 		for (BlockAnswer ba:blocks) {
 			float realScore = 0, num = 0;
 			
@@ -258,8 +296,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 			if (realScore != 0)
 				ba.setScore(String.valueOf(realScore));
-			ba.setTeacid(teacid);
-			num = markTaskM.insertAnswer(ba);
+
+			num = markTaskM.insertAnswer(ba, teacid);
 			if (num < 0 || num > 2 || ba.getId() < 0) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
 						",pri key->" + ba.getId());

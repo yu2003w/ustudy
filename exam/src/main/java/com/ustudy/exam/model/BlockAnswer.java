@@ -1,10 +1,12 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ustudy.exam.model.cache.FirstMarkRecord;
 
 
 /**
@@ -42,17 +44,22 @@ public class BlockAnswer implements Serializable {
 	private String fullscore = "";
 	// real score for this question block
 	private String score = "";
+	
+	private boolean isfinal = false;
+	
 	private List<SingleAnswer> steps = null;
 	
-	private List <ImgRegion> regions = null;
+	@JsonProperty("markRecords")
+	private FirstMarkRecord[] markRec= null;
+	
+	private List<ImgRegion> regions = null;
 	
 	private String paperImg = null;
-	
-	private String teacid = null;
 	
 	public BlockAnswer() {
 		super();
 		// TODO Auto-generated constructor stub
+		markRec = new FirstMarkRecord[2];
 	}
 
 	public BlockAnswer(String questionName, String questionType, String quesid, String markMode, boolean isMarked,
@@ -161,6 +168,14 @@ public class BlockAnswer implements Serializable {
 		this.fullscore = fullscore;
 	}
 
+	public boolean isIsfinal() {
+		return isfinal;
+	}
+
+	public void setIsfinal(boolean isfinal) {
+		this.isfinal = isfinal;
+	}
+
 	public String getScore() {
 		return score;
 	}
@@ -201,12 +216,12 @@ public class BlockAnswer implements Serializable {
 		this.paperImg = paperImg;
 	}
 
-	public String getTeacid() {
-		return teacid;
+	public FirstMarkRecord[] getMarkRec() {
+		return markRec;
 	}
 
-	public void setTeacid(String teacid) {
-		this.teacid = teacid;
+	public void setMarkRec(FirstMarkRecord[] markRec) {
+		this.markRec = markRec;
 	}
 
 	@Override
@@ -214,7 +229,8 @@ public class BlockAnswer implements Serializable {
 		return "BlockAnswer [id=" + id + ", questionName=" + questionName + ", questionType=" + questionType
 				+ ", markMode=" + markMode + ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid
 				+ ", mflag=" + mflag + ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score="
-				+ score + ", steps=" + steps + ", regions=" + regions + ", paperImg=" + paperImg + "]";
+				+ score + ", isfinal=" + isfinal + ", steps=" + steps + ", markRec=" + Arrays.toString(markRec)
+				+ ", regions=" + regions + ", paperImg=" + paperImg + "]";
 	}
 	
 }
