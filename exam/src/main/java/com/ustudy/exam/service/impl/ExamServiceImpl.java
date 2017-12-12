@@ -50,12 +50,12 @@ public class ExamServiceImpl implements ExamService {
 	}
 
     @Override
-    public JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String starDate, String endDate, String name) {
+    public JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String startDate, String endDate, String name) {
         
         JSONArray result = new JSONArray();
         
         try {
-            List<Exam> exams = examDaoImpl.getExams(finished, gradeId, subjectId, starDate, endDate, name);
+            List<Exam> exams = examDaoImpl.getExams(finished, gradeId, subjectId, startDate, endDate, name);
             
             for (Exam exam : exams) {
                 

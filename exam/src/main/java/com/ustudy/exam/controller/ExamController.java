@@ -78,17 +78,17 @@ public class ExamController {
     public Map getExams(@RequestParam(value="finished", defaultValue="false") Boolean finished, 
             @RequestParam(value="gradeId", defaultValue="0") Long gradeId, 
             @RequestParam(value="subjectId", defaultValue="0") Long subjectId, 
-            @RequestParam(value="starDate", defaultValue="") String starDate, 
+            @RequestParam(value="startDate", defaultValue="") String startDate, 
             @RequestParam(value="endDate", defaultValue="") String endDate, 
             @RequestParam(value="name", defaultValue="") String name) {
         
         logger.debug("getExams().");
-        logger.debug("finished: " + finished + ",gradeId=" + gradeId + ",subjectId=" + subjectId + ",starDate=" + starDate + ",endDate=" + endDate + ",name=" + name);
+        logger.debug("finished: " + finished + ",gradeId=" + gradeId + ",subjectId=" + subjectId + ",startDate=" + startDate + ",endDate=" + endDate + ",name=" + name);
         
         Map result = new HashMap<>();
 
         result.put("success", true);
-        result.put("data", service.getExams(finished, gradeId, subjectId, starDate, endDate, name));
+        result.put("data", service.getExams(finished, gradeId, subjectId, startDate, endDate, name));
 
         return result;
     }
