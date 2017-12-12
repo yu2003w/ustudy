@@ -61,10 +61,12 @@ public class ExamServiceImpl implements ExamService {
                 
                 List<Map<String, Object>> grades = examDaoImpl.getExamGrades(exam.getId());
                 List<Map<String, Object>> subjects = examDaoImpl.getExamSubjects(exam.getId());
+                long count = examDaoImpl.getExamStudengCount(exam.getId());
                 
                 JSONObject object = JSONObject.fromObject(exam);
                 object.put("grades", grades);
                 object.put("subjects", subjects);
+                object.put("studentCount", count);
                 
                 result.add(object);
             }
