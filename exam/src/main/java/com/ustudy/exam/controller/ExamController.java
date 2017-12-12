@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.service.ExamService;
@@ -44,27 +45,53 @@ public class ExamController {
 
 		return result;
 	}
-	
-	/**
-	 * 根据考试状态获取考试信息
-	 * @param examStatus 考试状态
-	 * @param request HttpServletRequest 
-	 * @param response HttpServletResponse
-	 * @return Map
-	 */
-	@RequestMapping(value = "/exams/{examStatus}", method = RequestMethod.GET)
-	public Map getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
-		
-		logger.debug("getExams().");
-		logger.debug("examStatus: " + examStatus);
-		
-		Map result = new HashMap<>();
+    
+    /**
+     * 根据考试状态获取考试信息
+     * @param examStatus 考试状态
+     * @param request HttpServletRequest 
+     * @param response HttpServletResponse
+     * @return Map
+     */
+    @RequestMapping(value = "/exams/{examStatus}", method = RequestMethod.GET)
+    public Map getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
+        
+        logger.debug("getExams().");
+        logger.debug("examStatus: " + examStatus);
+        
+        Map result = new HashMap<>();
 
-		result.put("success", true);
-		result.put("data", service.getExamsByStatus(examStatus));
+        result.put("success", true);
+        result.put("data", service.getExamsByStatus(examStatus));
 
-		return result;
-	}
+        return result;
+    }
+    
+    /**
+     * 根据考试状态获取考试信息
+     * @param examStatus 考试状态
+     * @param request HttpServletRequest 
+     * @param response HttpServletResponse
+     * @return Map
+     */
+    @RequestMapping(value = "/exams", method = RequestMethod.GET)
+    public Map getExams(@RequestParam(value="finished", defaultValue="false") Boolean finished, 
+            @RequestParam(value="gradeId", defaultValue="0") Long gradeId, 
+            @RequestParam(value="subjectId", defaultValue="0") Long subjectId, 
+            @RequestParam(value="starDate", defaultValue="") String starDate, 
+            @RequestParam(value="endDate", defaultValue="") String endDate, 
+            @RequestParam(value="name", defaultValue="") String name) {
+        
+        logger.debug("getExams().");
+        logger.debug("finished: " + finished + ",gradeId=" + gradeId + ",subjectId=" + subjectId + ",starDate=" + starDate + ",endDate=" + endDate + ",name=" + name);
+        
+        Map result = new HashMap<>();
+
+        result.put("success", true);
+        result.put("data", service.getExams(finished, gradeId, subjectId, starDate, endDate, name));
+
+        return result;
+    }
 	
 	/**
 	 * 根据考试状态获取考试信息

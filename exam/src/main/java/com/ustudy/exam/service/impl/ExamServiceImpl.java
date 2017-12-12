@@ -14,6 +14,9 @@ import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.service.ExamService;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 @Service
 public class ExamServiceImpl implements ExamService {
 	
@@ -45,4 +48,33 @@ public class ExamServiceImpl implements ExamService {
 	public ArrayList<Map> getGrades() {
 		return examDaoImpl.getGrades();
 	}
+
+    @Override
+    public JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String starDate, String endDate, String name) {
+        
+        JSONArray result = new JSONArray();
+        
+        try {
+            List<Exam> exams = examDaoImpl.getExams(finished, gradeId, subjectId, starDate, endDate, name);
+            
+            for (Exam exam : exams) {
+                
+                List<Map<String, Object>> grades = examDaoImpl.getExamGrades(exam.getId());
+                List<Map<String, Object>> subjects = examDaoImpl.getExamSubjects(exam.getId());
+                
+                JSONObject object = JSONObject.fromObject(exam);
+                object.put("grades", grades);
+                object.put("subjects", subjects);
+                
+                result.add(object);
+            }
+            
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return result;
+        
+    }
 }
