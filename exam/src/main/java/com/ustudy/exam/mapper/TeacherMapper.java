@@ -17,4 +17,7 @@ public interface TeacherMapper {
 	@Select("select role_name from ustudy.teacherroles where teac_id = #{uid}")
 	public List<String> getRolesById(@Param("uid") String uid);
 	
+	@Select("select teacname from ustudy.teacher where teacid=#{tid}")
+	public String findNameById(@Param("tid") String tid);
+	
 }

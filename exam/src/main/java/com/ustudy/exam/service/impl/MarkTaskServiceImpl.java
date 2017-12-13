@@ -30,6 +30,7 @@ import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
+import com.ustudy.exam.service.impl.cache.TeacherCache;
 import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.OSSUtil;
 
@@ -43,6 +44,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Autowired
 	private PaperCache paperC;
+	
+	@Autowired
+	private TeacherCache teaC;
 	
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
@@ -212,9 +216,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				// if final mark, need to process following two elements
 				if (isfinal) {
 					FirstMarkRecord[] recs = new FirstMarkRecord[2];
-					recs[0] = new FirstMarkRecord(pImg.get(j+1).getTeacid(), null, 
+					String tid = pImg.get(j+1).getTeacid();
+					recs[0] = new FirstMarkRecord(tid, teaC.getTeaName(tid), 
 							String.valueOf(pImg.get(j+1).getScore()));
-					recs[1] = new FirstMarkRecord(pImg.get(j+2).getTeacid(), null, 
+					tid = pImg.get(j+2).getTeacid();
+					recs[1] = new FirstMarkRecord(tid, teaC.getTeaName(tid), 
 							String.valueOf(pImg.get(j+2).getScore()));
 					ba.setMarkRec(recs);
 				}
@@ -244,21 +250,20 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						// for final marks, need to add marked papers here
 						if (isfinal) {
 							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];
-							if (fMImgs.get(re.getPageno()*2).getTeacid().compareTo(
+							if (fMImgs.get((re.getPageno()-1)*2).getTeacid().compareTo(
 									pImg.get(j+1).getTeacid()) == 0) {
-								fmRec[0] = fMImgs.get(re.getPageno()*2);
-								fmRec[1] = fMImgs.get(re.getPageno()*2 +1);
+								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2);
+								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2 +1);
 							}
 							else {
-								fmRec[0] = fMImgs.get(re.getPageno()*2 + 1);
-								fmRec[1] = fMImgs.get(re.getPageno()*2);
+								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2 + 1);
+								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2);
 							}
-							
 							re.setFirstMarkImgs(fmRec);
 						}
 					}
 				}
-				
+				j += 2;
 				// need to populate and set mark img for first marks
 				
 				ba.setRegions(qreL);
