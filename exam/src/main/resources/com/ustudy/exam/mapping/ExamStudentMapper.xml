@@ -19,5 +19,9 @@
 	<select id="getStudentInfoByExamIDAndGradeId" parameterType="java.util.Map" resultMap="ExamStudentResult">
 		SELECT * FROM examinee where examid=#{examId} and gradeid=#{gradeId}
 	</select>
+	
+	<select id="getExamStudents" parameterType="Long" resultType="java.util.Map">
+		SELECT ee.id,ee.name,ee.exam_code AS examCode,cl.cls_name AS className from examinee ee LEFT JOIN class cl ON ee.class_id=cl.id where examid=#{examId} ORDER BY ee.id
+	</select>
 
 </mapper>

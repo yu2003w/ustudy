@@ -23,9 +23,14 @@ public class ExamApiTest {
 //        System.out.println("--------------------updateStatus1-------------------");
 //        System.out.println();
         
-        updateStatus2();
+//        updateStatus2();
+//        System.out.println();
+//        System.out.println("--------------------updateStatus2-------------------");
+//        System.out.println();
+        
+        getExamStudents();
         System.out.println();
-        System.out.println("--------------------updateStatus2-------------------");
+        System.out.println("--------------------getExamStudents-------------------");
         System.out.println();
 
         System.out.println("--------------- " + (System.currentTimeMillis() - t1));
@@ -119,6 +124,41 @@ public class ExamApiTest {
 
             HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
             httpConnection.setRequestMethod("POST");
+            httpConnection.setRequestProperty("Content-Type", "application/json");
+
+            if (httpConnection.getResponseCode() != 200) {
+                throw new RuntimeException("HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+            }
+
+            BufferedReader responseBuffer = new BufferedReader(new InputStreamReader((httpConnection.getInputStream())));
+
+            String output;
+            System.out.println("Output from Server:  \n");
+
+            while ((output = responseBuffer.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpConnection.disconnect();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    
+    public static void getExamStudents() {
+
+        String targetURL = "http://127.0.0.1:8080/exam/students/1";
+
+        try {
+
+            URL restServiceURL = new URL(targetURL);
+
+            HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+            httpConnection.setRequestMethod("GET");
             httpConnection.setRequestProperty("Content-Type", "application/json");
 
             if (httpConnection.getResponseCode() != 200) {
