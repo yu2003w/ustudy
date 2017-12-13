@@ -106,5 +106,27 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 		
 	}
+
+    public boolean updateExamSubjectStatus(Long egsId, Boolean release) {        
+        try {
+            daoImpl.updateExamSubjectStatusById(egsId, release);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        
+        return false;
+    }
+
+    public boolean updateExamSubjectStatus(Long examId, Long gradeId, Long subjectId, Boolean release) {        
+        try {
+            daoImpl.updateExamSubjectStatus(examId, gradeId, subjectId, release);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        
+        return false;        
+    }
 	
 }

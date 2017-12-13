@@ -107,5 +107,25 @@
 	<update id="isTaskDispatch" parameterType="Long">
 		UPDATE examgradesub SET task_dispatch=1 where id=#{id}
 	</update>
+	
+	<update id="updateExamSubjectStatusById" parameterType="java.util.Map">
+		<if test="release !=null and release == true">
+			UPDATE examgradesub SET status=2
+		</if>
+		<if test="release !=null and release == false">
+			UPDATE examgradesub SET status=1
+		</if>
+		where id=#{egsId}
+	</update>
+	
+	<update id="updateExamSubjectStatus" parameterType="java.util.Map">
+		<if test="release !=null and release == true">
+			UPDATE examgradesub SET status=2 
+		</if>
+		<if test="release !=null and release == false">
+			UPDATE examgradesub SET status=1 
+		</if>
+		WHERE examid=#{examId} AND grade_id=#{gradeId} AND sub_id=#{subjectId}
+	</update>
 
 </mapper>
