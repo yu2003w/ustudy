@@ -27,10 +27,16 @@ public class ExamStudentController {
 	private ExamStudentService service;
 	
 	/**
-	 * 获取科目信息
-	 * @param request HttpServletRequest 
-	 * @param response HttpServletResponse
-	 * @return
+	 * 
+	 * getExamStudents[获取考试全部考生信息]
+	 * 创建人:  dulei
+	 * 创建时间: 2017年12月13日 下午10:18:56
+	 *
+	 * @Title: getExamStudents
+	 * @param examId 考试ID
+	 * @param request
+	 * @param response
+	 * @return 考生信息
 	 */
 	@RequestMapping(value = "/students/{examId}", method = RequestMethod.GET)
 	public Map getExamStudents(@PathVariable Long examId, HttpServletRequest request, HttpServletResponse response) {
