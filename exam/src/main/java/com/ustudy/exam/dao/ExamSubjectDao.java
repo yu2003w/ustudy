@@ -31,5 +31,9 @@ public interface ExamSubjectDao {
 	void isAanswerSeted(Long id);
 	
 	void isTaskDispatch(Long id);
+    
+	void updateExamSubjectStatusById(@Param("egsId")Long egsId, @Param("release")Boolean release);
+    
+	void updateExamSubjectStatus(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("release")Boolean release);
 	
 }

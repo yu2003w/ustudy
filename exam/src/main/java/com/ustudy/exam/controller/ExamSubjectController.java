@@ -157,4 +157,64 @@ public class ExamSubjectController {
 
 		return result;
 	}
+    
+    /**
+     * 
+     * updateExamSubjectStatus[根据考试科目ID修改开始状态]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月13日 下午8:23:46
+     *
+     * @Title: updateExamSubjectStatus
+     * @param egsId 考试科目ID
+     * @param release 是否发布
+     * @return 返回状态
+     */
+    @RequestMapping(value = "/examsubject/status/{egsId}/{release}", method = RequestMethod.POST)
+    public Map updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release) {
+        
+        logger.debug("updateExamSubjectStatus().");
+        
+        Map result = new HashMap<>();
+
+        if(service.updateExamSubjectStatus(egsId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+    
+    /**
+     * 
+     * updateExamSubjectStatus[这里用一句话描述这个方法的作用]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月13日 下午8:27:12
+     *
+     * @Title: updateExamSubjectStatus
+     * @param examId 考试ID
+     * @param gradeId 年级ID
+     * @param subjectId 科目ID
+     * @param release 是否发布
+     * @return 放回状态
+     */
+    @RequestMapping(value = "/examsubject/status/{examId}/{gradeId}/{subjectId}/{release}", method = RequestMethod.POST)
+    public Map updateExamSubjectStatus(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, @PathVariable Boolean release) {
+        
+        logger.debug("updateExamSubjectStatus().");
+        
+        Map result = new HashMap<>();
+
+        if(service.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
 }

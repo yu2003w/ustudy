@@ -1,6 +1,7 @@
 package com.ustudy.exam.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -37,5 +38,9 @@ public class ExamStudentServiceImpl implements ExamStudentService {
 		
 		return array;
 	}
+
+    public List<Map<String, Object>> getExamStudents(Long examId) {        
+        return examStudentDaompl.getExamStudents(examId);        
+    }
 
 }
