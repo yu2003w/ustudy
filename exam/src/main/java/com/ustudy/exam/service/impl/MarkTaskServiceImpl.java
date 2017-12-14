@@ -215,6 +215,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				
 				// if final mark, need to process following two elements
 				if (isfinal) {
+					ba.setIsfinal(true);
 					FirstMarkRecord[] recs = new FirstMarkRecord[2];
 					String tid = pImg.get(j+1).getTeacid();
 					recs[0] = new FirstMarkRecord(tid, teaC.getTeaName(tid), 

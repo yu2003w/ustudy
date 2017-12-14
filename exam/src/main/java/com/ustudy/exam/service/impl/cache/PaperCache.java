@@ -126,9 +126,12 @@ public class PaperCache {
 		paperC.opsForValue().set(QUES_PAPER_PREFIX + pr.getQid(), mtcL);
 		
 		logger.debug("cachePapers(), papers cached for question{" + pr.getQid() + "} -> ");
+		// code for basic debugging
+		/*
 		for (MarkTaskCache mt:mtcL) {
 			logger.debug(mt.toString());
-		}
+		} 
+		*/
 		
 		return true;
 	}
@@ -144,8 +147,8 @@ public class PaperCache {
 		List<MarkTaskCache> mfL = new ArrayList<MarkTaskCache>();
 		for (int i = 0; i < num; i++) {
 			if (Math.abs(mtcL.get(i).getScore() - mtcL.get(i+num).getScore()) >= 5) {
-				logger.debug("popFinalMarkIds(),  mtcL[" + i +"] -> " + mtcL.get(i).toString() + 
-						", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
+				//logger.debug("popFinalMarkIds(),  mtcL[" + i +"] -> " + mtcL.get(i).toString() + 
+				//		", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
 				MarkTaskCache mt = new MarkTaskCache(mtcL.get(i).getPaperid(), mtcL.get(i).getImg());
 				mt.setSeq(i);
 				mfL.add(mt);
@@ -153,6 +156,7 @@ public class PaperCache {
 		}
 		
 		paperC.opsForValue().set(QUES_PAPER_PREFIX_FINAL + quesid, mfL);
+		logger.info("popFinalMarkIds(), finished for " + quesid + " with " + mfL.size() + "papers");
 		return true;
 	}
 	
