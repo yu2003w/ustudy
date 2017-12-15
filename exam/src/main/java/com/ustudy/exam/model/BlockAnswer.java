@@ -46,6 +46,7 @@ public class BlockAnswer implements Serializable {
 	private String score = "";
 	
 	private boolean isfinal = false;
+	private String scoreGap = null;
 	
 	private List<SingleAnswer> steps = null;
 	
@@ -176,6 +177,14 @@ public class BlockAnswer implements Serializable {
 		this.isfinal = isfinal;
 	}
 
+	public String getScoreGap() {
+		return scoreGap;
+	}
+
+	public void setScoreGap(String scoreGap) {
+		this.scoreGap = scoreGap;
+	}
+
 	public String getScore() {
 		return score;
 	}
@@ -229,8 +238,8 @@ public class BlockAnswer implements Serializable {
 		return "BlockAnswer [id=" + id + ", questionName=" + questionName + ", questionType=" + questionType
 				+ ", markMode=" + markMode + ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid
 				+ ", mflag=" + mflag + ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score="
-				+ score + ", isfinal=" + isfinal + ", steps=" + steps + ", markRec=" + Arrays.toString(markRec)
-				+ ", regions=" + regions + ", paperImg=" + paperImg + "]";
+				+ score + ", isfinal=" + isfinal + ", scoreGap=" + scoreGap + ", steps=" + steps + ", markRec="
+				+ Arrays.toString(markRec) + ", regions=" + regions + ", paperImg=" + paperImg + "]";
 	}
 	
 }

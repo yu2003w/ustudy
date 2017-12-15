@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,7 @@ public class ExamInfoController {
 	private ExamInfoService exS;
 	
 	@RequestMapping(value="create/", method = RequestMethod.POST)
-	public UResp createExam(@RequestBody @Valid ExamInfo ex, HttpServletResponse resp) {
+	public UResp createExamInfo(@RequestBody @Valid ExamInfo ex, HttpServletResponse resp) {
 		UResp res = new UResp();
 		if (ex == null) {
 			logger.warn("createExam(), received parameter is not valid");
@@ -59,21 +60,38 @@ public class ExamInfoController {
 		
 		logger.debug("createExam(), item to be created -> " + ex.toString());
 		try {
-			if (!exS.createExamInfo(ex)) {
-				logger.warn("createExam(), failed to create examination");
-				res.setMessage("Failed to create examination");
-				resp.setStatus(500);
-				return res;
-			}
+			exS.createExamInfo(ex);
 			logger.debug("createExam(), examination created.");
+			res.setRet(true);
 		} catch (Exception e) {
-			logger.warn("createExam(), failed to create examination with exception " + e.getMessage());
-			res.setMessage(e.getMessage());
+			logger.error("createExam(), failed to create examination with exception " + e.getMessage());
+			res.setMessage("failed to create examination with exception " + e.getMessage());
 			resp.setStatus(500);
+		}
+
+		return res;
+	}
+	
+	@RequestMapping(value="delete/{id}/", method = RequestMethod.DELETE)
+	public UResp deleteExamInfo(@PathVariable @Valid int id, HttpServletResponse resp) {
+		UResp res = new UResp();
+		if (id < 0) {
+			logger.warn("deleteExamInfo(), delete examination failed for " + id);
+			res.setMessage("parameter invalid");
+			resp.setStatus(400);
 			return res;
 		}
 		
-		res.setRet(true);
+		try {
+			exS.deleteExamInfo(id);
+			logger.info("deleteExamInfo(), delete exam info " + id + " successfully");
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("deleteExamInfo(), delete exam failed with exception ->" + e.getMessage());
+			res.setMessage("delete exam failed with exception ->" + e.getMessage());
+			resp.setStatus(500);
+		}
+
 		return res;
 	}
 	

@@ -1,5 +1,6 @@
 package com.ustudy.info.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -16,6 +17,9 @@ public interface ExamInfoMapper {
 			+ "type=#{type}, status=#{status}, id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys=true)
 	public int createExamInfo(ExamInfo ex);
+	
+	@Delete("delete from ustudy.exam where ustudy.exam.id=#{id}")
+	public int deleteExamInfo(@Param("id") int id);
 	
 	@Insert("insert into ustudy.examschool(examid, schid) values(#{eid}, #{sid}) on duplicate key update "
 			+ "examid=#{eid}, schId=#{sid}")

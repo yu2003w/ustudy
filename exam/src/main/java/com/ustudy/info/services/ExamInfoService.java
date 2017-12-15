@@ -4,6 +4,8 @@ import com.ustudy.info.model.ExamInfo;
 
 public interface ExamInfoService {
 
-	public boolean createExamInfo(ExamInfo ex);
+	public void createExamInfo(ExamInfo ex);
+	
+	public void deleteExamInfo(int id);
 	
 }

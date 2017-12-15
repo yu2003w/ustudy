@@ -70,7 +70,7 @@ public class LoginController {
 		}
 
 		if (status) {
-			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
+			logger.info("user [" + currentUser.getPrincipal() + "] logged in successfully");
 			
 			// need to populate current user's orgtype, orgid information
 			try {
