@@ -137,7 +137,7 @@ public class ExamController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", "data");
+		result.put("data", service.getExamSummary(examId));
 
 		return result;
     }

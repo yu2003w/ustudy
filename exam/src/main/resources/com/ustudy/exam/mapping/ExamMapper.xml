@@ -49,11 +49,9 @@
 	</select>
 	
 	<select id="getExamSummary" parameterType="Long" resultType="java.util.Map">
-		SELECT g.grade_name as gradeId,g.id AS gradeId,s.name subjectName,s.id AS subjectId,egs.mark_status,egs.template,egs.answer_set,egs.task_dispatch 
-		from examgradesub egs 
-		LEFT JOIN grade g ON egs.grade_id=g.id 
-		LEFT JOIN subject s on egs.sub_id=s.id
-		where egs.examid=#{examid}
+		SELECT g.grade_name as gradeName,g.id AS gradeId,s.name subjectName,s.id AS subjectId,egs.mark_status AS markStatus,
+		egs.template,egs.answer_set AS answerSet,egs.task_dispatch AS taskDispatch,egs.id egsId from examgradesub egs 
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s on egs.sub_id=s.id where egs.examid=#{examid}
 	</select>
 	
 	<select id="getExamStudengCount" parameterType="Long" resultType="Long">
