@@ -48,14 +48,6 @@
 		SELECT id,name from subject where id IN (SELECT DISTINCT sub_id from examgradesub where examid=#{examid}) ORDER BY id
 	</select>
 	
-	<select id="getExamSummary" parameterType="Long" resultType="java.util.Map">
-		SELECT g.grade_name as gradeId,g.id AS gradeId,s.name subjectName,s.id AS subjectId,egs.mark_status,egs.template,egs.answer_set,egs.task_dispatch 
-		from examgradesub egs 
-		LEFT JOIN grade g ON egs.grade_id=g.id 
-		LEFT JOIN subject s on egs.sub_id=s.id
-		where egs.examid=#{examid}
-	</select>
-	
 	<select id="getExamStudengCount" parameterType="Long" resultType="Long">
 		SELECT COUNT(1) from examinee where examid=#{examid}
 	</select>
@@ -80,21 +72,5 @@
 	
 	<select id="getLastExam" resultMap="ExamResult">
 		SELECT e.* from examgradesub egs LEFT JOIN exam e on egs.examid=e.id ORDER BY e.exam_date DESC LIMIT 1 
-	</select>
-	
-	<select id="getGradeStudentCounts" parameterType="Long" resultType="java.util.Map">
-		SELECT count(id) count,gradeId from examinee where examid=#{examid} GROUP BY gradeId;
-	</select>
-
-	<select id="getSubjectPaperCounts" parameterType="Long" resultType="java.util.Map">
-		SELECT count(p.id) count,p.exam_grade_sub_id as egsId from paper p 
-		LEFT JOIN examgradesub egs ON egs.id=p.exam_grade_sub_id 
-		where egs.examid=#{examid} GROUP BY p.exam_grade_sub_id
-	</select>
-
-	<select id="getSubjectQuestions" parameterType="Long" resultType="java.util.Map">
-		SELECT q.exam_grade_sub_id egsId,q.startno,q.endno,q.type,q.score from question q 
-		LEFT JOIN examgradesub egs ON q.exam_grade_sub_id=egs.id 
-		where egs.examid=#{examid}
 	</select>
 </mapper>

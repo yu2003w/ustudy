@@ -21,6 +21,4 @@ public interface ExamService {
 	ArrayList<Map> getGrades();
 
 	ArrayList<Map> getSubjects();
-	
-	JSONArray getExamSummary(Long examId);
 }

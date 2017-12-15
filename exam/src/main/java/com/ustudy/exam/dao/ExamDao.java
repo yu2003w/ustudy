@@ -20,14 +20,6 @@ public interface ExamDao {
 	
 	List<Map<String, Object>> getExamSubjects(Long examid);
 	
-	List<Map<String, Object>> getExamSummary(Long examid);
-	
-	List<Map<String, Object>> getGradeStudentCounts(Long examid);
-	
-	List<Map<String, Object>> getSubjectPaperCounts(Long examid);
-	
-	List<Map<String, Object>> getSubjectQuestions(Long examid);
-	
 	Long getExamStudengCount(Long examid);
 	
 	List<Exam> getExamsByStatus(String status);
