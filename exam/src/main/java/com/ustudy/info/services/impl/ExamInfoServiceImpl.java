@@ -22,7 +22,7 @@ public class ExamInfoServiceImpl implements ExamInfoService {
 	
 	@Override
 	@Transactional
-	public boolean createExamInfo(ExamInfo ex) {
+	public void createExamInfo(ExamInfo ex) {
 		
 		int ret = exM.createExamInfo(ex);
 		if (ret < 0 || ret > 2 || ex.getId() < 0) {
@@ -53,7 +53,17 @@ public class ExamInfoServiceImpl implements ExamInfoService {
 			
 		}
 		
-		return true;
+	}
+
+	@Override
+	@Transactional
+	public void deleteExamInfo(int id) {
+		int ret = exM.deleteExamInfo(id);
+		if (ret != 1) {
+			logger.error("deleteExamInfo(), exam info delete failed for " + id);
+			throw new RuntimeException("deleteExamInfo(), failed to delete exam for " + id);
+		}
+		
 	}
 
 }

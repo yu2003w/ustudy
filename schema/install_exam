@@ -228,7 +228,7 @@ create table if not exists ustudy.answer_step (
 id INT NOT NULL AUTO_INCREMENT,
 answer_id INT NOT NULL,
 quesno INT NOT NULL,
-score INT NOT NULL,
+score float(3,1) default 0,
 PRIMARY KEY (id),
 INDEX(answer_id),
 UNIQUE KEY (quesno, answer_id),

@@ -224,6 +224,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					recs[1] = new FirstMarkRecord(tid, teaC.getTeaName(tid), 
 							String.valueOf(pImg.get(j+2).getScore()));
 					ba.setMarkRec(recs);
+					ba.setScoreGap(String.valueOf(
+							Math.abs(pImg.get(j+1).getScore() - pImg.get(j+2).getScore())));
 				}
 				
 				// set region informations for this question id
