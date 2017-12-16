@@ -49,8 +49,9 @@
 	</select>
 	
 	<select id="getExamSummary" parameterType="Long" resultType="java.util.Map">
-		SELECT g.grade_name as gradeName,g.id AS gradeId,s.name subjectName,s.id AS subjectId,egs.mark_status AS markStatus,
-		egs.template,egs.answer_set AS answerSet,egs.task_dispatch AS taskDispatch,egs.id egsId from examgradesub egs 
+		SELECT g.grade_name AS gradeName,g.id AS gradeId,s.name AS subjectName,s.id AS subjectId,egs.status AS status,
+		egs.temp_upload AS template,egs.answer_set AS answerSet,egs.task_dispatch AS taskDispatch,egs.id AS egsId, 
+		egs.blank_answer_paper AS answerPaper,egs.blank_questions_paper AS questionsPaper from examgradesub egs 
 		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s on egs.sub_id=s.id where egs.examid=#{examid}
 	</select>
 	
@@ -81,7 +82,7 @@
 	</select>
 	
 	<select id="getGradeStudentCounts" parameterType="Long" resultType="java.util.Map">
-		SELECT count(id) count,gradeId from examinee where examid=#{examid} GROUP BY gradeId;
+		SELECT count(id) count,gradeId from examinee where examid=#{examid} GROUP BY gradeId
 	</select>
 
 	<select id="getSubjectPaperCounts" parameterType="Long" resultType="java.util.Map">
