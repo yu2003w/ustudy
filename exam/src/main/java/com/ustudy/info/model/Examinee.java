@@ -14,23 +14,21 @@ public class Examinee implements Serializable {
 	private String stuName = null;
 	private String stuId = null;
 	private String stuExamId = null;
-	
+
 	private String examId = null;
 	private String schId = null;
 	private String gradeId = null;
-	
+
 	private String classId = null;
 	private String className = null;
-	
-	private String roomId = null;
 
 	public Examinee() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Examinee(String stuName, String stuId, String stuExamId, String examId, String schId, String gradeId,
-			String classId, String className, String roomId) {
+	public Examinee(String stuName, String stuId, String stuExamId, String examId, String schId, 
+			String gradeId,	String classId, String className) {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
@@ -40,11 +38,10 @@ public class Examinee implements Serializable {
 		this.gradeId = gradeId;
 		this.classId = classId;
 		this.className = className;
-		this.roomId = roomId;
 	}
 
-	public Examinee(int id, String stuName, String stuId, String stuExamId, String examId, String schId, String gradeId,
-			String classId, String className, String roomId) {
+	public Examinee(int id, String stuName, String stuId, String stuExamId, String examId, String schId,
+			String gradeId,	String classId, String className) {
 		super();
 		this.id = id;
 		this.stuName = stuName;
@@ -55,7 +52,6 @@ public class Examinee implements Serializable {
 		this.gradeId = gradeId;
 		this.classId = classId;
 		this.className = className;
-		this.roomId = roomId;
 	}
 
 	public int getId() {
@@ -106,14 +102,6 @@ public class Examinee implements Serializable {
 		this.schId = schId;
 	}
 
-	public String getRoomId() {
-		return roomId;
-	}
-
-	public void setRoomId(String roomId) {
-		this.roomId = roomId;
-	}
-
 	public String getClassName() {
 		return className;
 	}
@@ -142,7 +130,7 @@ public class Examinee implements Serializable {
 	public String toString() {
 		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
-				+ ", className=" + className + ", roomId=" + roomId + "]";
+				+ ", className=" + className + "]";
 	}
 
 }

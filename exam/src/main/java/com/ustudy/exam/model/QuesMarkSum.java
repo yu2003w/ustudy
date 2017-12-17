@@ -25,6 +25,13 @@ public class QuesMarkSum implements Serializable {
 	
 	private String progress = null;
 	
+	/*
+	 *  for question has no subs, if score not less than 20, mark this field as true
+	 *  for question has subs, if score of one sub not less than 20, mark this field as true
+	 *  This field determines whether this question could be composed with others for marking
+	 */
+	private boolean composable = false;
+	
 	@JsonIgnore
 	private String quesno = null;
 	@JsonIgnore
@@ -161,12 +168,20 @@ public class QuesMarkSum implements Serializable {
 		this.progress = progress;
 	}
 
+	public boolean isComposable() {
+		return composable;
+	}
+
+	public void setComposable(boolean highScore) {
+		this.composable = highScore;
+	}
+
 	@Override
 	public String toString() {
 		return "QuesMarkSum [questionName=" + questionName + ", questionType=" + questionType + ", avgScore=" + avgScore
-				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", progress=" + progress + ", quesno=" + quesno
-				+ ", startno=" + startno + ", endno=" + endno + ", assignMode=" + assignMode + ", markMode=" + markMode
-				+ ", fullscore=" + fullscore + "]";
+				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", progress=" + progress + ", composable="
+				+ composable + ", quesno=" + quesno + ", startno=" + startno + ", endno=" + endno + ", assignMode="
+				+ assignMode + ", markMode=" + markMode + ", fullscore=" + fullscore + "]";
 	}
 	
 }

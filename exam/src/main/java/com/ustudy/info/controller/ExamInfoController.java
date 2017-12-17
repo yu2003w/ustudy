@@ -44,7 +44,7 @@ public class ExamInfoController {
 				List<String> schL = new ArrayList<String>();
 				schL.add(InfoUtil.retrieveSessAttr("orgId"));
 				ex.setSchIds(schL);
-				logger.debug("createExam(), " + ex.getSchIds().toString());
+				logger.debug("createExam(), populate schIds " + ex.getSchIds().toString());
 			}
 			else {
 				logger.warn("createExam(), no schools specified in request parameter");
@@ -96,7 +96,7 @@ public class ExamInfoController {
 		return res;
 	}
 	
-	@RequestMapping(value="udpate/", method = RequestMethod.POST)
+	@RequestMapping(value="update/", method = RequestMethod.POST)
 	public UResp updateExamInfo(@RequestBody @Valid ExamInfo ei, HttpServletResponse resp) {
 		UResp res = new UResp();
 		if (ei.getId() < 1) {
@@ -104,6 +104,20 @@ public class ExamInfoController {
 			res.setMessage("invalid parameter specified");
 			resp.setStatus(400);
 			return res;
+		}
+		
+		if (ei.getSchIds() == null || ei.getSchIds().isEmpty()) {
+			if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+				List<String> schL = new ArrayList<String>();
+				schL.add(InfoUtil.retrieveSessAttr("orgId"));
+				ei.setSchIds(schL);
+				logger.debug("updateExam(), populate schIds " + ei.getSchIds().toString());
+			}
+			else {
+				logger.warn("updateExam(), no schools specified in request parameter");
+				res.setMessage("parameter invalid");
+				return res;
+			}
 		}
 		
 		try {

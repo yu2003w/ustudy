@@ -210,6 +210,18 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
 					saL = markTaskM.getQuesDiv(mark.getQuesid());
+					// determine whether this question is composable
+					for (SingleAnswer sa:saL) {
+						if (Float.valueOf(sa.getFullscore()) >= 20) {
+							mark.setComposable(true);
+							break;
+						}
+					}
+				}
+				else {
+					if (Float.valueOf(mark.getFullscore()) >= 20) {
+						mark.setComposable(true);
+					}
 				}
 				ba.setSteps(saL);
 				
