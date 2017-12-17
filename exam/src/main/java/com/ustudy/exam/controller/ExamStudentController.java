@@ -36,15 +36,15 @@ public class ExamStudentController {
 	 * @param response
 	 * @return 考生信息
 	 */
-	@RequestMapping(value = "/students/{examId}", method = RequestMethod.GET)
-	public Map getExamStudents(@PathVariable Long examId, @RequestParam(required=false) Long classId, @RequestParam(required=false) String text) {
+	@RequestMapping(value = "/students/{examId}/{gradeId}", method = RequestMethod.GET)
+	public Map getExamStudents(@PathVariable Long examId, @PathVariable Long gradeId, @RequestParam(required=false) Long classId, @RequestParam(required=false) String text) {
 		
 		logger.debug("getExamStudents().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamStudents(examId, classId, text));
+		result.put("data", service.getExamStudents(examId, gradeId, classId, text));
 
 		return result;
 	}
@@ -61,15 +61,15 @@ public class ExamStudentController {
 	 * @param text 姓名或考号
 	 * @return
 	 */
-    @RequestMapping(value = "/students/miss/{egsId}", method = RequestMethod.GET)
-    public Map getMissExamStudents(@PathVariable Long egsId, @RequestParam(required=false) Long classId, @RequestParam(required=false) String text) {
+    @RequestMapping(value = "/students/miss/{egsId}/{gradeId}", method = RequestMethod.GET)
+    public Map getMissExamStudents(@PathVariable Long egsId, @PathVariable Long gradeId, @RequestParam(required=false) Long classId, @RequestParam(required=false) String text) {
         
         logger.debug("getMissExamStudents().");
         
         Map result = new HashMap<>();
 
         result.put("success", true);
-        result.put("data", service.getMissExamStudents(egsId, classId, text));
+        result.put("data", service.getMissExamStudents(egsId, gradeId, classId, text));
 
         return result;
     }

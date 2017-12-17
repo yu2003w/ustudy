@@ -47,12 +47,12 @@ public class ExamStudentServiceImpl implements ExamStudentService {
 		return array;
 	}
 
-    public Map<String, Object> getExamStudents(Long examId, Long classId, String studentName) {
+    public Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName) {
         
         Map<String, Object> result = new HashMap<>();
         
         try {
-            List<Map<String, Object>> students = examStudentDaompl.getExamStudents(examId, classId, studentName);
+            List<Map<String, Object>> students = examStudentDaompl.getExamStudents(examId, gradeId, classId, studentName);
             Set<Map<String, Object>> classes = getClasses(students);
             result.put("students", students);
             result.put("classes", classes);
@@ -86,12 +86,12 @@ public class ExamStudentServiceImpl implements ExamStudentService {
         return classes;
     }
 
-    public Map<String, Object> getMissExamStudents(Long egsId, Long classId, String studentName) {
+    public Map<String, Object> getMissExamStudents(Long egsId, Long gradeId, Long classId, String studentName) {
         
         Map<String, Object> result = new HashMap<>();
         
         try {
-            List<Map<String, Object>> students = examStudentDaompl.getMissExamStudents(egsId, classId, studentName);
+            List<Map<String, Object>> students = examStudentDaompl.getMissExamStudents(egsId, gradeId, classId, studentName);
             Set<Map<String, Object>> classes = getClasses(students);
             result.put("students", students);
             result.put("classes", classes);

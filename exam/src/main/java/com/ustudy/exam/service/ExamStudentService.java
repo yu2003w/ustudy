@@ -8,8 +8,8 @@ public interface ExamStudentService {
 
 	JSONArray getStudentInfoByExamGrade(Long examId, Long gradeId);
 	
-	Map<String, Object> getExamStudents(Long examId, Long classId, String studentName);
+	Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName);
 	
-	Map<String, Object> getMissExamStudents(Long egsId, Long classId, String studentName);
+	Map<String, Object> getMissExamStudents(Long egsId, Long gradeId, Long classId, String studentName);
 	
 }
