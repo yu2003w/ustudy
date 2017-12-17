@@ -86,4 +86,21 @@ public class ExamStudentServiceImpl implements ExamStudentService {
         return classes;
     }
 
+    public Map<String, Object> getMissExamStudents(Long egsId, Long classId, String studentName) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            List<Map<String, Object>> students = examStudentDaompl.getMissExamStudents(egsId, classId, studentName);
+            Set<Map<String, Object>> classes = getClasses(students);
+            result.put("students", students);
+            result.put("classes", classes);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return result;
+    }
+
 }

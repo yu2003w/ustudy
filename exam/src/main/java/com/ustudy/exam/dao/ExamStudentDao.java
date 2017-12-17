@@ -15,4 +15,6 @@ public interface ExamStudentDao {
 	
 	List<Map<String, Object>> getExamStudents(@Param("examId")Long examId, @Param("classId")Long classId, @Param("studentName")String studentName);
 	
+	List<Map<String, Object>> getMissExamStudents(@Param("egsId")Long egsId, @Param("classId")Long classId, @Param("studentName")String studentName);
+	
 }

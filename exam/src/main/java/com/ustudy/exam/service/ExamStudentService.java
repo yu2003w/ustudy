@@ -10,4 +10,6 @@ public interface ExamStudentService {
 	
 	Map<String, Object> getExamStudents(Long examId, Long classId, String studentName);
 	
+	Map<String, Object> getMissExamStudents(Long egsId, Long classId, String studentName);
+	
 }

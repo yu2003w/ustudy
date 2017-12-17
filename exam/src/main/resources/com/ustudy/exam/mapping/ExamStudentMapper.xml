@@ -32,5 +32,19 @@
 		</if>
 		ORDER BY ee.id
 	</select>
+	
+	<select id="getMissExamStudents" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT ee.id as studentId,ee.name AS studentName,ee.exam_code AS examCode,cl.cls_name AS className,cl.id AS classId 
+		from examinee ee LEFT JOIN class cl ON ee.class_id=cl.id 
+		where (ee.exam_code IN (SELECT exam_code from paper where paper_status='1' and exam_grade_sub_id=#{egsId})
+		OR ee.exam_code NOT IN (SELECT exam_code FROM paper where exam_grade_sub_id=#{egsId}))
+		<if test="classId !=null and classId > 0">
+		AND cl.id=#{classId}
+		</if>
+		<if test="studentName !=null and studentName != ''">
+		AND (ee.`name` LIKE CONCAT('%',#{studentName, jdbcType=VARCHAR},'%') or ee.exam_code LIKE CONCAT('%',#{studentName, jdbcType=VARCHAR},'%'))
+		</if>
+		ORDER BY ee.id
+	</select>
 
 </mapper>
