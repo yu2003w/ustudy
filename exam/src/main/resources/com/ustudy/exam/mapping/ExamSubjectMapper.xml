@@ -13,9 +13,9 @@
         <result property="stuNum" column="stu_num"/>
         <result property="teacNum" column="teac_num"/>
         <result property="examPaper" column="exam_paper"/>
-        <result property="examAnswer" column="mark_status"/>
+        <result property="examAnswer" column="status"/>
         <result property="examPaperNum" column="exam_paper_num"/>
-        <result property="template" column="template"/>
+        <result property="template" column="temp_upload"/>
         <result property="objItemNum" column="obj_item_num"/>
         <result property="subItemNum" column="sub_item_num"/>
         <result property="taskDispatch" column="task_dispatch"/>
@@ -64,10 +64,10 @@
 	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
 		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
-		 AND egs.grade_id = #{gradeId} AND egs.mark_status = #{markingStatus}
+		 AND egs.grade_id = #{gradeId} AND egs.status = #{markingStatus}
 		<choose>
 			<when test="templateStatus !=null and templateStatus != '-1'">
-			 AND egs.template=#{templateStatus}
+			 AND egs.temp_upload=#{templateStatus}
 			</when>
 		</choose>
 	</select>
@@ -97,7 +97,7 @@
 
 	<!-- 保存原始模板信息-->
 	<update id="saveOriginalData" parameterType="java.util.Map">
-		UPDATE examgradesub SET template=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+		UPDATE examgradesub SET temp_upload=1, blank_answer_paper=#{answerPaper}, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
 	
 	<update id="isAanswerSeted" parameterType="Long">

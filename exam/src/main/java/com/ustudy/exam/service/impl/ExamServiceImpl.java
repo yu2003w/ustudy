@@ -1,5 +1,6 @@
 package com.ustudy.exam.service.impl;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
@@ -21,7 +22,7 @@ import net.sf.json.JSONObject;
 @Service
 public class ExamServiceImpl implements ExamService {
     
-    private static final Logger logger = LogManager.getLogger(ExamServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExamServiceImpl.class);
     
     @Resource
     private ExamDao examDaoImpl;
@@ -82,15 +83,18 @@ public class ExamServiceImpl implements ExamService {
 
     public JSONArray getExamSummary(Long examId) {
         
+        logger.info("getExamSummary -> examId:" + examId);
+        
         List<Map<String, Object>> examSubjects = examDaoImpl.getExamSummary(examId);
         
         if(null != examSubjects && examSubjects.size() > 0){
             
             Map<Long, Long> gradeStudentCounts = getGradeStudentCounts(examId);
             Map<Long, Long> subjectPaperCounts = getSubjectPaperCounts(examId);
+            Map<Long, Long> subjectAnswers = getSubjectAnswers(examId);
             Map<Long, Map<String, Long>> subjectQuestions =  getSubjectQuestions(examId);
             
-            return summary(examSubjects, gradeStudentCounts, subjectPaperCounts, subjectQuestions);
+            return summary(examSubjects, gradeStudentCounts, subjectPaperCounts, subjectAnswers, subjectQuestions);
         }
         
         return null;
@@ -116,6 +120,20 @@ public class ExamServiceImpl implements ExamService {
         
         List<Map<String, Object>> subjectPaperCounts = examDaoImpl.getSubjectPaperCounts(examId);       
         for (Map<String, Object> map : subjectPaperCounts) {
+            long egsId = (int) map.get("egsId");
+            long count = (long) map.get("count");
+            counts.put(egsId, count);
+        }
+        
+        return counts;
+    }
+    
+    private Map<Long, Long> getSubjectAnswers(Long examId){
+        
+        Map<Long, Long> counts =  new HashMap<>();
+        
+        List<Map<String, Object>> subjectAnswers = examDaoImpl.getSubjectAnswers(examId);       
+        for (Map<String, Object> map : subjectAnswers) {
             long egsId = (int) map.get("egsId");
             long count = (long) map.get("count");
             counts.put(egsId, count);
@@ -160,22 +178,36 @@ public class ExamServiceImpl implements ExamService {
             }else{
                 Map<String, Long> m = counts.get(egsId);
                 long subjectCount = 0;
+                long answerCount = 0;
                 long subjectScore = 0;
                 if(null == m){
                     m = new HashMap<>();
                 }else {
                     if(null != m.get("subjectCount")){
                         subjectCount = m.get("subjectCount");
+                        answerCount = m.get("answerCount");
                     }
                     if(null != m.get("subjectScore")){
                         subjectScore = m.get("subjectScore");
                     }
                 }
+                
                 int count = endno - startno + 1;
                 subjectCount += count;
                 subjectScore += count*score;
                 
+                String markMode = "单评";
+                if(null != m.get("markMode")){
+                    markMode = map.get("markMode").toString();
+                }
+                if(markMode.equals("双评")){
+                    answerCount += count * 2;
+                }else {
+                    answerCount += count;
+                }
+                
                 m.put("subjectCount", subjectCount);
+                m.put("answerCount", answerCount);
                 m.put("subjectScore", subjectScore);
                 
                 counts.put(egsId, m);
@@ -185,7 +217,7 @@ public class ExamServiceImpl implements ExamService {
         return counts;
     }
     
-    private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts, Map<Long, Long> subjectPaperCounts, Map<Long, Map<String, Long>> subjectQuestions){
+    private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts, Map<Long, Long> subjectPaperCounts, Map<Long, Long> subjectAnswers, Map<Long, Map<String, Long>> subjectQuestions){
         
         JSONArray result = new JSONArray();
         JSONArray array = new JSONArray();
@@ -195,12 +227,14 @@ public class ExamServiceImpl implements ExamService {
         for (Map<String, Object> map : examSubjects) {
             long gradeId = (int) map.get("gradeId");
             String gradeName = String.valueOf(map.get("gradeName"));
+            String examDate = String.valueOf(map.get("examDate"));
             List<JSONObject> list = subjects.get(gradeId);          
             if(null == list){
                 list = new ArrayList<>();
                 JSONObject object = new JSONObject();
                 object.put("gradeId", gradeId);
                 object.put("gradeName", gradeName);
+                object.put("examDate", examDate);
                 
                 long count = 0;
                 if(null != gradeStudentCounts.get(gradeId)){
@@ -214,10 +248,26 @@ public class ExamServiceImpl implements ExamService {
             JSONObject subject = new JSONObject();
             subject.put("subjectName", map.get("subjectName"));
             subject.put("subjectId", map.get("subjectId"));
-            subject.put("markStatus", map.get("markStatus"));
+            subject.put("status", map.get("status"));
             subject.put("template", map.get("template"));
             subject.put("answerSet", map.get("answerSet"));
             subject.put("taskDispatch", map.get("taskDispatch"));
+            
+            String answerPaper = "";
+            if(null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")){
+                answerPaper = "";
+            }else {
+                answerPaper = map.get("answerPaper").toString();
+            }
+            subject.put("answerPaper", answerPaper);
+            
+            String questionsPaper = "";
+            if(null == map.get("questionsPaper") || map.get("questionsPaper").toString().equals("null")){
+                questionsPaper = "";
+            }else {
+                questionsPaper = map.get("questionsPaper").toString();
+            }
+            subject.put("questionsPaper", questionsPaper);
             
             long egsId = 0;
             if(null != map.get("egsId")){
@@ -235,6 +285,7 @@ public class ExamServiceImpl implements ExamService {
             long objectScore = 0;
             long subjectCount = 0;
             long subjectScore = 0;
+            long answerCount = 0;
             
             Map<String, Long> questions = subjectQuestions.get(egsId);
             if(null != questions){
@@ -242,12 +293,25 @@ public class ExamServiceImpl implements ExamService {
                 objectScore = questions.get("objectScore")==null?0:questions.get("objectScore");
                 subjectCount = questions.get("subjectCount")==null?0:questions.get("subjectCount");
                 subjectScore = questions.get("subjectScore")==null?0:questions.get("subjectScore");
+                answerCount = questions.get("answerCount")==null?0:questions.get("answerCount");
             }
             
             subject.put("objectCount", objectCount);
             subject.put("objectScore", objectScore);
             subject.put("subjectCount", subjectCount);
             subject.put("subjectScore", subjectScore);
+            
+            answerCount = paperCount * answerCount;
+            long markedCount = 0;
+            if(null != subjectAnswers.get(egsId)){
+                markedCount = subjectAnswers.get(egsId);
+            }
+            if(answerCount == 0 || markedCount == 0){
+                subject.put("progressRate", 0);
+            }else{
+                float progressRate = (float)markedCount / answerCount * 100;                
+                subject.put("progressRate", new DecimalFormat("###.##").format(progressRate));
+            }
             
             list.add(subject);
             
@@ -263,6 +327,7 @@ public class ExamServiceImpl implements ExamService {
                 
                 robject.put("gradeId", gradeId);
                 robject.put("gradeName", object.getString("gradeName"));
+                robject.put("examDate", object.getString("examDate"));
                 robject.put("studentCount", object.getLong("studentCount"));
                 robject.put("subjects", subjects.get(gradeId));
                 
@@ -272,4 +337,5 @@ public class ExamServiceImpl implements ExamService {
         
         return result;
     }
+    
 }
