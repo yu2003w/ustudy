@@ -252,8 +252,22 @@ public class ExamServiceImpl implements ExamService {
             subject.put("template", map.get("template"));
             subject.put("answerSet", map.get("answerSet"));
             subject.put("taskDispatch", map.get("taskDispatch"));
-            subject.put("answerPaper", map.get("answerPaper")==null?"":map.get("answerPaper"));
-            subject.put("questionsPaper", map.get("questionsPaper")==null?"":map.get("questionsPaper"));
+            
+            String answerPaper = "";
+            if(null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")){
+                answerPaper = "";
+            }else {
+                answerPaper = map.get("answerPaper").toString();
+            }
+            subject.put("answerPaper", answerPaper);
+            
+            String questionsPaper = "";
+            if(null == map.get("questionsPaper") || map.get("questionsPaper").toString().equals("null")){
+                questionsPaper = "";
+            }else {
+                questionsPaper = map.get("questionsPaper").toString();
+            }
+            subject.put("questionsPaper", questionsPaper);
             
             long egsId = 0;
             if(null != map.get("egsId")){
