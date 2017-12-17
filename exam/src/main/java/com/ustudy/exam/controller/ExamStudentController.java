@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.service.ExamStudentService;
@@ -39,14 +40,14 @@ public class ExamStudentController {
 	 * @return 考生信息
 	 */
 	@RequestMapping(value = "/students/{examId}", method = RequestMethod.GET)
-	public Map getExamStudents(@PathVariable Long examId, HttpServletRequest request, HttpServletResponse response) {
+	public Map getExamStudents(@PathVariable Long examId, @RequestParam(required=false) Long classId, @RequestParam(required=false) String text, HttpServletRequest request, HttpServletResponse response) {
 		
 		logger.debug("getExamStudents().");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamStudents(examId));
+		result.put("data", service.getExamStudents(examId, classId, text));
 
 		return result;
 	}
