@@ -215,12 +215,7 @@ public class ClientServiceImpl implements ClientService {
 
         logger.debug("originalData: " + data);
 
-        JSONObject originalData = JSONObject.fromObject(data);
-        String xmlServerPath = "";
-        if (null != originalData.get("AnswerSheetXmlPath")) {
-            xmlServerPath = originalData.getString("AnswerSheetXmlPath");
-        }
-        examSubjectDaoImpl.saveOriginalData(id, xmlServerPath, data);
+        JSONObject originalData = saveOriginalData(id, data);
 
         cleanQuestion(id);
         Map<String, Long> quesAnswersId = getQuesAnswer(id, originalData);
@@ -230,6 +225,45 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return false;
+    }
+    
+    private JSONObject saveOriginalData(Long id, String data){
+        
+        JSONObject originalData = null;
+        try {
+            originalData = JSONObject.fromObject(data);
+            String xmlServerPath = "";
+            if (null != originalData.get("AnswerSheetXmlPath")) {
+                xmlServerPath = originalData.getString("AnswerSheetXmlPath");
+            }
+            
+            examSubjectDaoImpl.saveOriginalData(id, getFileNames(originalData), xmlServerPath, data);
+        } catch (Exception e) {
+            logger.error("examgradesub 表更新失败， " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return originalData;
+    }
+    
+    private String getFileNames(JSONObject originalData){
+        
+        StringBuffer fileNames = new StringBuffer();
+        if (null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")) {
+            JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
+            for (int i = 0; i < pages.size(); i++) {
+                JSONObject page = pages.getJSONObject(i);
+                if (null != page.get("fileName")) {
+                    if (fileNames.length() != 0) {
+                        fileNames.append(",");
+                    }
+                    fileNames.append(page.getString("fileName"));
+                }
+            }
+        }
+        
+        return fileNames.toString();
+        
     }
 
     /**
@@ -494,24 +528,27 @@ public class ClientServiceImpl implements ClientService {
                 data = data.replace("null", "\"\"");
             }
             JSONObject originalData = JSONObject.fromObject(data);
-            StringBuffer fileNames = new StringBuffer();
-            if (null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")) {
-                JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
-                for (int i = 0; i < pages.size(); i++) {
-                    JSONObject page = pages.getJSONObject(i);
-                    if (null != page.get("fileName")) {
-                        if (fileNames.length() != 0) {
-                            fileNames.append(",");
-                        }
-                        fileNames.append(page.getString("fileName"));
-                    }
-                }
-            }
+            String fileNames = getFileNames(originalData);
 
-            result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper().equals("null") ? "" : examSubject.getBlankAnswerPaper());
-            result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null") ? "" : examSubject.getBlankQuestionsPaper());
-            result.put("AnswerSheetPicPath", fileNames.toString());
-            result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null") ? "" : examSubject.getXmlServerPath());
+            String examQAPicPath = examSubject.getBlankAnswerPaper();
+            if(null == examQAPicPath || examQAPicPath.equals("null")){
+                examQAPicPath = "";
+            }
+            result.put("ExamQAPicPath", examQAPicPath);
+            
+            String examPaperPicPath = examSubject.getBlankQuestionsPaper();
+            if(null == examPaperPicPath || examPaperPicPath.equals("null")){
+                examPaperPicPath = "";
+            }
+            result.put("ExamPaperPicPath", examPaperPicPath);
+            
+            String answerSheetXMLPath = examSubject.getXmlServerPath();
+            if(null == answerSheetXMLPath || answerSheetXMLPath.equals("null")){
+                answerSheetXMLPath = "";
+            }
+            result.put("AnswerSheetXMLPath", answerSheetXMLPath);
+            
+            result.put("AnswerSheetPicPath", fileNames);
             result.put("AnswerSheetXML", data);
             result.put("Id", "" + examSubject.getId());
         }
@@ -532,24 +569,27 @@ public class ClientServiceImpl implements ClientService {
                 data = data.replace("null", "\"\"");
             }
             JSONObject originalData = JSONObject.fromObject(data);
-            StringBuffer fileNames = new StringBuffer();
-            if (null != originalData.get("TemplateInfo") && null != originalData.getJSONObject("TemplateInfo").get("pages")) {
-                JSONArray pages = originalData.getJSONObject("TemplateInfo").getJSONArray("pages");
-                for (int i = 0; i < pages.size(); i++) {
-                    JSONObject page = pages.getJSONObject(i);
-                    if (null != page.get("fileName")) {
-                        if (fileNames.length() != 0) {
-                            fileNames.append(",");
-                        }
-                        fileNames.append(page.getString("fileName"));
-                    }
-                }
-            }
+            String fileNames = getFileNames(originalData);
 
-            result.put("ExamQAPicPath", examSubject.getBlankAnswerPaper().equals("null") ? "" : examSubject.getBlankAnswerPaper());
-            result.put("ExamPaperPicPath", examSubject.getBlankQuestionsPaper().equals("null") ? "" : examSubject.getBlankQuestionsPaper());
-            result.put("AnswerSheetPicPath", fileNames.toString());
-            result.put("AnswerSheetXMLPath", examSubject.getXmlServerPath().equals("null") ? "" : examSubject.getXmlServerPath());
+            String examQAPicPath = examSubject.getBlankAnswerPaper();
+            if(null == examQAPicPath || examQAPicPath.equals("null")){
+                examQAPicPath = "";
+            }
+            result.put("ExamQAPicPath", examQAPicPath);
+            
+            String examPaperPicPath = examSubject.getBlankQuestionsPaper();
+            if(null == examPaperPicPath || examPaperPicPath.equals("null")){
+                examPaperPicPath = "";
+            }
+            result.put("ExamPaperPicPath", examPaperPicPath);
+            
+            String answerSheetXMLPath = examSubject.getXmlServerPath();
+            if(null == answerSheetXMLPath || answerSheetXMLPath.equals("null")){
+                answerSheetXMLPath = "";
+            }
+            result.put("AnswerSheetXMLPath", answerSheetXMLPath);
+            
+            result.put("AnswerSheetPicPath", fileNames);
             result.put("AnswerSheetXML", data);
             result.put("Id", "" + examSubject.getId());
         }

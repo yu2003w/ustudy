@@ -97,7 +97,7 @@
 
 	<!-- 保存原始模板信息-->
 	<update id="saveOriginalData" parameterType="java.util.Map">
-		UPDATE examgradesub SET temp_upload=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+		UPDATE examgradesub SET temp_upload=1, blank_answer_paper=#{answerPaper}, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
 	
 	<update id="isAanswerSeted" parameterType="Long">

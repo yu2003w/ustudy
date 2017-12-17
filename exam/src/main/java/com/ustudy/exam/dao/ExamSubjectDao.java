@@ -26,7 +26,7 @@ public interface ExamSubjectDao {
 	
 	void saveBlankQuestionsPaper(@Param("id")Long id, @Param("fileName") String fileName);
 
-	void saveOriginalData(@Param("id")Long id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
+	void saveOriginalData(@Param("id")Long id, @Param("answerPaper")String answerPaper, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
 	void isAanswerSeted(Long id);
 	
