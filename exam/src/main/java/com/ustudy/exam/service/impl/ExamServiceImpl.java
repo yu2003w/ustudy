@@ -248,7 +248,7 @@ public class ExamServiceImpl implements ExamService {
             JSONObject subject = new JSONObject();
             subject.put("subjectName", map.get("subjectName"));
             subject.put("subjectId", map.get("subjectId"));
-            subject.put("markStatus", map.get("markStatus"));
+            subject.put("status", map.get("status"));
             subject.put("template", map.get("template"));
             subject.put("answerSet", map.get("answerSet"));
             subject.put("taskDispatch", map.get("taskDispatch"));
