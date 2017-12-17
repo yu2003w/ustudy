@@ -146,7 +146,9 @@ public class PaperCache {
 		int num = mtcL.size()/2;
 		List<MarkTaskCache> mfL = new ArrayList<MarkTaskCache>();
 		for (int i = 0; i < num; i++) {
-			if (Math.abs(mtcL.get(i).getScore() - mtcL.get(i+num).getScore()) >= 5) {
+			//make sure that related papers are marked
+			if ((mtcL.get(i).getScore() != -1 && mtcL.get(i+num).getScore() != -1) &&
+					(Math.abs(mtcL.get(i).getScore() - mtcL.get(i+num).getScore()) >= 5)) {
 				//logger.debug("popFinalMarkIds(),  mtcL[" + i +"] -> " + mtcL.get(i).toString() + 
 				//		", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
 				MarkTaskCache mt = new MarkTaskCache(mtcL.get(i).getPaperid(), mtcL.get(i).getImg());

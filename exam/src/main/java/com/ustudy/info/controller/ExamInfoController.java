@@ -35,6 +35,7 @@ public class ExamInfoController {
 		if (ex == null) {
 			logger.warn("createExam(), received parameter is not valid");
 			res.setMessage("parameter invalid");
+			resp.setStatus(400);
 			return res;
 		}
 		
@@ -95,4 +96,24 @@ public class ExamInfoController {
 		return res;
 	}
 	
+	@RequestMapping(value="udpate/", method = RequestMethod.POST)
+	public UResp updateExamInfo(@RequestBody @Valid ExamInfo ei, HttpServletResponse resp) {
+		UResp res = new UResp();
+		if (ei.getId() < 1) {
+			logger.error("updateExamInfo(), invalid id->" + ei.getId());
+			res.setMessage("invalid parameter specified");
+			resp.setStatus(400);
+			return res;
+		}
+		
+		try {
+			exS.updateExamInfo(ei);
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("updateExamInfo(), failed to update examination info with exception->" + e.getMessage());
+			res.setMessage("failed to update examination info with exception->" + e.getMessage());
+			resp.setStatus(500);
+		}
+		return res;
+	}
 }

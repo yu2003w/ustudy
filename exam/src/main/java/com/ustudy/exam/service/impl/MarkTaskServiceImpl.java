@@ -263,10 +263,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2);
 							}
 							re.setFirstMarkImgs(fmRec);
+							j += 2;
 						}
 					}
 				}
-				j += 2;
+				
 				// need to populate and set mark img for first marks
 				
 				ba.setRegions(qreL);

@@ -7,5 +7,7 @@ public interface ExamInfoService {
 	public void createExamInfo(ExamInfo ex);
 	
 	public void deleteExamInfo(int id);
+
+	public void updateExamInfo(ExamInfo exam);
 	
 }

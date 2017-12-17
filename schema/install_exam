@@ -138,7 +138,7 @@ stuno varchar(20) DEFAULT NULL COMMENT '学号',
 room int(11) DEFAULT NULL COMMENT '考场',
 paper_status char(1) DEFAULT '1' COMMENT '考生状态（0：缺考，1：正常）',
 PRIMARY KEY (id),
-UNIQUE KEY stuno (exam_code),
+UNIQUE KEY (exam_code, examid),
 KEY name (name,exam_code,gradeid,schid),
 KEY gradeid (gradeid),
 KEY schid (schid)

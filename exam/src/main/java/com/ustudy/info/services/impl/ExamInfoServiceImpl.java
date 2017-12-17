@@ -57,6 +57,16 @@ public class ExamInfoServiceImpl implements ExamInfoService {
 
 	@Override
 	@Transactional
+	public void updateExamInfo(ExamInfo exam) {
+		//delete fristly then insert again
+		deleteExamInfo(exam.getId());
+		logger.debug("updateExamInfo(), delete completed before update");
+		createExamInfo(exam);
+		logger.debug("updateExamInfo(), created examination info again for update");
+	}
+	
+	@Override
+	@Transactional
 	public void deleteExamInfo(int id) {
 		int ret = exM.deleteExamInfo(id);
 		if (ret != 1) {

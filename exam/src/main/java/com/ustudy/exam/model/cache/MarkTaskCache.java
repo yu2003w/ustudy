@@ -27,7 +27,8 @@ public class MarkTaskCache implements Serializable {
 	 */
 	private int status = 0;
 	
-	private float score = 0;
+	// default value -1 indicates not marked yet
+	private float score = -1;
 	
 	// index of papers in cache should be finally marked
 	private int seq = 0;
