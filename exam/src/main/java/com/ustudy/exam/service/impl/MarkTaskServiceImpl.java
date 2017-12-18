@@ -213,14 +213,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					// determine whether this question is composable
 					for (SingleAnswer sa:saL) {
 						if (Float.valueOf(sa.getFullscore()) >= 20) {
-							mark.setComposable(true);
+							mark.setComposable(false);
 							break;
 						}
 					}
 				}
 				else {
 					if (Float.valueOf(mark.getFullscore()) >= 20) {
-						mark.setComposable(true);
+						mark.setComposable(false);
 					}
 				}
 				ba.setSteps(saL);

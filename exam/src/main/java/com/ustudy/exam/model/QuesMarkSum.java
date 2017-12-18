@@ -30,7 +30,7 @@ public class QuesMarkSum implements Serializable {
 	 *  for question has subs, if score of one sub not less than 20, mark this field as true
 	 *  This field determines whether this question could be composed with others for marking
 	 */
-	private boolean composable = false;
+	private boolean composable = true;
 	
 	@JsonIgnore
 	private String quesno = null;
