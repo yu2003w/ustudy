@@ -18,20 +18,20 @@ public class ExamApiTest {
 //        System.out.println("--------------------exams-------------------");
 //        System.out.println();
         
-//        updateStatus1();
-//        System.out.println();
-//        System.out.println("--------------------updateStatus1-------------------");
-//        System.out.println();
+        updateStatus1();
+        System.out.println();
+        System.out.println("--------------------updateStatus1-------------------");
+        System.out.println();
         
 //        updateStatus2();
 //        System.out.println();
 //        System.out.println("--------------------updateStatus2-------------------");
 //        System.out.println();
         
-        getExamStudents();
-        System.out.println();
-        System.out.println("--------------------getExamStudents-------------------");
-        System.out.println();
+//        getExamStudents();
+//        System.out.println();
+//        System.out.println("--------------------getExamStudents-------------------");
+//        System.out.println();
 
         System.out.println("--------------- " + (System.currentTimeMillis() - t1));
     }

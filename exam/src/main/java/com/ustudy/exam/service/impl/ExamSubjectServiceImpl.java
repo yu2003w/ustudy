@@ -1,5 +1,6 @@
 package com.ustudy.exam.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -128,6 +129,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return false;
@@ -155,7 +157,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			long studentId = objs.getKey();
 			subscore.setStuid(studentId);
 			float objScore = objs.getValue();
-			float subjScore = subjScores.get(studentId);
+			float subjScore = 0;
+			if(null != subjScores.get(studentId)){
+			    subjScore = subjScores.get(studentId);
+			}
 			float score = objScore + subjScore;
 			subscore.setScore(score);
 			
@@ -175,6 +180,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					studentSubscore.setRank(index);
 				}
 			}
+			scoreDaoImpl.deleteStudentSubscores(egsId);
 			scoreDaoImpl.insertStudentSubscores(scores);
 		}
 	}
@@ -186,9 +192,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		List<Map<String, Object>> scores = daoImpl.getExamSubjectObjScores(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("objScore")) {
-				long studentId = (long) map.get("id");
-				float score = (float) map.get("objScore");
-				result.put(studentId, score);
+				long studentId = (int) map.get("id");
+				BigDecimal score = (BigDecimal) map.get("objScore");
+				result.put(studentId, score.floatValue());
 			}
 		}
 
@@ -205,8 +211,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		List<Map<String, Object>> scores = daoImpl.getExamSubjectSubjScores(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("quesid")) {
-				long studentId = (long) map.get("id");
-				long quesid = (long) map.get("quesid");
+				long studentId = (int) map.get("id");
+				long quesid = (int) map.get("quesid");
 				Map<Long, List<Map<String, Object>>> questions = questScores.get(studentId);
 				if (null == questions) {
 					questions = new HashMap<>();
@@ -271,7 +277,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		List<Map<String, Object>> scores = daoImpl.getExamSubjectMarkMode(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("markMode")) {
-				long questionId = (long) map.get("id");
+				long questionId = (int) map.get("id");
 				String markMode = map.get("markMode").toString();
 				result.put(questionId, markMode);
 			}
