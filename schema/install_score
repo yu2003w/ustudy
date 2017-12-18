@@ -4,12 +4,12 @@ create table if not exists ustudy.stusubscore (
 id INT NOT NULL AUTO_INCREMENT,
 stuid INT NOT NULL,
 exam_grade_sub_id INT NOT NULL,
-score INT,
-rank INT,
+score float(3,2) DEFAULT '0.00',
+rank int(11) DEFAULT '0',
 PRIMARY KEY(id),
 INDEX (stuid, exam_grade_sub_id),
 FOREIGN KEY (stuid)
-    REFERENCES ustudy.student(id)
+    REFERENCES ustudy.examinee(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)

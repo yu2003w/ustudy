@@ -6,25 +6,35 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.ustudy.exam.model.StudentSubscore;
 
 public class ScoreApiTest {
 
 	public static void main(String[] args) {
 
-		long t1 =  System.currentTimeMillis();
+		long t1 = System.currentTimeMillis();
+
+//		recalculateScore();
+//		System.out.println();
+//		System.out.println("--------------------recalculateScore-------------------");
+//		System.out.println();
 		
-		recalculateScore();
-		 System.out.println();
-		 System.out.println("--------------------recalculateScore-------------------");
-		 System.out.println();
-		
+		sort();
+		System.out.println();
+		System.out.println("--------------------sort-------------------");
+		System.out.println();
+
 		System.out.println("--------------- " + (System.currentTimeMillis() - t1));
 	}
 
 	/**
 	 * 
-	 * recalculateScore[單題答案修改重新计算分数接口]
-	 * 创建人:  dulei
+	 * recalculateScore[單題答案修改重新计算分数接口] 
+	 * 创建人: dulei 
 	 * 创建时间: 2017年12月11日 下午10:24:55
 	 *
 	 * @Title: recalculateScore
@@ -42,9 +52,9 @@ public class ScoreApiTest {
 			httpConnection.setRequestMethod("POST");
 			httpConnection.setRequestProperty("Content-Type", "application/json");
 
-//			OutputStream outputStream = httpConnection.getOutputStream();
-//			outputStream.write(parameters.getBytes());
-//			outputStream.flush();
+			// OutputStream outputStream = httpConnection.getOutputStream();
+			// outputStream.write(parameters.getBytes());
+			// outputStream.flush();
 
 			if (httpConnection.getResponseCode() != 200) {
 				throw new RuntimeException(
@@ -70,5 +80,20 @@ public class ScoreApiTest {
 		}
 
 	}
-	
+
+	public static void sort() {
+
+		List<StudentSubscore> subscores = new ArrayList<>();
+
+		for (int i = 0; i < 10; i++) {
+			StudentSubscore subscore = new StudentSubscore();
+			subscore.setScore(Float.valueOf(i));
+			subscores.add(subscore);
+		}
+
+		Collections.sort(subscores);
+
+		System.out.println(subscores.size());
+	}
+
 }
