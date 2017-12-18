@@ -127,5 +127,21 @@
 		</if>
 		WHERE examid=#{examId} AND grade_id=#{gradeId} AND sub_id=#{subjectId}
 	</update>
+	
+	<select id="getExamSubjectObjScores" parameterType="Long" resultMap="java.util.Map">
+		SELECT SUM(oa.score) objScore,e.id FROM obj_answer oa 
+		LEFT JOIN paper p on oa.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
+		WHERE p.exam_grade_sub_id=#{egsId} GROUP BY e.id
+	</select>
+	
+	<select id="getExamSubjectSubjScores" parameterType="Long" resultMap="java.util.Map">
+		SELECT e.id,a.quesid,a.isviewed,a.isfinal,a.score from answer a
+		LEFT JOIN paper p on a.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
+		WHERE p.exam_grade_sub_id=#{egsId} ORDER BY e.id,a.quesid
+	</select>
+	
+	<select id="getExamSubjectMarkMode" parameterType="Long" resultMap="java.util.Map">
+		SELECT id,mark_mode AS markMode from question where exam_grade_sub_id=#{egsId}
+	</select>
 
 </mapper>
