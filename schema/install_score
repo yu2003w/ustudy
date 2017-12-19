@@ -1,18 +1,37 @@
 # create table for score analytics
 set names utf8;
-create table if not exists ustudy.stusubscore (
+create table if not exists ustudy.subscore (
 id INT NOT NULL AUTO_INCREMENT,
 stuid INT NOT NULL,
 exam_grade_sub_id INT NOT NULL,
-score float(3,2) DEFAULT '0.00',
+score float(4,1) DEFAULT '0.0',
 rank int(11) DEFAULT '0',
 PRIMARY KEY(id),
-INDEX (stuid, exam_grade_sub_id),
+UNIQUE KEY (stuid, exam_grade_sub_id),
+INDEX (rank),
 FOREIGN KEY (stuid)
     REFERENCES ustudy.examinee(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+# store total score and rank information for student in one examination
+create table if not exists ustudy.exameescore (
+id INT NOT NULL AUTO_INCREMENT,
+examee_id INT NOT NULL,
+exam_id INT NOT NULL,
+score float(4,1) DEFAULT 0,
+rank INT (11) DEFAULT 0,
+PRIMARY KEY(id),
+INDEX (rank),
+UNIQUE KEY(examee_id, exam_id),
+FOREIGN KEY(examee_id)
+    REFERENCES ustudy.examinee(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(exam_id)
+    REFERENCES ustudy.exam(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

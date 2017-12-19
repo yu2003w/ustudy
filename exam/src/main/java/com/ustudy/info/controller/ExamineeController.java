@@ -52,7 +52,7 @@ public class ExamineeController {
 		
 	}
 	
-	@RequestMapping(value="delete/", method = RequestMethod.DELETE)
+	@RequestMapping(value="delete/{id}/", method = RequestMethod.DELETE)
 	public UResp deleteExaminee(@PathVariable @Valid int id, HttpServletResponse resp) {
 		UResp res = new UResp();
 		try {

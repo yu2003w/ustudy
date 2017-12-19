@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.info.mapper.ExamineeMapper;
 import com.ustudy.info.model.Examinee;
 import com.ustudy.info.services.ExamineeService;
+import com.ustudy.info.util.InfoUtil;
 
 @Service
 public class ExamineeServiceImpl implements ExamineeService {
@@ -25,6 +26,16 @@ public class ExamineeServiceImpl implements ExamineeService {
 	public int createExaminee(List<Examinee> ex) {
 		int count = 0;
 		for (Examinee ee : ex) {
+			if (ee.getSchId() == null || ee.getSchId().isEmpty()) {
+				if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+					ee.setSchId(InfoUtil.retrieveSessAttr("orgId"));
+					logger.debug("createExaminee(), populated schIds " + ee.getSchId().toString());
+				}
+				else {
+					logger.error("createExam(), schId is not specified in item->" + ee.toString());
+					throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
+				}
+			}
 			int ret = exM.createExaminee(ee);
 			if (ret < 0 || ret > 2) {
 				logger.error("createExaminee(), failed to create examinee with return code->" + ret);
@@ -46,6 +57,15 @@ public class ExamineeServiceImpl implements ExamineeService {
 			if (ee.getId() < 1) {
 				logger.error("updateExaminee(), id is not valid\n" + ee.toString());
 				throw new RuntimeException("updateExaminee(), invalid ids");
+			}
+			
+			if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+				ee.setSchId(InfoUtil.retrieveSessAttr("orgId"));
+				logger.debug("updateExaminee(), populated schIds " + ee.getSchId().toString());
+			}
+			else {
+				logger.error("updateExam(), schId is not specified in item->" + ee.toString());
+				throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
 			}
 
 			// need to check whether examId or stuExamId updated, whether unique key changed
