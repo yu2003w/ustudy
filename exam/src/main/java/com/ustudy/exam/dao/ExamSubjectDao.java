@@ -43,4 +43,6 @@ public interface ExamSubjectDao {
 	
 	List<Map<String, Object>> getExamSubjectMarkMode(Long egsId);
 	
+	long isExamAllSubjectPublished(Long examId);
+	
 }

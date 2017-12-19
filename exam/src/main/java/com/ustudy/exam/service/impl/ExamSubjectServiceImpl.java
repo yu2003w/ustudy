@@ -12,15 +12,17 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
-import com.ustudy.exam.dao.StudentSubscoreDao;
+import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
-import com.ustudy.exam.model.StudentSubscore;
+import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
+import com.ustudy.exam.service.impl.cache.PaperCache;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -31,10 +33,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	private ExamSubjectDao daoImpl;
 	
 	@Resource
-	private StudentSubscoreDao scoreDaoImpl;
+	private SubscoreDao scoreDaoImpl;
 
 	@Resource
 	private ExamDao examDao;
+	
+	@Autowired
+	private PaperCache paperC;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -121,9 +126,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		try {
 			daoImpl.updateExamSubjectStatusById(egsId, release);
 
-			// 分数汇总
 			if (release) {
+			    // 分数汇总
 				SummaryScore(egsId);
+				// 清除缓存
+				paperC.clearSubCache(String.valueOf(egsId));
 			}
 
 			return true;
@@ -150,9 +157,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		Map<Long, Float> objScores = getObjScores(egsId);
 		Map<Long, Float> subjScores = getSubjScores(egsId);
 		
-		List<StudentSubscore> scores = new ArrayList<>();
+		List<Subscore> scores = new ArrayList<>();
 		for (Entry<Long, Float> objs : objScores.entrySet()) {
-			StudentSubscore subscore = new StudentSubscore();
+			Subscore subscore = new Subscore();
 			subscore.setEgsId(egsId);
 			long studentId = objs.getKey();
 			subscore.setStuid(studentId);
@@ -171,17 +178,17 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			Collections.sort(scores);
 			float score = 1000;
 			int index = 0;
-			for (StudentSubscore studentSubscore : scores) {
-				if(studentSubscore.getScore() <= score){
-					if(studentSubscore.getScore() < score){
+			for (Subscore subscore : scores) {
+				if(subscore.getScore() <= score){
+					if(subscore.getScore() < score){
 						index = index+1;
 					}
-					score = studentSubscore.getScore();
-					studentSubscore.setRank(index);
+					score = subscore.getScore();
+					subscore.setRank(index);
 				}
 			}
-			scoreDaoImpl.deleteStudentSubscores(egsId);
-			scoreDaoImpl.insertStudentSubscores(scores);
+			scoreDaoImpl.deleteSubscores(egsId);
+			scoreDaoImpl.insertSubscores(scores);
 		}
 	}
 

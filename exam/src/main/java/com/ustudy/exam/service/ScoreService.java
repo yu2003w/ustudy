@@ -6,4 +6,6 @@ public interface ScoreService {
 	
 	boolean recalculateQuestionScore(Long egsId) throws Exception;
 	
+	boolean publishExamScore(Long examId) throws Exception;
+	
 }

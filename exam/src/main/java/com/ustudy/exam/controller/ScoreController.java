@@ -74,4 +74,26 @@ public class ScoreController {
         return result;
     }
 
+    @RequestMapping(value = "/publish/{examId}", method = RequestMethod.POST)
+    public Map publishExamScore(@PathVariable Long examId) {
+
+        logger.debug("publishExamScore(examId:"+examId+").");
+
+        Map result = new HashMap<>();
+
+        try {
+            if (service.publishExamScore(examId)) {
+                result.put("success", true);
+            } else {
+                result.put("success", false);
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
 }

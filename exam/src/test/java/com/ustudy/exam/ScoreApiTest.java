@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.ustudy.exam.model.StudentSubscore;
+import com.ustudy.exam.model.Subscore;
 
 public class ScoreApiTest {
 
@@ -23,10 +23,15 @@ public class ScoreApiTest {
 //		System.out.println("--------------------recalculateScore-------------------");
 //		System.out.println();
 		
-		sort();
-		System.out.println();
-		System.out.println("--------------------sort-------------------");
-		System.out.println();
+//		sort();
+//		System.out.println();
+//		System.out.println("--------------------sort-------------------");
+//		System.out.println();
+		
+		publishScore();
+        System.out.println();
+        System.out.println("--------------------publishScore-------------------");
+        System.out.println();
 
 		System.out.println("--------------- " + (System.currentTimeMillis() - t1));
 	}
@@ -80,13 +85,55 @@ public class ScoreApiTest {
 		}
 
 	}
+	
+	public static void publishScore() {
+
+        String targetURL = "http://127.0.0.1:8080/exam/score/publish/1";
+
+        try {
+
+            URL restServiceURL = new URL(targetURL);
+
+            HttpURLConnection httpConnection = (HttpURLConnection) restServiceURL.openConnection();
+            httpConnection.setDoOutput(true);
+            httpConnection.setRequestMethod("POST");
+            httpConnection.setRequestProperty("Content-Type", "application/json");
+
+            // OutputStream outputStream = httpConnection.getOutputStream();
+            // outputStream.write(parameters.getBytes());
+            // outputStream.flush();
+
+            if (httpConnection.getResponseCode() != 200) {
+                throw new RuntimeException(
+                        "HTTP GET Request Failed with Error code : " + httpConnection.getResponseCode());
+            }
+
+            BufferedReader responseBuffer = new BufferedReader(
+                    new InputStreamReader((httpConnection.getInputStream())));
+
+            String output;
+            System.out.println("Output from Server:  \n");
+
+            while ((output = responseBuffer.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpConnection.disconnect();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 	public static void sort() {
 
-		List<StudentSubscore> subscores = new ArrayList<>();
+		List<Subscore> subscores = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
-			StudentSubscore subscore = new StudentSubscore();
+			Subscore subscore = new Subscore();
 			subscore.setScore(Float.valueOf(i));
 			subscores.add(subscore);
 		}
