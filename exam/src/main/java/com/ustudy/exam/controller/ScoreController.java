@@ -84,8 +84,10 @@ public class ScoreController {
         try {
             if (service.publishExamScore(examId)) {
                 result.put("success", true);
+                result.put("message", "考试成绩发布成功");
             } else {
                 result.put("success", false);
+                result.put("message", "考试成绩发布失败");
             }
         } catch (Exception e) {
             result.put("success", false);
