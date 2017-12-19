@@ -110,10 +110,10 @@
 	
 	<update id="updateExamSubjectStatusById" parameterType="java.util.Map">
 		<if test="release !=null and release == true">
-			UPDATE examgradesub SET status=2
+			UPDATE examgradesub SET status='2'
 		</if>
 		<if test="release !=null and release == false">
-			UPDATE examgradesub SET status=1
+			UPDATE examgradesub SET status='1'
 		</if>
 		where id=#{egsId}
 	</update>
