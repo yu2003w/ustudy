@@ -111,6 +111,9 @@ public interface MarkTaskMapper {
 			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")
 	public List<String> getQuesIdsByExamGradeSub(ExamGradeSub egs);
 	
+	@Select("select id from ustudy.question where exam_grade_sub_id=#{id}")
+	public List<String> getQuesIdsByExamGradeSubId(@Param("id") String egsid);
+	
 	@Select("select distinct teac_owner as ownerId, assign_mode as type, duration as timeLimit, mark_mode as markMode"
 			+ " from question join ustudy.marktask on question.id = ustudy.marktask.quesid where "
 			+ "question.id=#{qid}")

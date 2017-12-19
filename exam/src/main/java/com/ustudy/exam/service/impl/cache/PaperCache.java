@@ -489,4 +489,40 @@ public class PaperCache {
 	public String getAveScore(String quesid, String tid) {
 		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid +	TEA_QUES_PREFIX + quesid).getAvescore();
 	}
+	
+	// this method should be called before score released
+	private void clearQuesCache(String quesid) {
+		if (quesid == null || quesid.isEmpty()) {
+			logger.error("clearCache(), invalid quesid");
+			throw new RuntimeException("clearCache(), invalid quesid");
+		}
+		String cacheK = this.QUES_PAPER_PREFIX + quesid;
+		if (paperC.opsForValue().get(cacheK) != null)
+			paperC.delete(cacheK);
+		cacheK = this.QUES_PAPER_PREFIX_FINAL + quesid;
+		if (paperC.opsForValue().get(cacheK) != null)
+			paperC.delete(cacheK);
+		logger.info("clearCache(), paper cache cleared for question " + quesid);
+		
+		List<String> teas = mtM.getTeachersByQid(quesid);
+		for (String tid : teas) {
+			cacheK = this.TEA_PAPER_PREFIX + tid + this.TEA_QUES_PREFIX + quesid;
+			if (teaPaperC.opsForValue().get(cacheK) == null) {
+				teaPaperC.delete(cacheK);
+				logger.debug("clearCache(), cache cleared for " + cacheK);
+			}
+		}
+		
+	}
+	
+	/*
+	 * clear subject cache after score released
+	 */
+	public void clearSubCache(String egsid) {
+		List<String> quesL = mtM.getQuesIdsByExamGradeSubId(egsid);
+		for (String ques: quesL) {
+			clearQuesCache(ques);
+		}
+		logger.info("clearSubCache(), subject cache cleared, quesid->" + quesL.toString());
+	}
 }
