@@ -5,10 +5,11 @@ create table if not exists ustudy.class (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id INT NOT NULL,
 cls_name VARCHAR(32) NOT NULL,
-cls_type ENUM ('art','sci','none') NOT NULL,
+cls_type ENUM ('art','sci','none') NOT NULL DEFAULT 'none',
 cls_owner CHAR(11),
 PRIMARY KEY (id),
 INDEX(grade_id),
+UNIQUE KEY(grade_id, cls_name),
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -74,9 +75,11 @@ FOREIGN KEY (teac_id)
 create table if not exists ustudy.departsub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_owner CHAR(11),
+sub_id int(11) NOT NULL,
 type ENUM('high','junior','primary','other'),
 schid varchar(32) NOT NULL,
 INDEX(sub_owner, schid, type),
+UNIQUE KEY(sub_id, type, schid),
 PRIMARY KEY (id),
 FOREIGN KEY (schid)
     REFERENCES ustudy.school(schid)

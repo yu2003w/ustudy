@@ -1,0 +1,68 @@
+package com.ustudy.dashboard.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import com.ustudy.dashboard.model.Grade;
+import com.ustudy.dashboard.model.OrgBrife;
+import com.ustudy.dashboard.model.School;
+import com.ustudy.dashboard.model.Subject;
+
+@Mapper
+public interface SchoolMapper {
+
+	@Select("select * from ustudy.school where id > #{id} limit 10000")
+	public List<School> getSchools(@Param("id") int id);
+	
+	@Select("select schid as orgId, schname as orgName, 'school' as orgType from ustudy.school where id "
+			+ "> ? limit 10000")
+	public List<OrgBrife> getSchBrife(@Param("id") int id);
+	
+	@Select("select * from ustudy.school where id=#{id}")
+	public School getSchoolById(@Param("id") int id);
+	
+	@Insert("insert into ustudy.school (schid, schname, type, province, city, district) values(#{schoolId}, "
+			+ "#{schoolName}, #{schoolType}, #{province}, #{city}, #{district}) on duplicate key update "
+			+ "type=#{schoolType}, province=#{province}, city=#{city}, district=#{district}")
+	@Options(useGeneratedKeys=true)
+	public int createSchool(School item);
+	
+	@Delete("delete from ustudy.school where id=#{id}")
+	public int delSchool(@Param("id") String id);
+	
+	@Insert("insert into ustudy.grade(grade_name, classes_num, schid) values (#{gr.gradeName}, #{gr.num}, "
+			+ "#{schid}) on duplicate key update grade_name=#{gr.gradeName}, classes_num=#{gr.num}, "
+			+ "schid=#{schid}")
+	@Options(useGeneratedKeys=true, keyProperty="gr.id")
+	public int createGrade(@Param("gr") Grade gr, @Param("schid") String schid);
+	
+	@Insert("insert into ustudy.gradesub(sub_id, grade_id) values (#{subId}, #{gradeId}) on duplicate key "
+			+ "update sub_id=#{subId}, grade_id=#{gradeId}")
+	public int createGradeSub(@Param("subId") String subId, @Param("gradeId") int gradeId);
+	
+	@Select("select id as subId, name as courseName from ustudy.subject")
+	public List<Subject> getSubs();
+	
+	@Insert("insert into ustudy.class (grade_id, cls_name) values(#{grId}, #{clsN}) on duplicate key update "
+			+ "grade_id=#{grId}, cls_name=#{clsName}")
+	public int createClass(@Param("grId") int grId, @Param("clsN") String clsName);
+	
+	@Insert("insert into ustudy.departsub (sub_id, type, schid) values(#{subId}, #{type}, #{schId}) on "
+			+ "duplicate key update sub_id=#{subId}, type=#{type}, schid=#{schId}")
+	public int createDepartSub(@Param("subId") String subId, @Param("type") String type, 
+			@Param("schId") String schId);
+	
+	@Select("select id, grade_name, classes_num from ustudy.grade where schid=#{sId}")
+	public List<Grade> getGrades(@Param("sId") String schId);
+	
+	@Select("select sub_id as subId, name as courseName from ustudy.gradesub join ustudy.subject on "
+			+ "ustudy.gradesub.sub_id = ustudy.subject.id where ustudy.gradesub.grade_id=#{gid}")
+	public List<Subject> getGradeSub(@Param("gid") int gid);
+	
+}

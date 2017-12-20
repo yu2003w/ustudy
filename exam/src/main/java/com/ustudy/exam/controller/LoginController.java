@@ -80,6 +80,7 @@ public class LoginController {
 					ses.setAttribute("uname", tea.getUname());
 					ses.setAttribute("orgType", tea.getOrgtype());
 					ses.setAttribute("orgId", tea.getOrgid());
+					ses.setAttribute("role", userS.findPriRoleById(tea.getUid()));
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
 					response.setStatus(404);
@@ -149,7 +150,7 @@ public class LoginController {
 			// u.setRoles(userS.getRolesById(uId));
 			// only retrieve highest priority role for the logined user */
 			
-			u = new TeacRole(uId, userS.findPriRoleById(uId), ses.getAttribute("orgType").toString(), 
+			u = new TeacRole(uId, ses.getAttribute("role").toString(), ses.getAttribute("orgType").toString(), 
 					ses.getAttribute("orgId").toString());
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;

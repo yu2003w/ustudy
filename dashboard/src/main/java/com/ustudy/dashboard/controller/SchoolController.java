@@ -8,7 +8,6 @@ import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +34,7 @@ public class SchoolController {
 		logger.debug("endpoint /school/list/ is visited");
 		List<School> res = null;
 		try {
-			res = ss.getList(id);
+			res = ss.getSchools(id);
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
 			String msg = "Failed to retrieve item list from " + id;
@@ -72,7 +71,7 @@ public class SchoolController {
 		logger.debug(item.toString());
 		String result = null;
 		try {
-		    int index = ss.createItem(item);
+		    int index = ss.createSchool(item);
 		    logger.debug("School created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
@@ -92,7 +91,7 @@ public class SchoolController {
 		logger.debug("endpoint /school/update/" + id + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = ss.updateItem(data, id);
+			int numOfRows = ss.updateSchool(data, id);
 			if (numOfRows == 1)
 				logger.debug("update item successfully");
 			else {
@@ -114,11 +113,8 @@ public class SchoolController {
 		logger.debug("endpoint /delete/" + id + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = ss.deleteItem(id);
-			if (numOfRows != 1)
-				throw new RuntimeException("Number of affected rows is " + numOfRows);
-			else
-				result = "item deleted";
+			ss.deleteSchool(id);
+			logger.info("item deleted");
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
 			result = "delete item failed";
@@ -137,7 +133,7 @@ public class SchoolController {
 		logger.debug("endpoint /school/delete is visited.");
 		String result = null;
 		try {
-			int num = ss.delItemSet(data);
+			int num = ss.delSchools(data);
 			if (num < 1)
 				throw new RuntimeException("Number of deleted items is " + num);
 			else {
@@ -157,22 +153,23 @@ public class SchoolController {
 		logger.debug("endpoint /school/view/" + id + " is visited.");
 		School item = null;
 		String msg = null;
-		try {
-			item = ss.displayItem(id);
-		} catch (IncorrectResultSizeDataAccessException ie) {
-			logger.warn("displayItem(), " + ie.getLocalizedMessage());
-			msg = "No items found for specified id = " + id;
-		} catch (Exception e) {
-			logger.warn("displayItem(), " + e.getMessage());
-			msg = "Failed to retrieve item " + id;
-		}
 		
-		if (item == null) {
+		if (id < 0) {
 			try {
+				msg = "displayItem(), input parameter invalid";
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("displayItem(), Failed to set error status in response");
+				logger.error("displayItem(), Failed to set error status in response");
+				return item;
 			}
+		}
+		
+		try {
+			item = ss.displaySchool(id);
+		} catch (Exception e) {
+			logger.error("displayItem(), " + e.getMessage());
+			msg = "Failed to retrieve item " + id;
+			resp.setStatus(500);
 		}
 				
 		return item;

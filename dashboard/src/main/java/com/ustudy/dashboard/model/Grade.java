@@ -16,7 +16,7 @@ public class Grade implements Serializable{
 	
 	// id is not need for grade information
 	@JsonIgnore
-	private String id = null;
+	private int id = -1;
 	@JsonProperty("grade")
 	private String gradeName = null;
 	private List<Subject> subjects = null;
@@ -30,18 +30,18 @@ public class Grade implements Serializable{
 	}
 
 	
-	public Grade(String id, String gradeName, int num) {
+	public Grade(int id, String gradeName, int num) {
 		super();
 		this.id = id;
 		this.gradeName = gradeName;
 		this.num = num;
 	}
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -71,11 +71,7 @@ public class Grade implements Serializable{
 
 	@Override
 	public String toString() {
-		String tmp = new String();
-		for (Subject sub: subjects) {
-			tmp += "{" + sub.toString() + "}";
-		}
-		return "Grade [name=" + gradeName + ", subjects=" + tmp + ", num=" + num + "]";
+		return "Grade [id=" + id + ", gradeName=" + gradeName + ", subjects=" + subjects + ", num=" + num + "]";
 	}	
 	
 }

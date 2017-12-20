@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Department;
 import com.ustudy.info.model.Grade;
@@ -44,12 +45,21 @@ public class SchoolServiceImp implements SchoolService {
 	@Autowired
 	private JdbcTemplate schS;
 	
+	@Autowired
+	private SchoolMapper schM;
+	
 	@Override
 	public School getSchool() {
-		String orgT = getOrgInfo("orgType"), orgId = getOrgInfo("orgId");
-		
-		String sqlSch = "select * from ustudy.school where schid = ?";
-		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId);
+		String orgT = InfoUtil.retrieveSessAttr("orgType");
+		String orgId = InfoUtil.retrieveSessAttr("orgId");
+		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
+			throw new RuntimeException("getSchool(), it seemed user not logged in");
+		}
+		/*String sqlSch = "select * from ustudy.school where schid = ?";
+		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId); */
+		if (orgT.compareTo("学校") != 0) 
+			throw new RuntimeException("getSchool(), invalid org type->" + orgT);
+		School item = schM.getSchoolById(orgId);
 		
 		// populate school owner and exam owner
 		if (!populateOwner(item, orgT, orgId))
@@ -60,12 +70,12 @@ public class SchoolServiceImp implements SchoolService {
 		return item;
 	}
 	
-	@Transactional
 	private boolean populateOwner(School item, String orgT, String orgId) {
 		// for school owner and examination owner, information could be retrieved from 
 		// ustudy.orgowner
-		String sqlS = "select loginname, name, role from ustudy.orgowner where orgtype = ? and orgid = ?";
-		List<OwnerBrife> oL = schS.query(sqlS, new OwnerRowMapper(), orgT, orgId); 
+		/*String sqlS = "select loginname, name, role from ustudy.orgowner where orgtype = ? and orgid = ?";
+		List<OwnerBrife> oL = schS.query(sqlS, new OwnerRowMapper(), orgT, orgId); */
+		List<OwnerBrife> oL = schM.getOrgOwners(orgT, orgId);
 		for (OwnerBrife e: oL) {
 			if (e.getRole().compareTo("校长") == 0) {
 				item.setOwner(new TeacherBrife(e.getLoginname(), e.getName()));
@@ -79,12 +89,13 @@ public class SchoolServiceImp implements SchoolService {
 		return true;
 	}
 	
-	@Transactional
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
 		
-		String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on departsub.sub_owner = "
+		/*String sqlT = "select sub_name, sub_owner, teacname from departsub join teacher on departsub.sub_owner = "
 				+ "teacher.teacid where departsub.schid = ? and departsub.type = ?";
-		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType);
+		List<SubjectTeac> soL = schS.query(sqlT, new SubjectTeacRowMapper(), orgId, dType); */
+		
+		List<SubjectTeac> soL = schM.getSubjectTeachers(orgId, dType);
 		
 		logger.debug("populateDepartSub(), " + soL.toString());
 		ConcurrentHashMap<String, List<TeacherBrife>> ret = null;
@@ -150,11 +161,11 @@ public class SchoolServiceImp implements SchoolService {
 		return true;
 	}
 	
-	@Transactional
 	private void populateDeparts(School item, String orgId) {
-		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from grade join teacher "
+		/* String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from grade join teacher "
 				+ "on grade.grade_owner = teacher.teacid where schid = ?";
-		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId);
+		List<Grade> grL = schS.query(sqlGr, new GradeRowMapper(), orgId); */
+		List<Grade> grL = schM.getGradesBySchId(orgId);
 		List<Grade> highL = new ArrayList<Grade>();
 		List<Grade> junL = new ArrayList<Grade>();
 		List<Grade> priL = new ArrayList<Grade>();
@@ -194,13 +205,13 @@ public class SchoolServiceImp implements SchoolService {
 	}
 
 	@Override
-	@Transactional
 	public List<SubjectLeader> getDepSubs(String depName) {
 		List<SubjectLeader> subL = populateDepartSub(getOrgInfo("orgId"), depName);
 		return subL;
 	}
 
 	@Override
+	@Transactional
 	public int updateDepSubs(List<SubjectLeader> subs, String dType) {
 		logger.debug("updateDepSubs(), updateDepSubs ->" + subs.toString());
 		String orgId = getOrgInfo("orgId"), msg = null;
@@ -315,7 +326,6 @@ public class SchoolServiceImp implements SchoolService {
 		return cnt;
 	}
 
-	@Transactional
 	private List<SubjectTeac> getClassSubs(String id) {
 		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
 				+ "classsub.sub_owner = teacher.teacid where classsub.cls_id = ?";
