@@ -27,6 +27,8 @@ import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.service.ScoreService;
 
+import net.sf.json.JSONArray;
+
 @Service
 public class ScoreServiceImpl implements ScoreService {
 	
@@ -158,8 +160,7 @@ public class ScoreServiceImpl implements ScoreService {
     	if (release) {
     		// 是否已全部发布
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
-    		if(count == 0){
-    			
+    		if(count == 0){    			
     			examDao.updateExamStatus(examId, "2");
     			
     			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
@@ -191,12 +192,54 @@ public class ScoreServiceImpl implements ScoreService {
     				exameeScoreDao.deleteExameeScores(examId);
     				exameeScoreDao.insertExameeScores(exameeScores);
     			}
-    		}
+    		}else {
+    		    return false;
+            }
     	} else {
     		examDao.updateExamStatus(examId, "1");
 		}
         
         return true;
+        
+    }
+
+    public JSONArray getStudentSubjects(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text) throws Exception {
+        
+        JSONArray array = new JSONArray();
+        
+        List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
+        if(null != exameeScores && exameeScores.size() > 0){
+            Map<Long, JSONArray> studentScores = getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
+            for (Map<String, Object> map : exameeScores) {
+                long stuid = (int)map.get("examee_id");
+                JSONArray scores = studentScores.get(stuid);
+                if(null != scores){
+                    map.put("scores", scores);
+                    array.add(map);
+                }
+            }
+        }
+
+        return array;
+    }
+    
+    private Map<Long, JSONArray> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text){
+        
+        Map<Long, JSONArray> result = new HashMap<>();
+        
+        List<Map<String, Object>> studentScores = exameeScoreDao.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
+        for (Map<String, Object> map : studentScores) {
+            long stuid = (int)map.get("stuid");
+            JSONArray array = result.get(stuid);
+            if(null == array){
+                array = new JSONArray();
+            }
+            array.add(map);
+            
+            result.put(stuid, array);
+        }
+        
+        return result;
         
     }
 

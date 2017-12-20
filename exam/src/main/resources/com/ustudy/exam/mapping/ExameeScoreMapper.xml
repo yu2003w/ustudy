@@ -12,5 +12,61 @@
 	        (#{item.stuid},#{item.examId},#{item.score},#{item.rank})  
 	    </foreach>  
 	</insert>
+	
+	<select id="getExameeScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT es.examee_id,es.exam_id,ee.name,sc.schname,es.score,es.rank from exameescore es 
+		LEFT JOIN examinee ee ON es.examee_id=ee.id 
+		LEFT JOIN school sc ON ee.schid=sc.id 
+		<if test="branch !=null and branch != ''">
+			LEFT JOIN class cl ON ee.class_id=cl.id 
+		</if>
+		where es.exam_id=1 
+		<if test="schId !=null and schId > 0">
+			AND ee.schid=#{schId}
+		</if>
+		<if test="gradeId !=null and gradeId > 0">
+			AND ee.gradeid=#{gradeId}
+		</if>
+		<if test="classId !=null and classId > 0">
+			AND ee.class_id=#{classId}
+		</if>
+		<if test="text !=null and text != ''">
+			AND ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="branch !=null and branch != ''">
+			AND cl.cls_type=#{branch, jdbcType=VARCHAR}
+		</if>
+		ORDER BY es.rank
+	</select>
+	
+	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT ss.stuid,su.id,su.name,ss.score,ss.rank from subscore ss 
+		LEFT JOIN examgradesub egs ON ss.exam_grade_sub_id=egs.id
+		LEFT JOIN examinee ee ON ss.stuid=ee.id 
+		LEFT JOIN subject su ON egs.sub_id=su.id 
+		<if test="branch !=null and branch != ''">
+			LEFT JOIN class cl ON ee.class_id=cl.id 
+		</if>
+		where egs.examid=1
+		<if test="schId !=null and schId > 0">
+			AND ee.schid=#{schId}
+		</if>
+		<if test="gradeId !=null and gradeId > 0">
+			AND ee.gradeid=#{gradeId}
+		</if>
+		<if test="classId !=null and classId > 0">
+			AND ee.class_id=#{classId}
+		</if>
+		<if test="text !=null and text != ''">
+			AND ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="branch !=null and branch != ''">
+			AND cl.cls_type=#{branch, jdbcType=VARCHAR}
+		</if>
+		<if test="subjectId !=null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+		ORDER BY ss.rank
+	</select>
 
 </mapper>

@@ -14,7 +14,7 @@
 	</insert>
 	
 	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
-		SELECT SUM(score) score,stuid from stusubscore 
+		SELECT SUM(score) score,stuid from subscore 
 		where exam_grade_sub_id IN (SELECT id from examgradesub where examid=#{examId}) 
 		GROUP BY stuid
 	</select>	
