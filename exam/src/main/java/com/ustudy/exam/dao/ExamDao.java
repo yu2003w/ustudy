@@ -42,4 +42,6 @@ public interface ExamDao {
 
 	ArrayList<Map> getSubjects();
 
+	void updateExamStatus(@Param("examid")Long examid, @Param("status")String status);
+
 }

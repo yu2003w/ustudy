@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.ExameeScoreDao;
 import com.ustudy.exam.dao.MultipleScoreSetDao;
@@ -45,6 +46,9 @@ public class ScoreServiceImpl implements ScoreService {
 	
 	@Resource
     private ExamSubjectDao examSubjectDao;
+	
+	@Resource
+    private ExamDao examDao;
     
     @Resource
     private SubscoreDao subscoreDao;
@@ -149,41 +153,48 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
 
-    public boolean publishExamScore(Long examId) throws Exception {
-        
-        // 是否已全部发布
-        long count = examSubjectDao.isExamAllSubjectPublished(examId);
-        if(count == 0){
-            List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
-            if(scores.size() > 0){
-                List<ExameeScore> exameeScores = new ArrayList<>();
-                for (Map<String, Object> map : scores) {
-                    ExameeScore exameeScore = new ExameeScore();
-                    exameeScore.setExamId(examId);
-                    long stuid = (int) map.get("stuid");
-                    exameeScore.setStuid(stuid);
-                    double score = (double) map.get("score");
-                    exameeScore.setScore(Float.valueOf(String.valueOf(score)));
-                    
-                    exameeScores.add(exameeScore);
-                }
-                Collections.sort(exameeScores);
-                
-                float score = 1000;
-                int index = 0;
-                for (ExameeScore exameeScore : exameeScores) {
-                    if(exameeScore.getScore() <= score){
-                        if(exameeScore.getScore() < score){
-                            index = index+1;
-                        }
-                        score = exameeScore.getScore();
-                        exameeScore.setRank(index);
-                    }
-                }
-                exameeScoreDao.deleteExameeScores(examId);
-                exameeScoreDao.insertExameeScores(exameeScores);
-            }
-        }
+    public boolean publishExamScore(Long examId, Boolean release) throws Exception {
+    	
+    	if (release) {
+    		// 是否已全部发布
+    		long count = examSubjectDao.isExamAllSubjectPublished(examId);
+    		if(count == 0){
+    			
+    			examDao.updateExamStatus(examId, "2");
+    			
+    			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
+    			if(scores.size() > 0){
+    				List<ExameeScore> exameeScores = new ArrayList<>();
+    				for (Map<String, Object> map : scores) {
+    					ExameeScore exameeScore = new ExameeScore();
+    					exameeScore.setExamId(examId);
+    					long stuid = (int) map.get("stuid");
+    					exameeScore.setStuid(stuid);
+    					double score = (double) map.get("score");
+    					exameeScore.setScore(Float.valueOf(String.valueOf(score)));
+    					
+    					exameeScores.add(exameeScore);
+    				}
+    				Collections.sort(exameeScores);
+    				
+    				float score = 1000;
+    				int index = 0;
+    				for (ExameeScore exameeScore : exameeScores) {
+    					if(exameeScore.getScore() <= score){
+    						if(exameeScore.getScore() < score){
+    							index = index+1;
+    						}
+    						score = exameeScore.getScore();
+    						exameeScore.setRank(index);
+    					}
+    				}
+    				exameeScoreDao.deleteExameeScores(examId);
+    				exameeScoreDao.insertExameeScores(exameeScores);
+    			}
+    		}
+    	} else {
+    		examDao.updateExamStatus(examId, "1");
+		}
         
         return true;
         

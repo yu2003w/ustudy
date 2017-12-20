@@ -74,21 +74,31 @@ public class ScoreController {
         return result;
     }
 
-    @RequestMapping(value = "/publish/{examId}", method = RequestMethod.POST)
-    public Map publishExamScore(@PathVariable Long examId) {
+    @RequestMapping(value = "/publish/{examId}/{release}", method = RequestMethod.POST)
+    public Map publishExamScore(@PathVariable Long examId, @PathVariable Boolean release) {
 
-        logger.debug("publishExamScore(examId:"+examId+").");
+        logger.debug("publishExamScore(examId:"+examId+",release:"+release+").");
 
         Map result = new HashMap<>();
 
         try {
-            if (service.publishExamScore(examId)) {
-                result.put("success", true);
-                result.put("message", "考试成绩发布成功");
-            } else {
-                result.put("success", false);
-                result.put("message", "考试成绩发布失败");
-            }
+        	if (release) {
+        		if (service.publishExamScore(examId, release)) {
+        			result.put("success", true);
+        			result.put("message", "考试成绩发布成功");
+        		} else {
+        			result.put("success", false);
+        			result.put("message", "考试成绩发布失败");
+        		}
+        	} else {
+        		if (service.publishExamScore(examId, release)) {
+        			result.put("success", true);
+        			result.put("message", "考试成绩取消发布成功");
+        		} else {
+        			result.put("success", false);
+        			result.put("message", "考试成绩取消发布失败");
+        		}
+			}
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", e.getMessage());
