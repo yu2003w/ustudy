@@ -200,9 +200,6 @@ public class SchoolServiceImp implements SchoolService {
 			}
 			
 			for (Subject sub : subs) {
-				// gradesub schema is as below,
-				// id, sub_name, grade_id, sub_owner
-				// sub_owner is not used by dashboard, it's used by info center
 				String subId = subMap.get(sub.getCourseName());
 				if (subId == null || subId.isEmpty() || Integer.valueOf(subId) < 0) {
 					msg = "saveGrades(), subId->" + subId + " invalid for " + sub.getCourseName();
@@ -233,7 +230,7 @@ public class SchoolServiceImp implements SchoolService {
 	private int saveClasses(Grade g) {
 		
 		for (int i = 0; i < g.getNum(); i++) {
-			String clsN = g.getGradeName() + "(" + String.valueOf(i + 1) + ")";
+			String clsN = g.getGradeName() + "（" + String.valueOf(i + 1) + "）班";
 			int ret = schM.createClass(g.getId(), clsN);
 			if (ret < 0 || ret > 2) {
 				String msg = "saveClasses(), create grade subject failed with ret->" + ret;
@@ -248,9 +245,10 @@ public class SchoolServiceImp implements SchoolService {
 
 		int ret = 0;
 		String msg = null;
+		
 		for (String sub : subS) {
 			String subId = subMap.get(sub);
-			if (subId == null || subId.isEmpty() || Integer.valueOf(sub) < 0) {
+			if (subId == null || subId.isEmpty() || Integer.valueOf(subId) < 0) {
 				msg = "saveDepSub(), subId->" + subId + " invalid for " + sub;
 				logger.error(msg);
 				throw new RuntimeException(msg);

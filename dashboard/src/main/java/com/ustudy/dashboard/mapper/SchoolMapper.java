@@ -17,14 +17,16 @@ import com.ustudy.dashboard.model.Subject;
 @Mapper
 public interface SchoolMapper {
 
-	@Select("select * from ustudy.school where id > #{id} limit 10000")
+	@Select("select id, schid as schoolId, schname as schoolName, type as schoolType, province, city, district "
+			+ "from ustudy.school where id > #{id} limit 10000")
 	public List<School> getSchools(@Param("id") int id);
 	
 	@Select("select schid as orgId, schname as orgName, 'school' as orgType from ustudy.school where id "
 			+ "> ? limit 10000")
 	public List<OrgBrife> getSchBrife(@Param("id") int id);
 	
-	@Select("select * from ustudy.school where id=#{id}")
+	@Select("select id, schid as schoolId, schname as schoolName, type as schoolType, province, city, district "
+			+ "from ustudy.school where id=#{id}")
 	public School getSchoolById(@Param("id") int id);
 	
 	@Insert("insert into ustudy.school (schid, schname, type, province, city, district) values(#{schoolId}, "
@@ -50,7 +52,7 @@ public interface SchoolMapper {
 	public List<Subject> getSubs();
 	
 	@Insert("insert into ustudy.class (grade_id, cls_name) values(#{grId}, #{clsN}) on duplicate key update "
-			+ "grade_id=#{grId}, cls_name=#{clsName}")
+			+ "grade_id=#{grId}, cls_name=#{clsN}")
 	public int createClass(@Param("grId") int grId, @Param("clsN") String clsName);
 	
 	@Insert("insert into ustudy.departsub (sub_id, type, schid) values(#{subId}, #{type}, #{schId}) on "

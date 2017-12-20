@@ -92,7 +92,8 @@ public class TeacherServiceImpl implements TeacherService {
 
 	private void retrieveProp(Teacher item) {
 		// retrieve subjects
-		String sqlD = "select sub_name as value from ustudy.teachersub where teac_id = ?";
+		String sqlD = "select name as value from ustudy.teachersub join ustudy.subject on "
+				+ "ustudy.subject.id = ustudy.teachersub.sub_id where teac_id = ?";
 		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setSubjects(subs);
 

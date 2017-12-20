@@ -54,31 +54,31 @@ public class SchoolController {
 		try {
 			ret = ss.getOrgBrifeList(id);
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error(e.getMessage());
 			String msg = "getOrgBrifeList(), Failed to retrieve orgnization brife list since " + id;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("getOrgBrifeList(), Failed to set error status in response");
+				logger.error("getOrgBrifeList(), Failed to set error status in response");
 			}
 		}
 		return ret;
 	}
 	
 	@RequestMapping(value="/add", method = RequestMethod.POST)
-	public String createItem(@RequestBody @Valid School item, HttpServletResponse resp, UriComponentsBuilder builder) {
-		logger.debug("endpoint /school/add/ is visited.");
+	public String createSchool(@RequestBody @Valid School item, HttpServletResponse resp, UriComponentsBuilder builder) {
+		logger.debug("createSchool(), endpoint /school/add/ is visited.");
 		logger.debug(item.toString());
 		String result = null;
 		try {
 		    int index = ss.createSchool(item);
-		    logger.debug("School created successfully with id " + index);
+		    logger.debug("createSchool(), school created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
 		    	builder.path("/school/view/{index}").buildAndExpand(index).toString());
 		    result = "create item successfully";
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error("createSchool(), failed with exception->" + e.getMessage());
 			result = "create item failed";
 			resp.setStatus(500);
 		}
