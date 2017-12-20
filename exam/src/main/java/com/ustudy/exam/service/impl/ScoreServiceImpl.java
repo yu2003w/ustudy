@@ -1,5 +1,7 @@
 package com.ustudy.exam.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +12,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.exam.dao.ExamDao;
+import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.ExameeScoreDao;
 import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.RefAnswerDao;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
+import com.ustudy.exam.dao.SubscoreDao;
+import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
@@ -36,6 +43,18 @@ public class ScoreServiceImpl implements ScoreService {
 	
 	@Resource
 	private StudentObjectAnswerDao answerDaoImpl;
+	
+	@Resource
+    private ExamSubjectDao examSubjectDao;
+	
+	@Resource
+    private ExamDao examDao;
+    
+    @Resource
+    private SubscoreDao subscoreDao;
+    
+    @Resource
+    private ExameeScoreDao exameeScoreDao;
 
     public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
         logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
@@ -131,6 +150,53 @@ public class ScoreServiceImpl implements ScoreService {
         }
         
         return studentCorrectCount;
+        
+    }
+
+    public boolean publishExamScore(Long examId, Boolean release) throws Exception {
+    	
+    	if (release) {
+    		// 是否已全部发布
+    		long count = examSubjectDao.isExamAllSubjectPublished(examId);
+    		if(count == 0){
+    			
+    			examDao.updateExamStatus(examId, "2");
+    			
+    			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
+    			if(scores.size() > 0){
+    				List<ExameeScore> exameeScores = new ArrayList<>();
+    				for (Map<String, Object> map : scores) {
+    					ExameeScore exameeScore = new ExameeScore();
+    					exameeScore.setExamId(examId);
+    					long stuid = (int) map.get("stuid");
+    					exameeScore.setStuid(stuid);
+    					double score = (double) map.get("score");
+    					exameeScore.setScore(Float.valueOf(String.valueOf(score)));
+    					
+    					exameeScores.add(exameeScore);
+    				}
+    				Collections.sort(exameeScores);
+    				
+    				float score = 1000;
+    				int index = 0;
+    				for (ExameeScore exameeScore : exameeScores) {
+    					if(exameeScore.getScore() <= score){
+    						if(exameeScore.getScore() < score){
+    							index = index+1;
+    						}
+    						score = exameeScore.getScore();
+    						exameeScore.setRank(index);
+    					}
+    				}
+    				exameeScoreDao.deleteExameeScores(examId);
+    				exameeScoreDao.insertExameeScores(exameeScores);
+    			}
+    		}
+    	} else {
+    		examDao.updateExamStatus(examId, "1");
+		}
+        
+        return true;
         
     }
 

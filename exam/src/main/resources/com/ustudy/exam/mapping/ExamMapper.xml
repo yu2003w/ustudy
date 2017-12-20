@@ -102,4 +102,9 @@
 		where isfinal=0 AND p.exam_grade_sub_id in (SELECT id FROM examgradesub where examid=#{examid}) 
 		GROUP BY p.exam_grade_sub_id
 	</select>
+	
+	<update id="updateExamStatus" parameterType="java.util.Map">
+		UPDATE exam SET status=#{status,jdbcType=VARCHAR} where id=#{examid}
+	</update>
+	
 </mapper>
