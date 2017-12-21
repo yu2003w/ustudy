@@ -19,4 +19,10 @@ public interface SubscoreDao {
 	
 	List<Map<String, Object>> getStudentScores(@Param("stuId")Long stuId, @Param("examId")Long examId);
 	
+	List<Map<String, Object>> getStudentObjScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
+	
+	List<Map<String, Object>> getStudentSubScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
+	
+	List<Map<String, Object>> getStudentStepScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
+	
 }

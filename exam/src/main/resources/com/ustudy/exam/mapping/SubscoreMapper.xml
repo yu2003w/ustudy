@@ -27,5 +27,40 @@
 		LEFT JOIN subject su ON egs.sub_id=su.id
 		where egs.examid=#{examId}
 	</select>
+	
+	<select id="getStudentObjScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',a.quesno) id,a.score from obj_answer a 
+		LEFT JOIN paper p ON a.paperid=p.id 
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON egs.id = p.exam_grade_sub_id
+		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
+	
+	<select id="getStudentSubScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',q.startno) id,a.isfinal,a.isviewed,a.score from answer a
+		LEFT JOIN paper p ON a.paperid=p.id  
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON egs.id = p.exam_grade_sub_id
+		LEFT JOIN question q on a.quesid=q.id
+		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
+	
+	<select id="getStudentStepScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',ast.quesno) id,ast.score FROM answer_step ast 
+		LEFT JOIN answer a ON ast.answer_id=a.id
+		LEFT JOIN paper p ON a.paperid=p.id
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON p.exam_grade_sub_id=egs.id
+		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
 
 </mapper>

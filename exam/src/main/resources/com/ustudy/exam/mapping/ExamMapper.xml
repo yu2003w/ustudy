@@ -92,7 +92,7 @@
 	</select>
 
 	<select id="getSubjectQuestions" parameterType="Long" resultType="java.util.Map">
-		SELECT q.exam_grade_sub_id as egsId,q.startno,q.endno,q.type,q.score,q.mark_mode as markMode from question q  
+		SELECT q.exam_grade_sub_id as egsId,egs.sub_id subId,q.startno,q.endno,q.type,q.score,q.mark_mode as markMode from question q  
 		LEFT JOIN examgradesub egs ON q.exam_grade_sub_id=egs.id 
 		where egs.examid=#{examid}
 	</select>
