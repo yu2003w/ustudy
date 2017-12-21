@@ -134,7 +134,7 @@ public class ScoreController {
             @RequestParam(required=false,defaultValue="") String branch, 
             @RequestParam(required=false,defaultValue="") String text) {
         
-        logger.error("getStudentSubjects(examId:"+examId+",schId:"+schId+",gradeId:"+gradeId+",classId:"+classId+",subjectId:"+subjectId+",branch:"+branch+",text:"+text+").");
+        logger.info("getStudentSubjects(examId:"+examId+",schId:"+schId+",gradeId:"+gradeId+",classId:"+classId+",subjectId:"+subjectId+",branch:"+branch+",text:"+text+").");
         
         Map result = new HashMap<>();
         
@@ -148,6 +148,25 @@ public class ScoreController {
         }
         
         return result;
+    }
+    
+    @RequestMapping(value = "/student/scores/{stuId}/{examId}")
+    public Map getStudentScores(@PathVariable Long stuId, @PathVariable Long examId) {
+    	
+    	logger.info("getStudentScores(stuId:"+stuId+",examId:"+examId+")");
+    	
+    	Map result = new HashMap<>();
+    	
+    	try {
+            result.put("data", service.getStudentScores(stuId, examId));
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            e.printStackTrace();
+        }
+    	
+    	return result;
     }
 
 }

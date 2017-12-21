@@ -10,6 +10,8 @@ public class Subscore implements Serializable, Comparable<Subscore> {
     private Long stuid;
     private Long egsId;
     private Float score;
+    private Float subScore;
+    private Float objScore;
     private int rank;
 
     public Long getId() {
@@ -42,6 +44,22 @@ public class Subscore implements Serializable, Comparable<Subscore> {
 
     public void setScore(Float score) {
         this.score = score;
+    }
+
+    public Float getSubScore() {
+        return subScore;
+    }
+
+    public void setSubScore(Float subScore) {
+        this.subScore = subScore;
+    }
+
+    public Float getObjScore() {
+        return objScore;
+    }
+
+    public void setObjScore(Float objScore) {
+        this.objScore = objScore;
     }
 
     public int getRank() {

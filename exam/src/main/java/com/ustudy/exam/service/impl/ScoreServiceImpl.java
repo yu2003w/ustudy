@@ -27,6 +27,7 @@ import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.service.ScoreService;
 
+import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
 
 @Service
@@ -242,5 +243,107 @@ public class ScoreServiceImpl implements ScoreService {
         return result;
         
     }
+
+	public JSONObject getStudentScores(Long stuId, Long examId) throws Exception {
+		
+		JSONObject object = new JSONObject();
+		
+		List<Map<String, Object>> scores = subscoreDao.getStudentScores(stuId, examId);
+		if(scores.size()>0){
+			JSONArray array = new JSONArray();
+			Map<String, Map<Long, List<Map<String, Integer>>>> questions = getQuestions(examId);
+			Map<Long, List<Map<String, Integer>>> subjectives = questions.get("subjectives");
+			Map<Long, List<Map<String, Integer>>> objectives = questions.get("objectives");
+			for (Map<String, Object> map : scores) {
+				JSONObject subject = new JSONObject();
+				long egsId = (int)map.get("egsId");
+				long subId = (int)map.get("subId");
+				String subName = map.get("subName").toString();
+				float score = (float)map.get("score");
+				float subScore = (float)map.get("subScore");
+				float objScore = (float)map.get("objScore");
+				subject.put("egsId", egsId);
+				subject.put("subId", subId);
+				subject.put("subName", subName);
+				subject.put("score", score);
+				subject.put("subScore", subScore);
+				subject.put("objScore", objScore);
+				if(null != subjectives.get(egsId)){
+					subject.put("subjectives", subjectives.get(egsId));
+				}
+				if(null != objectives.get(egsId)){
+					subject.put("objectives", objectives.get(egsId));
+				}
+				
+				array.add(subject);
+				
+				if(null != map.get("stuid")){
+					long stuid = (int)map.get("stuid");
+					String name = map.get("name").toString();
+					String stuno = map.get("stuno").toString();
+					object.put("stuId", stuid);
+					object.put("name", name);
+					object.put("stuno", stuno);
+				}
+			}
+			object.put("subjects", array);
+		}
+		
+		return object;
+	}
+	
+	private Map<String, Map<Long, List<Map<String, Integer>>>> getQuestions(Long examId){
+		
+		Map<String, Map<Long, List<Map<String, Integer>>>> result = new HashMap<>();
+		
+		List<Map<String, Object>> questions = examDao.getSubjectQuestions(examId);
+		
+		Map<Long, List<Map<String, Integer>>> subjectives = new HashMap<>();
+		Map<Long, List<Map<String, Integer>>> objectives = new HashMap<>();
+		
+		for (Map<String, Object> map : questions) {
+			long egsId = (int)map.get("egsId");
+			String type = map.get("type").toString();
+			int startno = (int)map.get("startno");
+			int endno = (int)map.get("endno");
+			int score = (int)map.get("score");
+			if(type.equals("单选题") || type.equals("多选题") || type.equals("判断题")){
+				List<Map<String, Integer>> objective = objectives.get(egsId);
+				if(null == objective){
+					objective = new ArrayList<>();
+				}
+				
+				for(int i=startno;i<=endno;i++){
+					Map<String, Integer> question = new HashMap<>();
+					question.put("quesno", i);
+					question.put("score", score);
+					
+					objective.add(question);
+				}
+				
+				objectives.put(egsId, objective);
+			}else{
+				List<Map<String, Integer>> subjective = subjectives.get(egsId);
+				if(null == subjective){
+					subjective = new ArrayList<>();
+				}
+				
+				for(int i=startno;i<=endno;i++){
+					Map<String, Integer> question = new HashMap<>();
+					question.put("quesno", i);
+					question.put("score", score);
+					
+					subjective.add(question);
+				}
+				
+				subjectives.put(egsId, subjective);
+			}
+		}
+		
+		result.put("subjectives", subjectives);
+		result.put("objectives", objectives);
+		
+		return result;
+	}
 
 }

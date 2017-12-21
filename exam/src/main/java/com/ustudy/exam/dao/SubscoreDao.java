@@ -3,6 +3,7 @@ package com.ustudy.exam.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.Subscore;
@@ -15,5 +16,7 @@ public interface SubscoreDao {
 	void insertSubscores(List<Subscore> subscores);
 	
 	List<Map<String, Object>> getExamScores(Long examId);
+	
+	List<Map<String, Object>> getStudentScores(@Param("stuId")Long stuId, @Param("examId")Long examId);
 	
 }

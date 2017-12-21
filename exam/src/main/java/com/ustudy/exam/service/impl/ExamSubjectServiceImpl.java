@@ -169,6 +169,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			    subjScore = subjScores.get(studentId);
 			}
 			float score = objScore + subjScore;
+			subscore.setSubScore(subjScore);
+			subscore.setObjScore(objScore);
 			subscore.setScore(score);
 			
 			scores.add(subscore);
