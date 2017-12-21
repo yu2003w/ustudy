@@ -7,16 +7,25 @@
 	</delete>
 
 	<insert id="insertSubscores" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into subscore (stuid,exam_grade_sub_id,score,rank) values  
+		insert into subscore (stuid,exam_grade_sub_id,score,sub_score,obj_score,rank) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.stuid},#{item.egsId},#{item.score},#{item.rank})  
+	        (#{item.stuid},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
 	    </foreach>  
 	</insert>
 	
 	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
-		SELECT SUM(score) score,stuid from stusubscore 
+		SELECT SUM(score) score,stuid from subscore 
 		where exam_grade_sub_id IN (SELECT id from examgradesub where examid=#{examId}) 
 		GROUP BY stuid
-	</select>	
+	</select>
+	
+	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT ss.stuid,ee.name,ee.stuno,egs.id egsId,su.id subId,su.name subName,ifnull(ss.score,0) score,ifnull(ss.sub_score,0) subScore,ifnull(ss.obj_score,0) objScore
+		from examgradesub egs
+		LEFT JOIN (SELECT * from subscore where stuid=#{stuId}) ss ON egs.id=ss.exam_grade_sub_id
+		LEFT JOIN examinee ee ON ss.stuid=ee.id
+		LEFT JOIN subject su ON egs.sub_id=su.id
+		where egs.examid=#{examId}
+	</select>
 
 </mapper>

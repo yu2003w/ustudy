@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.service.ScoreService;
@@ -106,6 +107,66 @@ public class ScoreController {
         }
 
         return result;
+    }
+    
+    /**
+     * 
+     * getStudentSubjects[统计考生成绩]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月20日 下午10:48:54
+     *
+     * @Title: getStudentSubjects
+     * @param examId 考试ID
+     * @param schId 学校ID
+     * @param gradeId 年级ID
+     * @param classId 班级ID
+     * @param subjectId 科目ID
+     * @param branch 分科:(文科:art,理科:sci,不分科：none)
+     * @param text 考生姓名或考号
+     * @return
+     */
+    @RequestMapping(value = "/students/subjects/{examId}")
+    public Map getStudentSubjects(@PathVariable Long examId,
+            @RequestParam(required=false,defaultValue="0") Long schId, 
+            @RequestParam(required=false,defaultValue="0") Long gradeId, 
+            @RequestParam(required=false,defaultValue="0") Long classId, 
+            @RequestParam(required=false,defaultValue="0") Long subjectId, 
+            @RequestParam(required=false,defaultValue="") String branch, 
+            @RequestParam(required=false,defaultValue="") String text) {
+        
+        logger.info("getStudentSubjects(examId:"+examId+",schId:"+schId+",gradeId:"+gradeId+",classId:"+classId+",subjectId:"+subjectId+",branch:"+branch+",text:"+text+").");
+        
+        Map result = new HashMap<>();
+        
+        try {
+            result.put("data", service.getStudentSubjects(examId, schId, gradeId, classId, subjectId, branch, text));
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return result;
+    }
+    
+    @RequestMapping(value = "/student/scores/{stuId}/{examId}")
+    public Map getStudentScores(@PathVariable Long stuId, @PathVariable Long examId) {
+    	
+    	logger.info("getStudentScores(stuId:"+stuId+",examId:"+examId+")");
+    	
+    	Map result = new HashMap<>();
+    	
+    	try {
+            result.put("data", service.getStudentScores(stuId, examId));
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            e.printStackTrace();
+        }
+    	
+    	return result;
     }
 
 }

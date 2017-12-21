@@ -88,7 +88,7 @@ public class ScoreApiTest {
 	
 	public static void publishScore() {
 
-        String targetURL = "http://127.0.0.1:8080/exam/score/publish/1";
+        String targetURL = "http://127.0.0.1:8080/exam/score/publish/1/true";
 
         try {
 
