@@ -150,6 +150,17 @@ public class ScoreController {
         return result;
     }
     
+    /**
+     * 
+     * getStudentScores[考生的分明细]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月21日 下午9:00:15
+     *
+     * @Title: getStudentScores
+     * @param stuId 考生ID
+     * @param examId 考试ID
+     * @return
+     */
     @RequestMapping(value = "/student/scores/{stuId}/{examId}")
     public Map getStudentScores(@PathVariable Long stuId, @PathVariable Long examId) {
     	
