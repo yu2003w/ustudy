@@ -56,7 +56,7 @@ public class TeacherController {
 		Teacher item = null;
 		String msg = null;
 		try {
-			item = teaS.displayItem(id);
+			item = teaS.displayTeacher(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
 			logger.warn("displayItem(), " + ie.getLocalizedMessage());
 			msg = "No item found for specified id " + id;
@@ -79,7 +79,7 @@ public class TeacherController {
 		logger.debug("endpoint /teacher/delete/" + id + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = teaS.deleteItem(id);
+			int numOfRows = teaS.deleteTeacher(id);
 			if (numOfRows != 1)
 				throw new RuntimeException("Number of affected rows is " + numOfRows);
 			else
@@ -103,7 +103,7 @@ public class TeacherController {
 		logger.debug("endpoint /teacher/delete is visited.");
 		String result = null;
 		try {
-			int num = teaS.delItemSet(data);
+			int num = teaS.delTeas(data);
 			if (num < 1)
 				throw new RuntimeException("Number of deleted items is " + num);
 			else {
@@ -124,7 +124,7 @@ public class TeacherController {
 		String result = null;
 		try {
 			// Before create item, need to check whether corresponding orgId is valid.
-		    int index = teaS.createItem(item);
+		    int index = teaS.createTeacher(item);
 		    logger.debug("createItem(), item created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
@@ -144,7 +144,7 @@ public class TeacherController {
 		logger.debug("endpoint /teacher/update" + data.getId() + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = teaS.updateItem(data, Integer.parseInt(data.getId()));
+			int numOfRows = teaS.updateTeacher(data, data.getId());
 			if (numOfRows == 1)
 				logger.debug("updateItem(), update item successfully");
 			else {

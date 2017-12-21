@@ -94,6 +94,7 @@ id INT NOT NULL AUTO_INCREMENT,
 sub_id int(11) NOT NULL,
 teac_id CHAR(11) NOT NULL,
 INDEX(teac_id),
+UNIQUE KEY (sub_id, teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
@@ -107,7 +108,7 @@ create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id int(11) NOT NULL,
 teac_id CHAR(11) NOT NULL,
-INDEX(teac_id, grade_id),
+UNIQUE KEY(teac_id, grade_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
@@ -122,6 +123,7 @@ id INT NOT NULL AUTO_INCREMENT,
 class_id INT(11) NOT NULL,
 teac_id CHAR(11) NOT NULL,
 INDEX(teac_id),
+UNIQUE KEY(class_id, teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)

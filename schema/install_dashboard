@@ -2,10 +2,11 @@ set names utf8;
 create database if not exists ustudy character set utf8;
 
 CREATE TABLE if not exists ustudy.subject (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  name varchar(20) DEFAULT NULL,
-  type varchar(1) DEFAULT '0' COMMENT '是否分科，0：不分科，1：文综，2：理综',
-  PRIMARY KEY (`id`)
+id int(11) NOT NULL AUTO_INCREMENT,
+name varchar(20) DEFAULT NULL,
+type varchar(1) DEFAULT '0' COMMENT '是否分科，0：不分科，1：文综，2：理综',
+PRIMARY KEY (`id`),
+INDEX(name)  
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.users (

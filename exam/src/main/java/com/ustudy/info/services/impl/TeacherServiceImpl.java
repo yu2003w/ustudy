@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,20 +17,18 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
+import com.ustudy.info.mapper.TeaMapper;
+import com.ustudy.info.model.Subject;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.model.UElem;
 import com.ustudy.info.services.TeacherService;
 import com.ustudy.info.util.InfoUtil;
-import com.ustudy.info.util.TeacherRowMapper;
 import com.ustudy.info.util.UElemRowMapper;
 
 /**
@@ -45,46 +44,37 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Autowired
 	private JdbcTemplate jTea;
+	
+	@Autowired
+	private TeaMapper teaM;
 
 	@Override
 	public List<Teacher> getList(int id) {
-		List<Teacher> teaL = null;
 
-		String sqlOrg = "select * from ustudy.teacher where id > ? and orgid = ? and orgtype = ? limit 10000";
-		try {
-
-			String orgT = InfoUtil.retrieveSessAttr("orgType");
-			String orgId = InfoUtil.retrieveSessAttr("orgId");
-			if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
-				throw new RuntimeException("getList(), it seemed user not logged in");
-			}
-
-			if (id < 0)
-				id = 0;
-
-			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, orgId, orgT);
-			logger.debug("Fetched " + teaL.size() + " items of user");
-
-			for (Teacher tea : teaL) {
-				// Noted: for getList() service, front end doesn't need
-				// additional permissions related information
-				retrieveProp(tea);
-				logger.debug(tea.toString());
-			}
-
-		} catch (DataAccessException e) {
-			logger.warn("getList(), retrieve data from id " + id + " failed.");
-			logger.warn(e.getMessage());
+		String orgT = InfoUtil.retrieveSessAttr("orgType");
+		String orgId = InfoUtil.retrieveSessAttr("orgId");
+		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
+			logger.error("getList(), it seemed that user not logged in");
+			throw new RuntimeException("getList(), it seemed user not logged in");
 		}
+		
+		if (id < 0)
+			id = 0;
+		
+		List<Teacher> teaL = teaM.getTeaList(id, orgT, orgId);
+		for (Teacher tea : teaL) {
+			// Noted: for getList() service, front end doesn't need
+			// additional permissions related information
+			retrieveProp(tea);
+			logger.debug(tea.toString());
+		}
+		
 		return teaL;
 	}
 
 	@Override
-	@Transactional
-	public Teacher displayItem(int id) {
-		String sqlD = "select * from ustudy.teacher where id = ?";
-		Teacher item = jTea.queryForObject(sqlD, new TeacherRowMapper(), id);
-
+	public Teacher displayTeacher(int id) {
+		Teacher item = teaM.findTeaById(id);
 		retrieveProp(item);
 
 		return item;
@@ -98,7 +88,9 @@ public class TeacherServiceImpl implements TeacherService {
 		item.setSubjects(subs);
 
 		// retrieve classes
-		sqlD = "select class_name as value from ustudy.teacherclass where teac_id = ?";
+		sqlD = "select cls_name as value from ustudy.teacherclass left join ustudy.class on "
+				+ "teacherclass.class_id = ustudy.class.id where teac_id = ? and ustudy.teacherclass.class_id "
+				+ "IS NULL";
 		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setClasses(cls);
 
@@ -128,9 +120,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public Teacher findTeacherById(String teaid) {
 		logger.debug("findTeacherById(), retrieve information for " + teaid);
-		String sqlT = "select * from ustudy.teacher where teacid = ?";
-		Teacher item = jTea.queryForObject(sqlT, new TeacherRowMapper(), teaid);
-		return item;
+		return teaM.findTeaByTeaId(teaid); 
 	}
 
 	@Override
@@ -147,122 +137,94 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	@Transactional
-	public int createItem(Teacher item) {
-		logger.debug("createItem(), " + item);
-		// Noted: Schema for table ustudy.teacher is as below,
-		// id, teacid, teacname, passwd, orgType, orgId, ctime, lltime
-		String sqlTeac = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?)";
-
-		// insert record into ustudy.teacher firstly, also auto generated keys is required.
-		KeyHolder keyH = new GeneratedKeyHolder();
-		int id = -1; // auto generated id
+	public int createTeacher(Teacher item) {
+		
 		String msg = null;
 
 		String orgT = InfoUtil.retrieveSessAttr("orgType");
 		String orgId = InfoUtil.retrieveSessAttr("orgId");
 		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
-			throw new RuntimeException("createItem(), it seemed user not logged in");
+			throw new RuntimeException("createTeacher(), it seemed user not logged in");
 		}
 		item.setOrgid(orgId);
 		item.setOrgtype(orgT);
 
-		// need to retrieve auto id of teacher item which is returned back in header location
-		int num = jTea.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlTeac, Statement.RETURN_GENERATED_KEYS);
-				psmt.setNull(1, java.sql.Types.INTEGER);
-				psmt.setString(2, item.getTeacId());
-				psmt.setString(3, item.getTeacName());
-
-				// Noted: password should be set as last 6 digits of teacher id
-				// which is phone number
-				try {
-					MessageDigest md = MessageDigest.getInstance("MD5");
-					if (item.getPasswd() != null) {
-						md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
-					} else {
-						// if no passwd set for teacher, passwd should be last 6
-						// characters in teacId
-						if (item.getTeacId() == null || item.getTeacId().length() < 6) {
-							logger.warn("createItem(), teacher id contains less than 6 "
-									+ "characters, failed to populate password");
-							throw new RuntimeException("createItem(), failed to set password.");
-						}
-						String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
-								item.getTeacId().length());
-						md.update(pw.getBytes(), 0, 6);
-
-					}
-
-					item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
-				} catch (NoSuchAlgorithmException ne) {
-					String emsg = "createItem(), failed to initialize MD5 algorithm.";
-					logger.warn(emsg);
-					throw new RuntimeException(emsg);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			if (item.getPasswd() != null) {
+				md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+			} else {
+				// if no passwd set for teacher, passwd should be last 6 characters in teacId
+				if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+					
+					logger.error("createTeacher(), teacher id contains less than 6 characters, failed to "
+							+ "populate password");
+					
+					throw new RuntimeException("createTeacher(), failed to set password.");
 				}
+				String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
+						item.getTeacId().length());
+				md.update(pw.getBytes(), 0, 6);
 
-				psmt.setString(4, item.getPasswd());
-
-				// Noted: need to populate current user's orgtype, orgid
-				psmt.setString(5, orgT);
-				psmt.setString(6, orgId);
-
-				// teacher creation time should be set to current time
-				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-				psmt.setNull(8, java.sql.Types.DATE);
-
-				return psmt;
 			}
-		}, keyH);
-		if (num != 1) {
-			msg = "createItem(), return value for teacher insert is " + num;
+
+			item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
+			
+		} catch (NoSuchAlgorithmException ne) {
+			msg = "createTeacher(), failed to initialize MD5 algorithm.";
 			logger.warn(msg);
 			throw new RuntimeException(msg);
 		}
-
-		id = keyH.getKey().intValue();
-		if (id < 0) {
-			msg = "createItem() failed with invalid id " + id;
-			logger.warn(msg);
+		
+		// ready to insert teacher info to database
+		int ret = teaM.createTeacher(item);
+		
+		if (ret < 0 || ret > 2) {
+			msg = "createTeacher(), insert failed with ret->" + ret;
+			logger.error(msg);
 			throw new RuntimeException(msg);
 		}
 
+		if (item.getId() < 0) {
+			msg = "createTeacher(), invalid id " + item.getId();
+			logger.error(msg);
+			throw new RuntimeException(msg);
+		}
+		
+		logger.debug("createTeacher(), created ret->" + ret + ", generated id->" + item.getId());
+		
 		// save subjects
-		num = 0;
 		if (item.getSubjects() != null)
-			num = saveSubjects(item.getSubjects(), item.getTeacId());
-		logger.debug("createItem()," + num + " subjects populated for " + item.getTeacId());
+			ret = saveSubjects(item.getSubjects(), item.getTeacId());
+		logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
 
 		// save grades
-		num = 0;
 		if (item.getGrades() != null)
-			num = saveGrades(item.getGrades(), item.getTeacId());
-		logger.debug("createItem()," + num + " grades populated for " + item.getTeacId());
+			ret = saveTeaGrades(item.getGrades(), item.getTeacId());
+		logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
 
 		// save classes
-		num = 0;
 		if (item.getClasses() != null)
-			num = saveClasses(item.getClasses(), item.getTeacId());
-		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
+			ret = saveClasses(item.getClasses(), item.getTeacId());
+		logger.debug("createItem()," + ret + " classes populated for " + item.getTeacId());
 
 		// save roles
-		num = saveRoles(item.getRoles(), item);
-		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
+		ret = saveRoles(item.getRoles(), item);
+		logger.debug("createItem(), " + ret + " roles is saved for " + item.getTeacId());
 
 		// save additional permission
-		num = 0;
 		if (item.getAddiPerms() != null)
-			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
+			ret = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+		logger.debug("createItem()," + ret + " additional perms populated for " + item.getTeacId());
 
-		return id;
+		logger.debug("createTeacher(), teacher created->" + item);
+		return item.getId();
 	}
 
 	@Override
-	public int updateItem(Teacher item, int id) {
+	public int updateTeacher(Teacher item, int id) {
 		String updateOrg = "update ustudy.teacher set ";
-		Teacher origin = displayItem(id);
+		Teacher origin = displayTeacher(id);
 		Map<String, String> orgDiff = item.compare(origin);
 		if (orgDiff.size() == 0) {
 			logger.info("No changes in orgowner and no need to update");
@@ -286,7 +248,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public int delItemSet(String ids) {
+	public int delTeas(String ids) {
 		List<String> idsList = InfoUtil.parseIds(ids);
 		int len = idsList.size();
 		if (len == 0)
@@ -304,7 +266,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public int deleteItem(int id) {
+	public int deleteTeacher(int id) {
 		String sqlDel = "delete from ustudy.teacher where id = ?";
 		return jTea.update(sqlDel, id);
 	}
@@ -424,53 +386,43 @@ public class TeacherServiceImpl implements TeacherService {
 
 	}
 
-	private int saveSubjects(List<UElem> subs, String teachid) {
-		String sqlSub = "insert into ustudy.teachersub values(?,?,?)";
-		String msg = null;
+	private int saveSubjects(List<UElem> subs, String teacid) {
+		
+		List<Subject> subL = teaM.getSubs();
+		HashMap<String, String> subMap = new HashMap<String, String>();
+		for (Subject sub:subL) {
+			subMap.put(sub.getSubName(), sub.getSubId());
+		}
+		
 		for (UElem u : subs) {
-			int num = jTea.update(new PreparedStatementCreator() {
-				@Override
-				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-					PreparedStatement psmt = conn.prepareStatement(sqlSub, Statement.RETURN_GENERATED_KEYS);
-					psmt.setNull(1, java.sql.Types.NULL);
-					psmt.setString(2, u.getValue());
-					psmt.setString(3, teachid);
-					return psmt;
-				}
-			});
-			if (num != 1) {
-				msg = "saveSubjects(), return value from subject insert is " + num;
-				logger.warn(msg);
-				throw new RuntimeException(msg);
+			String sId = subMap.get(u.getValue());
+			if (sId == null || sId.isEmpty()) {
+				logger.error("saveSubjects(), invalid sub id->" + sId);
+				throw new RuntimeException("saveSubjects(), invalid subject id");
+			}
+			int ret = teaM.saveTeaSub(sId, teacid);
+			if (ret < 0 || ret > 2) {
+				logger.error("saveSubjects(), insert failed with ret->" + ret);
+				throw new RuntimeException("saveSubjects(), insert failed with ret->" + ret);
 			}
 
-			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teachid);
+			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teacid);
 		}
 
 		return subs.size();
 	}
 
-	private int saveGrades(List<UElem> grades, String teachid) {
-		String sqlG = "insert into ustudy.teachergrade values(?,?,?)";
-		String msg = null;
+	private int saveTeaGrades(List<UElem> grades, String teacid) {
+		
 		for (UElem u : grades) {
-			int num = jTea.update(new PreparedStatementCreator() {
-				@Override
-				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-					PreparedStatement psmt = conn.prepareStatement(sqlG, Statement.RETURN_GENERATED_KEYS);
-					psmt.setNull(1, java.sql.Types.NULL);
-					psmt.setString(2, u.getValue());
-					psmt.setString(3, teachid);
-					return psmt;
-				}
-			});
-			if (num != 1) {
-				msg = "saveGrades(), return value from grade insert is " + num;
+			int ret = teaM.saveTeaGr(u.getValue(), teacid);
+			if (ret != 1) {
+				String msg = "saveTeaGrades(), insert failed with ret->" + ret;
 				logger.warn(msg);
 				throw new RuntimeException(msg);
 			}
 
-			logger.debug("saveGrades(), grades saved -> " + u.getValue() + ":" + teachid);
+			logger.debug("saveTeaGrades(), grades saved -> " + u.getValue() + ":" + teacid);
 		}
 
 		return grades.size();

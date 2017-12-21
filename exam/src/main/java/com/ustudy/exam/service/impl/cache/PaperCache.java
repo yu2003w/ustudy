@@ -221,7 +221,7 @@ public class PaperCache {
 					return paperM;
 				}
 			}
-			else if (pr.getAssmode().compareTo("平均") == 0) {
+			else if (!isFinalMark && pr.getAssmode().compareTo("平均") == 0) {
 				logger.info("getPapersForSingleQues(), all assigned papers are marked by " + teacid);
 				return null;
 			}
@@ -232,6 +232,18 @@ public class PaperCache {
 		
 		if (isFinalMark) {
 			paperCacheKey = QUES_PAPER_PREFIX_FINAL + pr.getQid();
+			// for final mark, need to fetch items from cache each time
+			mtcL = paperC.opsForValue().get(paperCacheKey);
+			if (mtcL != null) {
+				paperC.delete(paperCacheKey);
+				mtcL = null;
+				logger.info("getPapersForSingleQues(), clear final mark cache for " + paperCacheKey);
+			}
+			if (msc != null) {
+				paperC.delete(cacheKey);
+				msc = null;
+				logger.info("getPapersForSingleQues(), clean final mark cache for " + cacheKey);
+			}
 		}
 		else {
 			paperCacheKey = QUES_PAPER_PREFIX + pr.getQid();
@@ -239,11 +251,13 @@ public class PaperCache {
 		mtcL = paperC.opsForValue().get(paperCacheKey);
 		
 		if (mtcL == null || mtcL.isEmpty()) {
-			if (!cachePapers(pr)) {
-				logger.error("getPapersForSingleQues(), failed to cache papers for question " + pr.getQid());
-				return null;
+			if (paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid()) == null) {
+				if (!cachePapers(pr)) {
+					logger.error("getPapersForSingleQues(), failed to cache papers for question " + pr.getQid());
+					return null;
+				}
+				logger.info("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
 			}
-			logger.info("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
 			
 			// for final mark, paper ids should be caculated from first round mark 
 			if (isFinalMark && !popFinalMarkIds(pr.getQid())) {
@@ -266,7 +280,7 @@ public class PaperCache {
 				msc = new MarkStaticsCache();
 			logger.debug("getPapersForSingleQues(), initialize mark statics cache for teacher " + teacid);
 		}
-				
+		
 		if (msc.getCurAssign() == null)
 			msc.setCurAssign(new ConcurrentHashMap<String, MarkTaskCache>());
 		

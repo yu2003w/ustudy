@@ -68,6 +68,7 @@ public class SchoolServiceImp implements SchoolService {
 	@Transactional
 	@Override
 	public int updateSchool(School data, int id) {
+		
 		String updateSch = "update ustudy.school set ";
 		School origin = displaySchool(id);
 		Map<String, String> schDiff = data.compare(origin);

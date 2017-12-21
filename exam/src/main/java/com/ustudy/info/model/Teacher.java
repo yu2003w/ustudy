@@ -15,7 +15,7 @@ public class Teacher implements Serializable {
 	 */
 	private static final long serialVersionUID = -6133372584686820580L;
 
-	private String id = null;
+	private int id = -1;
 
 	@JsonProperty("teacherId")
 	private String teacId = null;
@@ -49,7 +49,7 @@ public class Teacher implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Teacher(String id, String teacId, String teacName, String passwd, String cTime, String llTime,
+	public Teacher(int id, String teacId, String teacName, String passwd, String cTime, String llTime,
 			List<UElem> roles, List<UElem> subjects, List<UElem> grades, List<UElem> classes, List<UElem> addiPerms) {
 		super();
 		this.id = id;
@@ -65,7 +65,7 @@ public class Teacher implements Serializable {
 		this.addiPerms = addiPerms;
 	}
 
-	public Teacher(String id, String teacId, String teacName, String passwd, String cTime, String llTime,
+	public Teacher(int id, String teacId, String teacName, String passwd, String cTime, String llTime,
 			String orgtype, String orgid) {
 		super();
 		this.id = id;
@@ -78,11 +78,11 @@ public class Teacher implements Serializable {
 		this.orgid = orgid;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -186,7 +186,8 @@ public class Teacher implements Serializable {
 	public String toString() {
 		return "Teacher [id=" + id + ", teacId=" + teacId + ", teacName=" + teacName + ", passwd=" + passwd + ", cTime="
 				+ cTime + ", llTime=" + llTime + ", roles=" + roles + ", subjects=" + subjects + ", grades=" + grades
-				+ ", classes=" + classes + ", addiPerms=" + addiPerms + "]";
+				+ ", classes=" + classes + ", addiPerms=" + addiPerms + ", orgtype=" + orgtype + ", orgid=" + orgid
+				+ "]";
 	}
 
 	public Map<String, String> compare(Teacher item) {
