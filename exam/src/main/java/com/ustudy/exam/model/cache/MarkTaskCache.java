@@ -31,7 +31,7 @@ public class MarkTaskCache implements Serializable {
 	private float score = -1;
 	
 	// index of papers in cache should be finally marked
-	private int seq = 0;
+	private int seq = -1;
 	
 	public MarkTaskCache() {
 		super();
@@ -53,6 +53,16 @@ public class MarkTaskCache implements Serializable {
 		this.score = score;
 	}
 
+	public MarkTaskCache(String paperid, String img, String teacid, int status, float score, int seq) {
+		super();
+		this.paperid = paperid;
+		this.img = img;
+		this.teacid = teacid;
+		this.status = status;
+		this.score = score;
+		this.seq = seq;
+	}
+
 	public MarkTaskCache(String paperid, String teacid, int status) {
 		super();
 		this.paperid = paperid;
@@ -66,6 +76,7 @@ public class MarkTaskCache implements Serializable {
 		this.status = mt.getStatus();
 		this.score = mt.getScore();
 		this.img = mt.getImg();
+		this.seq = mt.getSeq();
 	}
 	
 	public String getPaperid() {

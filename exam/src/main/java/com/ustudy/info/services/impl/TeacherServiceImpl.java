@@ -95,7 +95,8 @@ public class TeacherServiceImpl implements TeacherService {
 		item.setClasses(cls);
 
 		// retrieve grades
-		sqlD = "select grade_name as value from ustudy.teachergrade where teac_id = ?";
+		sqlD = "select grade_name as value from ustudy.teachergrade join ustudy.grade on "
+				+ "ustudy.teachergrade.grade_id = ustudy.grade.id where teac_id = ?";
 		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setGrades(gs);
 

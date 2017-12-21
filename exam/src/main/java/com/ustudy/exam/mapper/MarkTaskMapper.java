@@ -59,16 +59,21 @@ public interface MarkTaskMapper {
 			+ "mark_mode as markMode, score as fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 	
-	@Select("select ustudy.paper.id as paperid, ustudy.paper.paper_img as img from ustudy.question join "
-			+ "ustudy.paper on ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
+	@Select("select ustudy.paper.id as paperid, ustudy.paper.paper_img as img from ustudy.question "
+			+ "join ustudy.paper on ustudy.question.exam_grade_sub_id = ustudy.paper.exam_grade_sub_id "
 			+ "where ustudy.question.id = #{qid}")
 	public List<MarkTaskCache> getPapersByQuesId(@Param("qid") String quesid);
  	
-	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true")
+	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true "
+			+ "and isfinal=false")
 	public List<PaperScoreCache> getViewedPapersByQuesId(@Param("qid") String quesid);
 	
-	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true and "
-			+ "teacid=#{tid}")
+	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true "
+			+ "and isfinal=true")
+	public List<PaperScoreCache> getFinalViewedPapersByQuesId(@Param("qid") String quesid);
+	
+	@Select("select paperid, score, teacid from ustudy.answer where quesid=#{qid} and isviewed=true "
+			+ "and teacid=#{tid}")
 	public List<PaperScoreCache> getPaperScoreByQuesId(@Param("qid") String quesid, @Param("tid") String tid);
 	
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")

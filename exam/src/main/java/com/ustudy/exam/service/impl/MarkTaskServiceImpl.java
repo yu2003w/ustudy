@@ -348,7 +348,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		// need to update statics here, make sure this is called only after database operations are completed
 		List<MarkUpdateResult> murL = new ArrayList<MarkUpdateResult>();
 		for (BlockAnswer ba:blocks) {
-			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId(), ba.getScore());
+			paperC.updateMarkStaticsCache(ba.getQuesid(), ba.getPaperId(), ba.getScore(), ba.isIsfinal());
 			murL.add(new MarkUpdateResult(ba.getQuestionName(), paperC.getProgress(ba.getQuesid(), teacid), 
 					paperC.getAveScore(ba.getQuesid(), teacid)));
 		}
