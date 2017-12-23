@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Object contains information about grade and related subjects defined in a school
  *
  */
-public class TeaGrade implements Serializable {
+public class SchGradeSub implements Serializable {
 
 	/**
 	 * 
@@ -24,12 +24,12 @@ public class TeaGrade implements Serializable {
 	@JsonProperty("subjects")
 	private List<Item> subs = null;
 
-	public TeaGrade() {
+	public SchGradeSub() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public TeaGrade(int id, String name, List<Item> subs) {
+	public SchGradeSub(int id, String name, List<Item> subs) {
 		super();
 		this.id = id;
 		this.name = name;

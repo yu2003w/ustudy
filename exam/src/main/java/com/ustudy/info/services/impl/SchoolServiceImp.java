@@ -25,7 +25,7 @@ import com.ustudy.info.model.OwnerBrife;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
 import com.ustudy.info.model.SubjectTeac;
-import com.ustudy.info.model.TeaGrade;
+import com.ustudy.info.model.SchGradeSub;
 import com.ustudy.info.model.TeacherBrife;
 import com.ustudy.info.model.TeacherSub;
 import com.ustudy.info.services.SchoolService;
@@ -372,30 +372,38 @@ public class SchoolServiceImp implements SchoolService {
 		GradeSubRoles gsr = new GradeSubRoles();
 		gsr.setRoles(roles);
 		
+		List<SchGradeSub> tgL = getGrSubs(schid);	
+		gsr.setGrades(tgL);
+		
+		logger.debug("getGrSubRoles(), GradeSubRoles info populated for school->" + schid);
+		return gsr;
+	}
+
+	@Override
+	public List<SchGradeSub> getGrSubs(String schid) {
 		// retrieve grades and related subjects information for school
 		List<Item> grades = schM.getGrades(schid);
 		if (grades == null || grades.isEmpty()) {
-			logger.error("getGrSubRoles(), no grades found for school->" + schid);
+			logger.error("getGrSubs(), no grades found for school->" + schid);
 			throw new RuntimeException("getGrSubRoles(), no grades found for school->" + schid);
 		}
-		
-		List<TeaGrade> tgL = new ArrayList<TeaGrade>();
-		
+				
+		List<SchGradeSub> tgL = new ArrayList<SchGradeSub>();
+				
 		// for each grade, populate subjects
 		for (Item it: grades) {
 			List<Item> gSubs = schM.getGradeSub(it.getId());
 			if (gSubs == null || gSubs.isEmpty()) {
-				logger.error("getGrSubRoles(), no subjects found for grade->" + it.getId() + 
+				logger.error("getGrSubs(), no subjects found for grade->" + it.getId() + 
 						", school->" + schid);
-				throw new RuntimeException("getGrSubRoles(), no subjects found for grade->" + 
+				throw new RuntimeException("getGrSubs(), no subjects found for grade->" + 
 						it.getId() + ", school->" + schid);
 			}
-			TeaGrade tg = new TeaGrade(it.getId(), it.getName(), gSubs);
+			SchGradeSub tg = new SchGradeSub(it.getId(), it.getName(), gSubs);
 			tgL.add(tg);
 		}
 		
-		gsr.setGrades(tgL);
-		logger.debug("getGrSubRoles(), GradeSubRoles info populated for school->" + schid);
-		return gsr;
+		logger.debug("getGrSubs(), SchGrSubs->" + schid + "," + tgL.toString());
+		return tgL;
 	}
 }

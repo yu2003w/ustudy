@@ -5,6 +5,7 @@ import java.util.List;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
 import com.ustudy.info.model.GradeSubRoles;
+import com.ustudy.info.model.SchGradeSub;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
 import com.ustudy.info.model.TeacherSub;
@@ -45,5 +46,13 @@ public interface SchoolService {
 	 * 
 	 */
 	public GradeSubRoles getGrSubRoles(String schId);
+	
+	
+	/**
+	 * Construct information about grades and related subjects in a school
+	 * @param schId
+	 * @return
+	 */
+	public List<SchGradeSub> getGrSubs(String schId);
 	
 }

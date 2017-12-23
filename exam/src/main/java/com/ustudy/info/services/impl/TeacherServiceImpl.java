@@ -26,7 +26,6 @@ import com.mysql.cj.api.jdbc.Statement;
 import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.mapper.TeaMapper;
 import com.ustudy.info.model.Item;
-import com.ustudy.info.model.TeaGrade;
 import com.ustudy.info.model.Subject;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.model.UElem;
@@ -88,24 +87,20 @@ public class TeacherServiceImpl implements TeacherService {
 
 	private void retrieveProp(Teacher item) {
 		// retrieve grades
-		List<TeaGrade> grs = teaM.getTeaGrade(item.getTeacId());
+		List<Item> grs = teaM.getTeaGrade(item.getTeacId());
 		if (grs == null || grs.isEmpty()) {
 			logger.info("retrieveProp(), no grades found for " + item.getTeacId());
-			return;
 		}
-
-		for (TeaGrade tr: grs) {
-			// retrieve subjects
-			List<Item> subs = teaM.getTeaSubs(item.getTeacId());
-			if (subs == null || subs.isEmpty()) {
-				logger.info("retrieveProp(), no subjects found for " + item.getTeacId());
-				subs = new ArrayList<Item>();
-			}
-			tr.setSubs(subs);
-		}
-		
 		item.setGrades(grs);
 
+		// retrieve subjects
+		List<Item> subs = teaM.getTeaSubjects(item.getTeacId());
+		if (subs == null || subs.isEmpty()) {
+			logger.info("retrieveProp(), no subjects found for " + item.getTeacId());
+		}
+		item.setSubjects(subs);
+		
+		
 		// retrieve classes
 		/*
 		sqlD = "select cls_name as value from ustudy.teacherclass left join ustudy.class on "
@@ -174,20 +169,16 @@ public class TeacherServiceImpl implements TeacherService {
 			} else {
 				// if no passwd set for teacher, passwd should be last 6 characters in teacId
 				if (item.getTeacId() == null || item.getTeacId().length() < 6) {
-					
 					logger.error("createTeacher(), teacher id contains less than 6 characters, failed to "
 							+ "populate password");
-					
 					throw new RuntimeException("createTeacher(), failed to set password.");
 				}
 				String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
 						item.getTeacId().length());
 				md.update(pw.getBytes(), 0, 6);
-
 			}
 
 			item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
-			
 		} catch (NoSuchAlgorithmException ne) {
 			msg = "createTeacher(), failed to initialize MD5 algorithm.";
 			logger.warn(msg);
@@ -216,6 +207,10 @@ public class TeacherServiceImpl implements TeacherService {
 			ret = saveTeaGrades(item.getGrades(), item.getTeacId());
 		logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
 
+		if (item.getSubjects() != null)
+			ret = saveSubjects(item.getSubjects(), item.getTeacId());
+		logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
+		
 		// save classes
 		if (item.getClasses() != null)
 			ret = saveClasses(item.getClasses(), item.getTeacId());
@@ -308,7 +303,7 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 
 			logger.debug("saveRoles(), Role saved -> " + u.toString() + ":" + item.getTeacId());
-			int subId = item.getGrades().get(0).getSubs().get(0).getId();
+			int subId = item.getSubjects().get(0).getId();
 			int grId = item.getGrades().get(0).getId();
 			
 			// if role is sleader, need to populate into corresponding departsub
@@ -340,30 +335,17 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 		}
 
-		// Noted: a little tricky here, to populate additional permissions for
-		// the teacher, need to populate role as "addi_teachid" for the teacher
 		/*
-		ret = jTea.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-				psmt.setNull(1, java.sql.Types.NULL);
-				psmt.setString(2, "addi_" + item.getTeacId());
-				psmt.setString(3, item.getTeacId());
-				return psmt;
-			}
-		});
-		if (ret != 1) {
-			msg = "saveRoles(), return value from additional role insert is " + ret;
-			logger.warn(msg);
-			throw new RuntimeException(msg);
-		} 
+		 *  TODO: a little tricky here, to populate additional permissions for
+		 *  the teacher, need to populate role as "addi_teachid" for the teacher
+		 *  save addi_teacid as role name into rolevalue firstly, then insert related 
+		 *  record into ustudy.teacherroles
+		 */ 
 
-		logger.debug("saveRoles(), populated additional roles for " + item.getTeacId());
 		if (roles != null)
 			ret = roles.size() + 1;
 		else
-			ret = 1; */
+			ret = 1;
 		return ret;
 
 	}
@@ -400,16 +382,16 @@ public class TeacherServiceImpl implements TeacherService {
 		List<Subject> subL = teaM.getSubs();
 		HashMap<String, String> subMap = new HashMap<String, String>();
 		for (Subject sub:subL) {
-			subMap.put(sub.getSubName(), sub.getSubId());
+			subMap.put(sub.getSubId(), sub.getSubName());
 		}
 		
 		for (Item u : subs) {
-			String sId = subMap.get(String.valueOf(u.getName()));
-			if (sId == null || sId.isEmpty()) {
-				logger.error("saveSubjects(), invalid sub id->" + sId);
+			String sn = subMap.get(String.valueOf(u.getId()));
+			if (sn == null || sn.isEmpty()) {
+				logger.error("saveSubjects(), invalid sub id->" + u.getId());
 				throw new RuntimeException("saveSubjects(), invalid subject id");
 			}
-			int ret = teaM.saveTeaSub(sId, teacid);
+			int ret = teaM.saveTeaSub(u.getId(), teacid);
 			if (ret < 0 || ret > 2) {
 				logger.error("saveSubjects(), insert failed with ret->" + ret);
 				throw new RuntimeException("saveSubjects(), insert failed with ret->" + ret);
@@ -420,33 +402,17 @@ public class TeacherServiceImpl implements TeacherService {
 
 		return subs.size();
 	}
-
-	private int saveTeaGrades(List<TeaGrade> grades, String teacid) {
+	
+	private int saveTeaGrades(List<Item> grades, String teacid) {
 		String msg = null;
-		for (TeaGrade u : grades) {
-			int ret = teaM.saveTeaGr(u.getId(), teacid);
+		for (Item it : grades) {
+			int ret = teaM.saveTeaGr(it.getId(), teacid);
 			if (ret != 1) {
-				msg = "saveTeaGrades(), insert failed with ret->" + ret + u.toString();
+				msg = "saveTeaGrades(), insert failed with ret->" + ret + it.toString();
 				logger.error(msg);
 				throw new RuntimeException(msg);
 			}
-			
-			List<Item> subs = u.getSubs();
-			if (subs == null || subs.isEmpty()) {
-				msg = "saveTeaGrades(), no subject specified," + u.toString();
-				logger.error(msg);
-				throw new RuntimeException(msg);
-			}
-			
-			ret = saveSubjects(subs, teacid);
-			if (ret != subs.size()) {
-				msg = "saveTeaGrades(), num of saved subjects not matched with specifed in request, " + ret
-						+ "," + subs.size();
-				logger.error(msg);
-				throw new RuntimeException(msg);
-			}
-				
-			logger.debug("saveTeaGrades(), grades saved -> " + u.toString() + ":" + teacid);
+			logger.debug("saveTeaGrades(), grades saved -> " + it.toString() + ":" + teacid);
 		}
 
 		return grades.size();

@@ -32,7 +32,8 @@ public class Teacher implements Serializable {
 	@JsonProperty("lastLoginTime")
 	private String llTime = null;
 
-	private List<TeaGrade> grades = null;
+	private List<Item> grades = null;
+	private List<Item> subjects = null;
 	private List<Item> roles = null;
 	
 	private List<UElem> classes = null;
@@ -62,12 +63,14 @@ public class Teacher implements Serializable {
 		this.orgid = orgid;
 	}
 
-	public Teacher(int id, String teacId, String teacName, List<TeaGrade> grades, List<Item> roles) {
+	public Teacher(int id, String teacId, String teacName, List<Item> grades, List<Item> subjects, 
+			List<Item> roles) {
 		super();
 		this.id = id;
 		this.teacId = teacId;
 		this.teacName = teacName;
 		this.grades = grades;
+		this.subjects = subjects;
 		this.roles = roles;
 	}
 
@@ -119,11 +122,11 @@ public class Teacher implements Serializable {
 		this.llTime = llTime;
 	}
 
-	public List<TeaGrade> getGrades() {
+	public List<Item> getGrades() {
 		return grades;
 	}
 
-	public void setGrades(List<TeaGrade> grades) {
+	public void setGrades(List<Item> grades) {
 		this.grades = grades;
 	}
 
@@ -133,6 +136,14 @@ public class Teacher implements Serializable {
 
 	public void setRoles(List<Item> roles) {
 		this.roles = roles;
+	}
+
+	public List<Item> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(List<Item> subjects) {
+		this.subjects = subjects;
 	}
 
 	public List<UElem> getClasses() {
@@ -170,8 +181,9 @@ public class Teacher implements Serializable {
 	@Override
 	public String toString() {
 		return "Teacher [id=" + id + ", teacId=" + teacId + ", teacName=" + teacName + ", passwd=" + passwd + ", cTime="
-				+ cTime + ", llTime=" + llTime + ", grades=" + grades + ", roles=" + roles + ", classes=" + classes
-				+ ", addiPerms=" + addiPerms + ", orgtype=" + orgtype + ", orgid=" + orgid + "]";
+				+ cTime + ", llTime=" + llTime + ", grades=" + grades + ", subjects=" + subjects + ", roles=" + roles
+				+ ", classes=" + classes + ", addiPerms=" + addiPerms + ", orgtype=" + orgtype + ", orgid=" + orgid
+				+ "]";
 	}
 
 	public Map<String, String> compare(Teacher item) {

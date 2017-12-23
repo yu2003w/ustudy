@@ -27,6 +27,7 @@ public interface ExamInfoMapper {
 	
 	@Insert("insert into ustudy.examgradesub(examid, grade_id, sub_id) values(#{eid}, #{gid}, #{sid}) on "
 			+ "duplicate key update examid=#{eid}, grade_id=#{gid}, sub_id=#{sid}")
-	public int createExamGradeSub(@Param("eid") int examId, @Param("gid") int gradeId, @Param("sid") int subId);
+	public int createExamGradeSub(@Param("eid") int examId, @Param("gid") int gradeId, 
+			@Param("sid") int subId);
 	
 }

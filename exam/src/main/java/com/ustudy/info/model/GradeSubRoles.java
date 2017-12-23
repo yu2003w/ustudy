@@ -18,7 +18,7 @@ public class GradeSubRoles implements Serializable {
 	 */
 	private static final long serialVersionUID = -4511281491452584288L;
 
-	private List<TeaGrade> grades = null;
+	private List<SchGradeSub> grades = null;
 	
 	private List<Item> roles = null;
 
@@ -27,17 +27,17 @@ public class GradeSubRoles implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public GradeSubRoles(List<TeaGrade> grades, List<Item> roles) {
+	public GradeSubRoles(List<SchGradeSub> grades, List<Item> roles) {
 		super();
 		this.grades = grades;
 		this.roles = roles;
 	}
 
-	public List<TeaGrade> getGrades() {
+	public List<SchGradeSub> getGrades() {
 		return grades;
 	}
 
-	public void setGrades(List<TeaGrade> grades) {
+	public void setGrades(List<SchGradeSub> grades) {
 		this.grades = grades;
 	}
 
