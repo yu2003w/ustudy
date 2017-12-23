@@ -318,27 +318,27 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 							quesAnswerDivs.add(quesAnswerDiv);
 						}
 					}
-				}
-			}
-
-			if (null != subjective.get("child") && !subjective.get("child").equals(null)) {
-				JSONArray childs = subjective.getJSONArray("child");
-				for (int j = 0; j < childs.size(); j++) {
-					JSONObject child = childs.getJSONObject(j);
-					QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
-
-					if (null != child.get("quesno"))
-						quesAnswerDiv.setQuesno(child.getString("quesno"));
-					if (null != child.get("branch"))
-						quesAnswerDiv.setBranch(child.getString("branch"));
-					if (null != child.get("score"))
-						quesAnswerDiv.setScore(child.getInt("score"));
-					if (null != subjective.get("startno") && null != quesids.get(subjective.getInt("startno"))) {
-						quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("startno")));
-					}
-					quesAnswerDiv.setEgsId(egsId);
-
-					quesAnswerDivs.add(quesAnswerDiv);
+				} else {
+				    if (null != subjective.get("child") && !subjective.get("child").equals(null)) {
+				        JSONArray childs = subjective.getJSONArray("child");
+				        for (int j = 0; j < childs.size(); j++) {
+				            JSONObject child = childs.getJSONObject(j);
+				            QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+				            
+				            if (null != child.get("quesno"))
+				                quesAnswerDiv.setQuesno(child.getString("quesno"));
+				            if (null != child.get("branch"))
+				                quesAnswerDiv.setBranch(child.getString("branch"));
+				            if (null != child.get("score"))
+				                quesAnswerDiv.setScore(child.getInt("score"));
+				            if (null != subjective.get("startno") && null != quesids.get(subjective.getInt("startno"))) {
+				                quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("startno")));
+				            }
+				            quesAnswerDiv.setEgsId(egsId);
+				            
+				            quesAnswerDivs.add(quesAnswerDiv);
+				        }
+				    }
 				}
 			}
 		}
