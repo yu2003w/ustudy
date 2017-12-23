@@ -20,7 +20,7 @@
 	</select>
 	
 	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT ss.stuid,ee.name,ee.stuno,egs.id egsId,su.id subId,su.name subName,ifnull(ss.score,0) score,ifnull(ss.sub_score,0) subScore,ifnull(ss.obj_score,0) objScore
+		SELECT ss.stuid,ee.name,ee.stuno,ee.gradeid,egs.id egsId,su.id subId,su.name subName,ifnull(ss.score,0) score,ifnull(ss.sub_score,0) subScore,ifnull(ss.obj_score,0) objScore
 		from examgradesub egs
 		LEFT JOIN (SELECT * from subscore where stuid=#{stuId}) ss ON egs.id=ss.exam_grade_sub_id
 		LEFT JOIN examinee ee ON ss.stuid=ee.id
