@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
+import com.ustudy.info.model.GradeSubRoles;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
 import com.ustudy.info.model.TeacherSub;
@@ -36,5 +37,13 @@ public interface SchoolService {
 	public int updateClassInfo(ClassInfo item);
 	
 	public List<TeacherSub> getClassTeac(String id);
+	
+	
+	/**
+	 * Retrieve school meta information for teacher creation 
+	 * @return
+	 * 
+	 */
+	public GradeSubRoles getGrSubRoles(String schId);
 	
 }

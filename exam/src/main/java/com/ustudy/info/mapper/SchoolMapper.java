@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.ustudy.info.model.Grade;
+import com.ustudy.info.model.Item;
 import com.ustudy.info.model.OwnerBrife;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectTeac;
@@ -31,5 +32,15 @@ public interface SchoolMapper {
 			+ "ustudy.grade left join ustudy.teacher on grade.grade_owner = teacher.teacid where "
 			+ "ustudy.grade.schid=#{schid} and ustudy.grade.grade_owner IS NULL")
 	public List<Grade> getGradesBySchId(@Param("schid") String schid);
-	 
+	
+	@Select("select id, name from ustudy.rolevalue")
+	public List<Item> getRoles();
+	
+	@Select("select id, grade_name as name from ustudy.grade where schid=#{schId}")
+	public List<Item> getGrades(String schId);
+	
+	@Select("select sub_id as id, name from ustudy.gradesub join ustudy.subject on "
+			+ "ustudy.subject.id = ustudy.gradesub.sub_id where grade_id=#{grId}")
+	public List<Item> getGradeSub(int grId);
+	
 }

@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.UResp;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
+import com.ustudy.info.model.GradeSubRoles;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
 import com.ustudy.info.model.TeacherSub;
 import com.ustudy.info.services.SchoolService;
+import com.ustudy.info.util.InfoUtil;
 
 @RestController
 @RequestMapping("info/school/")
@@ -277,5 +280,26 @@ public class SchoolController {
 			logger.warn(msg);
 		}
 		return itemL;
+	}
+	
+	@RequestMapping(value="gsr/", method = RequestMethod.GET)
+	public UResp getGradeSubRole(HttpServletResponse resp) {
+		
+		UResp res = new UResp();
+
+		if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+			String schId = InfoUtil.retrieveSessAttr("orgId");
+			GradeSubRoles gsr = schS.getGrSubRoles(schId);
+			res.setData(gsr);
+			res.setRet(true);
+			logger.debug("getGradeSubRole(), populate GradeSubRoles successful for school->" + schId);
+		}
+		else {
+			logger.warn("getGradeSubRole(), invalid org type found, not supported user yet");
+			res.setMessage("Not supported user");
+			resp.setStatus(500);
+			return res;
+		}
+		return res;
 	}
 }

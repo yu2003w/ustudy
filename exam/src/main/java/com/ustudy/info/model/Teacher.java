@@ -32,9 +32,9 @@ public class Teacher implements Serializable {
 	@JsonProperty("lastLoginTime")
 	private String llTime = null;
 
-	private List<UElem> roles = null;
-	private List<UElem> subjects = null;
-	private List<UElem> grades = null;
+	private List<TeaGrade> grades = null;
+	private List<Item> roles = null;
+	
 	private List<UElem> classes = null;
 	private List<UElem> addiPerms = null;
 
@@ -50,22 +50,6 @@ public class Teacher implements Serializable {
 	}
 
 	public Teacher(int id, String teacId, String teacName, String passwd, String cTime, String llTime,
-			List<UElem> roles, List<UElem> subjects, List<UElem> grades, List<UElem> classes, List<UElem> addiPerms) {
-		super();
-		this.id = id;
-		this.teacId = teacId;
-		this.teacName = teacName;
-		this.passwd = passwd;
-		this.cTime = cTime;
-		this.llTime = llTime;
-		this.roles = roles;
-		this.subjects = subjects;
-		this.grades = grades;
-		this.classes = classes;
-		this.addiPerms = addiPerms;
-	}
-
-	public Teacher(int id, String teacId, String teacName, String passwd, String cTime, String llTime,
 			String orgtype, String orgid) {
 		super();
 		this.id = id;
@@ -76,6 +60,15 @@ public class Teacher implements Serializable {
 		this.llTime = llTime;
 		this.orgtype = orgtype;
 		this.orgid = orgid;
+	}
+
+	public Teacher(int id, String teacId, String teacName, List<TeaGrade> grades, List<Item> roles) {
+		super();
+		this.id = id;
+		this.teacId = teacId;
+		this.teacName = teacName;
+		this.grades = grades;
+		this.roles = roles;
 	}
 
 	public int getId() {
@@ -126,28 +119,20 @@ public class Teacher implements Serializable {
 		this.llTime = llTime;
 	}
 
-	public List<UElem> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(List<UElem> roles) {
-		this.roles = roles;
-	}
-
-	public List<UElem> getSubjects() {
-		return subjects;
-	}
-
-	public void setSubjects(List<UElem> subjects) {
-		this.subjects = subjects;
-	}
-
-	public List<UElem> getGrades() {
+	public List<TeaGrade> getGrades() {
 		return grades;
 	}
 
-	public void setGrades(List<UElem> grades) {
+	public void setGrades(List<TeaGrade> grades) {
 		this.grades = grades;
+	}
+
+	public List<Item> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Item> roles) {
+		this.roles = roles;
 	}
 
 	public List<UElem> getClasses() {
@@ -185,9 +170,8 @@ public class Teacher implements Serializable {
 	@Override
 	public String toString() {
 		return "Teacher [id=" + id + ", teacId=" + teacId + ", teacName=" + teacName + ", passwd=" + passwd + ", cTime="
-				+ cTime + ", llTime=" + llTime + ", roles=" + roles + ", subjects=" + subjects + ", grades=" + grades
-				+ ", classes=" + classes + ", addiPerms=" + addiPerms + ", orgtype=" + orgtype + ", orgid=" + orgid
-				+ "]";
+				+ cTime + ", llTime=" + llTime + ", grades=" + grades + ", roles=" + roles + ", classes=" + classes
+				+ ", addiPerms=" + addiPerms + ", orgtype=" + orgtype + ", orgid=" + orgid + "]";
 	}
 
 	public Map<String, String> compare(Teacher item) {

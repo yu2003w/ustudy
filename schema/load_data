@@ -18,4 +18,9 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/subject.data' INTO TABLE ustud
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.data' INTO TABLE ustudy.rolevalue
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 

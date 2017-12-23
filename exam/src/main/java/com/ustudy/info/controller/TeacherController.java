@@ -119,13 +119,13 @@ public class TeacherController {
 	}
 	
 	@RequestMapping(value="/add", method = RequestMethod.POST)
-	public String createItem(@RequestBody @Valid Teacher item, HttpServletResponse resp, UriComponentsBuilder builder) {
+	public String createTeacher(@RequestBody @Valid Teacher item, HttpServletResponse resp, UriComponentsBuilder builder) {
 		logger.debug("endpoint /teacher/add is visited.");
 		String result = null;
 		try {
 			// Before create item, need to check whether corresponding orgId is valid.
 		    int index = teaS.createTeacher(item);
-		    logger.debug("createItem(), item created successfully with id " + index);
+		    logger.debug("createTeacher(), item created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
 		    	builder.path("/teacher/view/{index}").buildAndExpand(index).toString());

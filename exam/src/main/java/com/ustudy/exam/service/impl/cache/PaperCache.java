@@ -432,6 +432,7 @@ public class PaperCache {
 		msc.incrCompleted(1, score);
 		// also need to update score in cache for final marks
 		updatePaperCache(quesid, pid, score, mt.getSeq(), isfinal);
+
 		teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + quesid, msc);
 		return true;
 	}
@@ -512,15 +513,17 @@ public class PaperCache {
 		MarkTaskCache mt = null;
 		if (isfinal) {
 			for (MarkTaskCache mc : mtcM) {
-				if (mc.getPaperid().compareTo(pid) == 0 && mt.getTeacid().compareTo(teacid) == 0
-						&& mt.getStatus() == 1) {
+				if (mc.getPaperid().compareTo(pid) == 0 && mc.getTeacid().compareTo(teacid) == 0
+						&& mc.getStatus() == 1) {
 					mt = mc;
-				} else {
-					logger.error("updatePaperCache(), not find final item->" + pid + 
-							" in cache for " + cacheK);
-					throw new RuntimeException("updatePaperCache(), not find final item->" + pid + 
-							" in cache for " + cacheK);
-				}
+					break;
+				} 
+			}
+			if (mt == null) {
+				logger.error("updatePaperCache(), not find final item->" + pid + 
+						" in cache for " + cacheK);
+				throw new RuntimeException("updatePaperCache(), not find final item->" + pid + 
+						" in cache for " + cacheK);
 			}
 		} else {
 			mt = mtcM.get(seq);

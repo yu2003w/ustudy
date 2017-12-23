@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
+import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.mapper.TeaMapper;
+import com.ustudy.info.model.Item;
+import com.ustudy.info.model.TeaGrade;
 import com.ustudy.info.model.Subject;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.model.UElem;
@@ -48,6 +51,9 @@ public class TeacherServiceImpl implements TeacherService {
 	@Autowired
 	private TeaMapper teaM;
 
+	@Autowired
+	private SchoolMapper schM;
+	
 	@Override
 	public List<Teacher> getList(int id) {
 
@@ -81,38 +87,49 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	private void retrieveProp(Teacher item) {
-		// retrieve subjects
-		String sqlD = "select name as value from ustudy.teachersub join ustudy.subject on "
-				+ "ustudy.subject.id = ustudy.teachersub.sub_id where teac_id = ?";
-		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		item.setSubjects(subs);
+		// retrieve grades
+		List<TeaGrade> grs = teaM.getTeaGrade(item.getTeacId());
+		if (grs == null || grs.isEmpty()) {
+			logger.error("retrieveProp(), no grades found for " + item.getTeacId());
+			throw new RuntimeException("retrieveProp(), no grades found for " + item.getTeacId());
+		}
+
+		for (TeaGrade tr: grs) {
+			// retrieve subjects
+			List<Item> subs = teaM.getTeaSubs(item.getTeacId());
+			if (subs == null || subs.isEmpty()) {
+				logger.error("retrieveProp(), no subjects found for " + item.getTeacId());
+				throw new RuntimeException("retrieveProp(), no subjects found for " + item.getTeacId());
+			}
+			tr.setSubs(subs);
+		}
+		
+		item.setGrades(grs);
 
 		// retrieve classes
+		/*
 		sqlD = "select cls_name as value from ustudy.teacherclass left join ustudy.class on "
 				+ "teacherclass.class_id = ustudy.class.id where teac_id = ? and ustudy.teacherclass.class_id "
 				+ "IS NULL";
 		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setClasses(cls);
-
-		// retrieve grades
-		sqlD = "select grade_name as value from ustudy.teachergrade join ustudy.grade on "
-				+ "ustudy.teachergrade.grade_id = ustudy.grade.id where teac_id = ?";
-		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		item.setGrades(gs);
-
-		// retrieve roles and exclude addi_{teac_id}
+		
+	    // retrieve roles and exclude addi_{teac_id}
 		String aRole = "addi_" + item.getTeacId();
 		sqlD = "select role_name as value from ustudy.teacherroles where teac_id = ? and role_name != ?";
-		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole);
+		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole); */
+		
+		List<Item> rs = teaM.getTeaRoles(item.getTeacId());
 		// convert internal role to user readable role name
-		for (UElem e : rs) {
-			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
+		for (Item e : rs) {
+			e.setName(InfoUtil.getRolemapping().get(e.getName()));
 		}
 		logger.debug("retrieveProp(), roles -> " + rs.toString());
 		item.setRoles(rs);
 
 		// retrieve additional permissions
-		sqlD = "select * from ustudy.perms where role_name = ?";
+		String aRole = "addi_" + item.getTeacId();
+		String sqlD = "select * from ustudy.perms where role_name = ?";
 		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), aRole);
 		item.setAddiPerms(ps);
 
@@ -193,13 +210,8 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 		
 		logger.debug("createTeacher(), created ret->" + ret + ", generated id->" + item.getId());
-		
-		// save subjects
-		if (item.getSubjects() != null)
-			ret = saveSubjects(item.getSubjects(), item.getTeacId());
-		logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
 
-		// save grades
+		// save teacher grades
 		if (item.getGrades() != null)
 			ret = saveTeaGrades(item.getGrades(), item.getTeacId());
 		logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
@@ -207,16 +219,18 @@ public class TeacherServiceImpl implements TeacherService {
 		// save classes
 		if (item.getClasses() != null)
 			ret = saveClasses(item.getClasses(), item.getTeacId());
-		logger.debug("createItem()," + ret + " classes populated for " + item.getTeacId());
+		logger.debug("createTeacher()," + ret + " classes populated for " + item.getTeacId());
 
 		// save roles
-		ret = saveRoles(item.getRoles(), item);
-		logger.debug("createItem(), " + ret + " roles is saved for " + item.getTeacId());
+		if (item.getRoles() != null) {
+			ret = saveRoles(item.getRoles(), item);
+		}
+		logger.debug("createTeacher(), " + ret + " roles is saved for " + item.getTeacId());
 
 		// save additional permission
 		if (item.getAddiPerms() != null)
 			ret = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createItem()," + ret + " additional perms populated for " + item.getTeacId());
+		logger.debug("createTeacher()," + ret + " additional perms populated for " + item.getTeacId());
 
 		logger.debug("createTeacher(), teacher created->" + item);
 		return item.getId();
@@ -273,69 +287,63 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Transactional
-	private int saveRoles(List<UElem> roles, Teacher item) {
-		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
-		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
-		String sqlGSub = "update gradesub set sub_owner = ? where grade_id = (select id from grade where schid "
-				+ "= ? and grade_name = (select grade_name from teachergrade where teac_id = ?)) and sub_name = ?";
-		String sqlGrO = "update grade set grade_owner = ? where schid =? and grade_name = "
-				+ "(select grade_name from teachergrade where teac_id = ?)";
+	private int saveRoles(List<Item> roles, Teacher item) {
+
 		String msg = null;
-		int num = 0;
+		int ret = 0;
+		// retrieve system defined roles firstly
+		List<Item> roL = schM.getRoles();
+		HashMap<String, String> roleMap = new HashMap<String, String>();
+		for (Item it: roL) {
+			roleMap.put(String.valueOf(it.getId()), it.getName());
+		}
+		
+		// actually, here only one role specified when creating teacher
+		for (Item u : roles) {
+			ret = teaM.saveRoles(u.getId(), item.getTeacId());
+			if (ret < 0 || ret >2) {
+				msg = "saveRoles(), save role failed with ret->" + ret;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
 
-		if (roles != null) {
-			for (UElem u : roles) {
-				num = jTea.update(new PreparedStatementCreator() {
-					@Override
-					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-						psmt.setNull(1, java.sql.Types.NULL);
-						String r = InfoUtil.getRolemapping().get(u.getValue());
-						if (r == null || r.isEmpty()) {
-							logger.warn("saveRoles, unsupported role " + u.getValue());
-							throw new RuntimeException("saveRoles, unsupported role " + u.getValue());
-						}
-						psmt.setString(2, r);
-						psmt.setString(3, item.getTeacId());
-						return psmt;
+			logger.debug("saveRoles(), Role saved -> " + u.toString() + ":" + item.getTeacId());
+			int subId = item.getGrades().get(0).getSubs().get(0).getId();
+			int grId = item.getGrades().get(0).getId();
+			
+			// if role is sleader, need to populate into corresponding departsub
+			String rv = roleMap.get(String.valueOf(u.getId()));
+			if (rv == null) {
+				logger.error("saveRoles(), undefined roles in request ->" + rv);
+				throw new RuntimeException("saveRoles(), undefined roles in request ->" + rv);
+			}
+			if (rv.compareTo("sleader") == 0) {
+				String grName = teaM.getGrName(grId);
+				List<String> grNameL = new ArrayList<String>();
+				grNameL.add(grName);
+				List<String> tyL = determineDepartType(grNameL);
+				logger.debug("saveRoles(), department info->" + tyL.toString());
+				for (String t : tyL) {
+					ret = teaM.saveDepartSubOwner(subId, item.getOrgid(), t, item.getTeacId());
+					if (ret != 1 || ret != 0) {
+						msg = "saveRoles(), populate depart sub owner failed with ret->" + ret;
+						logger.warn(msg);
+						throw new RuntimeException(msg);
 					}
-				});
-				if (num != 1) {
-					msg = "saveRoles(), return value from role insert is " + num;
-					logger.warn(msg);
-					throw new RuntimeException(msg);
 				}
-
-				logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + item.getTeacId());
-				// if role is sleader, need to populate into corresponding
-				// departsub
-				if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("sleader") == 0) {
-					List<String> tyL = determineDepartType(item.getGrades());
-					logger.debug("saveRoles()," + tyL.toString());
-					for (String t : tyL) {
-						num = jTea.update(sqlDepSub, null, item.getSubjects().get(0).getValue(), item.getTeacId(), t,
-								item.getOrgid());
-						if (num != 1) {
-							msg = "saveRoles(), return value from department subject insert is " + num;
-							logger.warn(msg);
-							throw new RuntimeException(msg);
-						}
-					}
-				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("pleader") == 0) {
-					logger.debug("saveRoles()," + item.getSubjects().get(0).getValue());
-					num = jTea.update(sqlGSub, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId(),
-							item.getSubjects().get(0).getValue());
-				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("gleader") == 0) {
-					// need to update grade owner
-					num = jTea.update(sqlGrO, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId());
-				}
+			} else if (rv.compareTo("pleader") == 0) {
+				logger.debug("saveRoles(), prepare subject leader " + subId + "," + grId);
+				ret = teaM.saveGrSubOwner(subId, grId, item.getTeacId());
+			} else if (rv.compareTo("gleader") == 0) {
+				// only one grade specified when creating teacher
+				ret = teaM.saveGrOwner(grId, item.getTeacId());
 			}
 		}
 
 		// Noted: a little tricky here, to populate additional permissions for
-		// the teacher,
-		// need to populate role as "addi_teachid" for the teacher
-		num = jTea.update(new PreparedStatementCreator() {
+		// the teacher, need to populate role as "addi_teachid" for the teacher
+		/*
+		ret = jTea.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
@@ -345,18 +353,18 @@ public class TeacherServiceImpl implements TeacherService {
 				return psmt;
 			}
 		});
-		if (num != 1) {
-			msg = "saveRoles(), return value from additional role insert is " + num;
+		if (ret != 1) {
+			msg = "saveRoles(), return value from additional role insert is " + ret;
 			logger.warn(msg);
 			throw new RuntimeException(msg);
-		}
+		} 
 
 		logger.debug("saveRoles(), populated additional roles for " + item.getTeacId());
 		if (roles != null)
-			num = roles.size() + 1;
+			ret = roles.size() + 1;
 		else
-			num = 1;
-		return num;
+			ret = 1; */
+		return ret;
 
 	}
 
@@ -387,7 +395,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 	}
 
-	private int saveSubjects(List<UElem> subs, String teacid) {
+	private int saveSubjects(List<Item> subs, String teacid) {
 		
 		List<Subject> subL = teaM.getSubs();
 		HashMap<String, String> subMap = new HashMap<String, String>();
@@ -395,8 +403,8 @@ public class TeacherServiceImpl implements TeacherService {
 			subMap.put(sub.getSubName(), sub.getSubId());
 		}
 		
-		for (UElem u : subs) {
-			String sId = subMap.get(u.getValue());
+		for (Item u : subs) {
+			String sId = subMap.get(String.valueOf(u.getId()));
 			if (sId == null || sId.isEmpty()) {
 				logger.error("saveSubjects(), invalid sub id->" + sId);
 				throw new RuntimeException("saveSubjects(), invalid subject id");
@@ -407,23 +415,38 @@ public class TeacherServiceImpl implements TeacherService {
 				throw new RuntimeException("saveSubjects(), insert failed with ret->" + ret);
 			}
 
-			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teacid);
+			logger.debug("saveSubjects(), subjects saved -> " + u.getId() + ":" + teacid);
 		}
 
 		return subs.size();
 	}
 
-	private int saveTeaGrades(List<UElem> grades, String teacid) {
-		
-		for (UElem u : grades) {
-			int ret = teaM.saveTeaGr(u.getValue(), teacid);
+	private int saveTeaGrades(List<TeaGrade> grades, String teacid) {
+		String msg = null;
+		for (TeaGrade u : grades) {
+			int ret = teaM.saveTeaGr(u.getId(), teacid);
 			if (ret != 1) {
-				String msg = "saveTeaGrades(), insert failed with ret->" + ret;
-				logger.warn(msg);
+				msg = "saveTeaGrades(), insert failed with ret->" + ret + u.toString();
+				logger.error(msg);
 				throw new RuntimeException(msg);
 			}
-
-			logger.debug("saveTeaGrades(), grades saved -> " + u.getValue() + ":" + teacid);
+			
+			List<Item> subs = u.getSubs();
+			if (subs == null || subs.isEmpty()) {
+				msg = "saveTeaGrades(), no subject specified," + u.toString();
+				logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			ret = saveSubjects(subs, teacid);
+			if (ret != subs.size()) {
+				msg = "saveTeaGrades(), num of saved subjects not matched with specifed in request, " + ret
+						+ "," + subs.size();
+				logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+				
+			logger.debug("saveTeaGrades(), grades saved -> " + u.toString() + ":" + teacid);
 		}
 
 		return grades.size();
@@ -456,19 +479,15 @@ public class TeacherServiceImpl implements TeacherService {
 		return clss.size();
 	}
 
-	private List<String> determineDepartType(List<UElem> gL) {
+	private List<String> determineDepartType(List<String> gL) {
 		List<String> tL = new ArrayList<String>();
-		List<String> sGl = new ArrayList<String>();
-		for (UElem e : gL) {
-			sGl.add(e.getValue());
-		}
 
-		if (sGl.contains("高一") || sGl.contains("高二") || sGl.contains("高三"))
+		if (gL.contains("高一") || gL.contains("高二") || gL.contains("高三"))
 			tL.add("high");
-		if (sGl.contains("九年级") || sGl.contains("八年级") || sGl.contains("七年级"))
+		if (gL.contains("九年级") || gL.contains("八年级") || gL.contains("七年级"))
 			tL.add("junior");
-		if (sGl.contains("六年级") || sGl.contains("五年级") || sGl.contains("四年级") || sGl.contains("三年级")
-				|| sGl.contains("二年级") || sGl.contains("一年级"))
+		if (gL.contains("六年级") || gL.contains("五年级") || gL.contains("四年级") || gL.contains("三年级")
+				|| gL.contains("二年级") || gL.contains("一年级"))
 			tL.add("primary");
 		logger.debug("determineDepartType(), " + tL.toString());
 		return tL;
