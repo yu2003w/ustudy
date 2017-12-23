@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
+import com.ustudy.dashboard.mapper.OrgOwnerMapper;
 import com.ustudy.dashboard.model.OrgOwner;
 import com.ustudy.dashboard.services.OrgOwnerService;
 import com.ustudy.dashboard.util.DashboardUtil;
@@ -33,6 +34,9 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	
 	@Autowired
 	private JdbcTemplate jdbcT;
+	
+	@Autowired
+	private OrgOwnerMapper ooM;
 	
 	@Override
 	public List<OrgOwner> getList(int id) {
@@ -227,33 +231,23 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 		}
 		
 		// add default role_name "org_owner"
-		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
-		msg = null;
-		num = jdbcT.update(new PreparedStatementCreator(){
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-				psmt.setNull(1, java.sql.Types.NULL);
-				if (item.getRole().compareTo("校长") == 0) {
-					psmt.setString(2, "org_owner");
-				} else if (item.getRole().compareTo("考务老师") == 0) {
-					psmt.setString(2, "leader");
-				} else {
-					logger.warn("populateTeachers(), role is " + item.getRole() +
-							", set teacher as default role");
-					psmt.setString(2, "teacher");
-				}
-				
-				psmt.setString(3, item.getLoginname());
-				return psmt;
-			}
-		});
-		if (num != 1) {
-			msg = "populateTeachers(), return value from default role insert is " + num;
-			logger.warn(msg);
-			throw new RuntimeException(msg);
+		String role = null;
+		if (item.getRole().compareTo("校长") == 0) {
+			role = "org_owner";
+		} else if (item.getRole().compareTo("考务老师") == 0) {
+			role = "leader";
+		} else {
+			logger.error("populateTeachers(), unsupported role->" + item.getRole());
+			throw new RuntimeException("populateTeachers(), unsupported role->" + item.getRole());
 		}
-			
+		int rId = -1;
+		rId = ooM.getRoleId(role);
+		if (rId <= 0) {
+			logger.error("populateTeachers(), invalid role id->" + rId + "," + role);
+			throw new RuntimeException("populateTeachers(), invalid role id->" + rId + "," + role);
+		}
+		num = ooM.saveRoles(rId, item.getLoginname());
+
 		logger.debug("populateTeachers(), default role populated for " + item.getLoginname());
 
 		return id;

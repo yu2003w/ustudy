@@ -90,16 +90,16 @@ public class TeacherServiceImpl implements TeacherService {
 		// retrieve grades
 		List<TeaGrade> grs = teaM.getTeaGrade(item.getTeacId());
 		if (grs == null || grs.isEmpty()) {
-			logger.error("retrieveProp(), no grades found for " + item.getTeacId());
-			throw new RuntimeException("retrieveProp(), no grades found for " + item.getTeacId());
+			logger.info("retrieveProp(), no grades found for " + item.getTeacId());
+			return;
 		}
 
 		for (TeaGrade tr: grs) {
 			// retrieve subjects
 			List<Item> subs = teaM.getTeaSubs(item.getTeacId());
 			if (subs == null || subs.isEmpty()) {
-				logger.error("retrieveProp(), no subjects found for " + item.getTeacId());
-				throw new RuntimeException("retrieveProp(), no subjects found for " + item.getTeacId());
+				logger.info("retrieveProp(), no subjects found for " + item.getTeacId());
+				subs = new ArrayList<Item>();
 			}
 			tr.setSubs(subs);
 		}
@@ -404,7 +404,7 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 		
 		for (Item u : subs) {
-			String sId = subMap.get(String.valueOf(u.getId()));
+			String sId = subMap.get(String.valueOf(u.getName()));
 			if (sId == null || sId.isEmpty()) {
 				logger.error("saveSubjects(), invalid sub id->" + sId);
 				throw new RuntimeException("saveSubjects(), invalid subject id");
