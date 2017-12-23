@@ -12,7 +12,6 @@
         <result property="className" column="class_name"/>
         <result property="name" column="name"/>
         <result property="stuno" column="stuno"/>
-        <result property="room" column="room"/>
         <result property="paperStatus" column="paper_status"/>
     </resultMap>
 

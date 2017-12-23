@@ -15,7 +15,6 @@ public class ExamStudent implements Serializable {
 	private String className;
 	private String name;
 	private String stuno;
-	private int room;
 	private String paperStatus;
 	
 	public Long getId() {
@@ -90,20 +89,19 @@ public class ExamStudent implements Serializable {
 		this.stuno = stuno;
 	}
 	
-	public int getRoom() {
-		return room;
-	}
-	
-	public void setRoom(int room) {
-		this.room = room;
-	}
-	
 	public String getQaperStatus() {
 		return paperStatus;
 	}
 	
 	public void setQaperStatus(String paperStatus) {
 		this.paperStatus = paperStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "ExamStudent [id=" + id + ", examCode=" + examCode + ", examid=" + examid + ", schid=" + schid
+				+ ", gradeid=" + gradeid + ", classId=" + classId + ", className=" + className + ", name=" + name
+				+ ", stuno=" + stuno + ", paperStatus=" + paperStatus + "]";
 	}
 	
 }
