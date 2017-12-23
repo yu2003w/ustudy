@@ -213,7 +213,7 @@ public class ScoreServiceImpl implements ScoreService {
         if(null != exameeScores && exameeScores.size() > 0){
             Map<Long, JSONArray> studentScores = getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
             for (Map<String, Object> map : exameeScores) {
-                long stuid = (int)map.get("examee_id");
+                long stuid = (int)map.get("stuExamId");
                 JSONArray scores = studentScores.get(stuid);
                 if(null != scores){
                     map.put("scores", scores);
@@ -282,9 +282,11 @@ public class ScoreServiceImpl implements ScoreService {
 					long stuid = (int)map.get("stuid");
 					String name = map.get("name").toString();
 					String stuno = map.get("stuno").toString();
+					long gradeId = (int) map.get("gradeid");
 					object.put("stuId", stuid);
 					object.put("name", name);
 					object.put("stuno", stuno);
+					object.put("gradeId", gradeId);
 				}
 			}
 			object.put("subjects", array);

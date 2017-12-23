@@ -14,13 +14,11 @@
 	</insert>
 	
 	<select id="getExameeScores" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT es.examee_id,es.exam_id,ee.name,sc.schname,es.score,es.rank from exameescore es 
+		SELECT es.examee_id stuExamId,es.exam_id examId,ee.name,sc.schname,cl.cls_name clsName,es.score,es.rank from exameescore es 
 		LEFT JOIN examinee ee ON es.examee_id=ee.id 
 		LEFT JOIN school sc ON ee.schid=sc.id 
-		<if test="branch !=null and branch != ''">
-			LEFT JOIN class cl ON ee.class_id=cl.id 
-		</if>
-		where es.exam_id=1 
+		LEFT JOIN class cl ON ee.class_id=cl.id
+		where es.exam_id=#{examId}
 		<if test="schId !=null and schId > 0">
 			AND ee.schid=#{schId}
 		</if>
@@ -47,7 +45,7 @@
 		<if test="branch !=null and branch != ''">
 			LEFT JOIN class cl ON ee.class_id=cl.id 
 		</if>
-		where egs.examid=1
+		where egs.examid=#{examId}
 		<if test="schId !=null and schId > 0">
 			AND ee.schid=#{schId}
 		</if>
