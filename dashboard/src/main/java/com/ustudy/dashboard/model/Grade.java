@@ -3,7 +3,6 @@ package com.ustudy.dashboard.model;
 import java.io.Serializable;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Grade implements Serializable{
@@ -14,12 +13,13 @@ public class Grade implements Serializable{
 	 */
 	private static final long serialVersionUID = -3092091154717959822L;
 	
-	// id is not need for grade information
-	@JsonIgnore
 	private int id = -1;
+	
 	@JsonProperty("grade")
 	private String gradeName = null;
+	
 	private List<Subject> subjects = null;
+	
 	@JsonProperty("numOfClasses")
 	private int num = 0;
 	

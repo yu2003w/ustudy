@@ -2,7 +2,6 @@ package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Subject implements Serializable {
@@ -15,7 +14,7 @@ public class Subject implements Serializable {
 	@JsonProperty("subject")
 	private String courseName = null;
 	
-	@JsonIgnore
+    @JsonProperty("id")
 	private String subId = null;
 
 	

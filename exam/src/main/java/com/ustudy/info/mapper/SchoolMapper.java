@@ -33,7 +33,7 @@ public interface SchoolMapper {
 			+ "ustudy.grade.schid=#{schid} and ustudy.grade.grade_owner IS NULL")
 	public List<Grade> getGradesBySchId(@Param("schid") String schid);
 	
-	@Select("select id, name from ustudy.rolevalue where name unlike 'addi%'")
+	@Select("select id, name from ustudy.rolevalue where name not like 'addi%'")
 	public List<Item> getRoles();
 	
 	@Select("select id, grade_name as name from ustudy.grade where schid=#{schId}")

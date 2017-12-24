@@ -60,7 +60,7 @@ public interface SchoolMapper {
 	public int createDepartSub(@Param("subId") String subId, @Param("type") String type, 
 			@Param("schId") String schId);
 	
-	@Select("select id, grade_name, classes_num from ustudy.grade where schid=#{sId}")
+	@Select("select id, grade_name as gradeName, classes_num as num from ustudy.grade where schid=#{sId}")
 	public List<Grade> getGrades(@Param("sId") String schId);
 	
 	@Select("select sub_id as subId, name as courseName from ustudy.gradesub join ustudy.subject on "

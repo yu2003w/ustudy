@@ -320,7 +320,7 @@ public class TeacherServiceImpl implements TeacherService {
 				logger.debug("saveRoles(), department info->" + tyL.toString());
 				for (String t : tyL) {
 					ret = teaM.saveDepartSubOwner(subId, item.getOrgid(), t, item.getTeacId());
-					if (ret != 1 || ret != 0) {
+					if (ret != 1) {
 						msg = "saveRoles(), populate depart sub owner failed with ret->" + ret;
 						logger.warn(msg);
 						throw new RuntimeException(msg);

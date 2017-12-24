@@ -90,6 +90,7 @@ public class SchoolServiceImp implements SchoolService {
 		updateSch += " where id = ?";
 		int num = jdbcT.update(updateSch, id);
 
+		
 		// for grades related information, need to replace previous information
 		// delete origin grades information firstly, then insert new values
 		String sqlDelGr = "delete from ustudy.grade where schid = ?";
