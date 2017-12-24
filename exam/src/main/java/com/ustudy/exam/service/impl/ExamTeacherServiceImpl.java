@@ -1,7 +1,11 @@
 package com.ustudy.exam.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +16,8 @@ import com.ustudy.exam.utility.ExamUtil;
 
 @Service
 public class ExamTeacherServiceImpl implements TeacherService {
+	
+	private static final Logger logger = LogManager.getLogger(ExamTeacherServiceImpl.class);
 
 	@Autowired
 	private TeacherMapper userM;
@@ -56,6 +62,16 @@ public class ExamTeacherServiceImpl implements TeacherService {
 			r = "teacher";
 
 		return ExamUtil.getRolemapping().get(r);
+	}
+
+	@Override
+	public void setLLTime(String tid) {
+		int ret = userM.setLLTime(tid, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		if (ret != 1) {
+			logger.error("setLLTime(), failed to set lltime for " + tid);
+			throw new RuntimeException("setLLTime(), failed to set lltime for " + tid);
+		}
+
 	}
 
 }

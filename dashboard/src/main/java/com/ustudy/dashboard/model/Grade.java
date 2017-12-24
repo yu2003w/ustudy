@@ -1,12 +1,13 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Grade implements Serializable{
-
 	
 	/**
 	 * 
@@ -23,12 +24,10 @@ public class Grade implements Serializable{
 	@JsonProperty("numOfClasses")
 	private int num = 0;
 	
-	
 	public Grade() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
 	
 	public Grade(int id, String gradeName, int num) {
 		super();
@@ -73,5 +72,37 @@ public class Grade implements Serializable{
 	public String toString() {
 		return "Grade [id=" + id + ", gradeName=" + gradeName + ", subjects=" + subjects + ", num=" + num + "]";
 	}	
+	
+	public boolean equals(Grade g) {
+		// compare meta info firstly
+		if (this.id != g.id || this.gradeName.compareTo(g.getGradeName()) != 0 || this.num != g.getNum())
+			return false;
+		
+		// compare subjects
+		List<Subject> oSub = g.getSubjects();
+		if ((oSub == null && this.subjects != null) || (oSub != null && this.subjects == null) || 
+				(oSub != null && this.subjects != null && (oSub.size() != this.subjects.size()))) {
+			return false;
+		}
+		else if (oSub == null && this.subjects == null) {
+			return true;
+		}
+		
+		// origin grade and updated grade has same number of subjects
+		Map<String, Subject> sMap = new HashMap<String, Subject>();
+		if (oSub != null) {
+			for (Subject s: oSub) {
+				sMap.put(s.getCourseName(), s);
+			}
+		}
+		
+		for (Subject s: this.subjects) {
+			if (!sMap.containsKey(s.getCourseName())) {
+				return true;
+			}
+		}
+		
+		return true;
+	}
 	
 }

@@ -1,15 +1,15 @@
 package com.ustudy.dashboard.services.imp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +25,10 @@ import com.ustudy.dashboard.model.School;
  * @author jared
  *
  */
-
 @Service
 public class SchoolServiceImp implements SchoolService {
 
 	private static final Logger logger = LogManager.getLogger(SchoolServiceImp.class);
-
-	@Autowired
-	private JdbcTemplate jdbcT;
 
 	@Autowired
 	private SchoolMapper schM;
@@ -67,40 +63,85 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Transactional
 	@Override
-	public int updateSchool(School data, int id) {
-		
-		String updateSch = "update ustudy.school set ";
-		School origin = displaySchool(id);
-		Map<String, String> schDiff = data.compare(origin);
-		if (schDiff.size() == 0) {
-			logger.info("updateSchool(), No changes in school and no need to update");
-		} else {
-			// some stuff in school changed, need to populate changed fields
-			Set<Map.Entry<String, String>> fields = schDiff.entrySet();
-			boolean first = true;
-			for (Map.Entry<String, String> elem : fields) {
-				if (first) {
-					updateSch += elem.getKey() + " = '" + elem.getValue() + "'";
-					first = false;
-				} else
-					updateSch += ", " + elem.getKey() + " = '" + elem.getValue() + "'";
-			}
-			logger.debug("updateSchool(), SQL for school item " + id + " -->" + updateSch);
+	public void updateSchool(School data, int id) {
+
+		int ret = schM.createSchool(data);
+		if (ret < 0 || ret > 2) {
+			logger.error("updateSchool(), update school failed with ret " + ret);
+			throw new RuntimeException("updateSchool(), failed with ret " + ret);
 		}
-		updateSch += " where id = ?";
-		int num = jdbcT.update(updateSch, id);
-
 		
-		// for grades related information, need to replace previous information
-		// delete origin grades information firstly, then insert new values
-		String sqlDelGr = "delete from ustudy.grade where schid = ?";
-		int numOfGr = jdbcT.update(sqlDelGr, data.getSchoolId());
-		logger.debug("updateSchool()," + numOfGr + " grade items deleted for update.");
+		// For grades, need to compare which should be updated, origin ones should not be deleted
+		// delete origin grades may result in grade id changes and related exam information maybe lost
+		List<Grade> oriGr = schM.getGrades(data.getSchoolId());
+		HashMap<String, Grade> oGM = new HashMap<String, Grade>();
+		for (Grade gr: oriGr) {
+			oGM.put(gr.getGradeName(), gr);
+		}
+		
+		List<Grade> grL = data.getGrades();
+		List<Grade> fin = new ArrayList<Grade>();
+		for (Grade gr: grL) {
+			Grade og = oGM.get(gr.getGradeName());
+			if (og == null) {
+				// newly added grade
+				fin.add(gr);
+				oGM.remove(gr.getGradeName());
+			}
+			else {
+				// already existed grade, check whether need to update or not
+				if (!gr.equals(og)) {
+					fin.add(gr);
+				}
+			}
+		}
+		
+		logger.debug("updateSchool(), grades needs to be removed->" + oGM.values());
+		Set<Entry<String, Grade>> rgr = oGM.entrySet();
+		String ids = null;
+		boolean first = true;
+		for (Entry<String, Grade> en: rgr) {
+			if (first) {
+				ids = String.valueOf(en.getValue().getId());
+			}
+			else
+				ids += " or id = " + String.valueOf(en.getValue().getId());
+		}
+		
+		if (ids != null) {
+			ret = schM.delGrade(ids);
+			if (ret < 1) {
+				logger.error("updateSchool(), faile to delete grade with ret->" + ret);
+				throw new RuntimeException("updateSchool(), faile to delete grade with ret->" + ret);
+			}
+			logger.debug("updateSchool()," + ret + " grades to be deleted->" + ids);
+		}
+		
+		logger.debug("updateSchool(), grades needs to added and updated->" + fin.toString());
+		for (Grade gr: fin) {
+			ret = schM.createGrade(gr, data.getSchoolId());
+			if (ret < 0 || ret > 2) {
+				logger.error("updateSchool(), create grades failed with ret->" + ret);
+				throw new RuntimeException("updateSchool(), create grades failed with ret->" + ret);
+			}
+			logger.debug("updateSchool(), create grade->" + gr.toString() + " with ret->" + ret + 
+					", generated keys->" + gr.getId());
+			
+			// need to update grade related subjects, delete firstly then insert again
+			ret = schM.delGradeSubs(gr.getId());
+			logger.debug("updateSchool(), clear " + ret + " subjects for " + gr.toString());
+			for (Subject s: gr.getSubjects()) {
+				ret = schM.createGradeSub(s.getSubId(), gr.getId());
+				if (ret < 0 || ret >2) {
+					logger.error("updateSchool(), grade subject saved failed with ret->" + ret);
+					throw new RuntimeException("updateSchool(), grade subject saved failed with ret->" + ret);
+				}
+			}
+			logger.info("updateSchool(), populated subjects for grade " + gr.toString());
+		}
+		
+		logger.info("updateSchool()," + fin.size() + " grade items saved into database");
 
-		numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
-		logger.info("updateSchool()," + numOfGr + " grade items saved into database");
-
-		return num;
 	}
 
 	@Override

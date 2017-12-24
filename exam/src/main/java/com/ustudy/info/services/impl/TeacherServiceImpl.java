@@ -185,6 +185,9 @@ public class TeacherServiceImpl implements TeacherService {
 			throw new RuntimeException(msg);
 		}
 		
+		// set creation time
+		item.setcTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		
 		// ready to insert teacher info to database
 		int ret = teaM.createTeacher(item);
 		
@@ -488,4 +491,15 @@ public class TeacherServiceImpl implements TeacherService {
 
 		return InfoUtil.getRolemapping().get(r);
 	}
+	
+	@Override
+	public void setLLTime(String tid) {
+		int ret = teaM.setLLTime(tid, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		if (ret != 1) {
+			logger.error("setLLTime(), failed to set lltime for " + tid);
+			throw new RuntimeException("setLLTime(), failed to set lltime for " + tid);
+		}
+		logger.debug("setLLTime(), update last login time for " + tid);
+	}
+	
 }

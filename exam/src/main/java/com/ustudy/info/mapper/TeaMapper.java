@@ -48,7 +48,7 @@ public interface TeaMapper {
 	@Insert("insert into ustudy.teacherroles(role_id, teac_id) values (#{rid}, #{tid})")
 	public int saveRoles(@Param("rid") int id, @Param("tid") String teacid);
 	
-	@Update("update ustudy.grade set grade_owner=#{gid} where ustudy.grade.id=#{gid}")
+	@Update("update ustudy.grade set grade_owner=#{tid} where ustudy.grade.id=#{gid}")
 	public int saveGrOwner(@Param("gid") int id, @Param("tid") String teacid);
 	
 	@Update("update ustudy.gradesub set sub_owner=#{tid} where sub_id=#{sid} and grade_id=#{gid}")
@@ -75,5 +75,8 @@ public interface TeaMapper {
 			+ "ustudy.teacherroles on ustudy.rolevalue.id = ustudy.teacherroles.role_id where "
 			+ "ustudy.teacherroles.teac_id=#{tid}")
 	public List<Item> getTeaRoles(String tid);
+	
+	@Update("update ustudy.teacher set ll_time=#{lt} where teacid=#{tid}")
+	public int setLLTime(@Param("tid") String tid, @Param("lt") String lltime);
 	
 }

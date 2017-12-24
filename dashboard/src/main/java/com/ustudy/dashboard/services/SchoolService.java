@@ -29,7 +29,7 @@ public interface SchoolService {
 	
 	public School displaySchool(int id);
 	
-	public int updateSchool(School data, int id);
+	public void updateSchool(School data, int id);
 	
 	public int delSchools(String ids);
 	

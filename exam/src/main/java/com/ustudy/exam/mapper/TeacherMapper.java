@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.ustudy.exam.model.Teacher;
 
@@ -20,5 +21,8 @@ public interface TeacherMapper {
 	
 	@Select("select teacname from ustudy.teacher where teacid=#{tid}")
 	public String findNameById(@Param("tid") String tid);
+	
+	@Update("update ustudy.teacher set ll_time=#{lt} where teacid=#{tid}")
+	public int setLLTime(@Param("tid") String tid, @Param("lt") String lltime);
 	
 }

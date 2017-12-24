@@ -87,21 +87,16 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value="/update/{id}", method = RequestMethod.POST)
-	public String updateItem(@RequestBody @Valid School data, @PathVariable int id, HttpServletResponse resp) {
-		logger.debug("endpoint /school/update/" + id + " is visited.");
+	public String updateSchool(@RequestBody @Valid School data, @PathVariable int id, HttpServletResponse resp) {
+		logger.debug("updateSchool(), endpoint /school/update/" + id + " is visited.");
 		String result = null;
+		
 		try {
-			int numOfRows = ss.updateSchool(data, id);
-			if (numOfRows == 1)
-				logger.debug("update item successfully");
-			else {
-				String msg = numOfRows + " items are updated, maybe something goes wrong";
-				logger.warn(msg);
-				throw new RuntimeException(msg);
-			}
+			ss.updateSchool(data, id);
 			result = "update item successfully";
+			logger.debug("updateSchool()," + result);
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error(e.getMessage());
 			result = "update item failed";
 			resp.setStatus(500);
 		}

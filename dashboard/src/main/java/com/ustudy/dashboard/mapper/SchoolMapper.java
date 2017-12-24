@@ -67,4 +67,10 @@ public interface SchoolMapper {
 			+ "ustudy.gradesub.sub_id = ustudy.subject.id where ustudy.gradesub.grade_id=#{gid}")
 	public List<Subject> getGradeSub(@Param("gid") int gid);
 	
+	@Delete("delete from ustudy.grade where id=#{gid}")
+	public int delGrade(String gid);
+	
+	@Delete("delete from ustudy.gradesub where grade_id=#{qid}")
+	public int delGradeSubs(int gid);
+	
 }

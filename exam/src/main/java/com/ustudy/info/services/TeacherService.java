@@ -24,4 +24,6 @@ public interface TeacherService {
 	
 	public String findPriRoleById(String teaid);
 
+	public void setLLTime(String tid);
+
 }
