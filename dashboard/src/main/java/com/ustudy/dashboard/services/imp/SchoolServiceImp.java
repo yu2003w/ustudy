@@ -56,7 +56,7 @@ public class SchoolServiceImp implements SchoolService {
 			throw new RuntimeException("createSchool(), failed with ret " + ret);
 		}
 		int numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
-		logger.info(numOfGr + " grade items saved into database");
+		logger.info(numOfGr + " grade items saved indashboard/src/main/java/com/ustudy/dashboard/services/imp/SchoolServiceImp.javato database");
 		
 		return data.getId();
 	}
@@ -89,56 +89,29 @@ public class SchoolServiceImp implements SchoolService {
 				oGM.remove(gr.getGradeName());
 			}
 			else {
-				// already existed grade, check whether need to update or not
-				if (!gr.equals(og)) {
-					fin.add(gr);
-				}
+				fin.add(gr);
 			}
 		}
 		
 		logger.debug("updateSchool(), grades needs to be removed->" + oGM.values());
 		Set<Entry<String, Grade>> rgr = oGM.entrySet();
-		String ids = null;
-		boolean first = true;
+		List<String> ids = new ArrayList<String>();
+		
 		for (Entry<String, Grade> en: rgr) {
-			if (first) {
-				ids = String.valueOf(en.getValue().getId());
-			}
-			else
-				ids += " or id = " + String.valueOf(en.getValue().getId());
+			ids.add(String.valueOf(en.getValue().getId()));
 		}
 		
-		if (ids != null) {
+		if (!ids.isEmpty()) {
 			ret = schM.delGrade(ids);
 			if (ret < 1) {
 				logger.error("updateSchool(), faile to delete grade with ret->" + ret);
 				throw new RuntimeException("updateSchool(), faile to delete grade with ret->" + ret);
 			}
-			logger.debug("updateSchool()," + ret + " grades to be deleted->" + ids);
+			logger.debug("updateSchool(), grades to be deleted->" + ids);
 		}
 		
 		logger.debug("updateSchool(), grades needs to added and updated->" + fin.toString());
-		for (Grade gr: fin) {
-			ret = schM.createGrade(gr, data.getSchoolId());
-			if (ret < 0 || ret > 2) {
-				logger.error("updateSchool(), create grades failed with ret->" + ret);
-				throw new RuntimeException("updateSchool(), create grades failed with ret->" + ret);
-			}
-			logger.debug("updateSchool(), create grade->" + gr.toString() + " with ret->" + ret + 
-					", generated keys->" + gr.getId());
-			
-			// need to update grade related subjects, delete firstly then insert again
-			ret = schM.delGradeSubs(gr.getId());
-			logger.debug("updateSchool(), clear " + ret + " subjects for " + gr.toString());
-			for (Subject s: gr.getSubjects()) {
-				ret = schM.createGradeSub(s.getSubId(), gr.getId());
-				if (ret < 0 || ret >2) {
-					logger.error("updateSchool(), grade subject saved failed with ret->" + ret);
-					throw new RuntimeException("updateSchool(), grade subject saved failed with ret->" + ret);
-				}
-			}
-			logger.info("updateSchool(), populated subjects for grade " + gr.toString());
-		}
+		ret = saveGrades(fin, data.getSchoolId());	
 		
 		logger.info("updateSchool()," + fin.size() + " grade items saved into database");
 
@@ -213,6 +186,7 @@ public class SchoolServiceImp implements SchoolService {
 			subMap.put(sub.getCourseName(), sub.getSubId());
 		}
 		
+		int ret = -1;
 		for (Grade gr : grades) {
 			List<Subject> subs = gr.getSubjects();
 			HashSet<String> depS = null;
@@ -228,7 +202,7 @@ public class SchoolServiceImp implements SchoolService {
 				depS = priS;
 			}
 
-			int ret = schM.createGrade(gr, schId);
+			ret = schM.createGrade(gr, schId);
 			// insert grade related information into ustudy.grade firstly
 			// need to retrieve auto generated key
 			if (ret < 0 || ret > 2) {
@@ -241,6 +215,11 @@ public class SchoolServiceImp implements SchoolService {
 				logger.warn(msg);
 				throw new RuntimeException(msg);
 			}
+			
+			// need to update grade related subjects, delete firstly then insert again
+			// when update school and update existed grades, need to do delete firstly
+			ret = schM.delGradeSubs(gr.getId());
+			logger.debug("updateSchool(), clear " + ret + " subjects for grade->" + gr.toString());
 			
 			for (Subject sub : subs) {
 				String subId = subMap.get(sub.getCourseName());
@@ -264,6 +243,10 @@ public class SchoolServiceImp implements SchoolService {
 			logger.debug(schId + " of " + gr.getGradeName() + " has " + ret + " classes");
 		}
 
+		// before save depart sub, need to delete firstly for update school and grades
+		ret = schM.delDepartSub(schId);
+		logger.debug("saveGrades(), clear depart sub with ret->" + ret);
+		
 		saveDepSub(highS, "high", schId, subMap);
 		saveDepSub(juniorS, "junior", schId, subMap);
 		saveDepSub(priS, "primary", schId, subMap);

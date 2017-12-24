@@ -60,6 +60,9 @@ public interface SchoolMapper {
 	public int createDepartSub(@Param("subId") String subId, @Param("type") String type, 
 			@Param("schId") String schId);
 	
+	@Delete("delete from ustudy.departsub where schid=#{sid}")
+	public int delDepartSub(@Param("sid") String schId);
+	
 	@Select("select id, grade_name as gradeName, classes_num as num from ustudy.grade where schid=#{sId}")
 	public List<Grade> getGrades(@Param("sId") String schId);
 	
@@ -67,8 +70,8 @@ public interface SchoolMapper {
 			+ "ustudy.gradesub.sub_id = ustudy.subject.id where ustudy.gradesub.grade_id=#{gid}")
 	public List<Subject> getGradeSub(@Param("gid") int gid);
 	
-	@Delete("delete from ustudy.grade where id=#{gid}")
-	public int delGrade(String gid);
+	@Delete("delete from ustudy.grade where id in (#{ids})")
+	public int delGrade(List<String> ids);
 	
 	@Delete("delete from ustudy.gradesub where grade_id=#{qid}")
 	public int delGradeSubs(int gid);
