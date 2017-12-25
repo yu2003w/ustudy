@@ -95,10 +95,17 @@ public class SchoolServiceImp implements SchoolService {
 		
 		logger.debug("updateSchool(), grades needs to be removed->" + oGM.values());
 		Set<Entry<String, Grade>> rgr = oGM.entrySet();
-		List<String> ids = new ArrayList<String>();
+		String ids = null;
+		boolean first = true;
 		
 		for (Entry<String, Grade> en: rgr) {
-			ids.add(String.valueOf(en.getValue().getId()));
+			if (first) {
+				ids = String.valueOf(en.getValue().getId());
+				first = false;
+			}
+			else {
+				ids += "," + String.valueOf(en.getValue().getId());
+			}
 		}
 		
 		if (!ids.isEmpty()) {
