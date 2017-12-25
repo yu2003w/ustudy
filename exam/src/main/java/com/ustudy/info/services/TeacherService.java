@@ -12,7 +12,7 @@ public interface TeacherService {
 	
 	public int createTeacher(Teacher item);
 	
-	public int updateTeacher(Teacher item, int id);
+	public void updateTeacher(Teacher item, int id);
 	
 	public int delTeas(String ids);
 	

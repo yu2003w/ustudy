@@ -23,6 +23,9 @@ public interface TeaMapper {
 	@Options(useGeneratedKeys=true)
 	public int createTeacher(Teacher tea);
 	
+	@Update("update ustudy.teacher set teacname=#{tea.teacName}, teacid=#{tea.teacId} where ustudy.teacher.id=#{id}")
+	public int updateTeacher(@Param("tea") Teacher tea, @Param("id") int id);
+	
 	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype, orgid, ctime as cTime, "
 			+ "ll_time as llTime from ustudy.teacher where teacid=#{tid}")
 	public Teacher findTeaByTeaId(String tid);

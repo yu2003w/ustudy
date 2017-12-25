@@ -38,6 +38,15 @@ echo "Deploying exam.war successfully"
 echo "clear logs generated in ${WORK_DIR}/ustudy/logs/"
 rm ${WORK_DIR}/logs/ustudy/*
 
+# start redis as cache
+docker run --rm -it --name uredis -p 6379:6379 -v ${WORK_DIR}/ustudy/redis:/data -d redis:3.2
+if [ $? != 0 ];then
+  echo "Failed to launch redis container"
+  exit 1
+else
+  echo "Launched redis container successfully"
+fi
+
 docker run --rm --name ustudy -p 8080:8080 -v ${WORK_DIR}/ustudy/webapps/:/usr/local/tomcat/webapps \
     -v ${WORK_DIR}/logs/ustudy/:/usr/local/tomcat/logs/ -d tomcat:9.0
 

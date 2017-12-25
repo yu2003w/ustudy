@@ -170,7 +170,7 @@
     <!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
+		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6380"
 		p:timeout="100" />
 
 	<context:annotation-config />
