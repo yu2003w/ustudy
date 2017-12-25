@@ -49,6 +49,7 @@ import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.TeacherService;
 import com.ustudy.exam.utility.Base64Util;
+import com.ustudy.exam.utility.ExamUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -682,7 +683,12 @@ public class ClientServiceImpl implements ClientService {
 
         logger.debug("examStatus: " + examStatus);
 
-        return examDaoImpl.getExamsByStatus(examStatus);
+        String sid = ExamUtil.retrieveSessAttr("orgId");
+        if (sid == null || sid.isEmpty()) {
+        	logger.error("getExamsByStatus(), no school id found, maybe user not login");
+        	throw new RuntimeException("getExamsByStatus(), no school id found, maybe user not login");
+        }
+        return examDaoImpl.getExamsByStatus(Boolean.valueOf(examStatus), sid);
 
     }
 

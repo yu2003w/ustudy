@@ -31,9 +31,6 @@ public class LoginController {
 	// orgtype, orgid, orgname, roles and so on.
 	@Autowired
 	private TeacherService userS;
-	
-	@Autowired
-	private TeacherService teaS;
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public Teacher login(HttpServletRequest request, HttpServletResponse response) {

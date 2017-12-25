@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.service.ExamService;
 
 @RestController
@@ -53,18 +54,23 @@ public class ExamController {
      * @param response HttpServletResponse
      * @return Map
      */
-    @RequestMapping(value = "/exams/{examStatus}", method = RequestMethod.GET)
-    public Map getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/exams/{status}", method = RequestMethod.GET)
+    public UResp getExams(@PathVariable boolean status, HttpServletResponse resp) {
         
-        logger.debug("getExams().");
-        logger.debug("examStatus: " + examStatus);
+        logger.debug("getExams(), examStatus: " + status);
         
-        Map result = new HashMap<>();
+        UResp res = new UResp();
+        
+        try {
+        	res.setData(service.getExamsByStatus(status));
+        	res.setRet(true);
+        }catch (Exception e) {
+        	res.setMessage("getExams(), " + e.getMessage());
+        	resp.setStatus(500);
+        }
 
-        result.put("success", true);
-        result.put("data", service.getExamsByStatus(examStatus));
-
-        return result;
+        return res;
+        
     }
     
     /**

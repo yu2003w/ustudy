@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.service.ExamService;
+import com.ustudy.exam.utility.ExamUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -31,9 +32,14 @@ public class ExamServiceImpl implements ExamService {
         return examDaoImpl.getAllExams();
     }
     
-    public List<Exam> getExamsByStatus(String status){
+    public List<Exam> getExamsByStatus(boolean status){
         logger.debug("getExamsByStatus -> status:" + status);
-        return examDaoImpl.getExamsByStatus(status);
+        String sid = ExamUtil.retrieveSessAttr("orgId");
+        if (sid == null || sid.isEmpty()) {
+        	logger.error("getExamsByStatus(), no school id found, maybe user not login");
+        	throw new RuntimeException("getExamsByStatus(), no school id found, maybe user not login");
+        }
+        return examDaoImpl.getExamsByStatus(status, sid);
     }
     
     public Exam getExamsById(Long id){

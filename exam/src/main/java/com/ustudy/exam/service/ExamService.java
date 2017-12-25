@@ -14,7 +14,7 @@ public interface ExamService {
 	
 	JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String startDate, String endDate, String name);
 	
-	List<Exam> getExamsByStatus(String status);
+	List<Exam> getExamsByStatus(boolean status);
 	
 	Exam getExamsById(Long id);
 
