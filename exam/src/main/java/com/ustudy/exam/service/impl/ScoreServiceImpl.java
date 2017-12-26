@@ -103,7 +103,6 @@ public class ScoreServiceImpl implements ScoreService {
                     }
                     
                     if(studentAnswer.getScore() != studentScore){
-                        System.out.println("id=" + studentAnswer.getId() + ",score=" + studentScore);
                         answerDaoImpl.updateStudentObjectAnswer(studentAnswer.getId(), studentScore);
                     }
                 }
