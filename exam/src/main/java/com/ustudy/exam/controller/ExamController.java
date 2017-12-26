@@ -88,13 +88,17 @@ public class ExamController {
             @RequestParam(value="endDate", defaultValue="") String endDate, 
             @RequestParam(value="name", defaultValue="") String name) {
         
-        logger.debug("getExams().");
-        logger.debug("finished: " + finished + ",gradeId=" + gradeId + ",subjectId=" + subjectId + ",startDate=" + startDate + ",endDate=" + endDate + ",name=" + name);
+        logger.debug("getExams(finished: " + finished + ",gradeId=" + gradeId + ",subjectId=" + subjectId + ",startDate=" + startDate + ",endDate=" + endDate + ",name=" + name + ").");
         
         Map result = new HashMap<>();
-
-        result.put("success", true);
-        result.put("data", service.getExams(finished, gradeId, subjectId, startDate, endDate, name));
+        
+        try {
+        	result.put("success", true);
+        	result.put("data", service.getExams(finished, gradeId, subjectId, startDate, endDate, name));
+        }catch (Exception e) {
+        	result.put("success", false);
+        	result.put("message", e.getMessage());
+        }
 
         return result;
     }
