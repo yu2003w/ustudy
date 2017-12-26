@@ -123,7 +123,7 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 							grade.put("id", g.getId());
 							grade.put("gradeName", g.getGradeName());
 							grade.put("gradeType", true);
-							grade.put("gradeOwner", teacherMap.get(g.getGradeOwner().toString()));
+							grade.put("gradeOwner", teacherMap.get(g.getGradeOwner()));
 							grade.put("classNum", g.getClassesNum());
 							
 							JSONArray subjects = new JSONArray();					
@@ -131,8 +131,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 							if(null != gradesubs && gradesubs.size()>0){
 								for(Map gradesub : gradesubs){
 									JSONObject subject = new JSONObject();
-									subject.put("subject", gradesub.get("name").toString());
-									subject.put("teacher", teacherMap.get(gradesub.get("owner").toString()));
+									Object name = gradesub.get("name");
+									if(null != name){
+										subject.put("subject", name.toString());
+									}
+									Object owner = gradesub.get("owner");
+									if(null != owner){
+										subject.put("teacher", teacherMap.get(owner.toString()));
+									}
 									
 									subjects.add(subject);
 								}
@@ -155,8 +161,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 									if(null != classubs && classubs.size()>0){
 										for(Map sub : classubs){
 											JSONObject subject_ = new JSONObject();
-											subject_.put("subject", sub.get("name").toString());
-											subject_.put("teacher", teacherMap.get(sub.get("owner").toString()));
+											Object name = sub.get("name");
+											if(null != name){
+												subject_.put("subject", name.toString());
+											}
+											Object owner = sub.get("owner");
+											if(null != owner){
+												subject_.put("teacher", teacherMap.get(owner.toString()));
+											}
 											
 											subjects_.add(subject_);
 										}
@@ -203,8 +215,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 			if(null != gradeSubjects && gradeSubjects.size()>0){
 				for(Map gradesub : gradeSubjects){
 					JSONObject subject = new JSONObject();
-					subject.put("subject", gradesub.get("name").toString());
-					subject.put("teacher", teacherMap.get(gradesub.get("owner").toString()));
+					Object name = gradesub.get("name");
+					if(null != name){
+						subject.put("subject", name.toString());
+					}
+					Object owner = gradesub.get("owner");
+					if(null != owner){
+						subject.put("teacher", teacherMap.get(owner.toString()));
+					}
 					
 					subjects.add(subject);
 				}
@@ -227,8 +245,15 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 					if(null != classSubs && classSubs.size()>0){
 						for (Map classsub : classSubs) {
 							JSONObject subject = new JSONObject();
-							subject.put("subject", classsub.get("name").toString());
-							subject.put("teacher", teacherMap.get(classsub.get("owner").toString()));
+							
+							Object name = classsub.get("name");
+							if(null != name){
+								subject.put("subject", name.toString());
+							}
+							Object owner = classsub.get("owner");
+							if(null != owner){
+								subject.put("teacher", teacherMap.get(owner.toString()));
+							}
 							
 							classSub.add(subject);
 						}
