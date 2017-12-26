@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ import com.ustudy.exam.service.ExamService;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExamController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
+	private static final Logger logger = LogManager.getLogger(ExamController.class);
 	
 	@Autowired
 	private ExamService service;

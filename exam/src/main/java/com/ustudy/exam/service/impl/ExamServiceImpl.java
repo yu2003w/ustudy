@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
@@ -24,7 +24,7 @@ import net.sf.json.JSONObject;
 @Service
 public class ExamServiceImpl implements ExamService {
     
-    private static final Logger logger = LoggerFactory.getLogger(ExamServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(ExamServiceImpl.class);
     
     @Resource
     private ExamDao examDaoImpl;
