@@ -8,6 +8,9 @@ if [ $# != 2 ]; then
   exit
 fi
 
+echo "Stopping already started containers"
+docker stop dredis dashboard
+
 WORK_DIR=$1
 SOURCE_DIR=$2
 echo "Working directory is " ${WORK_DIR}

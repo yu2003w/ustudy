@@ -5,6 +5,7 @@ import java.util.List;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
 import com.ustudy.info.model.GradeSubRoles;
+import com.ustudy.info.model.Item;
 import com.ustudy.info.model.SchGradeSub;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
@@ -54,5 +55,13 @@ public interface SchoolService {
 	 * @return
 	 */
 	public List<SchGradeSub> getGrSubs(String schId);
+	
+	
+	/**
+	 * Return class info as <id, name> pair for the specified grade
+	 * @param id 
+	 * @return
+	 */
+	public List<Item> getGrClsList(int id);
 	
 }

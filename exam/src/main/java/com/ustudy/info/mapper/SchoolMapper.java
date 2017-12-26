@@ -33,6 +33,11 @@ public interface SchoolMapper {
 			+ "ustudy.grade.schid=#{schid} and ustudy.grade.grade_owner IS NULL")
 	public List<Grade> getGradesBySchId(@Param("schid") String schid);
 	
+	@Select("select grade.id, grade_name as name, classes_num as classNum, grade_owner as gradeO from "
+			+ "ustudy.grade left join ustudy.teacher on grade.grade_owner = teacher.teacid where "
+			+ "ustudy.grade.id=#{gid} and ustudy.grade.grade_owner IS NULL")
+	public Grade getGradeInfo(@Param("gid") String gid);
+	
 	@Select("select id, name from ustudy.rolevalue where name not like 'addi%'")
 	public List<Item> getRoles();
 	
@@ -42,5 +47,8 @@ public interface SchoolMapper {
 	@Select("select sub_id as id, name from ustudy.gradesub join ustudy.subject on "
 			+ "ustudy.subject.id = ustudy.gradesub.sub_id where grade_id=#{grId}")
 	public List<Item> getGradeSub(int grId);
+	
+	@Select("select id, cls_name as name from ustudy.class where grade_id=#{gid}")
+	public List<Item> getGradeClass(@Param("gid") int grId);
 	
 }
