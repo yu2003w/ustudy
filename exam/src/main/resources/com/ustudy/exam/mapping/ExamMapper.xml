@@ -16,27 +16,30 @@
 	</select>
 	
 	<select id="getExams" parameterType="java.util.Map" resultMap="ExamResult">
-		SELECT * FROM exam where 1=1
+		SELECT e.* FROM exam e LEFT JOIN examschool ec ON e.id=ec.examid where schid=#{orgId}
 		<if test="finished == false">
-		 AND status &lt;&gt; 2
+		 AND e.status &lt;&gt; 2
 		</if>
 		<if test="finished == true">
-		 AND status = 2
+		 AND e.status = 2
 		</if>
-		<if test="gradeId > 0">
-		 AND id IN (SELECT DISTINCT examid from examgradesub where grade_id=#{gradeId})
+		<if test="gradeId > 0 and subjectId > 0">
+		 AND e.id IN (SELECT DISTINCT examid from examgradesub where grade_id=#{gradeId} AND sub_id=#{subjectId})
 		</if>
-		<if test="subjectId > 0">
-		 AND id IN (SELECT DISTINCT examid from examgradesub where sub_id=#{subjectId})
+		<if test="subjectId > 0 and gradeId &lt; 1">
+		 AND e.id IN (SELECT DISTINCT examid from examgradesub where sub_id=#{subjectId})
+		</if>
+		<if test="gradeId > 0 and subjectId &lt; 1">
+		 AND e.id IN (SELECT DISTINCT examid from examgradesub where grade_id=#{gradeId})
 		</if>
 		<if test="startDate != ''">
-		 AND exam_date &gt;= #{startDate,jdbcType=VARCHAR}
+		 AND e.exam_date &gt;= #{startDate,jdbcType=VARCHAR}
 		</if>
 		<if test="endDate != ''">
-		AND exam_date &lt;= #{endDate,jdbcType=VARCHAR}
+		AND e.exam_date &lt;= #{endDate,jdbcType=VARCHAR}
 		</if>
 		<if test="name != ''">
-		AND exam_name LIKE concat('%',#{name,jdbcType=VARCHAR},'%')
+		AND e.exam_name LIKE concat('%',#{name,jdbcType=VARCHAR},'%')
 		</if>
 	</select>
 	

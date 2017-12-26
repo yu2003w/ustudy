@@ -16,6 +16,7 @@ import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.service.ExamService;
 import com.ustudy.exam.utility.ExamUtil;
+import com.ustudy.info.util.InfoUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -61,8 +62,14 @@ public class ExamServiceImpl implements ExamService {
         
         JSONArray result = new JSONArray();
         
+        String orgId = InfoUtil.retrieveSessAttr("orgId");
+        if (orgId == null || orgId.isEmpty()) {
+        	logger.error("getExams(), no school id found, maybe user not login");
+        	throw new RuntimeException("getExams(), no school id found, maybe user not login");
+        }
+        
         try {
-            List<Exam> exams = examDaoImpl.getExams(finished, gradeId, subjectId, startDate, endDate, name);
+            List<Exam> exams = examDaoImpl.getExams(finished, orgId, gradeId, subjectId, startDate, endDate, name);
             
             for (Exam exam : exams) {
                 
