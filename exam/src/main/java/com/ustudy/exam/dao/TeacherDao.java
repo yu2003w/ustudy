@@ -15,4 +15,6 @@ public interface TeacherDao {
 	
 	List<Map> getTeachersBySchoolInGradeName(@Param("schoolId")String schoolId, @Param("gradeName")String gradeName);
 	
+	List<Map> getGradeNotaskTeachers(Long gradeId);
+	
 }

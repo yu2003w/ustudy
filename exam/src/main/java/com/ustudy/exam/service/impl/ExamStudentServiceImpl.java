@@ -66,19 +66,16 @@ public class ExamStudentServiceImpl implements ExamStudentService {
         Set<Map<String, Object>> classes = new HashSet<>();
         
         for (Map<String, Object> student : students) {
-            String className = "";
-            long classId = 0;
-            if(null != student.get("className")){
-                className = student.get("className").toString();
+            if(null != student.get("className") && null != student.get("classId")){
+            	String className = student.get("className").toString();
+            	long classId = Long.valueOf(student.get("classId").toString());
+            	
+            	Map<String, Object> class_ = new HashMap<>();
+            	class_.put("className", className);
+            	class_.put("classId", classId);
+            	
+            	classes.add(class_);
             }
-            if(null != student.get("classId")){
-                classId = Long.valueOf(student.get("classId").toString());
-            }
-            Map<String, Object> class_ = new HashMap<>();
-            class_.put("className", className);
-            class_.put("classId", classId);
-            
-            classes.add(class_);
         }
         
         return classes;
