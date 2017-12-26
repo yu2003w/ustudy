@@ -58,11 +58,15 @@ public class ExamInfoServiceImpl implements ExamInfoService {
 	@Override
 	@Transactional
 	public void updateExamInfo(ExamInfo exam) {
-		//delete fristly then insert again
-		deleteExamInfo(exam.getId());
-		logger.debug("updateExamInfo(), delete completed before update");
-		createExamInfo(exam);
+
+		int ret = exM.createExamInfo(exam);
+		if (ret < 0 || ret > 2 || exam.getId() < 0) {
+			logger.error("updateExamInfo(), failed to create examination " + exam);
+			throw new RuntimeException("updateExamInfo(), failed to update exam record.");
+		}
+		
 		logger.debug("updateExamInfo(), created examination info again for update");
+		
 	}
 	
 	@Override

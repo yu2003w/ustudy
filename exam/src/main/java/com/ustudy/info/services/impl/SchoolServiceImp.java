@@ -30,7 +30,6 @@ import com.ustudy.info.model.TeacherBrife;
 import com.ustudy.info.model.TeacherSub;
 import com.ustudy.info.services.SchoolService;
 import com.ustudy.info.util.ClassInfoRowMapper;
-import com.ustudy.info.util.GradeRowMapper;
 import com.ustudy.info.util.InfoUtil;
 import com.ustudy.info.util.SubjectTeacRowMapper;
 import com.ustudy.info.util.TeacherSubRowMapper;
@@ -270,9 +269,8 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	public Grade getGradeInfo(String id) {
-		String sqlGr = "select grade.id, grade_name, classes_num, grade_owner, teacname from "
-				+ "ustudy.grade join teacher on grade.grade_owner = teacher.teacid where grade.id = ?";
-		Grade info = schS.queryForObject(sqlGr, new GradeRowMapper(), id);
+		
+		Grade info = schM.getGradeInfo(id);
 		populateGrade(info);
 		return info;
 	}
@@ -332,7 +330,12 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Override
-	@Transactional
+	public List<Item> getGrClsList(int id) {
+		List<Item> clsL = schM.getGradeClass(id);
+		return clsL;
+	}
+	
+	@Override
 	public List<TeacherSub> getClassTeac(String id) {
 		List<TeacherSub> teaL = null;
 		return teaL;
@@ -406,4 +409,5 @@ public class SchoolServiceImp implements SchoolService {
 		logger.debug("getGrSubs(), SchGrSubs->" + schid + "," + tgL.toString());
 		return tgL;
 	}
+
 }

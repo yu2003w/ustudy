@@ -20,8 +20,8 @@ public class DashboardUtil {
 	/**
 	 * Json String should be in the format as below,
 	 * [
-	 *   {"id": "123"},
-	 *   {"id": "124"}
+	 *   {"id": 123},
+	 *   {"id": 124}
 	 * ]
 	 * @param data --- json data contains content of ids
 	 * @return  --- list of ids parsed from json string
@@ -36,7 +36,7 @@ public class DashboardUtil {
 			int len = jArr.size();
 			for (int i = 0; i < len; i++) {
 				JsonObject obj = jArr.getJsonObject(i);
-				ret.add(obj.getJsonString("id").getString());
+				ret.add(String.valueOf(obj.getInt("id")));
 			}
 		} catch (JsonException je) {
 			logger.info(je.getMessage());
