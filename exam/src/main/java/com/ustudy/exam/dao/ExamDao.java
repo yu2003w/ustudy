@@ -32,7 +32,7 @@ public interface ExamDao {
 	
 	Long getExamStudengCount(Long examid);
 	
-	List<Exam> getExamsByStatus(@Param("status") boolean status, @Param("sid") String sid);
+	List<Exam> getExamsByStatus(@Param("status") String status, @Param("sid") String sid);
 	
 	Exam getExamsById(Long id);
 	

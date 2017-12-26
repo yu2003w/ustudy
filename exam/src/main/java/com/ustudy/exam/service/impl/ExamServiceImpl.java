@@ -33,7 +33,7 @@ public class ExamServiceImpl implements ExamService {
         return examDaoImpl.getAllExams();
     }
     
-    public List<Exam> getExamsByStatus(boolean status){
+    public List<Exam> getExamsByStatus(String status){
         logger.debug("getExamsByStatus -> status:" + status);
         String sid = ExamUtil.retrieveSessAttr("orgId");
         if (sid == null || sid.isEmpty()) {

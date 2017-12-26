@@ -688,7 +688,7 @@ public class ClientServiceImpl implements ClientService {
         	logger.error("getExamsByStatus(), no school id found, maybe user not login");
         	throw new RuntimeException("getExamsByStatus(), no school id found, maybe user not login");
         }
-        return examDaoImpl.getExamsByStatus(Boolean.valueOf(examStatus), sid);
+        return examDaoImpl.getExamsByStatus(examStatus, sid);
 
     }
 
