@@ -335,4 +335,8 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 		return resaltMap;
 	}
 
+	public List<Map> getGradeNotaskTeachers(Long gradeId) throws Exception {
+		return teacherDaoImpl.getGradeNotaskTeachers(gradeId);
+	}
+
 }

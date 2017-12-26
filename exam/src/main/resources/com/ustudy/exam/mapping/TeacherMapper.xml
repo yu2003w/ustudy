@@ -28,5 +28,11 @@
 	<select id="getSubjectsOfTeacher" parameterType="java.util.Map" resultType="string">
 		select s.name from teachersub ts left join subject s on ts.sub_id=s.id WHERE teac_id = #{teacid}
 	</select>
-
+	
+	<select id="getGradeNotaskTeachers" parameterType="long" resultType="java.util.Map">
+		SELECT t.id,t.teacid,t.teacname FROM teacher t LEFT JOIN teachergrade tg ON t.teacid = tg.teac_id
+		WHERE tg.grade_id = #{gradeId} AND t.teacid NOT IN (SELECT m.teacid FROM marktask m WHERE m.teacid IN (
+		SELECT t.id FROM teacher t LEFT JOIN teachergrade tg ON t.teacid = tg.teac_id WHERE tg.grade_id = #{gradeId}))
+	</select>
+	
 </mapper>
