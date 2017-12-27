@@ -53,12 +53,10 @@ public class ExamStudentServiceImpl implements ExamStudentService {
         
         try {
             List<Map<String, Object>> students = examStudentDaompl.getExamStudents(examId, gradeId, classId, studentName);
-            Set<Map<String, Object>> classes = getClasses(students);
             result.put("students", students);
-            result.put("classes", classes);
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
+            logger.error("getExamStudents() failed->" + e.getMessage());
+            throw new RuntimeException("getExamStudents() failed->" + e.getMessage());
         }
         
         return result;

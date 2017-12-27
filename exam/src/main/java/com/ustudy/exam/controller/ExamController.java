@@ -55,7 +55,7 @@ public class ExamController {
      * @return Map
      */
     @RequestMapping(value = "/exams/{status}", method = RequestMethod.GET)
-    public UResp getExams(@PathVariable boolean status, HttpServletResponse resp) {
+    public UResp getExams(@PathVariable String status, HttpServletResponse resp) {
         
         logger.debug("getExams(), examStatus: " + status);
         
