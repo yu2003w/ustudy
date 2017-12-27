@@ -24,6 +24,7 @@ import com.ustudy.exam.model.Grade;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.service.TaskAllocationService;
+import com.ustudy.info.util.InfoUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -365,7 +366,13 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 		return teacherDaoImpl.getGradeNotaskTeachers(gradeId);
 	}
 
-	public JSONArray getSchoolTeachers(String schId) throws Exception {
+	public JSONArray getSchoolTeachers() throws Exception {
+		
+		String schId = InfoUtil.retrieveSessAttr("orgId");
+        if (schId == null || schId.isEmpty()) {
+        	logger.error("getSchoolTeachers(), no school id found, maybe user not login");
+        	throw new RuntimeException("getSchoolTeachers(), no school id found, maybe user not login");
+        }
 		
 		JSONArray array = new JSONArray();
 		

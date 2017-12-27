@@ -18,6 +18,6 @@ public interface TaskAllocationService {
 	
 	List<Map<String, Object>> getGradeNotaskTeachers(Long gradeId) throws Exception;
 	
-	JSONArray getSchoolTeachers(String schId) throws Exception;
+	JSONArray getSchoolTeachers() throws Exception;
 	
 }

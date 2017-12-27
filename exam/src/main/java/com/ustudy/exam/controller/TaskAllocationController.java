@@ -122,7 +122,7 @@ public class TaskAllocationController {
 		return result;
 	}
 
-	@RequestMapping(value = "/school/{schId}/teachers", method = RequestMethod.GET)
+	@RequestMapping(value = "/school/teachers", method = RequestMethod.GET)
 	public Map getSchoolTeachers(@PathVariable String schId) {
 
 		logger.debug("getSchoolTeachers(schId: "+schId+").");
@@ -130,7 +130,7 @@ public class TaskAllocationController {
 		Map result = new HashMap<>();
 		try {
 			result.put("success", true);
-			result.put("data", service.getSchoolTeachers(schId));
+			result.put("data", service.getSchoolTeachers());
 		} catch (Exception e) {
 			result.put("success", false);
 			result.put("message", e.getMessage());
