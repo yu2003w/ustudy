@@ -9,12 +9,14 @@ import org.mybatis.spring.annotation.MapperScan;
 @MapperScan
 public interface TeacherDao {
 
-	Map getTeacherBySchoolIdType(@Param("schoolId")String schoolId, @Param("type")String type);
+	Map<String, Object> getTeacherBySchoolIdType(@Param("schoolId")String schoolId, @Param("type")String type);
 	
-	List<Map> getTeachersBySchoolId(String schoolId);
+	List<Map<String, Object>> getTeachersBySchoolId(String schoolId);
 	
-	List<Map> getTeachersBySchoolInGradeName(@Param("schoolId")String schoolId, @Param("gradeName")String gradeName);
+	List<Map<String, Object>> getTeachersBySchoolInGradeName(@Param("schoolId")String schoolId, @Param("gradeName")String gradeName);
 	
-	List<Map> getGradeNotaskTeachers(Long gradeId);
+	List<Map<String, Object>> getGradeNotaskTeachers(Long gradeId);
+	
+	List<Map<String, Object>> getSchoolTeachers(String schId);
 	
 }

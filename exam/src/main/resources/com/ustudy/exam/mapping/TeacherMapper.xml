@@ -35,4 +35,14 @@
 		SELECT t.id FROM teacher t LEFT JOIN teachergrade tg ON t.teacid = tg.teac_id WHERE tg.grade_id = #{gradeId}))
 	</select>
 	
+	<select id="getSchoolTeachers" parameterType="string" resultType="java.util.Map">
+		select grade.id gradeId, grade.grade_name gradeName, subject.id subId, subject.name subName, 
+		teachergrade.teac_id teacId,teacher.teacName from teachergrade 
+		JOIN teacher on teacher.teacid=teachergrade.teac_id
+		join grade on grade.id=teachergrade.grade_id 
+		join teachersub on teachersub.teac_id = teachergrade.teac_id 
+		join subject on subject.id = teachersub.sub_id
+		where schid=#{schId}
+	</select>
+	
 </mapper>

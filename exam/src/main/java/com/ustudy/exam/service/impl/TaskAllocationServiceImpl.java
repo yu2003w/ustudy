@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -206,7 +207,7 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 			object.put("gradeType", true);
 			object.put("classNum", grade.getClassesNum());
 			
-			List<Map> teachers = teacherDaoImpl.getTeachersBySchoolInGradeName(grade.getSchid(), grade.getGradeName());
+			List<Map<String, Object>> teachers = teacherDaoImpl.getTeachersBySchoolInGradeName(grade.getSchid(), grade.getGradeName());
 			Map<String, Map> teacherMap = getTeachersBySchoolInGradeName(teachers);
 			object.put("gradeOwner", teacherMap.get(grade.getGradeOwner()));
 			
@@ -273,14 +274,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 	
 	private Map<String, Map> getTeachersBySchoolId(String schoolId){
 		Map<String, Map> resaltMap = new HashMap<>(); 
-		List<Map> teachers = teacherDaoImpl.getTeachersBySchoolId(schoolId);
+		List<Map<String, Object>> teachers = teacherDaoImpl.getTeachersBySchoolId(schoolId);
 		for (Map map : teachers) {
 			resaltMap.put(map.get("id").toString(), map);
 		}
 		return resaltMap;
 	}
 	
-	private Map<String, Map> getTeachersBySchoolInGradeName(List<Map> teachers){
+	private Map<String, Map> getTeachersBySchoolInGradeName(List<Map<String, Object>> teachers){
 		Map<String, Map> resaltMap = new HashMap<>(); 
 		if(null != teachers && teachers.size()>0){
 			for (Map map : teachers) {
@@ -360,8 +361,84 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 		return resaltMap;
 	}
 
-	public List<Map> getGradeNotaskTeachers(Long gradeId) throws Exception {
+	public List<Map<String, Object>> getGradeNotaskTeachers(Long gradeId) throws Exception {
 		return teacherDaoImpl.getGradeNotaskTeachers(gradeId);
+	}
+
+	public JSONArray getSchoolTeachers(String schId) throws Exception {
+		
+		JSONArray array = new JSONArray();
+		
+		List<Map<String, Object>> teachers = teacherDaoImpl.getSchoolTeachers(schId);
+		
+		Map<Long, Map<String, Object>> gradeMap = new HashMap<>();
+		Map<Long, Map<String, Object>> subMap = new HashMap<>();
+		Map<String, Map<String, Object>> teacMap = new HashMap<>();
+		Map<Long, Map<Long, List<String>>> summary = new HashMap<>();
+		
+		for (Map<String, Object> map : teachers) {
+			if(null != map.get("gradeId") && null != map.get("subId") && null != map.get("teacId")){
+				long gradeId = (int)map.get("gradeId");
+				Map<Long, List<String>> grades = summary.get(gradeId);
+				if(null == grades){
+					grades = new HashMap<>();
+					
+					Map<String, Object> gMap = new HashMap<>();
+					gMap.put("gradeId", gradeId);
+					gMap.put("gradeName", map.get("gradeName"));
+					gradeMap.put(gradeId, gMap);
+				}
+				
+				long subId = (int)map.get("subId");
+				List<String> subs = grades.get(subId);
+				if(null == subs){
+					subs = new ArrayList<>();
+					Map<String, Object> sMap = new HashMap<>();
+					sMap.put("subId", subId);
+					sMap.put("subName", map.get("subName"));
+					subMap.put(subId, sMap);
+				}
+				
+				String teacId = map.get("teacId").toString();
+				subs.add(teacId);
+				grades.put(subId, subs);
+				
+				Map<String, Object> tMap = new HashMap<>();
+				tMap.put("teacId", teacId);
+				tMap.put("teacName", map.get("teacName"));
+				teacMap.put(teacId, tMap);
+				
+				summary.put(gradeId, grades);
+			}
+		}
+		
+		for (Entry<Long,Map<Long,List<String>>> entry : summary.entrySet()) {
+			long gradeId = entry.getKey();
+			Map<String, Object> grade = gradeMap.get(gradeId);
+			if(null != grade){
+				Map<Long,List<String>> subjects = entry.getValue();
+				JSONArray subjectArray = new JSONArray();
+				for (Entry<Long,List<String>> sub : subjects.entrySet()) {
+					long subId = sub.getKey();
+					Map<String, Object> subject = subMap.get(subId);
+					if(null != subject){
+						List<String> teacs = sub.getValue();
+						JSONArray teacherArray = new JSONArray();
+						for (String teacId : teacs) {
+							if(null != teacMap.get(teacId)){
+								teacherArray.add(teacMap.get(teacId));
+							}
+						}
+						subject.put("teachers", teacherArray);
+					}
+					subjectArray.add(subject);
+				}
+				grade.put("subjects", subjectArray);
+			}
+			array.add(grade);
+		}
+		
+		return array;
 	}
 
 }
