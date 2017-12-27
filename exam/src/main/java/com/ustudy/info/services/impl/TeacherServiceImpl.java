@@ -148,7 +148,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	@Transactional
-	public int createTeacher(Teacher item) {
+	public int createTeacher(List<Teacher> teaS) {
 		
 		String msg = null;
 
@@ -157,79 +157,92 @@ public class TeacherServiceImpl implements TeacherService {
 		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("createTeacher(), it seemed user not logged in");
 		}
-		item.setOrgid(orgId);
-		item.setOrgtype(orgT);
-
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			if (item.getPasswd() != null) {
-				md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
-			} else {
-				// if no passwd set for teacher, passwd should be last 6 characters in teacId
-				if (item.getTeacId() == null || item.getTeacId().length() < 6) {
-					logger.error("createTeacher(), teacher id contains less than 6 characters, failed to "
-							+ "populate password");
-					throw new RuntimeException("createTeacher(), failed to set password.");
+		
+		int ret = -1;
+		
+		for (Teacher item: teaS) {
+			item.setOrgid(orgId);
+			item.setOrgtype(orgT);
+			
+			try {
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				if (item.getPasswd() != null) {
+					md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+				} else {
+					// if no passwd set for teacher, passwd should be last 6 characters in teacId
+					if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+						logger.error("createTeacher(), teacher id contains less than 6 characters, failed to "
+								+ "populate password");
+						throw new RuntimeException("createTeacher(), failed to set password.");
+					}
+					String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
+							item.getTeacId().length());
+					md.update(pw.getBytes(), 0, 6);
 				}
-				String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
-						item.getTeacId().length());
-				md.update(pw.getBytes(), 0, 6);
+
+				item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
+			} catch (NoSuchAlgorithmException ne) {
+				msg = "createTeacher(), failed to initialize MD5 algorithm.";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			// set creation time
+			item.setcTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+			
+			// ready to insert teacher info to database
+			ret = teaM.createTeacher(item);
+			
+			if (ret < 0 || ret > 2) {
+				msg = "createTeacher(), insert failed with ret->" + ret;
+				logger.error(msg);
+				throw new RuntimeException(msg);
 			}
 
-			item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
-		} catch (NoSuchAlgorithmException ne) {
-			msg = "createTeacher(), failed to initialize MD5 algorithm.";
-			logger.warn(msg);
-			throw new RuntimeException(msg);
+			if (item.getId() < 0) {
+				msg = "createTeacher(), invalid id " + item.getId();
+				logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("createTeacher(), created ret->" + ret + ", generated id->" + item.getId());
+
+			// save teacher grades
+			if (item.getGrades() != null)
+				ret = saveTeaGrades(item.getGrades(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
+
+			if (item.getSubjects() != null)
+				ret = saveSubjects(item.getSubjects(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
+			
+			// save classes
+			if (item.getClasses() != null)
+				ret = saveClasses(item.getClasses(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " classes populated for " + item.getTeacId());
+
+			// save roles
+			if (item.getRoles() != null) {
+				ret = saveRoles(item.getRoles(), item);
+			}
+			logger.debug("createTeacher(), " + ret + " roles is saved for " + item.getTeacId());
+
+			// save additional permission
+			if (item.getAddiPerms() != null)
+				ret = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " additional perms populated for " + item.getTeacId());
+
+			logger.debug("createTeacher(), teacher created->" + item);
+			
+			ret = item.getId();
+			
 		}
 		
-		// set creation time
-		item.setcTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		if (teaS.size() == 1)
+			return ret;
+		else
+			return teaS.size();
 		
-		// ready to insert teacher info to database
-		int ret = teaM.createTeacher(item);
-		
-		if (ret < 0 || ret > 2) {
-			msg = "createTeacher(), insert failed with ret->" + ret;
-			logger.error(msg);
-			throw new RuntimeException(msg);
-		}
-
-		if (item.getId() < 0) {
-			msg = "createTeacher(), invalid id " + item.getId();
-			logger.error(msg);
-			throw new RuntimeException(msg);
-		}
-		
-		logger.debug("createTeacher(), created ret->" + ret + ", generated id->" + item.getId());
-
-		// save teacher grades
-		if (item.getGrades() != null)
-			ret = saveTeaGrades(item.getGrades(), item.getTeacId());
-		logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
-
-		if (item.getSubjects() != null)
-			ret = saveSubjects(item.getSubjects(), item.getTeacId());
-		logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
-		
-		// save classes
-		if (item.getClasses() != null)
-			ret = saveClasses(item.getClasses(), item.getTeacId());
-		logger.debug("createTeacher()," + ret + " classes populated for " + item.getTeacId());
-
-		// save roles
-		if (item.getRoles() != null) {
-			ret = saveRoles(item.getRoles(), item);
-		}
-		logger.debug("createTeacher(), " + ret + " roles is saved for " + item.getTeacId());
-
-		// save additional permission
-		if (item.getAddiPerms() != null)
-			ret = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createTeacher()," + ret + " additional perms populated for " + item.getTeacId());
-
-		logger.debug("createTeacher(), teacher created->" + item);
-		return item.getId();
 	}
 
 	@Override

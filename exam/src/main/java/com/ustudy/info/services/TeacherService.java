@@ -10,7 +10,7 @@ public interface TeacherService {
 	
 	public Teacher displayTeacher(int id);
 	
-	public int createTeacher(Teacher item);
+	public int createTeacher(List<Teacher> item);
 	
 	public void updateTeacher(Teacher item, int id);
 	

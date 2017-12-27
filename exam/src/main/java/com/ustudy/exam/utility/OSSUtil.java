@@ -30,8 +30,7 @@ public class OSSUtil {
 	 * put object into OSS bucket
      * @param bucketName, key, file 
      * @return 
-     */  
-    @SuppressWarnings("restriction")
+     */
 	public static void putObject(String key, File file) throws Exception{
     	try {
     		ossClient.putObject(bucketName, key, file);
@@ -52,8 +51,7 @@ public class OSSUtil {
 	 * put object into OSS bucket
      * @param bucketName, key, inputStream 
      * @return 
-     */  
-    @SuppressWarnings("restriction")
+     */
 	public static void putObject(String key, InputStream inputStream) throws Exception {
     	try {
     		ossClient.putObject(bucketName, key, inputStream);
@@ -74,8 +72,7 @@ public class OSSUtil {
 	 * combine two images into one and then put object
      * @param baseKey, markKey, targetKey, x, y, w, h
      * @return 
-     */  
-    @SuppressWarnings("restriction")
+     */
 	public static void putObject(String baseKey, String markKey, String targetKey, String x, String y, String w, String h) throws Exception {
     	try {
     		String base64MarkKey = Base64Utils.encodeToUrlSafeString(markKey.getBytes());
