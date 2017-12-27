@@ -13,6 +13,7 @@ import com.ustudy.dashboard.model.Grade;
 import com.ustudy.dashboard.model.OrgBrife;
 import com.ustudy.dashboard.model.School;
 import com.ustudy.dashboard.model.Subject;
+import com.ustudy.dashboard.model.Teacher;
 
 @Mapper
 public interface SchoolMapper {
@@ -75,5 +76,12 @@ public interface SchoolMapper {
 	
 	@Delete("delete from ustudy.gradesub where grade_id=#{qid}")
 	public int delGradeSubs(int gid);
+	
+	@Insert("insert into ustudy.teacher(teacid, teacname, passwd, orgtype, orgid, ctime, ll_time) "
+			+ "values(#{teacId}, #{teacName}, #{passwd}, #{orgType}, #{orgId}, #{createTime}, #{llTime}) on "
+			+ "duplicate key update teacname=#{teacName}, passwd=#{passwd}, orgtype=#{orgType}, "
+			+ "orgid=#{orgId}, ctime=#{createTime}, ll_time=#{llTime}")
+	@Options(useGeneratedKeys=true)
+	public int createCleaner(Teacher tea);
 	
 }

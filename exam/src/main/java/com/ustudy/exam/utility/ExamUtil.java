@@ -61,6 +61,7 @@ public class ExamUtil {
 		rolemapping.put("年级主任", "gleader");
 		rolemapping.put("校长", "org_owner");
 		rolemapping.put("考务老师", "leader");
+		rolemapping.put("清道夫", "cleaner");
 		
 		rolemapping.put("teacher", "任课老师");
 		rolemapping.put("cteacher", "班主任");
@@ -69,6 +70,7 @@ public class ExamUtil {
 		rolemapping.put("gleader", "年级主任");
 		rolemapping.put("org_owner", "校长");
 		rolemapping.put("leader", "考务老师");
+		rolemapping.put("cleaner", "清道夫");
 	}
 	
 }

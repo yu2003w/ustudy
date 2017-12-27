@@ -252,5 +252,5 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 
 		return id;
 	}
-	
+
 }

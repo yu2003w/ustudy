@@ -30,12 +30,12 @@ public interface SchoolMapper {
 	
 	@Select("select grade.id, grade_name as name, classes_num as classNum, grade_owner as gradeO from "
 			+ "ustudy.grade left join ustudy.teacher on grade.grade_owner = teacher.teacid where "
-			+ "ustudy.grade.schid=#{schid} and ustudy.grade.grade_owner IS NULL")
+			+ "ustudy.grade.schid=#{schid} order by ustudy.grade.id")
 	public List<Grade> getGradesBySchId(@Param("schid") String schid);
 	
 	@Select("select grade.id, grade_name as name, classes_num as classNum, grade_owner as gradeO from "
 			+ "ustudy.grade left join ustudy.teacher on grade.grade_owner = teacher.teacid where "
-			+ "ustudy.grade.id=#{gid} and ustudy.grade.grade_owner IS NULL")
+			+ "ustudy.grade.id=#{gid}")
 	public Grade getGradeInfo(@Param("gid") String gid);
 	
 	@Select("select id, name from ustudy.rolevalue where name not like 'addi%'")

@@ -1,5 +1,10 @@
 package com.ustudy.dashboard.services.imp;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.dashboard.model.Subject;
+import com.ustudy.dashboard.model.Teacher;
 import com.ustudy.dashboard.services.SchoolService;
 import com.ustudy.dashboard.util.DashboardUtil;
+import com.ustudy.dashboard.mapper.OrgOwnerMapper;
 import com.ustudy.dashboard.mapper.SchoolMapper;
 import com.ustudy.dashboard.model.Grade;
 import com.ustudy.dashboard.model.OrgBrife;
@@ -32,6 +39,9 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Autowired
 	private SchoolMapper schM;
+	
+	@Autowired
+	private OrgOwnerMapper ooM;
 	
 	@Override
 	public List<School> getSchools(int id) {
@@ -58,7 +68,72 @@ public class SchoolServiceImp implements SchoolService {
 		int numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
 		logger.info(numOfGr + " grade items saved indashboard/src/main/java/com/ustudy/dashboard/services/imp/SchoolServiceImp.javato database");
 		
+		// create cleaner account for this school
+		ret = createCleaner(data.getSchoolType(), data.getSchoolId());
+		logger.debug("createSchool(), cleaner id for school " + data.getSchoolId() + " " + ret);
 		return data.getId();
+	}
+	
+	
+	private int createCleaner(String orgType, String orgId) {
+		String tname = "admin" + orgId;
+		String msg = null;
+		
+		logger.debug("createCleaner(), create cleaner for school " + orgId);
+		Teacher item = new Teacher(tname, tname, orgType, orgId);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			if (item.getPasswd() != null) {
+				md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+			} else {
+				/*
+				// if no passwd set for teacher, passwd should be last 6 characters in teacId
+				if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+					logger.error("createCleaner(), teacher id contains less than 6 characters, failed to "
+							+ "populate password");
+					throw new RuntimeException("createTeacher(), failed to set password.");
+				}
+				*/
+				// set default password
+				String pw = "admin";
+				md.update(pw.getBytes(), 0, 6);
+			}
+
+			item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
+		} catch (NoSuchAlgorithmException ne) {
+			msg = "createCleaner(), failed to initialize MD5 algorithm.";
+			logger.warn(msg);
+			throw new RuntimeException(msg);
+		}
+		
+		// set creation time
+		item.setCreateTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		int ret = schM.createCleaner(item);
+		if (ret < 0 || ret > 2) {
+			msg = "createCleaner(), insert failed with ret->" + ret;
+			logger.error(msg);
+			throw new RuntimeException(msg);
+		}
+
+		if (item.getId() < 0) {
+			msg = "createCleaner(), invalid id " + item.getId();
+			logger.error(msg);
+			throw new RuntimeException(msg);
+		}
+		
+		logger.debug("createCleaner(), created ret->" + ret + ", generated id->" + item.getId());
+
+		// populate role as "cleaner"
+		ret = ooM.getRoleId("cleaner");
+		if (ret <= 0) {
+			logger.error("createCleaner(), invalid role id->" + ret);
+			throw new RuntimeException("createCleaner(), invalid role id->" + ret);
+		}
+		ret = ooM.saveRoles(ret, item.getTeacId());
+
+		logger.debug("createCleaner(), role populated for " + item.getTeacId());
+	
+		return item.getId();
 	}
 
 	@Transactional
