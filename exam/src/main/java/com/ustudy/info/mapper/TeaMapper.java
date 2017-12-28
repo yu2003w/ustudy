@@ -26,17 +26,17 @@ public interface TeaMapper {
 	@Update("update ustudy.teacher set teacname=#{tea.teacName}, teacid=#{tea.teacId} where ustudy.teacher.id=#{id}")
 	public int updateTeacher(@Param("tea") Teacher tea, @Param("id") int id);
 	
-	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype, orgid, ctime as cTime, "
+	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, "
 			+ "ll_time as llTime from ustudy.teacher where teacid=#{tid}")
 	public Teacher findTeaByTeaId(String tid);
 	
-	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype, orgid, ctime as cTime, "
+	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, "
 			+ "ll_time as llTime from ustudy.teacher where id=#{id}")
 	public Teacher findTeaById(int id);
 	
-	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype, orgid, ctime as cTime, "
-			+ "ll_time as llTime from ustudy.teacher where orgid=#{oid} and orgtype=#{otype} and id > #{id} "
-			+ "limit 1000")
+	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, ll_time as llTime "
+			+ "from ustudy.teacher where orgid=#{oid} and orgtype=#{otype} and id > #{id} and teacid NOT LIKE "
+			+ "'admin%' limit 1000")
 	public List<Teacher> getTeaList(@Param("id") int id, @Param("otype") String orgType, @Param("oid") String orgId);
 	
 	@Insert("insert into ustudy.teachersub(sub_id, teac_id) values(#{sid}, #{tid})")
