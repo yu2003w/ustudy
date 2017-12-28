@@ -31,8 +31,12 @@ public class ExamTeacherServiceImpl implements TeacherService {
 
 	@Override
 	public List<String> getRolesById(String id) {
-		List<String> r = userM.getRolesById(id);
-		return r;
+		List<String> rL = userM.getRolesById(id);
+		
+		for (String r: rL) {
+			r = ExamUtil.getRolemapping().get(r);
+		}
+		return rL;
 	}
 
 	@Override
@@ -46,7 +50,10 @@ public class ExamTeacherServiceImpl implements TeacherService {
 		
 		String r = null;
 
-		if (rL.contains("org_owner")) {
+		if (rL.contains("cleaner")) {
+			r = "cleaner";
+		}
+		else if (rL.contains("org_owner")) {
 			r = "org_owner";
 		} else if (rL.contains("leader")) {
 			r = "leader";
@@ -58,7 +65,8 @@ public class ExamTeacherServiceImpl implements TeacherService {
 			r = "pleader";
 		} else if (rL.contains("cteacher")) {
 			r = "cteacher";
-		} else
+		} 
+		else
 			r = "teacher";
 
 		return ExamUtil.getRolemapping().get(r);

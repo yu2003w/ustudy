@@ -496,7 +496,9 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 
 		String r = null;
-		if (rL.contains("org_owner")) {
+		if (rL.contains("cleaner")) {
+			r = "cleaner";
+		} else if (rL.contains("org_owner")) {
 			r = "org_owner";
 		} else if (rL.contains("leader")) {
 			r = "leader";

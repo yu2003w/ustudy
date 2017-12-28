@@ -396,13 +396,16 @@ public class SchoolServiceImp implements SchoolService {
 		// for each grade, populate subjects
 		for (Item it: grades) {
 			List<Item> gSubs = schM.getGradeSub(it.getId());
+			SchGradeSub tg = null;
 			if (gSubs == null || gSubs.isEmpty()) {
-				logger.error("getGrSubs(), no subjects found for grade->" + it.getId() + 
+				logger.warn("getGrSubs(), no subjects set for grade->" + it.getId() + 
 						", school->" + schid);
-				throw new RuntimeException("getGrSubs(), no subjects found for grade->" + 
-						it.getId() + ", school->" + schid);
+				// no subjects set for this grade, just skip it
+				tg = new SchGradeSub(it.getId(), it.getName(), new ArrayList<Item>());
 			}
-			SchGradeSub tg = new SchGradeSub(it.getId(), it.getName(), gSubs);
+			else
+				tg = new SchGradeSub(it.getId(), it.getName(), gSubs);
+			
 			tgL.add(tg);
 		}
 		

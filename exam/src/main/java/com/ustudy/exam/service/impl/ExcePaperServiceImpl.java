@@ -5,11 +5,13 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.mapper.ExcePaperMapper;
 import com.ustudy.exam.model.ExcePaperSum;
 import com.ustudy.exam.service.ExcePaperService;
 
+@Service
 public class ExcePaperServiceImpl implements ExcePaperService {
 	
 	private static final Logger logger = LogManager.getLogger(ExcePaperService.class);

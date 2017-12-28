@@ -417,6 +417,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				taskL.add(mt);
 			}
 		}
+		if (taskL.isEmpty()) {
+			return null;
+		}
 		return taskL;
 	}
 
@@ -427,18 +430,24 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			return mt;
 		}
 		mt.setMetaInfo(questionId, egs);
-		if (mt.getMarkMode().compareTo("单评") == 0) {
+		String markmode = mt.getMarkMode();
+		if (markmode == null) {
+			logger.error("getMarkTaskByEGSQuestion(), mark mode is not set for " + questionId);
+			return null;
+		}
+		if (markmode.compareTo("单评") == 0) {
 			mt.setTeachersIds(markTaskM.getTeachersByQid(questionId));
 			mt.setFinalMarkTeachersIds(new ArrayList<String>());
 		}
-		else if (mt.getMarkMode().compareTo("双评") == 0) {
+		else if (markmode.compareTo("双评") == 0) {
 			// get teachers for first screen
 			mt.setTeachersIds(markTaskM.getTeachersByQidRole(questionId, "初评"));
 			// get teachers for final screen
 			mt.setFinalMarkTeachersIds(markTaskM.getTeachersByQidRole(questionId, "终评"));
 		}
 		else {
-			logger.warn("getMarkTasksBySub(), wrong type -> " + mt.getMarkMode());
+			logger.error("getMarkTaskByEGSQuestion(), wrong type -> " + mt.getMarkMode());
+			return null;
 		}
 		return mt;
 	}
