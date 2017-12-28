@@ -22,4 +22,6 @@ public interface StudentObjectAnswerDao {
 	
 	List<StudentObjectAnswer> getQuestionsAnswer(@Param("egsId")Long egsId);
 	
+	void deleteOneStudentObjectAnswers(@Param("egsId")Long egsId, @Param("examCode")String examCode);
+	
 }

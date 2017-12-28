@@ -1,6 +1,7 @@
 package com.ustudy.exam.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
@@ -25,5 +26,7 @@ public interface QuesAnswerDao {
 	boolean initQuesAnswers(List<QuesAnswer> quesAnswers);
 	
 	boolean updateQuesAnswer(QuesAnswer quesAnswer);
+	
+	List<Map<String, Object>> getObjectQuestions(Long egsId);
 	
 }

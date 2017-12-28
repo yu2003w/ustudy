@@ -51,17 +51,16 @@ public class ExcePaperController {
 		return res;
 	}
 	
-	@RequestMapping(value = "/exception/paper/{subId}", method = RequestMethod.GET)
-	public UResp getErrorPapers(@PathVariable Long subId) {
+	@RequestMapping(value = "/exception/paper/{egsId}", method = RequestMethod.GET)
+	public UResp getErrorPapers(@PathVariable Long egsId) {
 		UResp res = new UResp();
 		
 		try {
-			List<ExcePaperSum> ep = epS.getErrorPapers(subId);
-			res.setData(ep);
+			res.setData(epS.getErrorPapers(egsId));
 			res.setRet(true);
-			logger.info("getErrorPapers(), exception paper list retrieved successfully");
+			logger.info("getErrorPapers("+egsId+"), exception paper list retrieved successfully");
 		} catch(Exception e) {
-			logger.error("getErrorPapers(), failed to retrieve exception paper list," + e.getMessage());
+			logger.error("getErrorPapers("+egsId+"), failed to retrieve exception paper list," + e.getMessage());
 			res.setMessage("failed to retrieve exception paper list");
 		}
 		
