@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ustudy.exam.mapper.ExcePaperMapper;
 import com.ustudy.exam.model.ExcePaperSum;
 import com.ustudy.exam.service.ExcePaperService;
+import com.ustudy.exam.utility.ExamUtil;
 
 public class ExcePaperServiceImpl implements ExcePaperService {
 	
@@ -26,6 +27,24 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 		
 		return exP;
 		
+	}
+
+	public List<ExcePaperSum> getErrorPapers(Long subId) {
+		
+		String schId = ExamUtil.retrieveSessAttr("orgId");
+		if (schId == null || schId.isEmpty()) {
+			logger.error("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
+			throw new RuntimeException("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
+		}
+		
+		return null;
+	}
+
+	public boolean updateErrorPaper(String paper) {
+		
+		
+		
+		return false;
 	}
 
 }

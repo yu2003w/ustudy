@@ -6,6 +6,9 @@ import com.ustudy.exam.model.ExcePaperSum;
 
 public interface ExcePaperService {
 
-	public List<ExcePaperSum> getExcePaperSum(String schid);
+	List<ExcePaperSum> getExcePaperSum(String schid);
 	
+	List<ExcePaperSum> getErrorPapers(Long subId);
+	
+	boolean updateErrorPaper(String paper);
 }

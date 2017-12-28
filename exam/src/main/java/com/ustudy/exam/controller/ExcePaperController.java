@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +46,43 @@ public class ExcePaperController {
 			logger.error("getExcePaperSum(), failed to retrieve exception paper list," + e.getMessage());
 			res.setMessage("failed to retrieve exception paper list");
 			resp.setStatus(500);
+		}
+		
+		return res;
+	}
+	
+	@RequestMapping(value = "/exception/paper/{subId}", method = RequestMethod.GET)
+	public UResp getErrorPapers(@PathVariable Long subId) {
+		UResp res = new UResp();
+		
+		try {
+			List<ExcePaperSum> ep = epS.getErrorPapers(subId);
+			res.setData(ep);
+			res.setRet(true);
+			logger.info("getErrorPapers(), exception paper list retrieved successfully");
+		} catch(Exception e) {
+			logger.error("getErrorPapers(), failed to retrieve exception paper list," + e.getMessage());
+			res.setMessage("failed to retrieve exception paper list");
+		}
+		
+		return res;
+	}
+	
+	@RequestMapping(value = "/paper", method = RequestMethod.POST)
+	public UResp updateErrorPaper(@RequestBody String paper) {
+		UResp res = new UResp();
+		
+		try {
+			if (epS.updateErrorPaper(paper)) {
+				res.setRet(true);
+				logger.info("updateErrorPaper(), update exception paper successfully");
+			} else {
+				res.setRet(false);
+				logger.info("updateErrorPaper(), update exception paper failed");
+			}
+		} catch(Exception e) {
+			logger.error("updateErrorPaper(), update error paper failed," + e.getMessage());
+			res.setMessage("failed to retrieve exception paper list");
 		}
 		
 		return res;
