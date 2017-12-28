@@ -54,7 +54,6 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	public Collection<Map<String,Object>> getErrorPapers(Long egsId) {
 		
 		String schId = ExamUtil.retrieveSessAttr("orgId");
-		schId = "001";
 		if (schId == null || schId.isEmpty()) {
 			logger.error("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
 			throw new RuntimeException("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
