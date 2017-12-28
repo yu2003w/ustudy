@@ -19,4 +19,8 @@ public interface TeacherDao {
 	
 	List<Map<String, Object>> getSchoolTeachers(String schId);
 	
+	List<Map<String, Object>> getSchoolOwner(String schId);
+	
+	List<Map<String, Object>> getSchoolLeader(String schId);
+	
 }

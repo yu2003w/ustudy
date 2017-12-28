@@ -42,7 +42,17 @@
 		join grade on grade.id=teachergrade.grade_id 
 		join teachersub on teachersub.teac_id = teachergrade.teac_id 
 		join subject on subject.id = teachersub.sub_id
-		where schid=#{schId}
+		where schid=#{schId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getSchoolOwner" parameterType="string" resultType="java.util.Map">
+		SELECT t.teacid,t.teacname from teacherroles tr LEFT JOIN teacher t ON tr.teac_id=t.teacid 
+		where tr.role_id=1 AND t.orgid=#{schId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getSchoolLeader" parameterType="string" resultType="java.util.Map">
+		SELECT t.teacid,t.teacname from teacherroles tr LEFT JOIN teacher t ON tr.teac_id=t.teacid 
+		where tr.role_id=2 AND t.orgid=#{schId,jdbcType=VARCHAR}
 	</select>
 	
 </mapper>
