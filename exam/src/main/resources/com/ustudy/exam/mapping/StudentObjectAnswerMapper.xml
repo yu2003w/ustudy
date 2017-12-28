@@ -39,5 +39,9 @@
 	<update id="updateStudentObjectAnswer" parameterType="java.util.Map">
 		UPDATE obj_answer SET score=#{score} where id=#{id}
 	</update>
+	
+	<delete id="deleteOneStudentObjectAnswers" parameterType="java.util.Map">
+		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and exam_code=#{examCode})
+	</delete>
 
 </mapper>

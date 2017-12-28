@@ -57,5 +57,9 @@
 	<update id="updateQuesAnswer" parameterType="com.ustudy.exam.model.QuesAnswer">  
         UPDATE question set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}
 	</update>
+	
+	<select id="getObjectQuestions" parameterType="Long" resultType="java.util.Map">
+		SELECT startno,endno,type FROM question where exam_grade_sub_id=#{egsId} AND type in ('单选题','多选题','判断题')
+	</select>
 
 </mapper>

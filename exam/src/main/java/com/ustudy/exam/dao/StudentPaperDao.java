@@ -1,6 +1,7 @@
 package com.ustudy.exam.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
@@ -17,4 +18,7 @@ public interface StudentPaperDao {
 	List<StudentPaper> getStudentPapers(@Param("egsId")Long egsId);
 	
 	List<StudentPaper> getAnswerPapers(@Param("egsId")Long egsId, @Param("questionId")Long questionId, @Param("classId")Long classId, @Param("type")String type, @Param("text")String text);
+	
+	List<Map<String, Object>> getErrorPapers(@Param("egsId")Long egsId, @Param("schId")String schId);
+	
 }
