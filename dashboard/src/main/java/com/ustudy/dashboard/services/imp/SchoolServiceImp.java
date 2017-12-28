@@ -66,7 +66,7 @@ public class SchoolServiceImp implements SchoolService {
 			throw new RuntimeException("createSchool(), failed with ret " + ret);
 		}
 		int numOfGr = saveGrades(data.getGrades(), data.getSchoolId());
-		logger.info(numOfGr + " grade items saved indashboard/src/main/java/com/ustudy/dashboard/services/imp/SchoolServiceImp.javato database");
+		logger.info(numOfGr + " grade items saved into database");
 		
 		// create cleaner account for this school
 		ret = createCleaner(data.getSchoolType(), data.getSchoolId());
@@ -80,7 +80,7 @@ public class SchoolServiceImp implements SchoolService {
 		String msg = null;
 		
 		logger.debug("createCleaner(), create cleaner for school " + orgId);
-		Teacher item = new Teacher(tname, tname, orgType, orgId);
+		Teacher item = new Teacher(tname, tname, "学校", orgId);
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			if (item.getPasswd() != null) {
@@ -95,8 +95,8 @@ public class SchoolServiceImp implements SchoolService {
 				}
 				*/
 				// set default password
-				String pw = "admin";
-				md.update(pw.getBytes(), 0, 6);
+				String pw = "ustudy123";
+				md.update(pw.getBytes(), 0, pw.length());
 			}
 
 			item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
@@ -222,9 +222,9 @@ public class SchoolServiceImp implements SchoolService {
 		String sqlDel = null;
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
-				sqlDel += "'" + idsList.get(0) + "'";
+				sqlDel = idsList.get(0);
 			} else
-				sqlDel += " or id = '" + idsList.get(i) + "'";
+				sqlDel += "," + idsList.get(i);
 		}
 		logger.debug("delSchools(), ids combined for batch deletion --> " + sqlDel);
 		return schM.delSchool(sqlDel);

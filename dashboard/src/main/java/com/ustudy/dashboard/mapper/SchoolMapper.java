@@ -36,8 +36,8 @@ public interface SchoolMapper {
 	@Options(useGeneratedKeys=true)
 	public int createSchool(School item);
 	
-	@Delete("delete from ustudy.school where id=#{id}")
-	public int delSchool(@Param("id") String id);
+	@Delete("delete from ustudy.school where FIND_IN_SET (id, #{ids})")
+	public int delSchool(@Param("ids") String ids);
 	
 	@Insert("insert into ustudy.grade(grade_name, classes_num, schid) values (#{gr.gradeName}, #{gr.num}, "
 			+ "#{schid}) on duplicate key update grade_name=#{gr.gradeName}, classes_num=#{gr.num}, "
