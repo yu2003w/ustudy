@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
 
@@ -82,6 +85,14 @@ public class ExamSubjectController {
 		result.put("data", grades.values());
 
 		return result;
+	}
+	
+	//TODO： Assemble exam subject info, related question info, related mark task info together
+	// so front end could reduce request
+	@RequestMapping(value = "/examsub/list/{eid}", method = RequestMethod.GET)
+	public UResp getExamSubBrife(@PathVariable int eid, HttpServletResponse resp) {
+		UResp res = new UResp();
+		return res;
 	}
 	
 	/**

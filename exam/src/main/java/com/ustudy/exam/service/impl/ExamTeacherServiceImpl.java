@@ -2,6 +2,7 @@ package com.ustudy.exam.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,10 +34,12 @@ public class ExamTeacherServiceImpl implements TeacherService {
 	public List<String> getRolesById(String id) {
 		List<String> rL = userM.getRolesById(id);
 		
+		List<String> cL = new ArrayList<String>();
 		for (String r: rL) {
-			r = ExamUtil.getRolemapping().get(r);
+			cL.add(ExamUtil.getRolemapping().get(r));
 		}
-		return rL;
+		
+		return cL;
 	}
 
 	@Override
