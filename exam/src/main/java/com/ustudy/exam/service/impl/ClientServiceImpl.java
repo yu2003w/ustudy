@@ -297,13 +297,11 @@ public class ClientServiceImpl implements ClientService {
                         for (int j = 0; j < subjectives.size(); j++) {
                             JSONObject subjective = subjectives.getJSONObject(j);
 
-                            String type = null;
                             int startno = 1;
                             int endno = 1;
                             int quesno = 0;
-                            if (null != subjective.get("TopicType")) {
-                                type = initType(subjective.getString("TopicType"));
-                            }
+                            String type = initType(subjective.getString("TopicType"));
+                            
                             if (null != subjective.get("StartQid")) {
                                 startno = subjective.getInt("StartQid");
                             }
@@ -322,13 +320,10 @@ public class ClientServiceImpl implements ClientService {
                         for (int j = 0; j < objectives.size(); j++) {
                             JSONObject objective = objectives.getJSONObject(j);
 
-                            String type = null;
                             int startno = 1;
                             int endno = 0;
                             int quesno = 0;
-                            if (null != objective.get("topicType")) {
-                                type = initType(objective.getString("topicType"));
-                            }
+                            String type = initType(objective.getString("topicType"));
 
                             if (null != objective.get("objectiveItems")) {
                                 JSONArray objectiveItems = objective.getJSONArray("objectiveItems");
@@ -367,15 +362,19 @@ public class ClientServiceImpl implements ClientService {
     }
     
     private String initType(String type){
-        
+        //0-未设置，1-客观题，2-填空题，3-主观题，4-隐藏曲云
         if(null != type){
-            if(type.equals("客观题")){
+            if(type.equals("1")){
                 type = "单选题";
-            }else if(type.equals("主观题")){
+            }else if(type.equals("2")){
                 type = "填空题";
+            }else if(type.equals("3")){
+                type = "解答题";
+            }else {
+                type = "解答题";
             }
         }else{
-            type = "单选题";
+            type = "解答题";
         }
         
         return type;
@@ -461,14 +460,12 @@ public class ClientServiceImpl implements ClientService {
         }
 
         int areaId = 0;
-        String questionType = null;
         int startQuestionNo = 1;
         int endQuestionNo = 0;
+        String type = initType(subjective.getString("TopicType"));
+        
         if (null != subjective.get("AreaID")) {
             areaId = subjective.getInt("AreaID");
-        }
-        if (null != subjective.get("TopicType")) {
-            questionType = initType(subjective.getString("TopicType"));
         }
         if (null != subjective.get("StartQid")) {
             startQuestionNo = subjective.getInt("StartQid");
@@ -508,7 +505,7 @@ public class ClientServiceImpl implements ClientService {
                     right = region.getInt("right");
                 }
 
-                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, questionType, startQuestionNo, endQuestionNo, egsId, quesid));
+                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, type, startQuestionNo, endQuestionNo, egsId, quesid));
             }
         }
 
