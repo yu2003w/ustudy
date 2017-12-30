@@ -41,7 +41,7 @@ public class BlockAnswer implements Serializable {
 	
 	private boolean isProblemPaper = false;
 	
-	private String fullscore = "";
+	private int fullscore = -1;
 	// real score for this question block
 	private String score = "";
 	
@@ -64,7 +64,7 @@ public class BlockAnswer implements Serializable {
 	}
 
 	public BlockAnswer(String questionName, String questionType, String quesid, String markMode, boolean isMarked,
-			String paperId, String mflag, String fullscore, String score) {
+			String paperId, String mflag, int fullscore, String score) {
 		super();
 		this.questionName = questionName;
 		this.questionType = questionType;
@@ -84,7 +84,7 @@ public class BlockAnswer implements Serializable {
 		this.paperImg = paperImg;
 	}
 
-	public void setMetaInfo(String questionName, String questionType, String markMode, String score) {
+	public void setMetaInfo(String questionName, String questionType, String markMode, int score) {
 		this.questionName = questionName;
 		this.questionType = questionType;
 		this.markMode = markMode;
@@ -161,11 +161,11 @@ public class BlockAnswer implements Serializable {
 		this.mflag = mflag;
 	}
 
-	public String getFullscore() {
+	public int getFullscore() {
 		return fullscore;
 	}
 
-	public void setFullscore(String fullscore) {
+	public void setFullscore(int fullscore) {
 		this.fullscore = fullscore;
 	}
 

@@ -94,6 +94,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		QuesMarkSum sum = markTaskM.getQuesSum(mst.getQuesid());
 		sum.setQuestionName(quesN);
 		sum.setQuestionType(mt.getQuesType());
+		
+		if (sum.getFullscore() > 20) {
+			sum.setComposable(false);
+			logger.debug("assembleTaskBrife(), " + sum.getQuesid() + " is not composable.");
+		}
+		
 		// new QuesMarkSum(quesN, mt.getQuesType(), null, null, mst.getQuesid());
 		List<QuesMarkSum> sumL = new ArrayList<QuesMarkSum>();
 		sumL.add(sum);
@@ -137,6 +143,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			else
 				quesN = qs.getQuesno();
 			qs.setQuestionName(quesN);
+			
+			// if full score greater than 20, this question is not composable
+			if (qs.getFullscore() >= 20) {
+				qs.setComposable(false);
+				logger.debug("getTaskPapers(), " + qs.getQuesid() + " is not composable");
+			}
 			sumL.add(qs);
 		}
 		
@@ -210,19 +222,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
 					saL = markTaskM.getQuesDiv(mark.getQuesid());
-					// determine whether this question is composable
-					for (SingleAnswer sa:saL) {
-						if (Float.valueOf(sa.getFullscore()) >= 20) {
-							mark.setComposable(false);
-							break;
-						}
-					}
 				}
-				else {
-					if (Float.valueOf(mark.getFullscore()) >= 20) {
-						mark.setComposable(false);
-					}
-				}
+				
 				ba.setSteps(saL);
 				
 				// if final mark, need to process following two elements
