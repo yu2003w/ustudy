@@ -143,8 +143,8 @@ public interface MarkTaskMapper {
 	public int deleteMetaMarkTaskByTeacher(@Param("teacid") String teac, @Param("quesid") String ques,
 			@Param("marktype") String mtype);
 
-	@Delete("delete from ustudy.marktask where quesid = #{qid} and marktype = #{marktype}")
-	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("marktype") String mtype);
+	@Delete("delete from ustudy.marktask where quesid = #{qid}")
+	public int deleteMetaMarkTaskByQues(@Param("qid") String qid);
 
 	// get information for statics
 	@Select("select count(*) as marked, sum(score) as score, quesid from answer where isviewed=true and "

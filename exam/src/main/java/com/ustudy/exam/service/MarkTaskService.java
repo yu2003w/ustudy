@@ -32,6 +32,11 @@ public interface MarkTaskService {
 	
 	public boolean updateMarkTask(MarkTask mt);
 	
+	/**
+	 * Delete all mark task related with specified question id 
+	 * @param mt
+	 * @return
+	 */
 	public boolean deleteMarkTask(MarkTask mt);
 	
 }

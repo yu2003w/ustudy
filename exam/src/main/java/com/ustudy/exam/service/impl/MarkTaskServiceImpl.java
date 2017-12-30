@@ -507,7 +507,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	@Transactional
 	public boolean updateMarkTask(MarkTask mt) {
-		if (deleteMarkTaskByQues(mt)) {
+		if (deleteMarkTask(mt)) {
 			if (!createMarkTask(mt)) {
 				logger.error("updateMarkTask(), failed to create mark task ->" + mt.toString());
 				return false;
@@ -521,54 +521,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		return true;
 	}
-
-	@Transactional
-	private boolean deleteMarkTaskByQues(MarkTask mt) {
-		int num = 0;
-		if (mt.getTeachersIds() != null && !mt.getTeachersIds().isEmpty()) {
-			num = markTaskM.deleteMetaMarkTaskByQues(mt.getQuestionId(), "初评");
-			if (num <= 0) {
-				logger.error("deleteMarkTaskByQues(), mark task delete failed -> " + mt.getTeachersIds());
-				return false;
-			}
-			logger.debug("deleteMarkTaskByQues(), mark task deleted -> " + mt.getTeachersIds());
-		}
-		
-		if (mt.getFinalMarkTeachersIds() != null && !mt.getFinalMarkTeachersIds().isEmpty()) {
-			num = markTaskM.deleteMetaMarkTaskByQues(mt.getQuestionId(), "终评");
-			if (num <= 0) {
-				logger.error("deleteMarkTaskByQues(), mark task delete failed -> " + mt.getFinalMarkTeachersIds());
-				return false;
-			}
-			logger.debug("deleteMarkTaskByQues(), mark task deleted -> " + mt.getFinalMarkTeachersIds());
-		}
-		
-		return true;
-	}
 	
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.MarkTaskService#deleteMarkTask(com.ustudy.exam.model.MarkTask)
+	 */
 	@Override
 	@Transactional
 	public boolean deleteMarkTask(MarkTask mt) {
-		List<String> teaL = mt.getTeachersIds();
-		int num = 0;
-		for (String id: teaL) {
-			num = markTaskM.deleteMetaMarkTaskByTeacher(id, mt.getQuestionId(), "初评");
-			if (num != 1) {
-				logger.error("deleteMarkTask(), delete failed with num ->" + num);
-				return false;
-			}
-			logger.debug("deleteMarkTask(), deleted mark task for " + id);
-		}
-		teaL = mt.getFinalMarkTeachersIds();
-		for (String id: teaL) {
-			num = markTaskM.deleteMetaMarkTaskByTeacher(id, mt.getQuestionId(), "终评");
-			if (num != 1) {
-				logger.error("deleteMarkTask(), delete failed with num ->" + num);
-				return false;
-			}
-			logger.debug("deleteMarkTask(), deleted mark task for " + id);
+		logger.debug("deleteMarkTask(), clear mark tasks assigned for question " + mt.getQuestionId());
+		int ret = markTaskM.deleteMetaMarkTaskByQues(mt.getQuestionId());
+		if (ret <= 0) {
+			logger.error("deleteMarkTask(), mark task delete failed -> " + mt.toString());
+			return false;
 		}
 		
+		logger.debug("deleteMarkTask(), " + ret + " mark task records cleared" );
 		return true;
 	}
+	
 }

@@ -172,16 +172,17 @@ public class MarkTaskController {
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
 	public UResp createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
-		if (mt == null) {
-			logger.warn("createMarkTask(), received parameter is not valid");
+		if (mt == null || !mt.isvalid()) {
+			logger.error("createMarkTask(), received parameter is not valid");
 			res.setMessage("parameter invalid");
+			resp.setStatus(422);
 			return res;
 		}
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
-			if (mt.isvalid() && !stS.createMarkTask(mt)) {
-				logger.warn("createMarkTask(), failed to create mark task");
+			if (!stS.createMarkTask(mt)) {
+				logger.error("createMarkTask(), failed to create mark task");
 				res.setMessage("Failed to create mark task");
 				resp.setStatus(500);
 				return res;
@@ -202,7 +203,7 @@ public class MarkTaskController {
 	public UResp updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
 		
-		if (mt == null) {
+		if (mt == null || !mt.isvalid()) {
 			logger.warn("updateMarkTask(), received parameter is invalid");
 			res.setMessage("parameter invalid");
 			return res;
