@@ -61,5 +61,9 @@
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		where p.exam_grade_sub_id=#{egsId} and ee.schid=#{schId,jdbcType=VARCHAR}
 	</select>
+	
+	<update id="updatePaperStatus" parameterType="java.util.Map">
+		UPDATE paper SET paper_status=#{status,jdbcType=VARCHAR} where id=#{paperid}
+	</update>
 
 </mapper>

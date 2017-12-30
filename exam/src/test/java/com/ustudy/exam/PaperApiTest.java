@@ -25,7 +25,7 @@ public class PaperApiTest {
     public static void updateErrorPaper() {
 
         String targetURL = "http://127.0.0.1:8080/exam/exam/paper";
-        String papers = "{\"egsId\":1,\"examCode\":\"181033\",\"answers\":[{\"paperid\":87,\"quesno\":1,\"answer\":\"A\"},{\"paperid\":87,\"quesno\":2,\"answer\":\"B\"},{\"paperid\":87,\"quesno\":3,\"answer\":\"C\"},{\"paperid\":87,\"quesno\":4,\"answer\":\"D\"},{\"paperid\":87,\"quesno\":5,\"answer\":\"A\"},{\"paperid\":87,\"quesno\":6,\"answer\":\"B\"},{\"paperid\":87,\"quesno\":7,\"answer\":\"C\"},{\"paperid\":87,\"quesno\":8,\"answer\":\"D\"},{\"paperid\":87,\"quesno\":9,\"answer\":\"A\"}]}";
+        String papers = "{\"egsId\":1,\"examCode\":\"181250\",\"paperid\":28,\"answers\":[{\"quesno\":1,\"answer\":\"A\"},{\"quesno\":2,\"answer\":\"B\"},{\"quesno\":3,\"answer\":\"C\"},{\"quesno\":4,\"answer\":\"D\"},{\"quesno\":5,\"answer\":\"A\"},{\"quesno\":6,\"answer\":\"B\"},{\"quesno\":7,\"answer\":\"C\"},{\"quesno\":8,\"answer\":\"D\"},{\"quesno\":9,\"answer\":\"A\"},{\"quesno\":10,\"answer\":\"A\"},{\"quesno\":11,\"answer\":\"A\"},{\"quesno\":12,\"answer\":\"B\"},{\"quesno\":13,\"answer\":\"C\"},{\"quesno\":14,\"answer\":\"D\"},{\"quesno\":15,\"answer\":\"A\"},{\"quesno\":16,\"answer\":\"B\"},{\"quesno\":17,\"answer\":\"C\"},{\"quesno\":18,\"answer\":\"D\"},{\"quesno\":19,\"answer\":\"A\"},{\"quesno\":20,\"answer\":\"A\"},{\"quesno\":21,\"answer\":\"A\"},{\"quesno\":22,\"answer\":\"B\"},{\"quesno\":23,\"answer\":\"C\"},{\"quesno\":24,\"answer\":\"D\"},{\"quesno\":25,\"answer\":\"A\"},{\"quesno\":26,\"answer\":\"B\"},{\"quesno\":27,\"answer\":\"C\"},{\"quesno\":28,\"answer\":\"D\"},{\"quesno\":29,\"answer\":\"A\"},{\"quesno\":30,\"answer\":\"A\"}]}";
 
         try {
 

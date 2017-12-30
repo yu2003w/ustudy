@@ -56,7 +56,6 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	public Collection<Map<String,Object>> getErrorPapers(Long egsId) {
 		
 		String schId = ExamUtil.retrieveSessAttr("orgId");
-		schId = "001";
 		if (schId == null || schId.isEmpty()) {
 			logger.error("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
 			throw new RuntimeException("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
@@ -177,13 +176,13 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	        JSONObject student = JSONObject.fromObject(papers);
 	        long egsId = student.getLong("egsId");
 	        String examCode = student.getString("examCode");
+            long paperid = student.getLong("paperid");
             JSONArray answers = student.getJSONArray("answers");
             
             List<StudentObjectAnswer> objAnswers = new ArrayList<>();
             for (int i=0; i<answers.size(); i++) {
                 JSONObject object = answers.getJSONObject(i);
                 StudentObjectAnswer objAnswer = new StudentObjectAnswer();
-                long paperid = object.getLong("paperid");
                 int quesno = object.getInt("quesno");
                 String answer = object.getString("answer");
                 objAnswer.setPaperid(paperid);
@@ -196,6 +195,7 @@ public class ExcePaperServiceImpl implements ExcePaperService {
             }
             
             soaDao.deleteOneStudentObjectAnswers(egsId, examCode);
+            spDao.updatePaperStatus(paperid, "3");
             soaDao.insertStudentObjectAnswers(objAnswers);
             
             return true;
