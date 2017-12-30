@@ -136,8 +136,14 @@ public class MarkTaskBrife implements Serializable {
 		return markType;
 	}
 
-	public void setMarkType(String scoreType) {
-		this.markType = scoreType;
+	public void setMarkType(String markType) {
+		// currently, front end only supports first mark, final mark and problem mark
+		if (markType.compareTo("初评") == 0) {
+			this.markType = "标准";
+		}
+		else
+			this.markType = markType;
+		
 	}
 
 	public String getProgress() {
