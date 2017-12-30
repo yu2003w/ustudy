@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,12 +56,15 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	public Collection<Map<String,Object>> getErrorPapers(Long egsId) {
 		
 		String schId = ExamUtil.retrieveSessAttr("orgId");
+		schId = "001";
 		if (schId == null || schId.isEmpty()) {
 			logger.error("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
 			throw new RuntimeException("getExcePaperSum(), failed to retrieve org id, maybe user not log in");
 		}
 		
+		List<Map<String, Object>> res = new ArrayList<>();
 		Map<String, Map<String, Object>> result = new HashMap<>();
+		Map<String, Map<Integer,Map<String, Object>>> studentQuestions = new HashMap<>();
 		
 		Map<Integer, String> questionsType = getQuestionsType(egsId);
 		
@@ -81,31 +85,65 @@ public class ExcePaperServiceImpl implements ExcePaperService {
                     student.put("paperImg", paperImg);
                 }
                 
-                @SuppressWarnings("unchecked")
-                List<Map<String, Object>> questions = (List<Map<String, Object>>) student.get("questions");
+                Map<Integer,Map<String, Object>> questions = (Map<Integer,Map<String, Object>>) studentQuestions.get(examCode);
+                
+                long id = 0;
+                int quesno = 0;
+                String answer = "";
+                String status = "2";
+                
                 if(null == questions){
-                    questions = new ArrayList<>();
+                    questions = new HashMap<>();
+                    
+                    for (Entry<Integer,String> entry : questionsType.entrySet()) {
+                        quesno = entry.getKey();
+                        
+                        Map<String, Object> question = new HashMap<>();
+                        question.put("id", id);
+                        question.put("quesno", quesno);
+                        question.put("answer", answer);
+                        question.put("status", status);
+                        if(null != questionsType.get(quesno)){
+                            question.put("type", questionsType.get(quesno));
+                        }
+                        
+                        questions.put(quesno, question);
+                    }                    
                 }
                 
-                long id = (int) map.get("id");
-                int quesno = (int) map.get("quesno");
-                String answer = map.get("answer").toString();
-                
-                Map<String, Object> question = new HashMap<>();
-                question.put("id", id);
-                question.put("quesno", quesno);
-                question.put("answer", answer);
-                if(null != questionsType.get(quesno)){
-                    question.put("type", questionsType.get(quesno));
+                if(null != map.get("id") && null != map.get("quesno") && null != map.get("answer")){
+                    id = (int) map.get("id");
+                    quesno = (int) map.get("quesno");
+                    answer = map.get("answer").toString();
+                    status = map.get("status").toString();
+                    
+                    Map<String, Object> question = new HashMap<>();
+                    question.put("id", id);
+                    question.put("quesno", quesno);
+                    question.put("answer", answer);
+                    question.put("status", status);
+                    if(null != questionsType.get(quesno)){
+                        question.put("type", questionsType.get(quesno));
+                    }
+                    
+                    questions.put(quesno, question);
                 }
                 
-                questions.add(question);
-                student.put("questions", questions);
+                studentQuestions.put(examCode, questions);                
                 result.put(examCode,student);
             }
         }
 		
-		return result.values();
+		for (Entry<String, Map<String, Object>> entry : result.entrySet()) {
+		    String examCode = entry.getKey();
+		    Map<String, Object> student = entry.getValue();
+		    Map<Integer,Map<String, Object>> questions = studentQuestions.get(examCode);
+		    student.put("questions", questions.values());
+		    
+		    res.add(student);
+		}
+		
+		return res;
 	}
 	
 	private Map<Integer, String> getQuestionsType(Long egsId){
