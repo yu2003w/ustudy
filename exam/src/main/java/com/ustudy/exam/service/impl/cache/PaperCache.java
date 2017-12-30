@@ -231,7 +231,7 @@ public class PaperCache {
 		MarkStaticsCache msc = teaPaperC.opsForValue().get(cacheKey);
 
 		// database design to make sure role is valid
-		String role = mtM.getMarkRole(pr.getQid(), teacid);
+		String role = mtM.getMarkType(teacid, pr.getQid());
 		boolean isFinalMark = (role.compareTo("终评") == 0);
 
 		List<PaperImgCache> paperM = null;
@@ -378,7 +378,7 @@ public class PaperCache {
 	 * @return --- amount needs to be assigned to the teacher
 	 */
 	private int calAssignedAmount(PaperRequest pr, int total, String role, String teacid) {
-		List<String> teaL = mtM.getTeachersByQidRole(pr.getQid(), role);
+		List<String> teaL = mtM.getTeachersByQidType(pr.getQid(), role);
 		int factor = teaL.size();
 		if (factor < 1) {
 			logger.error("calAssignedAmount(), mark task is not set for question -> " + pr.getQid());
@@ -517,13 +517,12 @@ public class PaperCache {
 						&& mc.getStatus() == 1) {
 					mt = mc;
 					break;
-				} 
+				}
 			}
 			if (mt == null) {
-				logger.error("updatePaperCache(), not find final item->" + pid + 
-						" in cache for " + cacheK);
-				throw new RuntimeException("updatePaperCache(), not find final item->" + pid + 
-						" in cache for " + cacheK);
+				logger.error("updatePaperCache(), not find final item->" + pid + " in cache for " + cacheK);
+				throw new RuntimeException(
+						"updatePaperCache(), not find final item->" + pid + " in cache for " + cacheK);
 			}
 		} else {
 			mt = mtcM.get(seq);

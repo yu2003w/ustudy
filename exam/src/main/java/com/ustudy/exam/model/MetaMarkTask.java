@@ -21,7 +21,6 @@ public class MetaMarkTask implements Serializable {
 	private String quesid = null;
 	private int threshold = 0;
 	private String marktype = null;
-	private String markrole = null;
 	private int numOfMarkedPapers = 0;
 	
 	public MetaMarkTask() {
@@ -36,17 +35,15 @@ public class MetaMarkTask implements Serializable {
 		this.quesid = quesid;
 		this.numOfMarkedPapers = numOfScoredPapers;
 		this.marktype = mtype;
-		this.markrole = "初评";
 		this.threshold = 0;
 	}
 
-	public MetaMarkTask(String teacid, String quesid, int threshold, String mtype, String markrole) {
+	public MetaMarkTask(String teacid, String quesid, int threshold, String mtype) {
 		super();
 		this.teacid = teacid;
 		this.quesid = quesid;
 		this.threshold = threshold;
 		this.marktype = mtype;
-		this.markrole = markrole;
 		this.numOfMarkedPapers = 0;
 	}
 
@@ -98,19 +95,10 @@ public class MetaMarkTask implements Serializable {
 		this.threshold = threshold;
 	}
 
-	public String getMarkrole() {
-		return markrole;
-	}
-
-	public void setMarkrole(String markrole) {
-		this.markrole = markrole;
-	}
-
 	@Override
 	public String toString() {
 		return "MetaMarkTask [id=" + id + ", teacid=" + teacid + ", quesid=" + quesid + ", threshold=" + threshold
-				+ ", marktype=" + marktype + ", markrole=" + markrole + ", numOfMarkedPapers=" + numOfMarkedPapers
-				+ "]";
+				+ ", marktype=" + marktype + ", numOfMarkedPapers=" + numOfMarkedPapers + "]";
 	}
 
 }

@@ -442,9 +442,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else if (markmode.compareTo("双评") == 0) {
 			// get teachers for first screen
-			mt.setTeachersIds(markTaskM.getTeachersByQidRole(questionId, "初评"));
+			mt.setTeachersIds(markTaskM.getTeachersByQidType(questionId, "初评"));
 			// get teachers for final screen
-			mt.setFinalMarkTeachersIds(markTaskM.getTeachersByQidRole(questionId, "终评"));
+			mt.setFinalMarkTeachersIds(markTaskM.getTeachersByQidType(questionId, "终评"));
 		}
 		else {
 			logger.error("getMarkTaskByEGSQuestion(), wrong type -> " + mt.getMarkMode());
@@ -461,9 +461,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		// populate first round mark teachers
 		List<String> teaL = mt.getTeachersIds();
 		int num = 0;
+		String mtype = "标准";
+		if (mt.getFinalMarkTeachersIds() != null && !mt.getFinalMarkTeachersIds().isEmpty()) {
+			mtype = "初评";
+		}
+		
 		if (teaL != null && !teaL.isEmpty()) {
 			for (String id: teaL) {
-				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, "标准", "初评");
+				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, mtype);
 				num = markTaskM.populateMetaMarkTask(mmt);
 				if (num != 1) {
 					logger.error("createMarkTask(), failed to populate record " + mmt.toString());
@@ -475,7 +480,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		teaL = mt.getFinalMarkTeachersIds();
 		if (teaL != null && !teaL.isEmpty()) {
 			for (String id: teaL) {
-				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, "标准", "终评");
+				MetaMarkTask mmt = new MetaMarkTask(id, mt.getQuestionId(), 0, "终评");
 				num = markTaskM.populateMetaMarkTask(mmt);
 				if (num != 1) {
 					logger.error("createMarkTask(), failed to populate record " + mmt.toString());

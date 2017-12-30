@@ -122,19 +122,16 @@ public interface MarkTaskMapper {
 			+ "question.id=#{qid}")
 	public MarkTask getAllMarkTasksByQuesId(@Param("qid") String qid);
 
-	@Select("select teacid from ustudy.marktask where quesid = #{qid} and markrole = #{role}")
-	public List<String> getTeachersByQidRole(@Param("qid") String qid, @Param("role") String markRole);
+	@Select("select teacid from ustudy.marktask where quesid = #{qid} and marktype = #{type}")
+	public List<String> getTeachersByQidType(@Param("qid") String qid, @Param("type") String mtype);
 
 	@Select("select teacid from ustudy.marktask where quesid = #{qid}")
 	public List<String> getTeachersByQid(@Param("qid") String qid);
 
-	@Select("select markrole from ustudy.marktask where quesid=#{qid} and teacid=#{teacid}")
-	public String getMarkRole(@Param("qid") String quesid, @Param("teacid") String teacid);
-
 	// meta mark task related functions
 
-	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, marktype, markrole) "
-			+ "values(#{teacid}, #{quesid}, #{threshold}, #{marktype}, #{markrole})")
+	@Insert("insert into ustudy.marktask(teacid, quesid, threshold, marktype) "
+			+ "values(#{teacid}, #{quesid}, #{threshold}, #{marktype})")
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 
 	@Update("update ustudy.question set assign_mode=#{type}, mark_mode=#{markMode}, duration=#{timeLimit}, "
@@ -142,12 +139,12 @@ public interface MarkTaskMapper {
 	public int updateQuestionMeta(MarkTask mt);
 
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "
-			+ "markrole = #{markrole}")
+			+ "marktype = #{marktype}")
 	public int deleteMetaMarkTaskByTeacher(@Param("teacid") String teac, @Param("quesid") String ques,
-			@Param("markrole") String role);
+			@Param("marktype") String mtype);
 
-	@Delete("delete from ustudy.marktask where quesid = #{qid} and markrole = #{markrole}")
-	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("markrole") String role);
+	@Delete("delete from ustudy.marktask where quesid = #{qid} and marktype = #{marktype}")
+	public int deleteMetaMarkTaskByQues(@Param("qid") String qid, @Param("marktype") String mtype);
 
 	// get information for statics
 	@Select("select count(*) as marked, sum(score) as score, quesid from answer where isviewed=true and "
