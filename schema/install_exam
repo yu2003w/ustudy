@@ -149,7 +149,7 @@ exam_grade_sub_id int(11) NOT NULL,
 batch_num int(11) DEFAULT NULL COMMENT '试卷所属扫描批次',
 paper_img varchar(360) DEFAULT NULL COMMENT '试卷图片地址,多个图片用'',''隔开',
 paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常, 3.异常已处理',
-error_status varchar(5) DEFAULT NULL COMMENT '错误代码',
+error_status varchar(5) DEFAULT NULL COMMENT '错误代码：0-试卷错误,1-学生信息错误,2-客观题存疑',
 PRIMARY KEY(id),
 INDEX (exam_code, exam_grade_sub_id),
 FOREIGN KEY (exam_code)

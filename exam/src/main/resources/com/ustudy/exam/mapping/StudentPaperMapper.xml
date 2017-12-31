@@ -56,7 +56,7 @@
 	</delete>
 	
 	<select id="getErrorPapers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT p.exam_code examCode,ee.name,p.id paperid,p.paper_img paperImg,oa.id,oa.quesno,oa.answer,p.paper_status status FROM paper p  
+		SELECT p.exam_code examCode,ee.name,p.id paperid,p.paper_img paperImg,oa.id,oa.quesno,oa.answer,p.paper_status status,p.error_status errorStatus FROM paper p  
 		LEFT JOIN obj_answer oa ON p.id=oa.paperid 
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		where p.exam_grade_sub_id=#{egsId} and ee.schid=#{schId,jdbcType=VARCHAR}

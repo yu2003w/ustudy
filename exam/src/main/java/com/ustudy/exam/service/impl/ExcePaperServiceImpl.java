@@ -90,6 +90,7 @@ public class ExcePaperServiceImpl implements ExcePaperService {
                 int quesno = 0;
                 String answer = "";
                 String status = "2";
+                String errorStatus = "";
                 
                 if(null == questions){
                     questions = new HashMap<>();
@@ -102,6 +103,7 @@ public class ExcePaperServiceImpl implements ExcePaperService {
                         question.put("quesno", quesno);
                         question.put("answer", answer);
                         question.put("status", status);
+                        question.put("errorStatus", errorStatus);
                         if(null != questionsType.get(quesno)){
                             question.put("type", questionsType.get(quesno));
                         }
@@ -115,12 +117,14 @@ public class ExcePaperServiceImpl implements ExcePaperService {
                     quesno = (int) map.get("quesno");
                     answer = map.get("answer").toString();
                     status = map.get("status").toString();
+                    errorStatus = map.get("errorStatus").toString();
                     
                     Map<String, Object> question = new HashMap<>();
                     question.put("id", id);
                     question.put("quesno", quesno);
                     question.put("answer", answer);
                     question.put("status", status);
+                    question.put("errorStatus", errorStatus);
                     if(null != questionsType.get(quesno)){
                         question.put("type", questionsType.get(quesno));
                     }
