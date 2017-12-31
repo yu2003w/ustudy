@@ -26,6 +26,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.UResp;
 import com.ustudy.exam.dao.ClientDao;
@@ -226,6 +227,7 @@ public class ClientServiceImpl implements ClientService {
      * @return
      * @throws Exception
      */
+    @Transactional
     public boolean saveTemplates(Long id, String data) throws Exception {
 
         logger.debug("originalData: " + data);
@@ -295,7 +297,8 @@ public class ClientServiceImpl implements ClientService {
      */
     private Map<String, Long> getQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception {
 
-        List<QuesAnswer> quesAnswers = new ArrayList<>();
+//        List<QuesAnswer> quesAnswers = new ArrayList<>();
+        Map<String,QuesAnswer> quesAnswers = new HashMap<>();
 
         if (null != originalData.get("TemplateInfo")) {
             if (null != originalData.get("CSID")) {
@@ -326,7 +329,8 @@ public class ClientServiceImpl implements ClientService {
                                 quesno = startno;
                             }
 
-                            quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                            //quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                            quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
                         }
                     }
                     if (null != page.get("OmrObjectives") && !page.get("OmrObjectives").equals(null)) {
@@ -361,18 +365,22 @@ public class ClientServiceImpl implements ClientService {
                                 quesno = startno;
                             }
 
-                            quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                            //quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                            quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
                         }
                     }
                 }
             }
         }
 
+        List<QuesAnswer> quesAnswerList = new ArrayList<>();
+        
         if (null != quesAnswers && quesAnswers.size() > 0) {
-            quesAnswerDaoImpl.initQuesAnswers(quesAnswers);
+            quesAnswerList = new ArrayList<QuesAnswer>(quesAnswers.values());
+            quesAnswerDaoImpl.initQuesAnswers(quesAnswerList);
         }
 
-        return getQuesAnswersId(quesAnswers);
+        return getQuesAnswersId(quesAnswerList);
     }
     
     private String initType(String type){
@@ -575,7 +583,7 @@ public class ClientServiceImpl implements ClientService {
 
         ExamSubject examSubject = examSubjectDaoImpl.getExamSubjectById(egsId);
 
-        if (null != examSubject) {
+        if (null != examSubject && null != examSubject.getOriginalData()) {
             String data = examSubject.getOriginalData();
             if (data.indexOf("null") >= 0) {
                 data = data.replace("null", "\"\"");

@@ -60,8 +60,7 @@ public class ClientController {
 	@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
 	public UResp saveExamTemplate(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
-		logger.debug("saveTemplate().");
-		logger.debug("egsId: " + egsId + ",parameters: " + parameters);
+		logger.info("saveTemplate(egsId: " + egsId + ",parameters: " + parameters + ").");
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);		
@@ -93,8 +92,7 @@ public class ClientController {
 	@RequestMapping(value = "/getExamTemplate/{examId}/{gradeId}/{subjectId}", method = RequestMethod.POST)
 	public UResp getExamTemplate(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getTemplates().");
-		logger.debug("examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId);
+		logger.info("getTemplates(examId: " + examId + ",gradeId: " + gradeId + ",subjectId: " + subjectId+ ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -119,8 +117,7 @@ public class ClientController {
 	@RequestMapping(value = "/getExamTemplate/{egsId}", method = RequestMethod.POST)
 	public UResp getExamTemplateByEgsId(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getTemplates().");
-		logger.debug("egsId: " + egsId);
+		logger.debug("getTemplates(egsId: " + egsId + ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -146,8 +143,7 @@ public class ClientController {
 	@RequestMapping(value = "/getExamSubjects/{examId}/{gradeId}", method = RequestMethod.POST)
 	public UResp getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getSubject().");
-		logger.debug("examId: " + examId + ",gradeId: " + gradeId);
+		logger.info("getSubject(examId: " + examId + ",gradeId: " + gradeId + ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -173,8 +169,7 @@ public class ClientController {
 	@RequestMapping(value = "/exam/subject/status/{examId}/{templateStatus}/{gradeId}/{markingStatus}", method = RequestMethod.GET)
 	public UResp getExamSubjectStatus(@PathVariable Long examId, @PathVariable String templateStatus, @PathVariable Long gradeId, @PathVariable String markingStatus, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getSubject().");
-		logger.debug("examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus);
+		logger.info("getSubject(examId: " + examId + ",templateStatus: " + templateStatus + ",gradeId: " + gradeId + ",markingStatus: " + markingStatus + ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -199,8 +194,7 @@ public class ClientController {
 	@RequestMapping(value = "/getExamGrades/{examId}/{examStatus}", method = RequestMethod.POST)
 	public UResp getExamGrades(@PathVariable Long examId, @PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getSubject().");
-		logger.debug("examId: " + examId + ",examStatus: " + examStatus);
+		logger.info("getSubject(examId: " + examId + ",examStatus: " + examStatus + ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -224,8 +218,7 @@ public class ClientController {
 	@RequestMapping(value = "/getExams/{examStatus}", method = RequestMethod.POST)
 	public UResp getExams(@PathVariable String examStatus, HttpServletRequest request, HttpServletResponse response) {
 
-		logger.debug("getExams().");
-		logger.debug("examStatus: " + examStatus);
+		logger.info("getExams(examStatus: " + examStatus + ").");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -248,7 +241,7 @@ public class ClientController {
 	@RequestMapping(value = "/getPermissions", method = RequestMethod.POST)
 	public UResp getPermissions(HttpServletRequest request, HttpServletResponse response) {
 		
-		logger.debug("getPermissionList().");
+		logger.info("getPermissionList().");
 
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
@@ -272,7 +265,7 @@ public class ClientController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public UResp login(HttpServletRequest request, HttpServletResponse response) {
 		
-		logger.debug("login().");
+		logger.info("login().");
 		String token = request.getHeader("token");
 		
 		return cs.login(token);
@@ -288,8 +281,7 @@ public class ClientController {
 		
 		String currentVersionNo = request.getParameter("currentVersionNo");
 		
-		logger.debug("update().");
-		logger.debug("currentVersionNo: " + currentVersionNo);
+		logger.info("update(currentVersionNo: " + currentVersionNo + ").");
 
 		boolean beAvailableUpdates = false;
 		String ip = "127.0.0.1";
