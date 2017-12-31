@@ -22,6 +22,7 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -173,16 +174,29 @@ public class ClientServiceImpl implements ClientService {
                 logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
 
                 try {
+                    Session ses = currentUser.getSession(true);
                     teacher = teacherService.findUserById(currentUser.getPrincipal().toString());
-                    School schoole = schoolDaoImpl.getSchoolById(teacher.getOrgid());
-                    if (null != schoole) {
-                        teacher.setOrgname(schoole.getSchname());
+//                    School schoole = schoolDaoImpl.getSchoolById(teacher.getOrgid());
+//                    if (null != schoole) {
+//                        teacher.setOrgname(schoole.getSchname());
+//                    }
+                    
+                    if (teacher != null) {
+                        teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
+                        teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
+                        ses.setAttribute("uname", teacher.getUname());
+                        ses.setAttribute("orgType", teacher.getOrgtype());
+                        ses.setAttribute("orgId", teacher.getOrgid());
+                        ses.setAttribute("role", teacher.getRole());
+                        
+                        result.setData(teacher);                        
+                        logger.debug("login()," + teacher.toString());
+                    } else {
+                        result.setRet(false);
+                        result.setMessage("用户信息有误");
+                        return result;
                     }
-                    teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
-                    teacher.setRole(teacherService.findPriRoleById(teacher.getUid()));
-                    logger.debug("login()," + teacher.toString());
-
-                    result.setData(teacher);
+                    
                 } catch (Exception e) {
                     logger.warn("login(), session failed -> " + e.getMessage());
                     result.setRet(status);

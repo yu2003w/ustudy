@@ -14,7 +14,7 @@ public class ClientApiTest {
 
 	public static void main(String[] args) {
 
-		String username = "13810001340";
+		String username = "13810001344";
 		String password = "123456";
 		password = Base64Util.getMd5Pwd(password);
 		String token = Base64Util.decode(username + ":" + password);
@@ -36,10 +36,10 @@ public class ClientApiTest {
 //		 System.out.println("--------------------getExamTemplate-------------------");
 //		 System.out.println();
 		
-		 getExamTemplate("1", token);
-		 System.out.println();
-		 System.out.println("--------------------getExamTemplate-------------------");
-		 System.out.println();
+//		 getExamTemplate("1", token);
+//		 System.out.println();
+//		 System.out.println("--------------------getExamTemplate-------------------");
+//		 System.out.println();
 		 
 //		 getExamSubjects("1", "1", token);
 //		 System.out.println();
@@ -51,10 +51,10 @@ public class ClientApiTest {
 //		 System.out.println("--------------------getExamGrades-------------------");
 //		 System.out.println();
 		
-//		 getExams("0", token);
-//		 System.out.println();
-//		 System.out.println("--------------------getExams-------------------");
-//		 System.out.println();
+		 getExams("0", token);
+		 System.out.println();
+		 System.out.println("--------------------getExams-------------------");
+		 System.out.println();
 		
 //		 login(token);
 //		 System.out.println();
@@ -370,8 +370,8 @@ public class ClientApiTest {
 
 	public static void getExams(String examStatus, String token) {
 
-//		String targetURL = "http://127.0.0.1:8080/exam/client/getExams/" + examStatus;
-		String targetURL = "http://47.92.53.57/api/client/getExams/" + examStatus;
+		String targetURL = "http://127.0.0.1:8080/exam/client/getExams/" + examStatus;
+//		String targetURL = "http://47.92.53.57/api/client/getExams/" + examStatus;
 
 		try {
 
