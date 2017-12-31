@@ -654,7 +654,7 @@ public class ClientApiTest {
 
 		String targetURL = "http://127.0.0.1:8080/exam/client//save/answers/" + examId + "/" + egsId;
 
-		String parameters = "{\"sipisModelList\":[{\"ESID\":1,\"BatchNum\":2,\"StuAPPath\":\"aaa.png,bbb.png,ccc.png\",\"PaperStatus\":0,\"Exam_Student_Score\":[{\"questNum\":1,\"answerHas\":1,\"stuObjectAnswer\":\"A\"},{\"questNum\":2,\"answerHas\":2,\"stuObjectAnswer\":\"B\"},{\"questNum\":3,\"answerHas\":4,\"stuObjectAnswer\":\"C\"},{\"questNum\":4,\"answerHas\":8,\"stuObjectAnswer\":\"D\"}],\"HistoryErrorStatusList\":[0,1,2]}]}";
+		String parameters = "{\"sipisModelList\":[{\"ESID\":1,\"BatchNum\":2,\"StuAPPath\":\"aaa.png,bbb.png,ccc.png\",\"PaperStatus\":0,\"Exam_Student_Score\":[{\"questNum\":1,\"answerHas\":1,\"stuObjectAnswer\":\"A\"},{\"questNum\":2,\"answerHas\":2,\"stuObjectAnswer\":\"B\"},{\"questNum\":3,\"answerHas\":4,\"stuObjectAnswer\":\"C\"},{\"questNum\":4,\"answerHas\":8,\"stuObjectAnswer\":\"D\"}],\"ErrorStatusList\":[0,1,2]}]}";
 		System.out.println(parameters);
 		try {
 

@@ -74,8 +74,8 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 				        if(null != object.get("PaperStatus")){
 				            paper.setPaperStatus(object.getString("PaperStatus"));
 				        }
-				        if(null != object.get("HistoryErrorStatusList")){
-				            String errorStatus = object.getJSONArray("HistoryErrorStatusList").toString();
+				        if(null != object.get("ErrorStatusList")){
+				            String errorStatus = object.getJSONArray("ErrorStatusList").toString();
 				            errorStatus = errorStatus.replace("[", "").replace("]", "");
 				            paper.setErrorStatus(errorStatus);
 				        }
