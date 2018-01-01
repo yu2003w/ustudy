@@ -81,6 +81,8 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 				        }
 				        paperDaoImpl.insertStudentPaper(paper);
 				        
+				        logger.debug("saveStudentsAnswers(), saved paper->" + paper.toString());
+				        
 				        JSONArray studentScores = object.getJSONArray("Exam_Student_Score");
 				        List<StudentObjectAnswer> answers = new ArrayList<>();
 				        

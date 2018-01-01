@@ -48,7 +48,12 @@
 	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
 		INSERT INTO paper (exam_code, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
         VALUES (#{stuExamNo}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
-		on duplicate key update batch_num=VALUES(batch_num),paper_img=VALUES(paper_img),paper_status=VALUES(paper_status),error_status=VALUES(error_status)
+		on duplicate key update 
+		    batch_num=VALUES(batch_num),
+		    paper_img=VALUES(paper_img),
+		    paper_status=VALUES(paper_status),
+		    error_status=VALUES(error_status),
+		    id=LAST_INSERT_ID(id)
 	</insert>
 	
 	<delete id="deleteStudentPapers" parameterType="java.util.Map">
@@ -59,7 +64,8 @@
 		SELECT p.exam_code examCode,ee.name,p.id paperid,p.paper_img paperImg,oa.id,oa.quesno,oa.answer,p.paper_status status,p.error_status errorStatus FROM paper p  
 		LEFT JOIN obj_answer oa ON p.id=oa.paperid 
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
-		where p.exam_grade_sub_id=#{egsId} and ee.schid=#{schId,jdbcType=VARCHAR}
+		where p.exam_grade_sub_id=#{egsId} and ee.schid=#{schId,jdbcType=VARCHAR} and 
+		      p.paper_status=2 and p.error_status=2
 	</select>
 	
 	<update id="updatePaperStatus" parameterType="java.util.Map">
