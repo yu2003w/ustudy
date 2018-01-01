@@ -170,6 +170,7 @@ answer varchar(16) DEFAULT NULL COMMENT '答案',
 answerHas int(11) DEFAULT NULL COMMENT '答案数值表示',
 PRIMARY KEY(id),
 INDEX (paperid, quesno),
+UNIQUE KEY(paperid, quesno),
 FOREIGN KEY (paperid)
     REFERENCES ustudy.paper(id)
     ON DELETE CASCADE ON UPDATE CASCADE
