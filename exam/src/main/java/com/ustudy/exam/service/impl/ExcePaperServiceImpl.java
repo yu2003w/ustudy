@@ -44,7 +44,8 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	@Override
 	public List<ExcePaperSum> getExcePaperSum(String schid) {
 		
-		List<ExcePaperSum> exP = exM.getPapersBySchool(2, schid);
+		// paper status, error status should be (2,2) for object question exception
+		List<ExcePaperSum> exP = exM.getPapersBySchool(2, 2, schid);
 		
 		logger.debug("getExcePaperSum(), exception paper for school->" + schid + ", " + exP.toString());
 		
