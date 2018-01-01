@@ -114,7 +114,7 @@ threshold INT,
 marktype ENUM ('标准','问题卷','初评','终评') NOT NULL,
 PRIMARY KEY (id),
 INDEX(quesid,teacid),
-UNIQUE KEY (teacid, quesid, markrole),
+UNIQUE KEY (teacid, quesid, marktype),
 FOREIGN KEY (teacid)
     REFERENCES ustudy.teacher(teacid)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -152,6 +152,7 @@ paper_status varchar(1) DEFAULT '0' COMMENT '0.正常，1.缺考，2.异常, 3.�
 error_status varchar(5) DEFAULT NULL COMMENT '错误代码：0-试卷错误,1-学生信息错误,2-客观题存疑',
 PRIMARY KEY(id),
 INDEX (exam_code, exam_grade_sub_id),
+UNIQUE KEY (exam_code, exam_grade_sub_id),
 FOREIGN KEY (exam_code)
     REFERENCES ustudy.examinee(exam_code)
     ON DELETE CASCADE ON UPDATE CASCADE,
