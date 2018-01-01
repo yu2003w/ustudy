@@ -45,10 +45,10 @@
 		</if>
 	</select>
 
-	<!-- 查询得到全部Exam对象 -->
 	<insert id="insertStudentPaper" useGeneratedKeys="true" keyProperty="id" parameterType="com.ustudy.exam.model.StudentPaper">
 		INSERT INTO paper (exam_code, exam_grade_sub_id, batch_num, paper_img, paper_status, error_status)  
         VALUES (#{stuExamNo}, #{egsId}, #{batchNum}, #{paperImg,jdbcType=VARCHAR}, #{paperStatus,jdbcType=VARCHAR}, #{errorStatus,jdbcType=VARCHAR})
+		on duplicate key update batch_num=VALUES(batch_num),paper_img=VALUES(paper_img),paper_status=VALUES(paper_status),error_status=VALUES(error_status)
 	</insert>
 	
 	<delete id="deleteStudentPapers" parameterType="java.util.Map">
