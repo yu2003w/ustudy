@@ -56,6 +56,10 @@
 		    id=LAST_INSERT_ID(id)
 	</insert>
 	
+	<select id="getStudentPaperId" parameterType="java.util.Map" resultType="Integer">
+		SELECT id from paper WHERE exam_code=#{examCode,jdbcType=VARCHAR} and exam_grade_sub_id=#{egsId}
+	</select>
+	
 	<delete id="deleteStudentPapers" parameterType="java.util.Map">
 		DELETE from paper where exam_grade_sub_id=#{egsId} and batch_num=#{batchNum}		
 	</delete>

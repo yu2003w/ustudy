@@ -13,6 +13,8 @@ public interface StudentPaperDao {
 
 	void insertStudentPaper(StudentPaper paper);
 	
+	int getStudentPaperId(@Param("egsId")Long egsId, @Param("examCode")String examCode);
+	
 	void updatePaperStatus(@Param("paperid")Long paperid, @Param("status")String status);
 	
 	void deleteStudentPapers(@Param("egsId")Long egsId, @Param("batchNum")Integer batchNum);
