@@ -81,6 +81,7 @@ public class LoginController {
 					ses.setAttribute("orgType", tea.getOrgtype());
 					ses.setAttribute("orgId", tea.getOrgid());
 					ses.setAttribute("role", userS.findPriRoleById(tea.getUid()));
+					ses.setAttribute("uid", currentUser.getPrincipal().toString());
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
 					response.setStatus(404);

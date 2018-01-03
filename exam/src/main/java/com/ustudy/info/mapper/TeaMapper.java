@@ -36,7 +36,7 @@ public interface TeaMapper {
 	
 	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, ll_time as llTime "
 			+ "from ustudy.teacher where orgid=#{oid} and orgtype=#{otype} and id > #{id} and teacid NOT LIKE "
-			+ "'admin%' limit 1000")
+			+ "'admin%' limit 1000 order by ctime desc")
 	public List<Teacher> getTeaList(@Param("id") int id, @Param("otype") String orgType, @Param("oid") String orgId);
 	
 	@Insert("insert into ustudy.teachersub(sub_id, teac_id) values(#{sid}, #{tid})")

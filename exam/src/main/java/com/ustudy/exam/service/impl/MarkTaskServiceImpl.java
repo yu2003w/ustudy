@@ -106,7 +106,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		// initialize paper cache here to get number of allocated numbers
 		List<PaperRequest> prS = new ArrayList<PaperRequest>();
 		for (QuesMarkSum que: sumL) {
-			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode()));
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), -1, -1));
 		}
 		paperC.retrievePapers(prS);
 		mt.setSummary(sumL);
@@ -181,7 +181,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		List<PaperRequest> prS = new ArrayList<PaperRequest>();
 		for (QuesMarkSum que: queS) {
-			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode()));
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), startSeq, endSeq));
 		}
 		
 		// need to initialize cache for each question ids

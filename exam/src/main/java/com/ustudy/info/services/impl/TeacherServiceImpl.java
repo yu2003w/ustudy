@@ -25,6 +25,7 @@ import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.mapper.TeaMapper;
 import com.ustudy.info.model.Item;
 import com.ustudy.info.model.Subject;
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.model.UElem;
 import com.ustudy.info.services.TeacherService;
@@ -131,7 +132,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public Teacher findTeacherById(String teaid) {
 		logger.debug("findTeacherById(), retrieve information for " + teaid);
-		return teaM.findTeaByTeaId(teaid); 
+		return teaM.findTeaByTeaId(teaid);
 	}
 
 	@Override
@@ -524,6 +525,34 @@ public class TeacherServiceImpl implements TeacherService {
 			throw new RuntimeException("setLLTime(), failed to set lltime for " + tid);
 		}
 		logger.debug("setLLTime(), update last login time for " + tid);
+	}
+
+	@Override
+	public TeaProperty getTeaProperty(String tid) {
+		TeaProperty tp = new TeaProperty();
+		
+		// retrieve grades information
+		List<Item> grs = teaM.getTeaGrade(tid);
+		if (grs == null || grs.isEmpty()) {
+			logger.info("getTeaProperty(), no grades found for " + tid);
+		}
+		tp.setGrades(grs);
+
+		// retrieve subjects information
+		List<Item> subs = teaM.getTeaSubjects(tid);
+		if (subs == null || subs.isEmpty()) {
+			logger.info("retrieveProp(), no subjects found for " + tid);
+		}
+		tp.setSubjects(subs);
+		
+		String role = InfoUtil.retrieveSessAttr("role");
+		if (role == null || role.isEmpty()) {
+			logger.error("retrieveProp(), did not find role for " + tid);
+			throw new RuntimeException("retrieveProp(), did not find role for " + tid);
+		}
+		
+		tp.setRole(role);
+		return tp;
 	}
 	
 }

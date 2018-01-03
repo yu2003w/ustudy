@@ -13,16 +13,22 @@ public class PaperRequest implements Serializable {
 	private String assmode = null;
 	private String markmode = null;
 	
+	// parameters to retrieve already marked papers
+	private int startSeq = -1;
+	private int endSeq = -1;
+	
 	public PaperRequest() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public PaperRequest(String qid, String assmode, String markmode) {
+	public PaperRequest(String qid, String assmode, String markmode, int startSeq, int endSeq) {
 		super();
 		this.qid = qid;
 		this.assmode = assmode;
 		this.markmode = markmode;
+		this.startSeq = startSeq;
+		this.endSeq = endSeq;
 	}
 
 	public String getQid() {
@@ -49,9 +55,26 @@ public class PaperRequest implements Serializable {
 		this.markmode = markmode;
 	}
 
+	public int getStartSeq() {
+		return startSeq;
+	}
+
+	public void setStartSeq(int startSeq) {
+		this.startSeq = startSeq;
+	}
+
+	public int getEndSeq() {
+		return endSeq;
+	}
+
+	public void setEndSeq(int endSeq) {
+		this.endSeq = endSeq;
+	}
+
 	@Override
 	public String toString() {
-		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + ", markmode=" + markmode + "]";
+		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + ", markmode=" + markmode + ", startSeq=" + startSeq
+				+ ", endSeq=" + endSeq + "]";
 	}
 
 }

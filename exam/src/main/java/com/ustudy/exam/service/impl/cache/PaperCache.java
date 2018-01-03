@@ -237,8 +237,13 @@ public class PaperCache {
 		List<PaperImgCache> paperM = null;
 		if (msc != null && msc.getCurAssign() != null) {
 			int wanted = msc.getTotal() - msc.getCompleted();
+			if (pr.getStartSeq() > 0) {
+				// get already marked papers
+				wanted = pr.getStartSeq() - pr.getEndSeq();
+			}
 			if (wanted > 0) {
-				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), 0, wanted, isFinalMark, pr.getQid());
+				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq() > 0 ? pr.getStartSeq():0, 
+						wanted > 0 ? wanted:MAX_THRES, isFinalMark, pr.getQid());
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
 							+ "tasks, batch ->" + paperM.size() + "," + paperM.toString());
@@ -322,8 +327,8 @@ public class PaperCache {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
-		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + " , current batch is "
-				+ batch);
+		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
+				" , current batch is " + batch);
 
 		// allocated tasks
 		int count = 0, mid = 0;
@@ -362,8 +367,17 @@ public class PaperCache {
 
 		// need to write back to redis cache again
 		paperC.opsForValue().set(paperCacheKey, mtcL);
-		logger.debug("getPapersForSingleQues(), assigned tasks for teacher " + teacid + " -> " + paperM.toString());
 
+		// Now paper cache, teacher paper cache initialized or request new papers
+		// for review already marked papers, need to get from teacher cache again rather than fresh papers
+		if (pr.getStartSeq() > 0) {
+			wanted = pr.getEndSeq() - pr.getStartSeq();
+			paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq(), 
+					wanted > 0 ? wanted : MAX_THRES, isFinalMark, pr.getQid());
+			logger.info("getPapersForSingleQues(), fetch marked papers for teacher " + teacid);
+		}
+		
+		logger.debug("getPapersForSingleQues(), assigned new papers for teacher " + teacid + " -> " + paperM.toString());
 		return paperM;
 
 	}
@@ -421,7 +435,6 @@ public class PaperCache {
 
 		MarkTaskCache mt = msc.getCurAssign().get(pid);
 		if (mt != null) {
-			mt.setStatus(2);
 			mt.setScore(Float.valueOf(score));
 		} else {
 			logger.error(
@@ -429,7 +442,12 @@ public class PaperCache {
 			throw new RuntimeException("updateMarkStaticsCache(), cache went wrong");
 		}
 
-		msc.incrCompleted(1, score);
+		// maybe paper is marked again
+		if (mt.getStatus() == 1) {
+			mt.setStatus(2);
+			msc.incrCompleted(1, score);
+		}
+		
 		// also need to update score in cache for final marks
 		updatePaperCache(quesid, pid, score, mt.getSeq(), isfinal);
 
@@ -445,8 +463,8 @@ public class PaperCache {
 	private List<PaperImgCache> getPapersFromTeaCache(Map<String, MarkTaskCache> task, int seq, int wanted,
 			boolean isfinal, String quesid) {
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
-		logger.debug(
-				"getPapersFromTeaCache(), currentAssign size ->" + task.size() + "\nkeys->" + task.keySet().toString());
+		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + 
+				"\nkeys->" + task.keySet().toString());
 		int i = 0, count = 0, mid = -1;
 		if (wanted > MAX_THRES)
 			wanted = MAX_THRES;
@@ -478,8 +496,8 @@ public class PaperCache {
 					count++;
 				}
 			} else {
-				// retrieve from specified sequence
-				if (i++ > seq && count < MAX_THRES) {
+				// retrieve from specified sequence, they're already marked papers
+				if (i++ > seq && count < MAX_THRES && en.getValue().getStatus() == 2) {
 					piC.add(new PaperImgCache(en.getKey(), en.getValue().getImg()));
 					if (isfinal) {
 						// for final marks, number of returned records should be times of triple
@@ -497,7 +515,6 @@ public class PaperCache {
 		return piC;
 	}
 
-	// todo: need add logic for handling final marks
 	private boolean updatePaperCache(String quesid, String pid, String score, int seq, boolean isfinal) {
 		String cacheK = QUES_PAPER_PREFIX + quesid;
 		if (isfinal) {
@@ -513,8 +530,7 @@ public class PaperCache {
 		MarkTaskCache mt = null;
 		if (isfinal) {
 			for (MarkTaskCache mc : mtcM) {
-				if (mc.getPaperid().compareTo(pid) == 0 && mc.getTeacid().compareTo(teacid) == 0
-						&& mc.getStatus() == 1) {
+				if (mc.getPaperid().compareTo(pid) == 0 && mc.getTeacid().compareTo(teacid) == 0) {
 					mt = mc;
 					break;
 				}
@@ -526,7 +542,7 @@ public class PaperCache {
 			}
 		} else {
 			mt = mtcM.get(seq);
-			if (mt.getPaperid().compareTo(pid) != 0 || mt.getTeacid().compareTo(teacid) != 0 || mt.getStatus() != 1) {
+			if (mt.getPaperid().compareTo(pid) != 0 || mt.getTeacid().compareTo(teacid) != 0) {
 				logger.error("updatePaperCache(), invalid seq->" + seq + " for " + cacheK);
 				throw new RuntimeException("updatePaperCache(), invalid seq->" + seq + " for " + cacheK);
 			}

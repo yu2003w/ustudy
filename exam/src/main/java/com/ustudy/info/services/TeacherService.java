@@ -2,6 +2,7 @@ package com.ustudy.info.services;
 
 import java.util.List;
 
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 
 public interface TeacherService {
@@ -9,6 +10,8 @@ public interface TeacherService {
 	public List<Teacher> getList(int id);
 	
 	public Teacher displayTeacher(int id);
+	
+	public TeaProperty getTeaProperty(String tid);
 	
 	public int createTeacher(List<Teacher> item);
 	

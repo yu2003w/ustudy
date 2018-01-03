@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ustudy.UResp;
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.services.TeacherService;
+import com.ustudy.info.util.InfoUtil;
 
 /**
  * @author jared
@@ -73,6 +75,33 @@ public class TeacherController {
 		}
 				
 		return item;
+	}
+	
+	@RequestMapping(value = "/prop/", method = RequestMethod.GET)
+	public UResp getTeaProperty(HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		logger.debug("getTeaProperty(), /info/teacher/prop/ visited");
+		
+		String tid = InfoUtil.retrieveSessAttr("uid");
+		if (tid == null || tid.isEmpty()) {
+			res.setMessage("getTeaProperty(), maybe user did not log in");
+			resp.setStatus(500);
+			return res;
+		}
+		
+		try {
+			TeaProperty tp = teaS.getTeaProperty(tid);
+			res.setData(tp);
+			res.setMessage("retrieved property successfully for " + tid);
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.warn("getTeaProperty(), retrieve teacher property failed with->" + e.getMessage());
+			res.setMessage("getTeaPropery(), retrieve teacher property failed");
+			resp.setStatus(500);
+		}
+		
+		return res;
 	}
 	
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
