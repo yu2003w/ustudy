@@ -13,7 +13,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
+import com.ustudy.exam.dao.QuesAnswerDao;
+import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.model.Exam;
+import com.ustudy.exam.model.QuesAnswer;
+import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.service.ExamService;
 import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.info.util.InfoUtil;
@@ -28,6 +32,12 @@ public class ExamServiceImpl implements ExamService {
     
     @Resource
     private ExamDao examDaoImpl;
+    
+    @Resource
+    private QuesAnswerDao questionDaoImpl;
+    
+    @Resource
+    private QuesareaDao quesareaDao;
     
     public List<Exam> getAllExams(){
         return examDaoImpl.getAllExams();
@@ -48,13 +58,11 @@ public class ExamServiceImpl implements ExamService {
         return examDaoImpl.getExamsById(id);
     }
 
-    @Override
-    public ArrayList<Map> getSubjects() {
+    public ArrayList<Map<String, Object>> getSubjects() {
         return examDaoImpl.getSubjects();
     }
 
-    @Override
-    public ArrayList<Map> getGrades() {
+    public ArrayList<Map<String, Object>> getGrades() {
         return examDaoImpl.getGrades();
     }
 
@@ -349,6 +357,134 @@ public class ExamServiceImpl implements ExamService {
         }
         
         return result;
+    }
+
+    public JSONArray getTeacherExams() {
+        
+        JSONArray result = new JSONArray();
+        
+        String orgId = InfoUtil.retrieveSessAttr("orgId");
+        orgId = "001";
+        if (orgId == null || orgId.isEmpty()) {
+            logger.error("getExams(), no school id found, maybe user not login");
+            throw new RuntimeException("getExams(), no school id found, maybe user not login");
+        }
+        
+        List<Map<String, Object>> exams = examDaoImpl.getTeacherExams(orgId);
+        if (null != exams && exams.size() > 0) {
+            List<Long> egsIds = new ArrayList<>();
+            for (Map<String, Object> exam : exams) {
+                if (null != exam.get("egsId")) {
+                    long egsId = (int) exam.get("egsId");
+                    egsIds.add(egsId);
+                }
+            }
+            
+            Map<Long, List<Map<String, Object>>> questions = getQuestions(egsIds);
+            
+            for (Map<String, Object> exam : exams) {
+                JSONObject object = JSONObject.fromObject(exam);
+                
+                if (null != exam.get("egsId")) {
+                    long egsId = (int) exam.get("egsId");
+                    object.put("questions", questions.get(egsId));
+                }
+                
+                result.add(object);
+            }
+        }
+        
+        return result;        
+    }
+    
+    private Map<Long, List<Map<String, Object>>> getQuestions(List<Long> egsIds){
+     
+        Map<Long, List<Map<String, Object>>> result = new HashMap<>();
+        
+        List<QuesAnswer> questions = questionDaoImpl.getQuestions(egsIds);
+        if (null != questions && questions.size() > 0) {
+            for (QuesAnswer question : questions) {
+                if (null != question.getExamGradeSubId()) {
+                    long egsId = question.getExamGradeSubId();
+                    List<Map<String, Object>> subQues = result.get(egsId);
+                    if (null == subQues) {
+                        subQues = new ArrayList<>();
+                    }
+                    long id = question.getId();
+                    int startno = question.getStartno();
+                    int endno = question.getEndno();
+                    
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", id);
+                    if (startno != endno) {
+                        map.put("name", startno + "-" + endno);
+                    } else {
+                        map.put("name", String.valueOf(startno));
+                    }
+                    
+                    subQues.add(map);
+                    result.put(egsId, subQues);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    /**
+     * 
+     * getSubjectQuestionPapers[根据考试科目、题块号，返回该题的所有答题卡]
+     * 创建人:  dulei
+     * 创建时间: 2018年1月3日 下午10:17:37
+     *
+     * @Title: getSubjectQuestionPapers
+     * @param subId 考试科目 
+     * @param quesId 题块号
+     * @return 该题的所有答题卡
+     */
+    public JSONArray getSubjectQuestionPapers(long egsId, long quesId) {
+        
+        JSONArray result = new JSONArray();
+        
+        List<Integer> pagenos = getPageNos(quesId);
+        if (pagenos.size() > 0) {
+            List<Map<String, Object>> papers = examDaoImpl.getSubjectQuestionPapers(egsId, quesId);
+            if (null != papers && papers.size()>0){
+                for (Map<String, Object> map : papers) {
+                    if (null != map.get("paperImg")){
+                        String[] paperImgs = map.get("paperImg").toString().split(",");
+                        String quesImgs = "";
+                        for (int pageno : pagenos) {
+                            if(pageno >= 0 && pageno < paperImgs.length){
+                                if (quesImgs.length()>0) {
+                                    quesImgs += "," + paperImgs[pageno];
+                                } else {
+                                    quesImgs += paperImgs[pageno];
+                                }
+                            }
+                        }
+                        map.put("paperImg", quesImgs);
+                        JSONObject object = JSONObject.fromObject(map);
+                        result.add(object);
+                    }
+                    
+                }
+            }
+        }
+        
+        return result;        
+    }
+    
+    private List<Integer> getPageNos(long quesId){
+        List<Integer> pagenos = new ArrayList<>();
+        List<Quesarea> quesareas = quesareaDao.getQuesareas(quesId);
+        if (null != quesareas && quesareas.size()>0){
+            for (Quesarea quesarea : quesareas) {
+                pagenos.add(quesarea.getPageno());
+            }
+        }
+        
+        return pagenos;
     }
     
 }

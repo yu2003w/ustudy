@@ -22,7 +22,11 @@
 		<foreach collection="list" item="item" index="index" separator="," >
 	        (#{item.paperid}, #{item.quesno}, #{item.score}, #{item.answer,jdbcType=VARCHAR}, #{item.answerHas})
 		</foreach>
-		on duplicate key update score=VALUES(score),answer=VALUES(answer),answerHas=VALUES(answerHas)
+		on duplicate key update 
+			score=VALUES(score),
+			answer=VALUES(answer),
+			answerHas=VALUES(answerHas),
+		    id=LAST_INSERT_ID(id)
 	</insert>
 	
 	<delete id="deleteStudentObjectAnswers" parameterType="java.util.Map">
