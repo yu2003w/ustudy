@@ -16,6 +16,8 @@ public interface ExamService {
 	
 	JSONArray getTeacherExams();
 	
+	JSONArray getSubjectQuestionPapers(long egsId, long quesId);
+	
 	List<Exam> getExamsByStatus(String status);
 	
 	Exam getExamsById(Long id);

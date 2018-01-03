@@ -124,6 +124,35 @@ public class ExamController {
 
         return result;
     }
+    
+    /**
+     * 
+     * getSubjectQuestionPapers[根据考试科目、题块号，返回该题的所有答题卡]
+     * 创建人:  dulei
+     * 创建时间: 2018年1月3日 下午10:17:37
+     *
+     * @Title: getSubjectQuestionPapers
+     * @param subId 考试科目 
+     * @param quesId 题块号
+     * @return 该题的所有答题卡
+     */
+    @RequestMapping(value = "/{egsId}/{quesId}/papers", method = RequestMethod.GET)
+    public Map getSubjectQuestionPapers(@PathVariable long egsId,@PathVariable long quesId) {
+        
+        logger.debug("getSubjectQuestionPapers(egsId:"+egsId+",quesId:"+quesId+").");
+        
+        Map result = new HashMap<>();
+        
+        try {
+            result.put("success", true);
+            result.put("data", service.getSubjectQuestionPapers(egsId, quesId));
+        }catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        return result;
+    }
 	
 	/**
 	 * 根据考试状态获取考试信息
