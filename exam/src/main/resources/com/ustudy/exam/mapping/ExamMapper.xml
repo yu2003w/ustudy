@@ -110,5 +110,15 @@
 	<update id="updateExamStatus" parameterType="java.util.Map">
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} where id=#{examid}
 	</update>
+
+	<select id="getTeacherExams" parameterType="String" resultType="java.util.Map">
+		SELECT e.id examId,e.exam_name examName,g.id gradeId,g.grade_name gradeName,s.id subId,s.name subName,egs.id egsId 
+		from examgradesub egs 
+		LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id
+		LEFT JOIN subject s ON egs.sub_id=s.id
+		LEFT JOIN examschool es ON e.id=es.examid
+		where e.id=#{orgId,jdbcType=VARCHAR} AND egs.examid in(SELECT examid from examgradesub GROUP BY examid HAVING COUNT(examid)=SUM(status)/3)
+	</select>
 	
 </mapper>

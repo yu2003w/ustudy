@@ -13,6 +13,8 @@ public interface QuesAnswerDao {
 
 	List<QuesAnswer> getQuesAnswers(Long egsId);
 	
+	List<QuesAnswer> getQuestions(@Param("egsIds")List<Long> egsIds);
+	
 	QuesAnswer getQuesAnswer(@Param("egsId")Long egsId, @Param("quesId")Long quesId);
 	
 	List<QuesAnswer> getQuesAnswersByIds(String egsIds);

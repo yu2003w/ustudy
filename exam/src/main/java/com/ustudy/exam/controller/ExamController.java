@@ -93,11 +93,33 @@ public class ExamController {
         Map result = new HashMap<>();
         
         try {
-        	result.put("success", true);
-        	result.put("data", service.getExams(finished, gradeId, subjectId, startDate, endDate, name));
+            result.put("success", true);
+            result.put("data", service.getExams(finished, gradeId, subjectId, startDate, endDate, name));
         }catch (Exception e) {
-        	result.put("success", false);
-        	result.put("message", e.getMessage());
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        return result;
+    }
+    
+    /**
+     * 获得该用户能访问的已发布成绩的考试列表
+     * @return Map
+     */
+    @RequestMapping(value = "/teacher/exams", method = RequestMethod.GET)
+    public Map getTeacherExams() {
+        
+        logger.debug("getTeacherExams().");
+        
+        Map result = new HashMap<>();
+        
+        try {
+            result.put("success", true);
+            result.put("data", service.getTeacherExams());
+        }catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
         }
 
         return result;

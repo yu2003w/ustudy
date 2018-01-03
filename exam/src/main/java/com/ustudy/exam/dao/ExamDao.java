@@ -30,6 +30,8 @@ public interface ExamDao {
 	
 	List<Map<String, Object>> getSubjectAnswers(Long examid);
 	
+	List<Map<String, Object>> getTeacherExams(String orgId);
+	
 	Long getExamStudengCount(Long examid);
 	
 	List<Exam> getExamsByStatus(@Param("status") String status, @Param("sid") String sid);
@@ -38,9 +40,9 @@ public interface ExamDao {
 	
 	Exam getLastExam();
 
-	ArrayList<Map> getGrades();
+	ArrayList<Map<String, Object>> getGrades();
 
-	ArrayList<Map> getSubjects();
+	ArrayList<Map<String, Object>> getSubjects();
 
 	void updateExamStatus(@Param("examid")Long examid, @Param("status")String status);
 

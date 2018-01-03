@@ -14,13 +14,15 @@ public interface ExamService {
 	
 	JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String startDate, String endDate, String name);
 	
+	JSONArray getTeacherExams();
+	
 	List<Exam> getExamsByStatus(String status);
 	
 	Exam getExamsById(Long id);
 
-	ArrayList<Map> getGrades();
+    ArrayList<Map<String, Object>> getGrades();
 
-	ArrayList<Map> getSubjects();
+	ArrayList<Map<String, Object>> getSubjects();
 	
 	JSONArray getExamSummary(Long examId);
 }

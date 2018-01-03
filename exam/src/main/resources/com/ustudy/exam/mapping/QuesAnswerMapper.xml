@@ -28,6 +28,13 @@
 	<select id="getQuesAnswersByIds" parameterType="string" resultMap="QuesAnswerResult">
 		SELECT * FROM question where exam_grade_sub_id in (#{egsIds})
 	</select>
+	
+	<select id="getQuestions" parameterType="java.util.List" resultMap="QuesAnswerResult">
+		SELECT * FROM question where exam_grade_sub_id in
+		<foreach item="item" index="index" collection="egsIds" open="(" separator="," close=")">  
+		 #{item}  
+		</foreach>
+	</select>
 
 	<delete id="deleteQuesAnswers" parameterType="Long">
 		delete FROM question where exam_grade_sub_id=#{egsId}
