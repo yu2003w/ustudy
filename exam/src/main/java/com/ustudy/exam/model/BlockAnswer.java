@@ -30,8 +30,9 @@ public class BlockAnswer implements Serializable {
 	
 	@JsonProperty("markStyle")
 	private String markMode = null;
+	
 	@JsonProperty("isMarked")
-	private boolean isMarked = false;
+	private boolean marked = false;
 	
 	private String paperId = null;
 	private String quesid = null;
@@ -70,7 +71,7 @@ public class BlockAnswer implements Serializable {
 		this.questionType = questionType;
 		this.quesid = quesid;
 		this.markMode = markMode;
-		this.isMarked = isMarked;
+		this.marked = isMarked;
 		this.paperId = paperId;
 		this.mflag = mflag;
 		this.fullscore = fullscore;
@@ -79,7 +80,7 @@ public class BlockAnswer implements Serializable {
 
 	public BlockAnswer(boolean isMarked, String mflag, String paperImg) {
 		super();
-		this.isMarked = isMarked;
+		this.marked = isMarked;
 		this.mflag = mflag;
 		this.paperImg = paperImg;
 	}
@@ -138,7 +139,7 @@ public class BlockAnswer implements Serializable {
 	}
 
 	public boolean isMarked() {
-		return isMarked;
+		return marked;
 	}
 
 	public boolean isProblemPaper() {
@@ -150,7 +151,7 @@ public class BlockAnswer implements Serializable {
 	}
 
 	public void setMarked(boolean isMarked) {
-		this.isMarked = isMarked;
+		this.marked = isMarked;
 	}
 
 	public String getMflag() {
@@ -236,7 +237,7 @@ public class BlockAnswer implements Serializable {
 	@Override
 	public String toString() {
 		return "BlockAnswer [id=" + id + ", questionName=" + questionName + ", questionType=" + questionType
-				+ ", markMode=" + markMode + ", isMarked=" + isMarked + ", paperId=" + paperId + ", quesid=" + quesid
+				+ ", markMode=" + markMode + ", marked=" + marked + ", paperId=" + paperId + ", quesid=" + quesid
 				+ ", mflag=" + mflag + ", isProblemPaper=" + isProblemPaper + ", fullscore=" + fullscore + ", score="
 				+ score + ", isfinal=" + isfinal + ", scoreGap=" + scoreGap + ", steps=" + steps + ", markRec="
 				+ Arrays.toString(markRec) + ", regions=" + regions + ", paperImg=" + paperImg + "]";

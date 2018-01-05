@@ -194,6 +194,18 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		logger.info("requestPapers()，max number of retrieved papers is " + maxSize);
 		
 		int i = 0;
+		if (startSeq == -1) {
+			int completed = paperC.getMarked(queS.get(0).getQuesid(), teacid);
+			for (QuesMarkSum que: queS) {
+				if (completed > paperC.getMarked(que.getQuesid(), teacid)) {
+					completed = paperC.getMarked(que.getQuesid(), teacid);
+				}
+			}
+			// for fetch fresh papers, only need to retrieve number of already marked papers
+			i = completed;
+		}
+		else
+			i += startSeq;
 
 		for (int j=0; j<maxSize; j++) {
 			//fetch question info from each paper and group them together
@@ -202,7 +214,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			if (startSeq == -1)
 				stuP.setPaperSeq(++i);
 			else
-				stuP.setPaperSeq(startSeq + (++i));
+				stuP.setPaperSeq(i++);
+			
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
 				List<PaperImgCache> pImg = papers.get(mark.getQuesid());
