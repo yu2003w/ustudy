@@ -282,7 +282,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					    re.setAnsImg(imgs[re.getPageno()]);
 					    
 					    // maybe this is remark operation
-					    if (remark && markImgs != null) {
+					    if (remark && markImgs != null && !markImgs.isEmpty()) {
+					    	logger.debug("requestPapers(), marked imgs->" + markImgs.toString());
 					    	MarkAnsImg mm = markImgs.get(re.getPageno());
 					    	if (mm != null) {
 					    		re.setMarkImg(mm.getMarkImg());

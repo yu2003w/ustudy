@@ -502,6 +502,7 @@ public class PaperCache {
 			wanted -= count;
 			logger.debug("getPapersFromTeaCache(), marked is " + count + ", need another " + wanted + " papers");
 		}
+
 		for (Entry<String, MarkTaskCache> en : entries) {
 			// get unmarked papers
 			if (en.getValue().getStatus() != 2 && count < wanted) {

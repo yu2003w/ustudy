@@ -96,7 +96,7 @@ public interface MarkTaskMapper {
 	public List<MarkAnsImg> getMarkAnsImgs(@Param("qid") String quesid, @Param("pid") String paperid, 
 			@Param("tid") String tid);
 	
-	@Select("select mflag, problem_paper as isProblemPaper, isviewed as isMarked, score, "
+	@Select("select mflag, problem_paper as isProblemPaper, isviewed as marked, score, "
 			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
 			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
 	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid, @Param("tid") String teacid);
