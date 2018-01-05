@@ -18,6 +18,7 @@ import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuesId;
 import com.ustudy.exam.model.QuesMarkSum;
 import com.ustudy.exam.model.ImgRegion;
+import com.ustudy.exam.model.MarkAnsImg;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.SingleAnswer;
 import com.ustudy.exam.model.cache.FirstMarkImgRecord;
@@ -194,6 +195,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		logger.info("requestPapers()，max number of retrieved papers is " + maxSize);
 		
 		int i = 0;
+		boolean remark = false;
 		if (startSeq == -1) {
 			int completed = paperC.getMarked(queS.get(0).getQuesid(), teacid);
 			for (QuesMarkSum que: queS) {
@@ -202,19 +204,18 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 			}
 			// for fetch fresh papers, only need to retrieve number of already marked papers
-			i = completed;
+			i = completed + 1;
 		}
-		else
-			i += startSeq;
-
+		else {
+			i = startSeq;
+			remark = true;
+		}		
+		
 		for (int j=0; j<maxSize; j++) {
 			//fetch question info from each paper and group them together
 			QuestionPaper stuP = new QuestionPaper();
 			// need to set paper sequences here
-			if (startSeq == -1)
-				stuP.setPaperSeq(++i);
-			else
-				stuP.setPaperSeq(i++);
+			stuP.setPaperSeq(i++);
 			
 			List<BlockAnswer> blA = new ArrayList<BlockAnswer>();
 			for (QuesMarkSum mark: queS) {
@@ -268,6 +269,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					if (isfinal) 
 						fMImgs = markTaskM.getFirstMarkImgs(mark.getQuesid(), pImg.get(j).getPaperid());
 					imgs = paperImg.split(",");
+					List<MarkAnsImg> markImgs = null;
+					if (remark)
+						markImgs = markTaskM.getMarkAnsImgs(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
 					for (ImgRegion re: qreL) {
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
@@ -276,6 +280,15 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						}
 					
 					    re.setAnsImg(imgs[re.getPageno()]);
+					    
+					    // maybe this is remark operation
+					    if (remark && markImgs != null) {
+					    	MarkAnsImg mm = markImgs.get(re.getPageno());
+					    	if (mm != null) {
+					    		re.setMarkImg(mm.getMarkImg());
+					    		re.setAnsMarkImg(mm.getAnsMarkImg());
+					    	}
+					    }
 						// for final marks, need to add marked papers here
 						if (isfinal) {
 							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];

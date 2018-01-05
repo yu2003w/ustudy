@@ -20,6 +20,7 @@ import com.ustudy.exam.model.statics.TeaStatics;
 import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.ImgRegion;
+import com.ustudy.exam.model.MarkAnsImg;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 
@@ -89,6 +90,12 @@ public interface MarkTaskMapper {
 			+ "ustudy.answer.isfinal = false order by pageno")
 	public List<FirstMarkImgRecord> getFirstMarkImgs(@Param("qid") String quesid, @Param("pid") String paperid);
 
+	@Select("select pageno, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer join "
+			+ "ustudy.answer_img on ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and "
+			+ "paperid=#{pid} and answer.teacid=#{tid} order by pageno")
+	public List<MarkAnsImg> getMarkAnsImgs(@Param("qid") String quesid, @Param("pid") String paperid, 
+			@Param("tid") String tid);
+	
 	@Select("select mflag, problem_paper as isProblemPaper, isviewed as isMarked, score, "
 			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
 			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")

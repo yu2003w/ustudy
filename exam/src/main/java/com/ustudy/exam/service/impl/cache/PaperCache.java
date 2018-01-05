@@ -481,23 +481,9 @@ public class PaperCache {
 			}
 		}
 		Set<Entry<String, MarkTaskCache>> entries = task.entrySet();
-		for (Entry<String, MarkTaskCache> en : entries) {
-			if (seq == 0) {
-				// get unmarked papers
-				if (en.getValue().getStatus() != 2 && count < wanted) {
-					piC.add(new PaperImgCache(en.getKey(), en.getValue().getImg()));
-					if (isfinal) {
-						// for final marks, number of returned records should be times of triple
-						// 1, final mark element 2, first mark element 3, first mark element
-						MarkTaskCache fm = firstMarkL.get(en.getValue().getSeq());
-						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-						fm = firstMarkL.get(en.getValue().getSeq() + mid);
-						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-					}
-					count++;
-				}
-			} else {
-				// retrieve from specified sequence, they're already marked papers
+		if (seq > 0) {
+			// get marked papers firstly
+			for (Entry<String, MarkTaskCache> en : entries) {
 				if (en.getValue().getStatus() == 2 && count < wanted) {
 					if (i++ >= seq) {
 						piC.add(new PaperImgCache(en.getKey(), en.getValue().getImg()));
@@ -513,7 +499,23 @@ public class PaperCache {
 					}
 				}
 			}
-
+			wanted -= count;
+			logger.debug("getPapersFromTeaCache(), marked is " + count + ", need another " + wanted + " papers");
+		}
+		for (Entry<String, MarkTaskCache> en : entries) {
+			// get unmarked papers
+			if (en.getValue().getStatus() != 2 && count < wanted) {
+				piC.add(new PaperImgCache(en.getKey(), en.getValue().getImg()));
+				if (isfinal) {
+					// for final marks, number of returned records should be times of triple
+					// 1, final mark element 2, first mark element 3, first mark element
+					MarkTaskCache fm = firstMarkL.get(en.getValue().getSeq());
+					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+					fm = firstMarkL.get(en.getValue().getSeq() + mid);
+					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+				}
+				count++;
+			}
 		}
 		return piC;
 	}
