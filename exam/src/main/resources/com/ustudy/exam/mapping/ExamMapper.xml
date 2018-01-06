@@ -129,7 +129,8 @@
 		LEFT JOIN answer_img ai ON a.id=ai.ans_id
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		LEFT JOIN class cl ON ee.class_id=cl.id
-		where p.exam_grade_sub_id=#{egsId} AND q.id=#{quesId}
+		LEFT JOIN examgradesub egs ON egs.examid=ee.examid
+		where egs.id=p.exam_grade_sub_id AND p.exam_grade_sub_id=#{egsId} AND q.id=#{quesId}
 	</select>
 	
 </mapper>
