@@ -1,6 +1,7 @@
 package com.ustudy.exam.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.UResp;
+import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.service.ExamService;
+import com.ustudy.exam.utility.ExamUtil;
 
 @RestController
 @RequestMapping(value = "/")
@@ -202,4 +205,33 @@ public class ExamController {
 
 		return result;
     }
+	
+	/**
+	 * Get exams and related grades information belongs to certain school
+	 * @param resp
+	 * @return
+	 */
+	@RequestMapping(value =  "/exam/exgr/",  method = RequestMethod.GET)
+	public UResp getExamGradesInfo(HttpServletResponse resp) {
+		logger.debug("getExamGradesInfo(), /exam/exgr/ visited");
+		UResp res = new UResp();
+		
+		String schId = ExamUtil.retrieveSessAttr("orgId");
+		if (schId == null || schId.isEmpty()) {
+			logger.error("getExamGradesInfo(), failed to retrieve org id, maybe user not log in");
+			throw new RuntimeException("getExamGradesInfo(), failed to retrieve org id, maybe user not log in");
+		}
+		
+		try {
+			List<ExamGrBrife> egL = service.getExamGrInfo(schId);
+			res.setData(egL);
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getExamGradesInfo(), retrieve exams grades info with exception->" + e.getMessage());
+			resp.setStatus(500);
+			res.setMessage("getExamGradesInfo()," + e.getMessage());
+		}
+		
+		return res;
+	}
 }

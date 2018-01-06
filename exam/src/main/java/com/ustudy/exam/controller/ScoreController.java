@@ -1,10 +1,12 @@
 package com.ustudy.exam.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.UResp;
+import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.service.ScoreService;
 
 @RestController
@@ -180,4 +184,29 @@ public class ScoreController {
     	return result;
     }
 
+    @RequestMapping(value = "/cls/{eid}/{gid}/", method = RequestMethod.GET)
+    public UResp getClsScore(@PathVariable("eid") @Valid int eid, @PathVariable("gid") @Valid int gid, 
+    		HttpServletResponse resp) {
+    	logger.debug("getClsScore(), retrieve class scores for exam->" + eid + ", gid->" + gid);
+    	UResp res = new UResp();
+    	
+    	if (eid < 0 || gid < 0) {
+    		logger.error("getClsScore(), parameter invalid");
+    		res.setMessage("getClsScore(), parameter invalid");
+    		return res;
+    	}
+    	
+    	try {
+    		List<ScoreClass> scL= service.getClsScores(eid, gid);
+    		res.setData(scL);
+    		res.setRet(true);
+    	} catch (Exception e) {
+    		logger.error("getClsScore(), failed with exception->" + e.getMessage());
+    		resp.setStatus(500);
+    		res.setMessage("retrieve class scores failed");
+    	}
+    	
+    	return res;
+    }
+    
 }

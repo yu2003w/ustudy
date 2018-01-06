@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
+import com.ustudy.Item;
 import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.mapper.TeaMapper;
-import com.ustudy.info.model.Item;
 import com.ustudy.info.model.Subject;
 import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;

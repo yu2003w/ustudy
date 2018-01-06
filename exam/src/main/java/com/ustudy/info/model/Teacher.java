@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ustudy.Item;
 
 public class Teacher implements Serializable {
 

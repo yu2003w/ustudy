@@ -10,12 +10,15 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
+import com.ustudy.exam.mapper.ExamMapper;
 import com.ustudy.exam.model.Exam;
+import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.service.ExamService;
@@ -38,6 +41,9 @@ public class ExamServiceImpl implements ExamService {
     
     @Resource
     private QuesareaDao quesareaDao;
+    
+    @Autowired
+    private ExamMapper exM;
     
     public List<Exam> getAllExams(){
         return examDaoImpl.getAllExams();
@@ -486,5 +492,12 @@ public class ExamServiceImpl implements ExamService {
         
         return pagenos;
     }
+
+	@Override
+	public List<ExamGrBrife> getExamGrInfo(String schid) {
+		List<ExamGrBrife> egL = exM.getExamGrBrife(schid);
+		logger.debug("getExamGrInfo(), " + egL.toString());
+		return egL;
+	}
     
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ustudy.exam.model.Exam;
+import com.ustudy.exam.model.ExamGrBrife;
 
 import net.sf.json.JSONArray;
 
@@ -27,4 +28,11 @@ public interface ExamService {
 	ArrayList<Map<String, Object>> getSubjects();
 	
 	JSONArray getExamSummary(Long examId);
+	
+	/**
+	 * @param schid
+	 * @return  exam and grades information grouped together for specified school
+	 */
+	public List<ExamGrBrife> getExamGrInfo(String schid);
+	
 }

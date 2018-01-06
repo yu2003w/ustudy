@@ -3,6 +3,8 @@ package com.ustudy.info.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.ustudy.Item;
+
 public class TeaProperty implements Serializable {
 
 	/**

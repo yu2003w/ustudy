@@ -26,6 +26,7 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
+import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.service.ScoreService;
 
 import net.sf.json.JSONArray;
@@ -392,6 +393,12 @@ public class ScoreServiceImpl implements ScoreService {
 	    }
 	    
 	    return scores;
+	}
+
+	@Override
+	public List<ScoreClass> getClsScores(int eid, int gid) {
+		List<ScoreClass> scL = null;
+		return scL;
 	}
 
 }
