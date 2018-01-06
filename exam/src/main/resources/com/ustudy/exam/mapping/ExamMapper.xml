@@ -122,8 +122,8 @@
 	</select>
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT p.exam_code examCode,p.paper_img paperImg,a.mflag,ai.ans_mark_img ansMarkImg,
-		cl.id classId,cl.cls_name clsName,p.exam_grade_sub_id egsId,q.id quesId from paper p
+		SELECT p.exam_code examCode,p.paper_img paperImg,IFNULL(a.mflag,'') mflag,IFNULL(ai.ans_mark_img,'') ansMarkImg,
+		IFNULL(cl.id,'') classId,IFNULL(cl.cls_name,'') clsName,p.exam_grade_sub_id egsId,q.id quesId from paper p
 		LEFT JOIN question q ON p.exam_grade_sub_id=q.exam_grade_sub_id
 		LEFT JOIN answer a ON q.id=a.quesid
 		LEFT JOIN answer_img ai ON a.id=ai.ans_id
