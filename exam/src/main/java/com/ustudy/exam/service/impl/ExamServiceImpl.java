@@ -77,7 +77,7 @@ public class ExamServiceImpl implements ExamService {
         
         JSONArray result = new JSONArray();
         
-        String orgId = InfoUtil.retrieveSessAttr("orgId");
+        String orgId = ExamUtil.retrieveSessAttr("orgId");
         if (orgId == null || orgId.isEmpty()) {
         	logger.error("getExams(), no school id found, maybe user not login");
         	throw new RuntimeException("getExams(), no school id found, maybe user not login");

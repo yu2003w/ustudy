@@ -14,11 +14,11 @@
 	</insert>
 	
 	<select id="getExameeScores" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT es.examee_id stuExamId,ee.exam_code stuExamNo,es.examee_id stuExamId,es.exam_id examId,ee.name,sc.schname,cl.cls_name clsName,es.score,es.rank from exameescore es 
+		SELECT es.examee_id stuExamId,ee.exam_code stuExamNo,es.exam_id examId,ee.name,sc.schname,cl.cls_name clsName,es.score,es.rank from exameescore es 
 		LEFT JOIN examinee ee ON es.examee_id=ee.id 
 		LEFT JOIN school sc ON ee.schid=sc.id 
 		LEFT JOIN class cl ON ee.class_id=cl.id
-		where es.exam_id=#{examId}
+		where es.exam_id=ee.examid and es.exam_id=#{examId}
 		<if test="schId !=null and schId > 0">
 			AND ee.schid=#{schId}
 		</if>
@@ -29,7 +29,7 @@
 			AND ee.class_id=#{classId}
 		</if>
 		<if test="text !=null and text != ''">
-			AND ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')
+			AND (ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%') OR ee.exam_code LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')) 
 		</if>
 		<if test="branch !=null and branch != ''">
 			AND cl.cls_type=#{branch, jdbcType=VARCHAR}
@@ -45,7 +45,7 @@
 		<if test="branch !=null and branch != ''">
 			LEFT JOIN class cl ON ee.class_id=cl.id 
 		</if>
-		where egs.examid=#{examId}
+		where egs.examid=ee.examid AND egs.examid=#{examId}
 		<if test="schId !=null and schId > 0">
 			AND ee.schid=#{schId}
 		</if>
@@ -56,7 +56,7 @@
 			AND ee.class_id=#{classId}
 		</if>
 		<if test="text !=null and text != ''">
-			AND ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')
+			AND (ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%') OR ee.exam_code LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%'))
 		</if>
 		<if test="branch !=null and branch != ''">
 			AND cl.cls_type=#{branch, jdbcType=VARCHAR}
