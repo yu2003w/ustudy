@@ -425,7 +425,7 @@ public class PaperCache {
 		return amount;
 	}
 
-	public boolean updateMarkStaticsCache(String quesid, String pid, String score, boolean isfinal) {
+	public synchronized boolean updateMarkStaticsCache(String quesid, String pid, String score, boolean isfinal) {
 		String teacid = ExamUtil.getCurrentUserId();
 		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + quesid);
 		if (msc == null) {

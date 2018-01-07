@@ -65,7 +65,18 @@ public class ExamInfoServiceImpl implements ExamInfoService {
 			throw new RuntimeException("updateExamInfo(), failed to update exam record.");
 		}
 		
-		logger.debug("updateExamInfo(), created examination info again for update");
+		for (GradeSubs gss:exam.getGrades()) {
+			for (int sub_id:gss.getSubjectIds()) {
+				ret = exM.createExamGradeSub(exam.getId(), gss.getId(), sub_id);
+				if (ret < 0 || ret > 2) {
+					logger.error("updateExamInfo(), failed to populate examgradesub record " + gss.getId() + 
+							"->" + sub_id);
+					throw new RuntimeException("updateExamInfo(), failed to populate examgradesub record.");
+				}
+			}
+		}
+		
+		logger.debug("updateExamInfo(), exam information updated->" + exam.toString());
 		
 	}
 	
