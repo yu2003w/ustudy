@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ExamGrBrife implements Serializable {
 
 	/**
@@ -15,16 +17,13 @@ public class ExamGrBrife implements Serializable {
 	private String examName = null;
 	private List<GrClsBrife> grades = null;
 	
+	// field to hold grade information
+	@JsonIgnore
+	private String grs = null;
+	
 	public ExamGrBrife() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-	
-	public ExamGrBrife(int examId, String examName, String grs) {
-		super();
-		this.examId = examId;
-		this.examName = examName;
-		this.parseGrs(grs);
 	}
 
 	public int getExamId() {
@@ -51,18 +50,27 @@ public class ExamGrBrife implements Serializable {
 		this.grades = grades;
 	}
 
-	private void parseGrs(String grs) {
+	public String getGrs() {
+		return grs;
+	}
+
+	public void setGrs(String grs) {
+		this.grs = grs;
+		parseGrs();
+	}
+
+	private void parseGrs() {
 		// string grs with the format "gradeid-gradename"
-		if (grs == null || grs.isEmpty()) {
+		if (this.grs == null || this.grs.isEmpty()) {
 			return;
 		}
 		
 		this.grades = new ArrayList<GrClsBrife>();
-		String[] grL = grs.split(",");
+		String[] grL = this.grs.split(",");
 		for (String gr: grL) {
-			String[] its = gr.split("-");				
-			GrClsBrife it = new GrClsBrife(Integer.valueOf(its[0]), its[1]);
-			this.grades.add(it);
+			String[] its = gr.split("-");
+			GrClsBrife gcb = new GrClsBrife(Integer.valueOf(its[0]), its[1]);
+			this.grades.add(gcb);
 		}
 		
 	}

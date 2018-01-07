@@ -498,6 +498,8 @@ public class ExamServiceImpl implements ExamService {
 	public List<ExamGrBrife> getExamGrInfo(String schid) {
 		List<ExamGrBrife> egL = exM.getExamGrBrife(schid);
 		
+		logger.debug("getExamGrInfo(), " + egL.toString());
+		
 		// populate class info here
 		for (ExamGrBrife eg: egL) {
 			List<GrClsBrife> grL = eg.getGrades();
