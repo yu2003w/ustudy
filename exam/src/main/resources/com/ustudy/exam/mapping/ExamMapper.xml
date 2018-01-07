@@ -122,15 +122,21 @@
 	</select>
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT p.exam_code examCode,p.paper_img paperImg,IFNULL(a.mflag,'') mflag,IFNULL(ai.ans_mark_img,'') ansMarkImg,
-		IFNULL(cl.id,'') classId,IFNULL(cl.cls_name,'') clsName,p.exam_grade_sub_id egsId,q.id quesId from paper p
+		SELECT p.exam_code examCode,p.paper_img paperImg,IFNULL(cl.id,'') classId,IFNULL(cl.cls_name,'') clsName,
+		p.exam_grade_sub_id egsId,q.id quesId from paper p
 		LEFT JOIN question q ON p.exam_grade_sub_id=q.exam_grade_sub_id
-		LEFT JOIN answer a ON q.id=a.quesid
-		LEFT JOIN answer_img ai ON a.id=ai.ans_id
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		LEFT JOIN class cl ON ee.class_id=cl.id
 		LEFT JOIN examgradesub egs ON egs.examid=ee.examid
 		where egs.id=p.exam_grade_sub_id AND p.exam_grade_sub_id=#{egsId} AND q.id=#{quesId}
+	</select>
+	
+	<select id="getSubjectQuestionMarkImgs" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT p.exam_code examCode,IFNULL(a.mflag,'') mflag,a.isviewed,a.isfinal,IFNULL(ai.mark_img,'') markImg,IFNULL(ai.ans_mark_img,'') ansMarkImg
+		from answer a
+		LEFT JOIN answer_img ai ON a.id=ai.ans_id
+		LEFT JOIN paper p ON a.paperid=p.id
+		where p.exam_grade_sub_id=#{egsId} AND a.quesid=#{quesId}
 	</select>
 	
 </mapper>

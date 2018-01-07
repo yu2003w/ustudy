@@ -34,6 +34,8 @@ public interface ExamDao {
 	
 	List<Map<String, Object>> getSubjectQuestionPapers(@Param("egsId")long egsId, @Param("quesId")long quesId);
 	
+	List<Map<String, Object>> getSubjectQuestionMarkImgs(@Param("egsId")long egsId, @Param("quesId")long quesId);
+	
 	Long getExamStudengCount(Long examid);
 	
 	List<Exam> getExamsByStatus(@Param("status") String status, @Param("sid") String sid);

@@ -457,8 +457,16 @@ public class ExamServiceImpl implements ExamService {
         if (pagenos.size() > 0) {
             List<Map<String, Object>> papers = examDaoImpl.getSubjectQuestionPapers(egsId, quesId);
             if (null != papers && papers.size()>0){
+                Map<String, List<Map<String, Object>>> markImgs = getSubjectQuestionMarkImgs(egsId, quesId);
                 for (Map<String, Object> map : papers) {
-                    if (null != map.get("paperImg")){
+                    if (null != map.get("paperImg") && null != map.get("examCode")){
+                        String examCode = map.get("examCode").toString();
+                        if(null != markImgs.get(examCode)){
+                            map.put("markImgs", markImgs.get(examCode));
+                        } else {
+                            map.put("markImgs", new ArrayList<>());
+                        }
+                        
                         String[] paperImgs = map.get("paperImg").toString().split(",");
                         String quesImgs = "";
                         for (int pageno : pagenos) {
@@ -480,6 +488,25 @@ public class ExamServiceImpl implements ExamService {
         }
         
         return result;        
+    }
+    
+    private Map<String, List<Map<String, Object>>> getSubjectQuestionMarkImgs(long egsId, long quesId){
+        Map<String, List<Map<String, Object>>> result = new HashMap<>();
+        List<Map<String, Object>> markImgs = examDaoImpl.getSubjectQuestionMarkImgs(egsId, quesId);
+        if (null != markImgs && markImgs.size()>0){
+            for (Map<String, Object> map : markImgs) {
+                if (null != map.get("examCode")){
+                    String examCode = map.get("examCode").toString();
+                    List<Map<String, Object>> list = result.get(examCode);
+                    if(null == list){
+                        list = new ArrayList<>();
+                    }
+                    list.add(map);
+                    result.put(examCode, list);
+                }
+            }
+        }
+        return result;
     }
     
     private List<Integer> getPageNos(long quesId){
