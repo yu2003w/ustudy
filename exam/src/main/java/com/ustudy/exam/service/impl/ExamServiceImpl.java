@@ -19,6 +19,7 @@ import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.mapper.ExamMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
+import com.ustudy.exam.model.GrClsBrife;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.service.ExamService;
@@ -496,6 +497,14 @@ public class ExamServiceImpl implements ExamService {
 	@Override
 	public List<ExamGrBrife> getExamGrInfo(String schid) {
 		List<ExamGrBrife> egL = exM.getExamGrBrife(schid);
+		
+		// populate class info here
+		for (ExamGrBrife eg: egL) {
+			List<GrClsBrife> grL = eg.getGrades();
+			for (GrClsBrife grC: grL) {
+				grC.setCls(exM.getClassByGrId(grC.getGrId()));
+			}
+		}
 		logger.debug("getExamGrInfo(), " + egL.toString());
 		return egL;
 	}

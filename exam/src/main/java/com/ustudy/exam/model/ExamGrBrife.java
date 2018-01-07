@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ustudy.Item;
-
 public class ExamGrBrife implements Serializable {
 
 	/**
@@ -15,7 +13,7 @@ public class ExamGrBrife implements Serializable {
 
 	private int examId = 0;
 	private String examName = null;
-	private List<Item> grades = null;
+	private List<GrClsBrife> grades = null;
 	
 	public ExamGrBrife() {
 		super();
@@ -45,11 +43,11 @@ public class ExamGrBrife implements Serializable {
 		this.examName = examName;
 	}
 
-	public List<Item> getGrades() {
+	public List<GrClsBrife> getGrades() {
 		return grades;
 	}
 
-	public void setGrades(List<Item> grades) {
+	public void setGrades(List<GrClsBrife> grades) {
 		this.grades = grades;
 	}
 
@@ -59,11 +57,11 @@ public class ExamGrBrife implements Serializable {
 			return;
 		}
 		
-		this.grades = new ArrayList<Item>();
+		this.grades = new ArrayList<GrClsBrife>();
 		String[] grL = grs.split(",");
 		for (String gr: grL) {
 			String[] its = gr.split("-");				
-			Item it = new Item(Integer.valueOf(its[0]), its[1]);
+			GrClsBrife it = new GrClsBrife(Integer.valueOf(its[0]), its[1]);
 			this.grades.add(it);
 		}
 		
