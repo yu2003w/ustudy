@@ -11,7 +11,7 @@ import com.ustudy.exam.model.ExamGrBrife;
 @Mapper
 public interface ExamMapper {
 
-	@Select("select exam.id as id, exam.exam_name as examName, group_concat(distinct examgradesub.grade_id, '-',"
+	@Select("select exam.id as examId, exam.exam_name as examName, group_concat(distinct examgradesub.grade_id, '-',"
 			+ " grade.grade_name order by examgradesub.grade_id) as grs from ustudy.exam join ustudy.examschool on "
 			+ "exam.id = examschool.examid join examgradesub on exam.id = examgradesub.examid join grade "
 			+ "on grade.id = examgradesub.grade_id where examschool.schid = #{sid} group by exam.id")
