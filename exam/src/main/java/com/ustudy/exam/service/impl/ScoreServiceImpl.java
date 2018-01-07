@@ -209,6 +209,17 @@ public class ScoreServiceImpl implements ScoreService {
         
         JSONArray array = new JSONArray();
         
+        if (null != branch && branch.trim().length() > 0) {
+            branch = branch.trim();
+            if (branch.equals("文科")) {
+                branch = "art";
+            } else if (branch.equals("理科")) {
+                branch = "sci";
+            } else {
+                branch = "";
+            }
+        }
+        
         List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
         if(null != exameeScores && exameeScores.size() > 0){
             Map<Long, JSONArray> studentScores = getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
@@ -305,7 +316,10 @@ public class ScoreServiceImpl implements ScoreService {
 		for (Map<String, Object> map : questions) {
 		    long subId = (int)map.get("subId");
             int startno = (int)map.get("startno");
-            String markMode = map.get("markMode").toString();
+            String markMode = "单评";
+            if(null != map.get("markMode")){
+                map.get("markMode").toString();
+            }
             markModes.put(subId + "-" + startno, markMode);
 		}
 		
