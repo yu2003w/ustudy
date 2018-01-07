@@ -461,11 +461,11 @@ public class ExamServiceImpl implements ExamService {
                 for (Map<String, Object> map : papers) {
                     if (null != map.get("paperImg") && null != map.get("examCode")){
                         String examCode = map.get("examCode").toString();
-                        if(null != markImgs.get(examCode)){
-                            map.put("markImgs", markImgs.get(examCode));
-                        } else {
-                            map.put("markImgs", new ArrayList<>());
+                        List<Map<String, Object>> markImg = markImgs.get(examCode);
+                        if(null == markImg){
+                            markImg = new ArrayList<>();
                         }
+                        map.put("markImgs", markImg);
                         
                         String[] paperImgs = map.get("paperImg").toString().split(",");
                         String quesImgs = "";
@@ -501,6 +501,7 @@ public class ExamServiceImpl implements ExamService {
                     if(null == list){
                         list = new ArrayList<>();
                     }
+                    map.remove("examCode");
                     list.add(map);
                     result.put(examCode, list);
                 }
