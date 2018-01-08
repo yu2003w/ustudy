@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
@@ -19,9 +20,9 @@ import com.ustudy.exam.dao.ExameeScoreDao;
 import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.RefAnswerDao;
-import com.ustudy.exam.dao.ScoreMapper;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
+import com.ustudy.exam.mapper.ScoreMapper;
 import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
@@ -63,7 +64,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Resource
     private ExameeScoreDao exameeScoreDao;
     
-    @Resource
+    @Autowired
     private ScoreMapper scoM;
 
     public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
@@ -421,8 +422,8 @@ public class ScoreServiceImpl implements ScoreService {
 		if (ssCl == null || ssCl.isEmpty()) {
 			logger.info("getClsScores(), maybe subject score for class is not calculated yet. Running statics now");
 			ssCl = scoM.calScoreSubCls(eid, gid);
-			logger.debug("getClsScores(), class subject score->" + ssCl.toString());
 		}
+		logger.debug("getClsScores(), class subject score->" + ssCl.toString());
 		
 		return scL;
 	}
