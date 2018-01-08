@@ -7,6 +7,7 @@
 		<result property="egsId"  column="egsId" />
 		<result property="aveScore"  column="aveScore" />
 		<result property="rank"  column="rank" />
+		<result property="subjectName" column="subjectName" />
 	</resultMap>
 	
 	<resultMap type="com.ustudy.exam.model.statics.ScoreClass" id="ScoreClass">
@@ -17,7 +18,7 @@
 	</resultMap>
 	
 	<select id="calScoreSubCls" resultMap="ScoreSubjectCls">
-		select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId
+		select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId,
 		subject.name as subjectName FROM ustudy.examinee
 		join ustudy.subscore on examinee.id = subscore.stuid
 		join ustudy.class on class.id = examinee.class_id

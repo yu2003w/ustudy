@@ -458,6 +458,7 @@ public class ScoreServiceImpl implements ScoreService {
 			else {
 				ScoreClass sc = new ScoreClass(ss.getClsId(), eid);
 				sc.setAveScore(ss.getAveScore());
+				scM.put(ss.getClsId(), sc);
 			}
 		}
 		
@@ -466,7 +467,7 @@ public class ScoreServiceImpl implements ScoreService {
 		logger.debug("calScoreClass(), before sort->" + scL.toString());
 		scL.sort(new Comparator<ScoreClass> () {
 			public int compare(ScoreClass a, ScoreClass b) {
-				if (a.getAveScore() > b.getAveScore()) {
+				if (a.getAveScore() < b.getAveScore()) {
 					return 1;
 				}
 				else if (a.getAveScore() == b.getAveScore()) {
@@ -476,7 +477,6 @@ public class ScoreServiceImpl implements ScoreService {
 					return -1;				
 			}
 		});
-		logger.debug("calScoreClass(), after sort->" + scL.toString());
 		
 		// set rank here
 		for (int i = 1; i <= scL.size(); i++) {
@@ -489,8 +489,8 @@ public class ScoreServiceImpl implements ScoreService {
 					scL.get(i-1).setRank(i);
 			}
 		}
+		logger.debug("calScoreClass(), after sort->" + scL.toString());
 		return scL;
-		
 	}
 
 	@Transactional
@@ -512,7 +512,7 @@ public class ScoreServiceImpl implements ScoreService {
 		for (int i = 0; i < ssCl.size(); i++) {
 			if (ssCl.get(i).getEgsId() == egsid) {
 				if (rank == 1) {
-					ssCl.get(i).setRank(rank);
+					ssCl.get(i).setRank(rank++);
 				}
 				else {
 					if (ssCl.get(i).getAveScore() == ssCl.get(i-1).getAveScore()) {
@@ -527,7 +527,7 @@ public class ScoreServiceImpl implements ScoreService {
 			else {
 				egsid = ssCl.get(i).getEgsId();
 				rank = 1;
-				ssCl.get(i).setRank(rank);
+				ssCl.get(i).setRank(rank++);
 			}
 		}
 		logger.debug("calClsSubScore(), after set rank for class subject->" + ssCl.toString());

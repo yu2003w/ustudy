@@ -11,7 +11,7 @@ public class ScoreSubjectCls implements Serializable {
 	 */
 	private static final long serialVersionUID = 1369388311080844442L;
 
-	private String subjecName = null;
+	private String subjectName = null;
 	
 	private float aveScore = 0;
 	
@@ -29,11 +29,11 @@ public class ScoreSubjectCls implements Serializable {
 	}
 
 	public String getSubjecName() {
-		return subjecName;
+		return subjectName;
 	}
 
 	public void setSubjecName(String subjecName) {
-		this.subjecName = subjecName;
+		this.subjectName = subjecName;
 	}
 
 	public float getAveScore() {
@@ -70,7 +70,7 @@ public class ScoreSubjectCls implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ScoreSubjectCls [subjecName=" + subjecName + ", aveScore=" + aveScore + ", clsId=" + clsId + ", egsId="
+		return "ScoreSubjectCls [subjecName=" + subjectName + ", aveScore=" + aveScore + ", clsId=" + clsId + ", egsId="
 				+ egsId + ", rank=" + rank + "]";
 	}
 	

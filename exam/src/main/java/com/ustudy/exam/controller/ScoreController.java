@@ -201,7 +201,7 @@ public class ScoreController {
     		List<ScoreClass> scL= service.getClsScores(eid, gid);
     		res.setData(scL);
     		res.setRet(true);
-    		res.setMessage("getClsScore(), retrieve class score information succeeded.");
+    		res.setMessage("retrieve class score information succeeded.");
     	} catch (Exception e) {
     		logger.error("getClsScore(), failed with exception->" + e.getMessage());
     		resp.setStatus(500);
