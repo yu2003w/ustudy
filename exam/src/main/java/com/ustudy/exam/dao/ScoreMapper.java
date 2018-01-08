@@ -1,14 +1,14 @@
-package com.ustudy.exam.mapper;
+package com.ustudy.exam.dao;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 
-@Mapper
+@MapperScan
 public interface ScoreMapper {
 
 	/*
