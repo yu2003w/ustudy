@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.ExamDao;
@@ -21,12 +22,14 @@ import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.RefAnswerDao;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
+import com.ustudy.exam.mapper.ScoreMapper;
 import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.statics.ScoreClass;
+import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 
 import net.sf.json.JSONArray;
@@ -60,6 +63,9 @@ public class ScoreServiceImpl implements ScoreService {
     
     @Resource
     private ExameeScoreDao exameeScoreDao;
+    
+    @Autowired
+    private ScoreMapper scoM;
 
     public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
         logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
@@ -412,6 +418,13 @@ public class ScoreServiceImpl implements ScoreService {
 	@Override
 	public List<ScoreClass> getClsScores(int eid, int gid) {
 		List<ScoreClass> scL = null;
+		List<ScoreSubjectCls> ssCl = scoM.getScoreSubCls(eid, gid);
+		if (ssCl == null || ssCl.isEmpty()) {
+			logger.info("getClsScores(), maybe subject score for class is not calculated yet. Running statics now");
+			ssCl = scoM.calScoreSubCls(eid, gid);
+			logger.debug("getClsScores(), class subject score->" + ssCl.toString());
+		}
+		
 		return scL;
 	}
 

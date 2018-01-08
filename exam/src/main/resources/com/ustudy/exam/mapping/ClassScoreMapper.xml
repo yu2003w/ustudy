@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.mapper.ScoreMapper">
+
+	<resultMap type="com.ustudy.exam.model.statics.ScoreSubjectCls"
+		id="ScoreSubjectCls">
+		<result property="clsId" column="clsId" />
+		<result property="egsId" column="egsId" />
+		<result property="aveScore" column="aveScore" />
+	</resultMap>
+	
+	<select id="calScoreSubCls" resultType="ScoreSubjectCls">
+	    select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId FROM ustudy.examinee 
+	    join ustudy.subscore on examinee.id = subscore.stuid 
+	    join ustudy.class on class.id = examinee.class_id 
+	    join examgradesub on examgradesub.id = subscore.exam_grade_sub_id 
+	    where examgradesub.examid = #{eid} and examgradesub.grade_id = #{gid} 
+	    group by examinee.class_id, examgradesub.sub_id order by aveScore desc
+	</select>
+	
+</mapper>
