@@ -3,6 +3,8 @@ package com.ustudy.exam.model.statics;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author jared
  * 
@@ -22,9 +24,13 @@ public class ScoreClass implements Serializable {
 	
 	private String clsName = null;
 	
+	@JsonIgnore
 	private int clsId = 0;
 	
 	private List<ScoreSubjectCls> subScore = null;
+	
+	@JsonIgnore
+	private int examId = 0;
 
 	public ScoreClass() {
 		super();
@@ -37,6 +43,12 @@ public class ScoreClass implements Serializable {
 		this.rank = rank;
 		this.clsName = clsName;
 		this.clsId = clsId;
+	}
+
+	public ScoreClass(int clsId, int examId) {
+		super();
+		this.clsId = clsId;
+		this.examId = examId;
 	}
 
 	public float getAveScore() {
@@ -79,10 +91,18 @@ public class ScoreClass implements Serializable {
 		this.clsId = clsId;
 	}
 
+	public int getExamId() {
+		return examId;
+	}
+
+	public void setExamId(int examId) {
+		this.examId = examId;
+	}
+
 	@Override
 	public String toString() {
 		return "ScoreClass [aveScore=" + aveScore + ", rank=" + rank + ", clsName=" + clsName + ", clsId=" + clsId
-				+ ", subScore=" + subScore + "]";
+				+ ", subScore=" + subScore + ", examId=" + examId + "]";
 	}
 
 }

@@ -22,20 +22,17 @@ public interface ScoreMapper {
 	/**
 	 * Query average score of class group by subjects based on examination id and grade id
 	 * @param eid --- examination id
-	 * @param gid --- grade id
+	 * @param gid --- gid <=0 indicates all grades info required
 	 * @return
 	 */
 	public List<ScoreSubjectCls> calScoreSubCls(@Param("eid") int eid, @Param("gid") int gid);
 	
-	public int saveScoreSubCls(ScoreSubjectCls ssc);
+	public int saveScoreSubCls(List<ScoreSubjectCls> ssc);
 	
-	/*
-	@Select("SELECT ave_score as aveScore, rank, class.cls_name as clsName, class.id as clsId FROM "
-			+ "ustudy.scoreclass join class on class.id = scoreclass.cls_id where scoreclass.exam_id = #{eid}")
-			*/
 	public List<ScoreClass> getScoreClass(@Param("eid") int eid, @Param("gid") int gid);
 	
 	public List<ScoreClass> calScoreClass(@Param("eid") int eid, @Param("gid") int gid);
 	
+	public int saveScoreClass(List<ScoreClass> sc);
 	
 }

@@ -2,6 +2,7 @@ package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
@@ -417,15 +419,136 @@ public class ScoreServiceImpl implements ScoreService {
 
 	@Override
 	public List<ScoreClass> getClsScores(int eid, int gid) {
-		List<ScoreClass> scL = null;
+		
 		List<ScoreSubjectCls> ssCl = scoM.getScoreSubCls(eid, gid);
-		if (ssCl == null || ssCl.isEmpty()) {
-			logger.info("getClsScores(), maybe subject score for class is not calculated yet. Running statics now");
-			ssCl = scoM.calScoreSubCls(eid, gid);
+			
+		// each time score for one grade calculated
+		if ((ssCl == null || ssCl.isEmpty()) && gid > 0) {
+			calClsSubScore(eid, gid);
 		}
+		
+		ssCl = scoM.getScoreSubCls(eid, gid);
 		logger.debug("getClsScores(), class subject score->" + ssCl.toString());
+		List<ScoreClass> scL = scoM.getScoreClass(eid, gid);
+		logger.debug("getClsScores(), class score->" + scL.toString());
+		
+		// need to assemble class score data
+		for (ScoreClass sc : scL) {
+			List<ScoreSubjectCls> ss = new ArrayList<ScoreSubjectCls>();
+			for (ScoreSubjectCls ssc: ssCl) {
+				if (ssc.getClsId() == sc.getClsId())
+					ss.add(ssc);
+			}
+			sc.setSubScore(ss);
+		}
 		
 		return scL;
 	}
+	
+	private List<ScoreClass> calScoreClass(List<ScoreSubjectCls> ssc, int eid) {
+		
+		HashMap<Integer, ScoreClass> scM = new HashMap<Integer, ScoreClass>();
+		
+		logger.debug("calScoreClass(), calculate score class from " + ssc);
+		for (ScoreSubjectCls ss: ssc) {
+			if (scM.containsKey(ss.getClsId())) {
+				ScoreClass sc = scM.get(ss.getClsId());
+				sc.setAveScore(sc.getAveScore() + ss.getAveScore());
+			}
+			else {
+				ScoreClass sc = new ScoreClass(ss.getClsId(), eid);
+				sc.setAveScore(ss.getAveScore());
+			}
+		}
+		
+		// sort based on ave score via list
+		List<ScoreClass> scL = new ArrayList<ScoreClass>(scM.values());
+		logger.debug("calScoreClass(), before sort->" + scL.toString());
+		scL.sort(new Comparator<ScoreClass> () {
+			public int compare(ScoreClass a, ScoreClass b) {
+				if (a.getAveScore() > b.getAveScore()) {
+					return 1;
+				}
+				else if (a.getAveScore() == b.getAveScore()) {
+					return 0;
+				}
+				else 
+					return -1;				
+			}
+		});
+		logger.debug("calScoreClass(), after sort->" + scL.toString());
+		
+		// set rank here
+		for (int i = 1; i <= scL.size(); i++) {
+			if (i == 1)
+				scL.get(i-1).setRank(i);
+			else {
+				if (scL.get(i-1).getAveScore() == scL.get(i-2).getAveScore())
+					scL.get(i-1).setRank(scL.get(i-2).getRank());
+				else
+					scL.get(i-1).setRank(i);
+			}
+		}
+		return scL;
+		
+	}
 
+	@Transactional
+	private void calClsSubScore(int eid, int gid) {
+		
+		logger.info("calClsSubScore(), to calculate class subject score for eid->" + eid + ", gid->" + gid);
+		
+		List<ScoreSubjectCls> ssCl = scoM.calScoreSubCls(eid, gid);
+		if (ssCl == null || ssCl.isEmpty()) {
+			logger.error("calClsSubScore(), failed to calculate class subject score for eid->" + eid + 
+					", gid->" + gid);
+			throw new RuntimeException("calClsSubScore(), failed to calculate class subject score");
+		}
+		
+		logger.debug("calClsSubScore(), before set rank for class subject->" + ssCl.toString());
+		// need to set rank for retrieved class subject score per egs
+		int egsid = ssCl.get(0).getEgsId();
+		int rank = 1;
+		for (int i = 0; i < ssCl.size(); i++) {
+			if (ssCl.get(i).getEgsId() == egsid) {
+				if (rank == 1) {
+					ssCl.get(i).setRank(rank);
+				}
+				else {
+					if (ssCl.get(i).getAveScore() == ssCl.get(i-1).getAveScore()) {
+						ssCl.get(i).setRank(ssCl.get(i-1).getRank());
+						rank++;
+					}
+					else {
+						ssCl.get(i).setRank(rank++);
+					}
+				}
+			}
+			else {
+				egsid = ssCl.get(i).getEgsId();
+				rank = 1;
+				ssCl.get(i).setRank(rank);
+			}
+		}
+		logger.debug("calClsSubScore(), after set rank for class subject->" + ssCl.toString());
+		
+		// save class subject score
+		int ret = scoM.saveScoreSubCls(ssCl);
+		if (ret != ssCl.size()) {
+			logger.error("calClsSubScore(), save subject class score failed with ret->" + ret + 
+					", expected->" + ssCl.size());
+			throw new RuntimeException("calClsSubScore(), save subject class score failed");
+		}
+		logger.info("calClsSubScore(), class subject score saved with ret->" + ret);
+		
+		List<ScoreClass> scL = calScoreClass(ssCl, eid);
+		ret = scoM.saveScoreClass(scL);
+		if (ret != scL.size()) {
+			logger.error("calClsSubScore(), save class score failed with ret->" + ret + 
+					", expected->" + scL.size());
+			throw new RuntimeException("getClsScores(), save class score failed");
+		}
+		logger.info("calClsSubScore(), class score saved with ret->" + ret);
+	}
+	
 }

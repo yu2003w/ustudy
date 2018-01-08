@@ -190,7 +190,8 @@ public class ScoreController {
     	logger.debug("getClsScore(), retrieve class scores for exam->" + eid + ", gid->" + gid);
     	UResp res = new UResp();
     	
-    	if (eid < 0 || gid < 0) {
+    	// if gid <=0 indicates retrieve scores for all grades
+    	if (eid < 0) {
     		logger.error("getClsScore(), parameter invalid");
     		res.setMessage("getClsScore(), parameter invalid");
     		return res;
@@ -200,6 +201,7 @@ public class ScoreController {
     		List<ScoreClass> scL= service.getClsScores(eid, gid);
     		res.setData(scL);
     		res.setRet(true);
+    		res.setMessage("getClsScore(), retrieve class score information succeeded.");
     	} catch (Exception e) {
     		logger.error("getClsScore(), failed with exception->" + e.getMessage());
     		resp.setStatus(500);
