@@ -421,15 +421,16 @@ public class ScoreServiceImpl implements ScoreService {
 	public List<ScoreClass> getClsScores(int eid, int gid) {
 		
 		List<ScoreSubjectCls> ssCl = scoM.getScoreSubCls(eid, gid);
-			
+		List<ScoreClass> scL = scoM.getScoreClass(eid, gid);
+		
 		// each time score for one grade calculated
-		if ((ssCl == null || ssCl.isEmpty()) && gid > 0) {
+		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty()) && gid > 0) {
 			calClsSubScore(eid, gid);
 		}
 		
 		ssCl = scoM.getScoreSubCls(eid, gid);
 		logger.debug("getClsScores(), class subject score->" + ssCl.toString());
-		List<ScoreClass> scL = scoM.getScoreClass(eid, gid);
+		scL = scoM.getScoreClass(eid, gid);
 		logger.debug("getClsScores(), class score->" + scL.toString());
 		
 		// need to assemble class score data

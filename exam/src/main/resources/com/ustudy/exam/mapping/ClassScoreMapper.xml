@@ -33,6 +33,7 @@
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.egsId}, #{item.aveScore}, #{item.rank})
 	    </foreach>
+	    on duplicate key update ave_score=#{item.aveScore}, rank=#{item.rank}
 	</insert>
 	
 	<select id="getScoreSubCls" resultMap="ScoreSubjectCls">
@@ -62,6 +63,7 @@
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.examId}, #{item.aveScore}, #{item.rank})
 	    </foreach>
+	    on duplicate key update ave_score=#{item.aveScore}, rank=#{item.rank}
 	</insert>
 	
 </mapper>

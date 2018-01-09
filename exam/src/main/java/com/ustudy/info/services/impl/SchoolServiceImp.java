@@ -151,9 +151,11 @@ public class SchoolServiceImp implements SchoolService {
 					cSub = new ArrayList<SubjectTeac>();
 				cls.setSubs(cSub);
 			}
-		} else
+		} else {
 			logger.debug("populateGrade(), no classes configured for grade " + gr.getId() + ":" + gr.getName());
-		
+			grclsL = new ArrayList<ClassInfo>();
+		}
+
 		logger.debug("populateGrade(), classes configured for " + gr.getName() + " as ->" + grclsL.toString());
 		gr.setcInfo(grclsL);
 		return true;
