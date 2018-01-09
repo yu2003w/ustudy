@@ -29,20 +29,6 @@ public class SubjectTeac implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectTeac(String sub, TeacherBrife planner) {
-		super();
-		this.sub = sub;
-		this.teac = planner;
-	}
-	
-	public SubjectTeac(String sub, String teacid, String teacname) {
-		super();
-		this.sub = sub;
-		this.teacid = teacid;
-		this.teacname = teacname;
-		this.teac = new TeacherBrife(teacid, teacname);
-	}
-	
 	public String getSub() {
 		return sub;
 	}
@@ -73,6 +59,10 @@ public class SubjectTeac implements Serializable {
 
 	public void setTeacname(String teacname) {
 		this.teacname = teacname;
+		if (teacname != null && this.teac == null) {
+			this.teac = new TeacherBrife(this.teacid, this.teacname);
+		}
+		
 	}
 
 	@Override

@@ -65,10 +65,8 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	private boolean populateOwner(School item, String orgT, String orgId) {
-		// for school owner and examination owner, information could be retrieved from 
-		// ustudy.orgowner
-		/*String sqlS = "select loginname, name, role from ustudy.orgowner where orgtype = ? and orgid = ?";
-		List<OwnerBrife> oL = schS.query(sqlS, new OwnerRowMapper(), orgT, orgId); */
+		// school owner and examination owner could be retrieved from ustudy.orgowner
+
 		List<OwnerBrife> oL = schM.getOrgOwners(orgT, orgId);
 		for (OwnerBrife e: oL) {
 			if (e.getRole().compareTo("校长") == 0) {
@@ -76,7 +74,7 @@ public class SchoolServiceImp implements SchoolService {
 			} else if (e.getRole().compareTo("考务老师") == 0) {
 				item.setExam(new TeacherBrife(e.getLoginname(), e.getName()));
 			} else {
-				logger.warn("populateOwner(), unsupported role" + e.toString());
+				logger.error("populateOwner(), unsupported role" + e.toString());
 				return false;
 			}			
 		}	
