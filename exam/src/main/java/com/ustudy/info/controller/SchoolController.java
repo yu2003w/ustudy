@@ -230,7 +230,7 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/class/{id}", method = RequestMethod.GET)
-	public ClassInfo getClassInfo(@PathVariable String id, HttpServletResponse resp) {
+	public ClassInfo getClassInfo(@PathVariable int id, HttpServletResponse resp) {
 		logger.debug("getClassInfo(), endpoint /school/class/" + id + " is visited.");
 		ClassInfo item = null;
 		String msg = null;

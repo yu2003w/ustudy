@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.ustudy.Item;
+import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
 import com.ustudy.info.model.OwnerBrife;
 import com.ustudy.info.model.School;
@@ -50,5 +51,27 @@ public interface SchoolMapper {
 	
 	@Select("select id, cls_name as name from ustudy.class where grade_id=#{gid}")
 	public List<Item> getGradeClass(@Param("gid") int grId);
+	
+	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
+			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
+			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
+			+ "where class.id = #{cid}")
+	public ClassInfo getClsInfoById(int cid);
+	
+	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
+			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
+			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
+			+ "where class.grade_id = #{gid}")
+	public List<ClassInfo> getClsInfoByGrId(int gid);
+	
+	@Select("select subject.name as sub, sub_owner as teacid, teacname from classsub "
+			+ "left join teacher on (classsub.sub_owner is not null and classsub.sub_owner = teacher.teacid) "
+			+ "join subject on classsub.sub_id = subject.id where classsub.cls_id = #{cid}")
+	public List<SubjectTeac> getClsSubs(int cid);
+
+	@Select("select subject.name as sub, sub_owner as teacid, teacname from gradesub "
+			+ "left join teacher on (gradesub.sub_owner is not null and gradesub.sub_owner = teacher.teacid) "
+			+ "join ustudy.subject on gradesub.sub_id = subject.id where grade_id = #{gid}")
+	public List<SubjectTeac> getGrSubs(int gid);
 	
 }

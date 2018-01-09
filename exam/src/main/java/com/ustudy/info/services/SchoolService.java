@@ -34,7 +34,7 @@ public interface SchoolService {
 	
 	public List<TeacherSub> getGradeTeac(String gradeId);
 	
-	public ClassInfo getClassInfo(String id);
+	public ClassInfo getClassInfo(int id);
 	
 	public int updateClassInfo(ClassInfo item);
 	

@@ -44,7 +44,7 @@ FOREIGN KEY (schid)
 
 create table if not exists ustudy.classsub (
 id INT NOT NULL AUTO_INCREMENT,
-sub_id int(11) DEFAULT NULL,
+sub_id int(11) NOT NULL,
 cls_id INT NOT NULL,
 sub_owner CHAR(11),
 PRIMARY KEY(id),

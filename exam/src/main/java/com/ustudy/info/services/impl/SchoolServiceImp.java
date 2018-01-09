@@ -29,17 +29,11 @@ import com.ustudy.info.model.SchGradeSub;
 import com.ustudy.info.model.TeacherBrife;
 import com.ustudy.info.model.TeacherSub;
 import com.ustudy.info.services.SchoolService;
-import com.ustudy.info.util.ClassInfoRowMapper;
 import com.ustudy.info.util.InfoUtil;
-import com.ustudy.info.util.SubjectTeacRowMapper;
 import com.ustudy.info.util.TeacherSubRowMapper;
 
 @Service
 public class SchoolServiceImp implements SchoolService {
-
-	private static final String SQL_GRADE_SUB = "select name as sub_name, sub_owner, teacname from gradesub "
-			+ "join teacher on gradesub.sub_owner = teacher.teacid join ustudy.subject on "
-			+ "ustudy.gradesub.sub_id = ustudy.subject.id where grade_id = ?";
 	
 	private static final Logger logger = LogManager.getLogger(SchoolServiceImp.class);
 	
@@ -56,8 +50,7 @@ public class SchoolServiceImp implements SchoolService {
 		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
 			throw new RuntimeException("getSchool(), it seemed user not logged in");
 		}
-		/*String sqlSch = "select * from ustudy.school where schid = ?";
-		School item = schS.queryForObject(sqlSch, new SchoolRowMapper(), orgId); */
+		
 		if (orgT.compareTo("学校") != 0) 
 			throw new RuntimeException("getSchool(), invalid org type->" + orgT);
 		School item = schM.getSchoolById(orgId);
@@ -91,10 +84,17 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	private List<SubjectLeader> populateDepartSub(String orgId, String dType) {
+		logger.debug("populateDepartSub(), populate department subject leaders for " +
+				dType + " in school -> " + orgId);
 		
 		List<SubjectTeac> soL = schM.getSubjectTeachers(orgId, dType);
 		
-		logger.debug("populateDepartSub(), " + soL.toString());
+		if (soL == null || soL.isEmpty()) {
+			logger.warn("populateDepartSub(), no subject teachers found for school->" + orgId + ", " + dType);
+		}
+		else
+			logger.debug("populateDepartSub(), subject teachers->" + soL.toString());
+		
 		ConcurrentHashMap<String, List<TeacherBrife>> ret = null;
 		if (soL != null && !soL.isEmpty()) {
 			ret = new ConcurrentHashMap<String, List<TeacherBrife>>();
@@ -111,34 +111,30 @@ public class SchoolServiceImp implements SchoolService {
 						ret.get(st.getSub()).add(st.getTeac());
 				}
 			}
+			logger.debug("populateDepartSub(), subject teachers->" + ret.toString());
 		}
-		logger.debug("populateDepartSub()," + ret.toString());
+		
 		List<SubjectLeader> lead = new ArrayList<SubjectLeader>();
 		if (ret != null && !ret.isEmpty())
-			ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v))); 
+			ret.forEach((k, v) -> lead.add(new SubjectLeader(k, v)));
 		
-		logger.debug("populateDepartSub(), populate department subject leaders for " +
-				dType + " in school -> " + orgId);
-		logger.debug("populateDepartSub()," + lead.toString());
+		logger.debug("populateDepartSub(), subject leader->" + lead.toString());
 		return lead;
 	}
 	
 	private boolean populateGrade(Grade gr) {
-		
-		String sqlCls = "select id, cls_name, cls_type, cls_owner from ustudy.class where grade_id = ?";
-		String sqlClsSub = "select name as sub_name, sub_owner from ustudy.classsub join ustudy.subject "
-				+ "on ustudy.subject.id = ustudy.classsub.sub_id where cls_id = ?";
 		
 		// populate <subject> + <prepare lesson teacher>
 		if (gr.getId() == null || gr.getId().isEmpty()) {
 			logger.warn("populateGrade(), grade id is not correct.");
 			return false;
 		}
-		List<SubjectTeac> grsubL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), gr.getId());
+		List<SubjectTeac> grsubL = schM.getGrSubs(Integer.valueOf(gr.getId()));
 		logger.debug("populateGrade(), grade subject ->" + grsubL.toString());
 		gr.setSubs(grsubL);
+		
 		// populate class information
-		List<ClassInfo> grclsL = schS.query(sqlCls, new ClassInfoRowMapper(), gr.getId());
+		List<ClassInfo> grclsL = schM.getClsInfoByGrId(Integer.valueOf(gr.getId()));
 		
 		if (grclsL != null && !grclsL.isEmpty()) {
 			logger.debug("populateGrade(), class info ->" + grclsL.toString());
@@ -146,7 +142,7 @@ public class SchoolServiceImp implements SchoolService {
 				if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
 					gr.setType(true);
 				}
-				List<SubjectTeac> cSub = schS.query(sqlClsSub, new SubjectTeacRowMapper(), cls.getId());
+				List<SubjectTeac> cSub = schM.getClsSubs(Integer.valueOf(cls.getId()));
 				if (cSub == null || cSub.isEmpty())
 					cSub = new ArrayList<SubjectTeac>();
 				cls.setSubs(cSub);
@@ -287,14 +283,7 @@ public class SchoolServiceImp implements SchoolService {
 		return cnt;
 	}
 
-	@Transactional
-	private List<SubjectTeac> getGradeSubs(String id) {
-		List<SubjectTeac> subL = schS.query(SQL_GRADE_SUB, new SubjectTeacRowMapper(), id);
-		return subL;
-	}
-
 	@Override
-	@Transactional
 	public List<TeacherSub> getGradeTeac(String id) {
 		String sqlGrTea = "select teacid, teacname from teacher where teacid in (select teac_id "
 				+ "from teachergrade join grade on grade.grade_name = teachergrade.grade_name where grade.id = ?)";
@@ -303,13 +292,17 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	@Override
-	@Transactional
-	public ClassInfo getClassInfo(String id) {
-		String sqlC = "select * from ustudy.class where id = ?";
-		ClassInfo info = schS.queryForObject(sqlC, new ClassInfoRowMapper(), id);
+	public ClassInfo getClassInfo(int id) {
+
+		ClassInfo info = schM.getClsInfoById(id);
 		
-		// need to populate class subjects information
-		info.setSubs(getClassSubs(id));
+		if (info != null) {
+			// need to populate class subjects information
+			info.setSubs(getClassSubs(id));
+		}
+		else {
+			logger.error("getClassInfo(), no class found for id->" + id);
+		}
 		return info;
 	}
 
@@ -323,11 +316,13 @@ public class SchoolServiceImp implements SchoolService {
 		return cnt;
 	}
 
-	private List<SubjectTeac> getClassSubs(String id) {
-		String sqlT = "select sub_name, sub_owner, teacname from classsub join teacher on "
-				+ "classsub.sub_owner = teacher.teacid where classsub.cls_id = ?";
-		List<SubjectTeac> stL = schS.query(sqlT, new SubjectTeacRowMapper(), id);
+	private List<SubjectTeac> getClassSubs(int id) {
 		
+		List<SubjectTeac> stL = schM.getClsSubs(id);
+		
+		if (stL == null || stL.isEmpty()) {
+			logger.warn("getClassSubs(), no subjects set for class ->" + id);
+		}
 		return stL;
 	}
 	
