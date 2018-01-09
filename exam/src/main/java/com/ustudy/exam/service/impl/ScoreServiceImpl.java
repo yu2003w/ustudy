@@ -425,7 +425,8 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		// each time score for one grade calculated
 		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty()) && gid > 0) {
-			calClsSubScore(eid, gid);
+			if (!calClsSubScore(eid, gid))
+				return new ArrayList<ScoreClass>();
 		}
 		
 		ssCl = scoM.getScoreSubCls(eid, gid);
@@ -495,15 +496,15 @@ public class ScoreServiceImpl implements ScoreService {
 	}
 
 	@Transactional
-	private void calClsSubScore(int eid, int gid) {
+	private boolean calClsSubScore(int eid, int gid) {
 		
 		logger.info("calClsSubScore(), to calculate class subject score for eid->" + eid + ", gid->" + gid);
 		
 		List<ScoreSubjectCls> ssCl = scoM.calScoreSubCls(eid, gid);
 		if (ssCl == null || ssCl.isEmpty()) {
-			logger.error("calClsSubScore(), failed to calculate class subject score for eid->" + eid + 
+			logger.warn("calClsSubScore(), failed to calculate class subject score for eid->" + eid + 
 					", gid->" + gid);
-			throw new RuntimeException("calClsSubScore(), failed to calculate class subject score");
+			return false;
 		}
 		
 		logger.debug("calClsSubScore(), before set rank for class subject->" + ssCl.toString());
@@ -550,6 +551,8 @@ public class ScoreServiceImpl implements ScoreService {
 			throw new RuntimeException("getClsScores(), save class score failed");
 		}
 		logger.info("calClsSubScore(), class score saved with ret->" + ret);
+		
+		return true;
 	}
 	
 }
