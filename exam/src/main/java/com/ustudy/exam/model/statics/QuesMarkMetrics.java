@@ -2,6 +2,8 @@ package com.ustudy.exam.model.statics;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class QuesMarkMetrics implements Serializable {
 
 	/**
@@ -14,6 +16,11 @@ public class QuesMarkMetrics implements Serializable {
 	private int endno = 0;
 	private int total = 0;
 	private int marked = 0;
+	
+	private String markStyle = null;
+	
+	@JsonProperty("teacherList")
+	private String teaL = null;
 	
 	public QuesMarkMetrics() {
 		super();
@@ -60,10 +67,26 @@ public class QuesMarkMetrics implements Serializable {
 		this.endno = endno;
 	}
 
+	public String getMarkStyle() {
+		return markStyle;
+	}
+
+	public void setMarkStyle(String markStyle) {
+		this.markStyle = markStyle;
+	}
+
+	public String getTeaL() {
+		return teaL;
+	}
+
+	public void setTeaL(String teaL) {
+		this.teaL = teaL;
+	}
+
 	@Override
 	public String toString() {
 		return "QuesMarkMetrics [quesid=" + quesid + ", startno=" + startno + ", endno=" + endno + ", total=" + total
-				+ ", marked=" + marked + "]";
+				+ ", marked=" + marked + ", markStyle=" + markStyle + ", teaL=" + teaL + "]";
 	}
 
 }
