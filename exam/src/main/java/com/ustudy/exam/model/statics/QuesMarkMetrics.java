@@ -10,6 +10,8 @@ public class QuesMarkMetrics implements Serializable {
 	private static final long serialVersionUID = 2350384160946919211L;
 	
 	private int quesid = 0;
+	private int startno = 0;
+	private int endno = 0;
 	private int total = 0;
 	private int marked = 0;
 	
@@ -42,9 +44,26 @@ public class QuesMarkMetrics implements Serializable {
 		this.marked = marked;
 	}
 
+	public int getStartno() {
+		return startno;
+	}
+
+	public void setStartno(int startno) {
+		this.startno = startno;
+	}
+
+	public int getEndno() {
+		return endno;
+	}
+
+	public void setEndno(int endno) {
+		this.endno = endno;
+	}
+
 	@Override
 	public String toString() {
-		return "QuesMetrics [quesid=" + quesid + ", total=" + total + ", marked=" + marked + "]";
+		return "QuesMarkMetrics [quesid=" + quesid + ", startno=" + startno + ", endno=" + endno + ", total=" + total
+				+ ", marked=" + marked + "]";
 	}
 
 }
