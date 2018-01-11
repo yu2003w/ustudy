@@ -24,11 +24,14 @@ public interface MarkProgressMapper {
 			+ "where examschool.schid = #{sid} and examgradesub.status != '2' order by gradeId")
 	public List<EgsMeta> getExamMetaInfo(String sid);
 	
-	@Select("select question.id as quesid, startno, endno "
-			+ "(select count(*) from examinee where examinee.paper_status != '1' and examinee.examid = #{eid}) * "
+	@Select("select question.id as quesid, startno, endno, mark_mode as markStyle, "
+			+ "group_concat(teacher.teacname, '-', teacher.teacid) as teacherName, "
+			+ "(select count(*) from examinee where examinee.paper_status != '1' and examinee.examid = 1) * "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 1, 2)) as total, "
 			+ "(select count(*) from ustudy.answer where isviewed=1 and answer.quesid = question.id) as marked "
-			+ "from question where exam_grade_sub_id = #{egsid}")
+			+ "from question join marktask on marktask.quesid = question.id "
+			+ "join teacher on marktask.teacid = teacher.teacid "
+			+ "where exam_grade_sub_id = 1 group by question.id")
 	public List<QuesMarkMetrics> getQuesMarkMetricsByEgsId(@Param("eid") int eid, @Param("egsid") int egsid);
 	
 }
