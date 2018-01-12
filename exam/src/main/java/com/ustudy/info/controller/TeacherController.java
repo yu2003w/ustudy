@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.ustudy.UResp;
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.services.TeacherService;
+import com.ustudy.info.util.InfoUtil;
 
 /**
  * @author jared
@@ -56,7 +59,7 @@ public class TeacherController {
 		Teacher item = null;
 		String msg = null;
 		try {
-			item = teaS.displayItem(id);
+			item = teaS.displayTeacher(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
 			logger.warn("displayItem(), " + ie.getLocalizedMessage());
 			msg = "No item found for specified id " + id;
@@ -74,12 +77,39 @@ public class TeacherController {
 		return item;
 	}
 	
+	@RequestMapping(value = "/prop/", method = RequestMethod.GET)
+	public UResp getTeaProperty(HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		logger.debug("getTeaProperty(), /info/teacher/prop/ visited");
+		
+		String tid = InfoUtil.retrieveSessAttr("uid");
+		if (tid == null || tid.isEmpty()) {
+			res.setMessage("getTeaProperty(), maybe user did not log in");
+			resp.setStatus(500);
+			return res;
+		}
+		
+		try {
+			TeaProperty tp = teaS.getTeaProperty(tid);
+			res.setData(tp);
+			res.setMessage("retrieved property successfully for " + tid);
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.warn("getTeaProperty(), retrieve teacher property failed with->" + e.getMessage());
+			res.setMessage("getTeaPropery(), retrieve teacher property failed");
+			resp.setStatus(500);
+		}
+		
+		return res;
+	}
+	
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
 	public String delete(@PathVariable int id, HttpServletResponse resp) {
 		logger.debug("endpoint /teacher/delete/" + id + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = teaS.deleteItem(id);
+			int numOfRows = teaS.deleteTeacher(id);
 			if (numOfRows != 1)
 				throw new RuntimeException("Number of affected rows is " + numOfRows);
 			else
@@ -103,7 +133,7 @@ public class TeacherController {
 		logger.debug("endpoint /teacher/delete is visited.");
 		String result = null;
 		try {
-			int num = teaS.delItemSet(data);
+			int num = teaS.delTeas(data);
 			if (num < 1)
 				throw new RuntimeException("Number of deleted items is " + num);
 			else {
@@ -119,39 +149,55 @@ public class TeacherController {
 	}
 	
 	@RequestMapping(value="/add", method = RequestMethod.POST)
-	public String createItem(@RequestBody @Valid Teacher item, HttpServletResponse resp, UriComponentsBuilder builder) {
-		logger.debug("endpoint /teacher/add is visited.");
-		String result = null;
+	public UResp createTeacher(@RequestBody @Valid List<Teacher> item, HttpServletResponse resp, UriComponentsBuilder builder) {
+		
+		logger.debug("createTeacher(), endpoint /teacher/add is visited.");
+		
+		UResp res = new UResp();
+		
+		if (item == null || item.isEmpty()) {
+			logger.info("createTeacher(), input parameter is empty");
+			resp.setStatus(422);
+			res.setMessage("submitted data is empty");
+			return res;
+		}
+		
 		try {
 			// Before create item, need to check whether corresponding orgId is valid.
-		    int index = teaS.createItem(item);
-		    logger.debug("createItem(), item created successfully with id " + index);
-		    //set header location
-		    resp.setHeader("Location", 
-		    	builder.path("/teacher/view/{index}").buildAndExpand(index).toString());
-		    result = "create item successfully";
+		    int ret = teaS.createTeacher(item);
+		    if (item.size() == 1) {
+		    	logger.debug("createTeacher(), item created successfully with id " + ret);
+			    
+			    // for single insert, need to set header location
+			    resp.setHeader("Location", 
+			    	builder.path("/teacher/view/{index}").buildAndExpand(ret).toString());
+			    res.setMessage("create item successfully");
+		    }
+		    else {
+		    	//batch operation
+		    	logger.info("createTeacher(), " + ret + " teacher loaded.");
+		    	res.setMessage(ret + " teachers loaded successfully");
+		    }
+		    res.setRet(true);
+		    
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			result = "create item failed";
+			logger.warn("createTeacher(), operation failed with->" + e.getMessage());
+			res.setMessage("createTeacher(), create item failed");
 			resp.setStatus(500);
 		}
 		
-		return result;
+		return res;
 	}
 	
 	@RequestMapping(value="/update", method = RequestMethod.POST)
-	public String updateItem(@RequestBody @Valid Teacher data, HttpServletResponse resp) {
-		logger.debug("endpoint /teacher/update" + data.getId() + " is visited.");
+	public String updateTeacher(@RequestBody @Valid Teacher data, HttpServletResponse resp) {
+		logger.debug("updateTeacher(), endpoint /teacher/update " + data.getId() + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = teaS.updateItem(data, Integer.parseInt(data.getId()));
-			if (numOfRows == 1)
-				logger.debug("updateItem(), update item successfully");
-			else {
-				String msg = numOfRows + " items are updated, maybe something goes wrong";
-				logger.warn(msg);
-				throw new RuntimeException(msg);
-			}
+			teaS.updateTeacher(data, data.getId());
+			
+			logger.debug("updateTeacher(), update item successfully");
+			
 			result = "update item successfully";
 		} catch (Exception e) {
 			logger.warn(e.getMessage());

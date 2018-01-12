@@ -1,3 +1,0 @@
-id,student_exam_num,student_number,exam_id,grade_id,sub_id,exam_grade_sub_id,batch_num,paper_img,paper_status,error_status
-null,A10001,S10001,1,1,1,1,1,/ustudy/exam/a10001.img,0,null
-null,A10002,S10002,1,1,1,1,1,/ustudy/exam/a10002.img,0,null

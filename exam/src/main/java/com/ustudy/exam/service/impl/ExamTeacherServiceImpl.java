@@ -1,7 +1,12 @@
 package com.ustudy.exam.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +17,8 @@ import com.ustudy.exam.utility.ExamUtil;
 
 @Service
 public class ExamTeacherServiceImpl implements TeacherService {
+	
+	private static final Logger logger = LogManager.getLogger(ExamTeacherServiceImpl.class);
 
 	@Autowired
 	private TeacherMapper userM;
@@ -25,8 +32,14 @@ public class ExamTeacherServiceImpl implements TeacherService {
 
 	@Override
 	public List<String> getRolesById(String id) {
-		List<String> r = userM.getRolesById(id);
-		return r;
+		List<String> rL = userM.getRolesById(id);
+		
+		List<String> cL = new ArrayList<String>();
+		for (String r: rL) {
+			cL.add(ExamUtil.getRolemapping().get(r));
+		}
+		
+		return cL;
 	}
 
 	@Override
@@ -40,7 +53,10 @@ public class ExamTeacherServiceImpl implements TeacherService {
 		
 		String r = null;
 
-		if (rL.contains("org_owner")) {
+		if (rL.contains("cleaner")) {
+			r = "cleaner";
+		}
+		else if (rL.contains("org_owner")) {
 			r = "org_owner";
 		} else if (rL.contains("leader")) {
 			r = "leader";
@@ -52,10 +68,21 @@ public class ExamTeacherServiceImpl implements TeacherService {
 			r = "pleader";
 		} else if (rL.contains("cteacher")) {
 			r = "cteacher";
-		} else
+		} 
+		else
 			r = "teacher";
 
 		return ExamUtil.getRolemapping().get(r);
+	}
+
+	@Override
+	public void setLLTime(String tid) {
+		int ret = userM.setLLTime(tid, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		if (ret != 1) {
+			logger.error("setLLTime(), failed to set lltime for " + tid);
+			throw new RuntimeException("setLLTime(), failed to set lltime for " + tid);
+		}
+
 	}
 
 }

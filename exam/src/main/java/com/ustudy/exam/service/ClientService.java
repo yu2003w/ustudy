@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
 
@@ -12,13 +13,13 @@ import net.sf.json.JSONArray;
 
 public interface ClientService {
 	
-	Map<String, Object> login(String token);
+	UResp login(String token);
 
-	boolean saveTemplates(Long csId, String data) throws Exception;
+	boolean saveTemplates(Long egsId, String data) throws Exception;
 	
 	Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId);
 	
-	Map<String, String> getTemplateById(Long csId);
+	Map<String, String> getTemplateById(Long egsId);
 	
 	JSONArray getExamSubjects(Long examId, Long gradeId);
 	

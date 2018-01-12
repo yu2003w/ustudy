@@ -16,6 +16,12 @@ public interface ExamSubjectService {
 	
 	ExamSubject getExamSubject(Long id);
 	
+	List<ExamSubject> getLastExamSubjects();
+	
+	boolean updateExamSubjectStatus(Long egsId, Boolean release);
+	
+	boolean updateExamSubjectStatus(Long examId, Long gradeId, Long subjectId, Boolean release);
+	
 	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
 	boolean saveBlankQuestionsPaper(Long id, String fileName);

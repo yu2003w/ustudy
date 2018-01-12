@@ -13,6 +13,9 @@ public class Subject implements Serializable {
 	
 	@JsonProperty("subject")
 	private String courseName = null;
+	
+    @JsonProperty("id")
+	private String subId = null;
 
 	
 	public Subject() {
@@ -20,10 +23,10 @@ public class Subject implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	
-	public Subject(String courseName) {
+	public Subject(String courseName, String subId) {
 		super();
 		this.courseName = courseName;
+		this.subId = subId;
 	}
 
 
@@ -35,10 +38,17 @@ public class Subject implements Serializable {
 		this.courseName = courseName;
 	}
 
+	public String getSubId() {
+		return subId;
+	}
+
+	public void setSubId(String subId) {
+		this.subId = subId;
+	}
 
 	@Override
 	public String toString() {
-		return "Subject [subject = " + courseName + "]";
+		return "Subject [courseName=" + courseName + ", subId=" + subId + "]";
 	}
 
 	

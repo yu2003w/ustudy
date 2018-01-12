@@ -1,6 +1,7 @@
 package com.ustudy.exam.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
@@ -26,10 +27,22 @@ public interface ExamSubjectDao {
 	
 	void saveBlankQuestionsPaper(@Param("id")Long id, @Param("fileName") String fileName);
 
-	void saveOriginalData(@Param("id")Long id, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
+	void saveOriginalData(@Param("id")Long id, @Param("answerPaper")String answerPaper, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
 	void isAanswerSeted(Long id);
 	
 	void isTaskDispatch(Long id);
+    
+	void updateExamSubjectStatusById(@Param("egsId")Long egsId, @Param("release")Boolean release);
+    
+	void updateExamSubjectStatus(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("release")Boolean release);
+	
+	List<Map<String, Object>> getExamSubjectObjScores(Long egsId);
+	
+	List<Map<String, Object>> getExamSubjectSubjScores(Long egsId);
+	
+	List<Map<String, Object>> getExamSubjectMarkMode(Long egsId);
+	
+	long isExamAllSubjectPublished(Long examId);
 	
 }

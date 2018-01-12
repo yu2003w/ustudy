@@ -70,7 +70,7 @@ public class LoginController {
 		}
 
 		if (status) {
-			logger.debug("user [" + currentUser.getPrincipal() + "] logged in successfully");
+			logger.info("user [" + currentUser.getPrincipal() + "] logged in successfully");
 			
 			// need to populate current user's orgtype, orgid information
 			try {
@@ -80,6 +80,8 @@ public class LoginController {
 					ses.setAttribute("uname", tea.getUname());
 					ses.setAttribute("orgType", tea.getOrgtype());
 					ses.setAttribute("orgId", tea.getOrgid());
+					ses.setAttribute("role", userS.findPriRoleById(tea.getUid()));
+					ses.setAttribute("uid", currentUser.getPrincipal().toString());
 				} else {
 					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
 					response.setStatus(404);
@@ -110,6 +112,11 @@ public class LoginController {
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
 
 		Subject currentUser = SecurityUtils.getSubject();
+		if (currentUser == null || currentUser.getPrincipal() == null) {
+			logger.info("logout(), no user logged in. Perhaps that server restarted.");
+			return;
+		}
+
 		logger.info("user " + currentUser.getPrincipal().toString() + " logged out");
 
 		currentUser.logout();
@@ -144,7 +151,7 @@ public class LoginController {
 			// u.setRoles(userS.getRolesById(uId));
 			// only retrieve highest priority role for the logined user */
 			
-			u = new TeacRole(uId, userS.findPriRoleById(uId), ses.getAttribute("orgType").toString(), 
+			u = new TeacRole(uId, ses.getAttribute("role").toString(), ses.getAttribute("orgType").toString(), 
 					ses.getAttribute("orgId").toString());
 			logger.debug("getLoginUser(), " + u.toString());
 			return u;

@@ -22,11 +22,37 @@
 	</select>
 	
 	<select id="getTeachersBySchoolInGradeName" parameterType="java.util.Map" resultMap="TeacherResultWithGroups">
-		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR} and t.teacid in (SELECT tg.teac_id from teachergrade tg where tg.grade_name=#{gradeName,jdbcType=VARCHAR}); 
+		select t.teacid,t.teacname from teacher t where t.orgid=#{schoolId,jdbcType=VARCHAR} and t.teacid in (SELECT tg.teac_id from teachergrade tg left join grade g on tg.grade_id=g.id where g.grade_name=#{gradeName,jdbcType=VARCHAR});
 	</select>
 
 	<select id="getSubjectsOfTeacher" parameterType="java.util.Map" resultType="string">
-		select sub_name from teachersub WHERE teac_id = #{teacid}
+		select s.name from teachersub ts left join subject s on ts.sub_id=s.id WHERE teac_id = #{teacid}
 	</select>
-
+	
+	<select id="getGradeNotaskTeachers" parameterType="long" resultType="java.util.Map">
+		SELECT t.id,t.teacid,t.teacname FROM teacher t LEFT JOIN teachergrade tg ON t.teacid = tg.teac_id
+		WHERE tg.grade_id = #{gradeId} AND t.teacid NOT IN (SELECT m.teacid FROM marktask m WHERE m.teacid IN (
+		SELECT t.id FROM teacher t LEFT JOIN teachergrade tg ON t.teacid = tg.teac_id WHERE tg.grade_id = #{gradeId}))
+	</select>
+	
+	<select id="getSchoolTeachers" parameterType="string" resultType="java.util.Map">
+		select grade.id gradeId, grade.grade_name gradeName, subject.id subId, subject.name subName, 
+		teachergrade.teac_id teacId,teacher.teacName from teachergrade 
+		JOIN teacher on teacher.teacid=teachergrade.teac_id
+		join grade on grade.id=teachergrade.grade_id 
+		join teachersub on teachersub.teac_id = teachergrade.teac_id 
+		join subject on subject.id = teachersub.sub_id
+		where schid=#{schId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getSchoolOwner" parameterType="string" resultType="java.util.Map">
+		SELECT t.teacid,t.teacname from teacherroles tr LEFT JOIN teacher t ON tr.teac_id=t.teacid 
+		where tr.role_id=1 AND t.orgid=#{schId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getSchoolLeader" parameterType="string" resultType="java.util.Map">
+		SELECT t.teacid,t.teacname from teacherroles tr LEFT JOIN teacher t ON tr.teac_id=t.teacid 
+		where tr.role_id=2 AND t.orgid=#{schId,jdbcType=VARCHAR}
+	</select>
+	
 </mapper>

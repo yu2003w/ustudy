@@ -48,3 +48,4 @@ null,infoschool:view,teacher
 null,teacher:view,teacher
 null,student:view,teacher
 null,marktask:view,teacher
+null,excemark:process,cleaner

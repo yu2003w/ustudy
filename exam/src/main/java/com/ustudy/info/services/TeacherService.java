@@ -2,26 +2,31 @@ package com.ustudy.info.services;
 
 import java.util.List;
 
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 
 public interface TeacherService {
 	
 	public List<Teacher> getList(int id);
 	
-	public Teacher displayItem(int id);
+	public Teacher displayTeacher(int id);
 	
-	public int createItem(Teacher item);
+	public TeaProperty getTeaProperty(String tid);
 	
-	public int updateItem(Teacher item, int id);
+	public int createTeacher(List<Teacher> item);
 	
-	public int delItemSet(String ids);
+	public void updateTeacher(Teacher item, int id);
 	
-	public int deleteItem(int id);
+	public int delTeas(String ids);
+	
+	public int deleteTeacher(int id);
 
 	public Teacher findTeacherById(String teaid);
 	
 	public boolean updateLLTime(String teaid);
 	
 	public String findPriRoleById(String teaid);
+
+	public void setLLTime(String tid);
 
 }

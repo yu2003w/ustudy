@@ -11,14 +11,42 @@
         <result property="answerHas" column="answerHas"/>
     </resultMap>
 
-	<!-- 查询得到全部Exam对象 -->
 	<insert id="insertStudentObjectAnswer" parameterType="com.ustudy.exam.model.StudentObjectAnswer">
-		INSERT INTO stuobjanswer (paperid, quesno, score, answer, answerHas)  
+		INSERT INTO obj_answer (paperid, quesno, score, answer, answerHas)  
         VALUES (#{paperid}, #{quesno}, #{score}, #{answer,jdbcType=VARCHAR}, #{answerHas})
+        on duplicate key update score=VALUES(score),answer=VALUES(answer),answerHas=VALUES(answerHas)
+	</insert>
+	
+	<insert id="insertStudentObjectAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		INSERT INTO obj_answer (paperid, quesno, score, answer, answerHas) values
+		<foreach collection="list" item="item" index="index" separator="," >
+	        (#{item.paperid}, #{item.quesno}, #{item.score}, #{item.answer,jdbcType=VARCHAR}, #{item.answerHas})
+		</foreach>
+		on duplicate key update 
+			score=VALUES(score),
+			answer=VALUES(answer),
+			answerHas=VALUES(answerHas),
+		    id=LAST_INSERT_ID(id)
 	</insert>
 	
 	<delete id="deleteStudentObjectAnswers" parameterType="java.util.Map">
-		DELETE from stuobjanswer where paperid in (SELECT id from stupaper WHERE exam_grade_sub_id=#{csId} and batch_num=#{batchNum});
+		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and batch_num=#{batchNum})
+	</delete>
+	
+	<select id="getQuestionAnswer" parameterType="java.util.Map" resultMap="StudentObjectAnswerResult">
+		SELECT a.* from obj_answer a LEFT JOIN paper p ON a.paperid=p.id where p.exam_grade_sub_id=#{egsId} and a.quesno=#{quesno}
+	</select>
+	
+	<select id="getQuestionsAnswer" parameterType="Long" resultMap="StudentObjectAnswerResult">
+		SELECT a.* from obj_answer a LEFT JOIN paper p ON a.paperid=p.id where p.exam_grade_sub_id=#{egsId} limit 1
+	</select>
+	
+	<update id="updateStudentObjectAnswer" parameterType="java.util.Map">
+		UPDATE obj_answer SET score=#{score} where id=#{id}
+	</update>
+	
+	<delete id="deleteOneStudentObjectAnswers" parameterType="java.util.Map">
+		DELETE from obj_answer where paperid in (SELECT id from paper WHERE exam_grade_sub_id=#{egsId} and exam_code=#{examCode})
 	</delete>
 
 </mapper>

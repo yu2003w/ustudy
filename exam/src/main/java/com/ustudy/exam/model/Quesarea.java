@@ -21,7 +21,6 @@ public class Quesarea implements Serializable {
 	private int startQuestionNo ;
 	private int endQuestionNo ;
 	private Long quesid ;
-	private String answer ;
 	
 	public Quesarea(){}
 	
@@ -138,14 +137,6 @@ public class Quesarea implements Serializable {
 		this.right = right;
 	}
 	
-	public String getAnswer() {
-		return answer;
-	}
-	
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
-	
 	public String getQuestionType() {
 		return questionType;
 	}
@@ -169,5 +160,14 @@ public class Quesarea implements Serializable {
 	public void setEndQuestionNo(int endQuestionNo) {
 		this.endQuestionNo = endQuestionNo;
 	}
+
+	@Override
+	public String toString() {
+		return "Quesarea [id=" + id + ", egsId=" + egsId + ", pageno=" + pageno + ", fileName=" + fileName + ", areaId="
+				+ areaId + ", posx=" + posx + ", posy=" + posy + ", width=" + width + ", height=" + height + ", bottom="
+				+ bottom + ", right=" + right + ", questionType=" + questionType + ", startQuestionNo="
+				+ startQuestionNo + ", endQuestionNo=" + endQuestionNo + ", quesid=" + quesid + "]";
+	}
+	
 	
 }

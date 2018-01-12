@@ -15,12 +15,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.Item;
+import com.ustudy.UResp;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
+import com.ustudy.info.model.GradeSubRoles;
 import com.ustudy.info.model.School;
 import com.ustudy.info.model.SubjectLeader;
+import com.ustudy.info.model.SchGradeSub;
 import com.ustudy.info.model.TeacherSub;
 import com.ustudy.info.services.SchoolService;
+import com.ustudy.info.util.InfoUtil;
 
 @RestController
 @RequestMapping("info/school/")
@@ -155,6 +160,26 @@ public class SchoolController {
 		return item;
 	}
 	
+	@RequestMapping(value = "/grade/{id}/clslist/", method = RequestMethod.GET) 
+	public UResp getGradeClasses(@PathVariable int id, HttpServletResponse resp) {
+		
+		logger.debug("getGradeClasses(), retrieve class list for grade " + id);
+		List<Item> clsL = null;
+		UResp res = new UResp();
+		try {
+			clsL = schS.getGrClsList(id);
+			res.setData(clsL);
+			res.setRet(true);
+			logger.debug("getGradeClasses(), class in grade " + id + " ->" + clsL.toString());
+		}catch (Exception e) {
+			logger.error("getGradeClasses(), retrieve class list failed for grade " + id + ", " + e.toString());
+			resp.setStatus(500);
+			res.setMessage("getGradeClasses(), retrieve class list failed for grade " + id);
+		}
+		
+		return res;
+	}
+	
 	@RequestMapping(value = "/grade/update/", method = RequestMethod.POST)
 	public String updateGrade(@RequestBody @Valid Grade g, HttpServletResponse resp) {
 		logger.debug("endpoint /grade/update is to update " + g.getId());
@@ -205,7 +230,7 @@ public class SchoolController {
 	}
 	
 	@RequestMapping(value = "/class/{id}", method = RequestMethod.GET)
-	public ClassInfo getClassInfo(@PathVariable String id, HttpServletResponse resp) {
+	public ClassInfo getClassInfo(@PathVariable int id, HttpServletResponse resp) {
 		logger.debug("getClassInfo(), endpoint /school/class/" + id + " is visited.");
 		ClassInfo item = null;
 		String msg = null;
@@ -278,4 +303,46 @@ public class SchoolController {
 		}
 		return itemL;
 	}
+	
+	@RequestMapping(value="gsr/", method = RequestMethod.GET)
+	public UResp getGradeSubRole(HttpServletResponse resp) {
+		
+		UResp res = new UResp();
+
+		if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+			String schId = InfoUtil.retrieveSessAttr("orgId");
+			GradeSubRoles gsr = schS.getGrSubRoles(schId);
+			res.setData(gsr);
+			res.setRet(true);
+			logger.debug("getGradeSubRole(), populate GradeSubRoles successful for school->" + schId);
+		}
+		else {
+			logger.error("getGradeSubRole(), invalid org type found, not supported user yet");
+			res.setMessage("Not supported user");
+			resp.setStatus(500);
+		}
+		return res;
+	}
+	
+	@RequestMapping(value="gs/", method = RequestMethod.GET)
+	public UResp getGradeSubs(HttpServletResponse resp) {
+		
+		UResp res = new UResp();
+
+		if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+			String schId = InfoUtil.retrieveSessAttr("orgId");
+			List<SchGradeSub> gsr = schS.getGrSubs(schId);
+			res.setData(gsr);
+			res.setRet(true);
+			logger.debug("getGradeSubRole(), populate GradeSubRoles successful for school->" + schId);
+		}
+		else {
+			logger.warn("getGradeSubRole(), invalid org type found, not supported user yet");
+			res.setMessage("Not supported user");
+			resp.setStatus(500);
+			return res;
+		}
+		return res;
+	}
+	
 }

@@ -13,13 +13,13 @@
         <result property="stuNum" column="stu_num"/>
         <result property="teacNum" column="teac_num"/>
         <result property="examPaper" column="exam_paper"/>
-        <result property="examAnswer" column="exam_answer"/>
+        <result property="examAnswer" column="status"/>
         <result property="examPaperNum" column="exam_paper_num"/>
-        <result property="template" column="template"/>
+        <result property="template" column="temp_upload"/>
         <result property="objItemNum" column="obj_item_num"/>
         <result property="subItemNum" column="sub_item_num"/>
         <result property="taskDispatch" column="task_dispatch"/>
-        <result property="answerSeted" column="answer_seted"/>
+        <result property="answerSeted" column="answer_set"/>
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
@@ -30,7 +30,7 @@
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT egs.* FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where 1=1
+		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
 		<if test="subjectId !=null and subjectId > 0">
 		 AND egs.sub_id=#{subjectId}
 		</if>
@@ -50,31 +50,39 @@
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamId" parameterType="Long" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId}
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubjectByExamIdAndGradeId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId}
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId}
 	</select>
 
 	<select id="getExamSubjectStatus" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} AND grade_id=#{gradeId} AND exam_answer=#{markingStatus}
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId} AND egs.status = #{markingStatus}
 		<choose>
 			<when test="templateStatus !=null and templateStatus != '-1'">
-			 AND template=#{templateStatus}
+			 AND egs.temp_upload=#{templateStatus}
 			</when>
 		</choose>
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectByExamIdAndGradeIdAndSubjectId" parameterType="java.util.Map" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId}
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.examid = #{examId}
+		 AND egs.grade_id = #{gradeId} AND egs.sub_id = #{subjectId}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getExamSubjectById" parameterType="Long" resultMap="ExamSubjectResult">
-		SELECT * FROM examgradesub where id=#{id}
+		SELECT egs.*, e.exam_name, g.grade_name, s.name AS sub_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id
+		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s ON egs.sub_id = s.id WHERE egs.id = #{id}
 	</select>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
@@ -89,15 +97,55 @@
 
 	<!-- 保存原始模板信息-->
 	<update id="saveOriginalData" parameterType="java.util.Map">
-		UPDATE examgradesub SET template=1, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
+		UPDATE examgradesub SET temp_upload=1, blank_answer_paper=#{answerPaper}, original_data=#{originalData}, xml_server_path=#{xmlServerPath,jdbcType=VARCHAR} where id=#{id}
 	</update>
 	
 	<update id="isAanswerSeted" parameterType="Long">
-		UPDATE examgradesub SET answer_seted=1 where id=#{id}
+		UPDATE examgradesub SET answer_set=1 where id=#{id}
 	</update>
 	
 	<update id="isTaskDispatch" parameterType="Long">
 		UPDATE examgradesub SET task_dispatch=1 where id=#{id}
 	</update>
+	
+	<update id="updateExamSubjectStatusById" parameterType="java.util.Map">
+		<if test="release !=null and release == true">
+			UPDATE examgradesub SET status='2'
+		</if>
+		<if test="release !=null and release == false">
+			UPDATE examgradesub SET status='1'
+		</if>
+		where id=#{egsId}
+	</update>
+	
+	<update id="updateExamSubjectStatus" parameterType="java.util.Map">
+		<if test="release !=null and release == true">
+			UPDATE examgradesub SET status=2 
+		</if>
+		<if test="release !=null and release == false">
+			UPDATE examgradesub SET status=1 
+		</if>
+		WHERE examid=#{examId} AND grade_id=#{gradeId} AND sub_id=#{subjectId}
+	</update>
+	
+	<select id="getExamSubjectObjScores" parameterType="Long" resultType="java.util.Map">
+		SELECT SUM(oa.score) objScore,e.id FROM obj_answer oa 
+		LEFT JOIN paper p on oa.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
+		WHERE p.exam_grade_sub_id=#{egsId} GROUP BY e.id
+	</select>
+	
+	<select id="getExamSubjectSubjScores" parameterType="Long" resultType="java.util.Map">
+		SELECT e.id,a.quesid,a.isviewed,a.isfinal,a.score from answer a
+		LEFT JOIN paper p on a.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
+		WHERE p.exam_grade_sub_id=#{egsId} ORDER BY e.id,a.quesid
+	</select>
+	
+	<select id="getExamSubjectMarkMode" parameterType="Long" resultType="java.util.Map">
+		SELECT id,mark_mode AS markMode from question where exam_grade_sub_id=#{egsId}
+	</select>
+	
+	<select id="isExamAllSubjectPublished" parameterType="Long" resultType="Long">
+		SELECT COUNT(1) from examgradesub where examid=#{examId} AND status &lt;&gt; '2';
+	</select>
 
 </mapper>

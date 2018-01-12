@@ -1,5 +1,8 @@
 package com.ustudy.exam.service;
 
+import java.util.List;
+import java.util.Map;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -12,5 +15,9 @@ public interface TaskAllocationService {
 	JSONObject getSchool(String schoolId) throws Exception;
 	
 	JSONObject getGrade(Long gradeId) throws Exception;
+	
+	List<Map<String, Object>> getGradeNotaskTeachers(Long gradeId) throws Exception;
+	
+	JSONArray getSchoolTeachers() throws Exception;
 	
 }

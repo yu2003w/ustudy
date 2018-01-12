@@ -21,22 +21,22 @@ public class SingleAnswer implements Serializable {
 	// question number for single question
 	@JsonProperty("name")
 	private String quesno = null;
-	private int fullscore = 0;
-	private int score = 0;
+	private String fullscore = "";
+	private String score = "";
 	
 	public SingleAnswer() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public SingleAnswer(String qno, int fullscore, int score) {
+	public SingleAnswer(String qno, String fullscore, String score) {
 		super();
 		this.quesno = qno;
 		this.fullscore = fullscore;
 		this.score = score;
 	}
 
-	public SingleAnswer(String quesno, int fullscore) {
+	public SingleAnswer(String quesno, String fullscore) {
 		super();
 		this.quesno = quesno;
 		this.fullscore = fullscore;
@@ -50,19 +50,19 @@ public class SingleAnswer implements Serializable {
 		this.quesno = quesno;
 	}
 
-	public int getFullscore() {
+	public String getFullscore() {
 		return fullscore;
 	}
 
-	public void setFullscore(int fullscore) {
+	public void setFullscore(String fullscore) {
 		this.fullscore = fullscore;
 	}
 
-	public int getScore() {
+	public String getScore() {
 		return score;
 	}
 
-	public void setScore(int score) {
+	public void setScore(String score) {
 		this.score = score;
 	}
 

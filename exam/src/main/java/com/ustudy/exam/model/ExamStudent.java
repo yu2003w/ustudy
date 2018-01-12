@@ -11,10 +11,10 @@ public class ExamStudent implements Serializable {
 	private Long examid;
 	private Long schid;
 	private Long gradeid;
+	private Long classId;
 	private String className;
 	private String name;
 	private String stuno;
-	private int room;
 	private String paperStatus;
 	
 	public Long getId() {
@@ -57,6 +57,14 @@ public class ExamStudent implements Serializable {
 		this.gradeid = gradeid;
 	}
 	
+	public Long getClassId() {
+		return classId;
+	}
+	
+	public void setClassId(Long classId) {
+		this.classId = classId;
+	}
+	
 	public String getClassName() {
 		return className;
 	}
@@ -81,20 +89,19 @@ public class ExamStudent implements Serializable {
 		this.stuno = stuno;
 	}
 	
-	public int getRoom() {
-		return room;
-	}
-	
-	public void setRoom(int room) {
-		this.room = room;
-	}
-	
 	public String getQaperStatus() {
 		return paperStatus;
 	}
 	
 	public void setQaperStatus(String paperStatus) {
 		this.paperStatus = paperStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "ExamStudent [id=" + id + ", examCode=" + examCode + ", examid=" + examid + ", schid=" + schid
+				+ ", gradeid=" + gradeid + ", classId=" + classId + ", className=" + className + ", name=" + name
+				+ ", stuno=" + stuno + ", paperStatus=" + paperStatus + "]";
 	}
 	
 }

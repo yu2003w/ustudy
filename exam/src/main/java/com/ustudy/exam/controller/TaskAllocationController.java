@@ -104,4 +104,40 @@ public class TaskAllocationController {
 		return result;
 	}
 
+	@RequestMapping(value = "/grade/notask/teachers/{gradeId}", method = RequestMethod.GET)
+	public Map getGradeNotaskTeachers(@PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse response) {
+
+		logger.debug("getGradeNotaskTeachers(gradeId: "+gradeId+").");
+
+		Map result = new HashMap<>();
+		try {
+			result.put("success", true);
+			result.put("data", service.getGradeNotaskTeachers(gradeId));
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	@RequestMapping(value = "/school/teachers", method = RequestMethod.GET)
+	public Map getSchoolTeachers() {
+
+		logger.debug("getSchoolTeachers().");
+
+		Map result = new HashMap<>();
+		try {
+			result.put("success", true);
+			result.put("data", service.getSchoolTeachers());
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+			logger.error(e.getMessage());
+		}
+
+		return result;
+	}
+
 }

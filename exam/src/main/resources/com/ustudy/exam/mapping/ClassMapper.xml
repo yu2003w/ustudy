@@ -12,7 +12,7 @@
     
     <resultMap id="ClassubResult" type="HashMap">  
 	    <result property="id" column="cls_id" />  
-	    <result property="name" column="sub_name" />
+	    <result property="name" column="name" />
 	    <result property="owner" column="sub_owner" />          
 	</resultMap>
 	
@@ -25,11 +25,11 @@
 	</select>
 	
 	<select id="getClassubBySchoolId" parameterType="String" resultMap="ClassubResult">
-		SELECT cls_id,sub_name,sub_owner from classsub where cls_id in (SELECT id from class where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR}))
+		SELECT cls_id, s.name,sub_owner from classsub cs left join subject s on cs.sub_id=s.id where cls_id in (SELECT id from class where grade_id in (SELECT id from grade where schid=#{schoolId,jdbcType=VARCHAR}))
 	</select>
 	
 	<select id="getClassubByGradeId" parameterType="long" resultMap="ClassubResult">
-		SELECT cls_id,sub_name,sub_owner from classsub where cls_id in (SELECT id from class where grade_id=#{gradeId})
+		SELECT cls_id, s.name,sub_owner from classsub cs left join subject s on cs.sub_id=s.id where cls_id in (SELECT id from class where grade_id=#{gradeId})
 	</select>
 
 </mapper>

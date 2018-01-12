@@ -9,7 +9,7 @@
 
 	<!-- 根据考试ID和考试状态查询得到一个ExamGrade对象-->
 	<select id="getExamGrades" parameterType="java.util.Map" resultMap="ExamGradeResult">
-		SELECT DISTINCT(egs.grade_id),egs.grade_name from examgradesub egs LEFT JOIN exam e ON egs.examid=e.id where e.id=#{examId} and e.status=#{status}
+		SELECT DISTINCT(egs.grade_id), g.grade_name FROM examgradesub egs LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN exam e ON egs.examid=e.id WHERE e.id=#{examId} AND e.status=#{status}		
 	</select>
 
 </mapper>

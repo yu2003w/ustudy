@@ -17,21 +17,21 @@ public interface SchoolService {
 	 * @param id  --- retrieve item list from id
 	 * @return
 	 */
-	public List<School> getList(int id);
+	public List<School> getSchools(int id);
 	
 	/**
 	 * @param data --- to be stored into database
 	 * @return  --- index in the datababse
 	 */
-	public int createItem(School data);
+	public int createSchool(School data);
 	
-	public int deleteItem(int id);
+	public void deleteSchool(int id);
 	
-	public School displayItem(int id);
+	public School displaySchool(int id);
 	
-	public int updateItem(School data, int id);
+	public void updateSchool(School data, int id);
 	
-	public int delItemSet(String ids);
+	public int delSchools(String ids);
 	
 	public List<OrgBrife> getOrgBrifeList(int id);
 	
