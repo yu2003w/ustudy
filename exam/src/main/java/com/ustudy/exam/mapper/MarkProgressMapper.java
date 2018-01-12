@@ -25,7 +25,7 @@ public interface MarkProgressMapper {
 	public List<EgsMeta> getExamMetaInfo(String sid);
 	
 	@Select("select question.id as quesid, startno, endno, mark_mode as markStyle, "
-			+ "group_concat(teacher.teacname, '-', teacher.teacid) as teacherName, "
+			+ "group_concat(teacher.teacname, '-', teacher.teacid) as teaL, "
 			+ "(select count(*) from examinee where examinee.paper_status != '1' and examinee.examid = 1) * "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 1, 2)) as total, "
 			+ "(select count(*) from ustudy.answer where isviewed=1 and answer.quesid = question.id) as marked "
