@@ -3,11 +3,13 @@
 <mapper namespace="com.ustudy.exam.dao.MarkProgressDao">
 
 	<select id="getEgsTeachers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT t.teacid teacId,t.teacname teacName,g.id gradeId,g.grade_name gradeName,q.id quesId,q.startno startNo,q.endno endNo,m.marktype markType from marktask m
+		SELECT t.teacid teacId,t.teacname teacName,sch.schname schName,s.name subName,g.id gradeId,g.grade_name gradeName,q.id quesId,q.startno startNo,q.endno endNo,m.marktype markType from marktask m
 		LEFT JOIN teacher t ON m.teacid=t.teacid
 		LEFT JOIN question q ON m.quesid=q.id
 		LEFT JOIN examgradesub egs ON egs.id=q.exam_grade_sub_id
 		LEFT JOIN grade g ON egs.grade_id=g.id
+		LEFT JOIN subject s ON s.id=egs.sub_id
+		LEFT JOIN school sch ON sch.schid=t.orgid
 		where t.orgid=#{orgId, jdbcType=VARCHAR} and q.exam_grade_sub_id=#{egsId} 
 		ORDER BY quesId,markType
 	</select>

@@ -1,5 +1,6 @@
 package com.ustudy.exam.service.impl;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import com.ustudy.exam.service.MarkProgService;
 public class MarkProgServiceImpl implements MarkProgService {
 
 	private static final Logger logger = LogManager.getLogger(MarkProgServiceImpl.class);
+	private static final DecimalFormat fnum = new DecimalFormat("##0.00");
 	
 	@Autowired
 	private MarkProgressMapper mpM;
@@ -102,12 +104,14 @@ public class MarkProgServiceImpl implements MarkProgService {
 	 * @return
 	 */
     public Collection<Map<String, Object>> getTeacherMarkProgress(String orgId, int egsId) {
-        
+
         List<Map<String, Object>> teachers = dao.getEgsTeachers(orgId, egsId);
         Map<String, Map<String, Object>> progress = getEgsTeacherMarkProgress(orgId, egsId);
         long studentsCount = dao.getEgsStudentsCount(orgId, egsId);
         Map<String, Integer> quesTeachersCount = getQuesTeachersCount(teachers);
         Map<Integer, Integer> finalMarks = getEgsTeacherFinalMarks(orgId, egsId);
+        
+        Map<String, Map<String, Long>> counts = new HashMap<>();
         
         Map<String, Map<String, Object>> map = new HashMap<>();
         for (Map<String, Object> teacher : teachers) {
@@ -119,6 +123,8 @@ public class MarkProgServiceImpl implements MarkProgService {
                 object.put("teacName", teacher.get("teacName"));
                 object.put("gradeId", teacher.get("gradeId"));
                 object.put("gradeName", teacher.get("gradeName"));
+                object.put("subName", teacher.get("subName"));
+                object.put("schName", teacher.get("schName"));
                 
                 List<Map<String, Object>> quesProgress = new ArrayList<>();
                 Map<String, Object> progres = new HashMap<>();
@@ -133,6 +139,11 @@ public class MarkProgServiceImpl implements MarkProgService {
                 }
                 
                 String markType = teacher.get("markType").toString();
+                if(markType.equals("标准")){
+                    progres.put("markStyle", "单评");
+                }else {
+                    progres.put("markStyle", "双评");
+                }
                 int teacherCount = quesTeachersCount.get(quesId + "-" + markType);
                 if(markType.equals("终评")){
                     studentsCount = finalMarks.get(quesId);
@@ -140,13 +151,18 @@ public class MarkProgServiceImpl implements MarkProgService {
                 long count = studentsCount%teacherCount==0?studentsCount/teacherCount:studentsCount/teacherCount+1;
                 
                 Map<String, Object> p = progress.get(teacId + "-" + quesId);
+                Map<String, Long> counts_ = new HashMap<>();
+                counts_.put("studentsCount", count);
                 if(null != p){
                     long processedCount = (long) p.get("count");
-                    float progress_ = (float)processedCount/count*100;
-                    progres.put("progress", progress_);
+                    counts_.put("processedCount", processedCount);
+                    //float progress_ = (float)processedCount/count*100;
+                    //progres.put("markProgress", progress_);
                 }else {
-                    progres.put("progress", 0);
+                    //progres.put("markProgress", 0);
+                    counts_.put("processedCount", 0L);
                 }
+                counts.put(teacId, counts_);
                 
                 quesProgress.add(progres);
                 object.put("questions", quesProgress);
@@ -165,6 +181,11 @@ public class MarkProgServiceImpl implements MarkProgService {
                 }
                 
                 String markType = teacher.get("markType").toString();
+                if(markType.equals("标准")){
+                    progres.put("markStyle", "单评");
+                }else {
+                    progres.put("markStyle", "双评");
+                }
                 int teacherCount = quesTeachersCount.get(quesId + "-" + markType);
                 if(markType.equals("终评") && null != finalMarks.get(quesId)){
                     studentsCount = finalMarks.get(quesId);
@@ -172,13 +193,26 @@ public class MarkProgServiceImpl implements MarkProgService {
                 long count = studentsCount%teacherCount==0?studentsCount/teacherCount:studentsCount/teacherCount+1;
                 
                 Map<String, Object> p = progress.get(teacId + "-" + quesId);
+                Map<String, Long> counts_ = counts.get(teacId);
+                if (null == counts_) {
+                    counts_ = new HashMap<>();
+                    counts_.put("studentsCount", 0l);
+                    counts_.put("processedCount", 0L);
+                }
+                counts_.put("studentsCount", counts_.get("studentsCount") + count);
                 if(null != p){
                     long processedCount = (long) p.get("count");
-                    float progress_ = (float)processedCount/count*100;
-                    progres.put("progress", progress_);
-                }else {
-                    progres.put("progress", 0);
+                    counts_.put("processedCount", counts_.get("processedCount") + processedCount);
+                    //float progress_ = (float)processedCount/count*100;
+                    //progres.put("markProgress", progress_);
                 }
+                //if(null != p){
+                    //long processedCount = (long) p.get("count");
+                    //float progress_ = (float)processedCount/count*100;
+                    //progres.put("markProgress", progress_);
+                //}else {
+                    //progres.put("markProgress", 0);
+                //}
                 
                 quesProgress.add(progres);
                 object.put("questions", quesProgress);
@@ -187,7 +221,21 @@ public class MarkProgServiceImpl implements MarkProgService {
             map.put(teacId, object);
         }
         
-        return map.values();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Entry<String, Map<String, Object>> entry : map.entrySet()) {
+            String teacId = entry.getKey();
+            Map<String, Object> object = entry.getValue();
+            if(null != counts.get(teacId)){
+                Map<String, Long> counts_ = counts.get(teacId);
+                long studentsCount_ = counts_.get("studentsCount");
+                long processedCount_ = counts_.get("processedCount");
+                counts_.put("processedCount", 0L);
+                object.put("markProgress",fnum.format((double)processedCount_/studentsCount_*100) + "%");
+            }
+            result.add(object);
+        }
+        
+        return result;
     }
     
     private Map<String, Map<String, Object>> getEgsTeacherMarkProgress(String orgId, int egsId){
