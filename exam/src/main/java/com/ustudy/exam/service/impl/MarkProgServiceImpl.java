@@ -102,7 +102,7 @@ public class MarkProgServiceImpl implements MarkProgService {
 	 * @return
 	 */
     public Collection<Map<String, Object>> getTeacherMarkProgress(String orgId, int egsId) {
-        orgId = "001";
+        
         List<Map<String, Object>> teachers = dao.getEgsTeachers(orgId, egsId);
         Map<String, Map<String, Object>> progress = getEgsTeacherMarkProgress(orgId, egsId);
         long studentsCount = dao.getEgsStudentsCount(orgId, egsId);
