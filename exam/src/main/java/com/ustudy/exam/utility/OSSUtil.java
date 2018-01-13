@@ -18,11 +18,11 @@ public class OSSUtil {
 	private final static Logger logger = LogManager.getLogger(OSSUtil.class);
 	
 
-	private final static String bucketURL = "http://ustudypaper.oss-cn-hangzhou.aliyuncs.com";
-	private final static String endpoint = "http://oss-cn-hangzhou.aliyuncs.com";
-	private final static String accessKeyId = "LTAIRf0qaQSS6Y2x";
-	private final static String accessKeySecret = "IaPIEYKXxtZ5k6XynMPhFPfLoqnXAn";
-	private final static String bucketName = "ustudypaper";
+	private final static String bucketURL = "http://ustudy.oss-cn-beijing.aliyuncs.com";
+	private final static String endpoint = "http://oss-cn-beijing.aliyuncs.com";
+	private final static String accessKeyId = "LTAIIyWV2k5MfhvR";
+	private final static String accessKeySecret = "GdRSce29XMmRND29a5RwKu8uFZMhBp";
+	private final static String bucketName = "ustudy";
 	
 	private static OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
 
