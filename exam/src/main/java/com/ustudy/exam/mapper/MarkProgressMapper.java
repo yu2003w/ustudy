@@ -32,13 +32,14 @@ public interface MarkProgressMapper {
 			+ "(SELECT count(if(abs(ans1.score - ans2.score) >=5, 1, null)) "
 			+ "from ustudy.answer ans1 cross join ustudy.answer as ans2 where ans1.quesid = ans2.quesid and "
 			+ "ans1.paperid = ans2.paperid and ans1.isfinal = ans2.isfinal and ans1.teacid <> ans2.teacid and "
-			+ "ans1.isfinal <> 1 group by ans1.quesid))) as total, "
+			+ "ans1.isfinal <> 1 and ans1.quesid = question.id))) as total, "
 			+ "(select count(*) from ustudy.answer where isviewed=1 and answer.quesid = question.id) + "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 0, "
 			+ "(SELECT count(*) from answer where answer.quesid= question.id and isfinal = 1 and isviewed = 1))) "
 			+ "as marked from question join marktask on marktask.quesid = question.id "
 			+ "join teacher on marktask.teacid = teacher.teacid "
-			+ "where exam_grade_sub_id = #{egsid} group by question.id")
+			+ "where exam_grade_sub_id = #{egsid} and question.type not in ('单选题', '多选题', '判断题') "
+			+ "group by question.id")
 	public List<QuesMarkMetrics> getQuesMarkMetricsByEgsId(@Param("eid") int eid, @Param("egsid") int egsid);
 	
 }

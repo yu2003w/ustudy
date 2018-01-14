@@ -345,6 +345,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 			if (realScore != 0)
 				ba.setScore(String.valueOf(realScore));
+			else
+				ba.setScore("0");
 
 			num = markTaskM.insertAnswer(ba, teacid);
 			if (num < 0 || num > 2 || ba.getId() < 0) {

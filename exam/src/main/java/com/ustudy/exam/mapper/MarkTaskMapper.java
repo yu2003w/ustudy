@@ -104,7 +104,7 @@ public interface MarkTaskMapper {
 	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, isfinal, "
 			+ "score) values (#{ba.quesid}, #{ba.paperId}, #{tid}, #{ba.mflag}, #{ba.isProblemPaper}, true, "
 			+ "#{ba.isfinal}, #{ba.score}) on duplicate key update mflag=#{ba.mflag}, isfinal=#{ba.isfinal}, "
-			+ "problem_paper=#{ba.isProblemPaper}, score=#{ba.score}")
+			+ "problem_paper=#{ba.isProblemPaper}, score=#{ba.score}, id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys = true, keyProperty = "ba.id")
 	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 
