@@ -32,3 +32,10 @@ if [ -d ${SRC_DIR}/exam/ ]; then
   mvn clean package -DskipTests
 fi
 
+# replace nginx to configure host ip address
+if [ -d ${SRC_DIR}/scripts/ ]; then
+  cd ${SRC_DIR}/scripts/
+  sed -i "s/prodhost/${InternalIP}/g" nginx.conf
+fi
+
+
