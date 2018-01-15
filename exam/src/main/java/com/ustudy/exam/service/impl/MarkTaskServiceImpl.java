@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.PaperRequest;
@@ -33,6 +34,7 @@ import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.TeacherCache;
 import com.ustudy.exam.utility.ExamUtil;
+import com.ustudy.exam.utility.OSSMetaInfo;
 import com.ustudy.exam.utility.OSSUtil;
 
 @Service
@@ -48,6 +50,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Autowired
 	private TeacherCache teaC;
+	
+	@Autowired
+	private ConfigMapper cgM;
 	
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
@@ -405,6 +410,17 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					// upload mark image
 					String b64MarkImg = mark.split(",")[1];
 					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
+					
+					if (OSSUtil.getClient() == null) {
+						// need to initialize OSSMetaInfo
+						synchronized(OSSMetaInfo.class) {
+							if (OSSUtil.getClient() == null) {
+								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								OSSUtil.initOSS(omi);
+							}
+						}
+					}
+					
 					OSSUtil.putObject(ir.getMarkImg(), new ByteArrayInputStream(markBytes));
 					
 					// upload answer&mark image
@@ -566,6 +582,19 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		logger.debug("deleteMarkTask(), " + ret + " mark task records cleared" );
 		return true;
+	}
+
+	@Override
+	public OSSMetaInfo loadOSSInfo(String key) {
+		
+		if (key == null || key.isEmpty()) {
+			logger.error("loadOSSInfo(), load oss info failed, key is empty");
+			throw new RuntimeException("load oss info failed, key is empty");
+		}
+		
+		OSSMetaInfo omi = cgM.getOSSInfo(key);
+		logger.debug("loadOSSInfo(), oss info->" + omi.toString());
+		return omi;
 	}
 	
 }

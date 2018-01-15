@@ -23,4 +23,9 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.data' INTO TABLE ust
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/config.data' REPLACE INTO TABLE ustudy.config
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '$'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 

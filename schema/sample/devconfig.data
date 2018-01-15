@@ -1,0 +1,2 @@
+id,key,value
+NULL,oss,${"bucketURL" : "http://ustudypaper.oss-cn-hangzhou.aliyuncs.com", "endpoint" : "http://oss-cn-hangzhou.aliyuncs.com", "accessKeyId" : "LTAIRf0qaQSS6Y2x", "accessKeySecret" : "IaPIEYKXxtZ5k6XynMPhFPfLoqnXAn", "bucketName" : "ustudypaper"}$

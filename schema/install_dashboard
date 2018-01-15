@@ -1,6 +1,15 @@
 set names utf8;
 create database if not exists ustudy character set utf8;
 
+# configuration info, key-> value pair
+create table if not exists ustudy.config (
+id INT NOT NULL AUTO_INCREMENT,
+cgname VARCHAR(64) NOT NULL,
+cgval  JSON,
+UNIQUE KEY (cgname),
+PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
 CREATE TABLE if not exists ustudy.subject (
 id int(11) NOT NULL AUTO_INCREMENT,
 name varchar(20) DEFAULT NULL,
