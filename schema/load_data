@@ -25,7 +25,7 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.csv' INTO TABLE ustu
   IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/config.csv' REPLACE INTO TABLE ustudy.config
   CHARACTER SET UTF8
-  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  FIELDS TERMINATED BY ',' ENCLOSED BY '$'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
 

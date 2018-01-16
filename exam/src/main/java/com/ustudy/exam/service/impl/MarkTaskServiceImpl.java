@@ -411,8 +411,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					String b64MarkImg = mark.split(",")[1];
 					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
 					
+					
 					if (OSSUtil.getClient() == null) {
 						// need to initialize OSSMetaInfo
+						logger.info("saveAnsImgByPage(), initialize OSSClient before use");
 						synchronized(OSSMetaInfo.class) {
 							if (OSSUtil.getClient() == null) {
 								OSSMetaInfo omi = cgM.getOSSInfo("oss");

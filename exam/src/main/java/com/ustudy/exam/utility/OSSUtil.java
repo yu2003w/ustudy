@@ -31,7 +31,7 @@ public class OSSUtil {
 		ossClient = new OSSClient(omi.getEndpoint(), omi.getAccessKeyId(), omi.getAccessKeySecret());
 		bucketURL = omi.getBucketURL();
 		bucketName = omi.getBucketName();
-		logger.info("initOSS(), OSS Client initialized");
+		logger.info("initOSS(), OSS Client initialized as->" + omi.toString());
 	}
 	
 	/** 
@@ -81,7 +81,8 @@ public class OSSUtil {
      * @param baseKey, markKey, targetKey, x, y, w, h
      * @return 
      */
-	public static void putObject(String baseKey, String markKey, String targetKey, String x, String y, String w, String h) throws Exception {
+	public static void putObject(String baseKey, String markKey, String targetKey, String x, 
+			String y, String w, String h) throws Exception {
     	try {
     		String base64MarkKey = Base64Utils.encodeToUrlSafeString(markKey.getBytes());
     		String url = bucketURL + "/" + baseKey;
@@ -107,5 +108,6 @@ public class OSSUtil {
     		logger.error("Error Message: " + e.getMessage());
     		throw new Exception("can not put object due to exception", e);
     	}
-    }    
+    } 
+	
 }
