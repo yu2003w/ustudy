@@ -1,4 +1,0 @@
-id,exam_grade_sub_id,pageno,file_name,area_id,posx,posy,width,height,posbottom,posright,question_type,start_question_no,end_question_no,quesid
-null,1,0,tpl1.0.png,0,262,1506,968,263,1769,1230,2,31,40,16
-null,1,1,tpl1.1.png,0,221,223,971,739,962,1192,3,41,41,18
-null,1,1,tpl1.1.png,0,228,966,974,809,1775,1202,3,42,42,19
