@@ -8,6 +8,7 @@ public class QuesAnswerDiv implements Serializable {
 
 	private Long id;
 	private String quesno;
+	private String type;
 	private String branch;
 	private int score;
 	private Long quesid;
@@ -29,13 +30,21 @@ public class QuesAnswerDiv implements Serializable {
 		this.id = id;
 	}
 
-	public String getQuesno() {
-		return quesno;
-	}
+    public String getQuesno() {
+        return quesno;
+    }
 
-	public void setQuesno(String quesno) {
-		this.quesno = quesno;
-	}
+    public void setQuesno(String quesno) {
+        this.quesno = quesno;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
 	public String getBranch() {
 		return branch;

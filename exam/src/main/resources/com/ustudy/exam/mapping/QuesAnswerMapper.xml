@@ -18,7 +18,7 @@
     </resultMap>
 
 	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
-		SELECT * FROM question where exam_grade_sub_id=#{egsId}
+		SELECT * FROM question where exam_grade_sub_id=#{egsId} ORDER BY startno
 	</select>
 	
 	<select id="getQuesAnswer" parameterType="java.util.Map" resultMap="QuesAnswerResult">

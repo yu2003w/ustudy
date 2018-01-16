@@ -80,6 +80,7 @@ FOREIGN KEY (exam_grade_sub_id)
 create table if not exists ustudy.question_step (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT(11) NOT NULL,
+type enum('填空题','解答题','证明题','作文题','论述题') NOT NULL DEFAULT '解答题',
 quesno varchar(16) NOT NULL,
 branch varchar(16) default '不分科',
 score INT NOT NULL,
