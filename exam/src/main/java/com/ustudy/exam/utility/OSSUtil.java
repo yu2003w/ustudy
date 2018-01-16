@@ -31,7 +31,7 @@ public class OSSUtil {
 		ossClient = new OSSClient(omi.getEndpoint(), omi.getAccessKeyId(), omi.getAccessKeySecret());
 		bucketURL = omi.getBucketURL();
 		bucketName = omi.getBucketName();
-		logger.info("initOSS(), OSS Client initialized as->" + omi.toString());
+		logger.info("initOSS(), OSS Client initialized!");
 	}
 	
 	/** 

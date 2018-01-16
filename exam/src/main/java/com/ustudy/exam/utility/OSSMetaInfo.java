@@ -35,7 +35,7 @@ public class OSSMetaInfo implements Serializable {
 	}
 
 	public void setBucketURL(String bucketURL) {
-		this.bucketURL = bucketURL;
+		this.bucketURL = bucketURL.replaceAll("\"", "");
 	}
 
 	public String getEndpoint() {
@@ -43,7 +43,7 @@ public class OSSMetaInfo implements Serializable {
 	}
 
 	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
+		this.endpoint = endpoint.replaceAll("\"", "");
 	}
 
 	public String getAccessKeyId() {
@@ -51,7 +51,7 @@ public class OSSMetaInfo implements Serializable {
 	}
 
 	public void setAccessKeyId(String accessKeyId) {
-		this.accessKeyId = accessKeyId;
+		this.accessKeyId = accessKeyId.replaceAll("\"", "");
 	}
 
 	public String getAccessKeySecret() {
@@ -59,7 +59,7 @@ public class OSSMetaInfo implements Serializable {
 	}
 
 	public void setAccessKeySecret(String accessKeySecret) {
-		this.accessKeySecret = accessKeySecret;
+		this.accessKeySecret = accessKeySecret.replaceAll("\"", "");
 	}
 
 	public String getBucketName() {
@@ -67,7 +67,7 @@ public class OSSMetaInfo implements Serializable {
 	}
 
 	public void setBucketName(String bucketName) {
-		this.bucketName = bucketName;
+		this.bucketName = bucketName.replaceAll("\"", "");
 	}
 
 	@Override

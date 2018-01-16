@@ -418,6 +418,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						synchronized(OSSMetaInfo.class) {
 							if (OSSUtil.getClient() == null) {
 								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								logger.debug("saveAnsImgByPage(), OSS Client init with->" + omi.toString());
 								OSSUtil.initOSS(omi);
 							}
 						}
