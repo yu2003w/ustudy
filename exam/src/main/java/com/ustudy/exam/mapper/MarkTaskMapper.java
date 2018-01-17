@@ -77,6 +77,11 @@ public interface MarkTaskMapper {
 
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
+	
+	@Select("select answer_step.quesno, answer_step.score, question_step.score as fullscore "
+			+ "from answer_step join question_step on question_step.quesno = answer_step.quesno "
+			+ "where answer_id = (select id from ustudy.answer where quesid = #{qid} and paperid = #{pid})")
+	public List<SingleAnswer> getMarkedQuesDiv(@Param("qid") String quesid, @Param("pid") String paperid);
 
 	@Select("select mark_mode from ustudy.question where id = #{qid}")
 	public String getMarkMode(@Param("qid") String qid);

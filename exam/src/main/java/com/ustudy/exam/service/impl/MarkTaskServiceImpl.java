@@ -240,7 +240,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || 
 						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
-					saL = markTaskM.getQuesDiv(mark.getQuesid());
+					if (remark) {
+						saL = markTaskM.getMarkedQuesDiv(mark.getQuesid(), ba.getPaperId());
+					}
+					else
+						saL = markTaskM.getQuesDiv(mark.getQuesid());
+					
 				}
 				
 				ba.setSteps(saL);
@@ -274,23 +279,26 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					if (isfinal) 
 						fMImgs = markTaskM.getFirstMarkImgs(mark.getQuesid(), pImg.get(j).getPaperid());
 					imgs = paperImg.split(",");
+					
 					List<MarkAnsImg> markImgs = null;
 					if (remark)
 						markImgs = markTaskM.getMarkAnsImgs(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
-					for (ImgRegion re: qreL) {
+					for (int k = 0; k < qreL.size(); k++) {
+						// page no is real pageno, it should not be greater than imgs.length
+						ImgRegion re = qreL.get(k);
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
 							throw new RuntimeException("requestPapers(), pageno " + re.getPageno() + 
 									" not matched with " + paperImg.toString());
 						}
-					
+						
 					    re.setAnsImg(imgs[re.getPageno()]);
 					    
 					    // maybe this is remark operation
 					    if (remark && markImgs != null && !markImgs.isEmpty()) {
 					    	logger.debug("requestPapers(), marked imgs->" + markImgs.toString());
-					    	MarkAnsImg mm = markImgs.get(re.getPageno());
-					    	if (mm != null) {
+					    	MarkAnsImg mm = markImgs.get(k);
+					    	if (mm != null && mm.getPageno() == re.getPageno()) {
 					    		re.setMarkImg(mm.getMarkImg());
 					    		re.setAnsMarkImg(mm.getAnsMarkImg());
 					    	}
@@ -298,14 +306,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						// for final marks, need to add marked papers here
 						if (isfinal) {
 							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];
-							if (fMImgs.get((re.getPageno()-1)*2).getTeacid().compareTo(
+							if (fMImgs.get(k*2).getTeacid().compareTo(
 									pImg.get(j+1).getTeacid()) == 0) {
-								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2);
-								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2 +1);
+								fmRec[0] = fMImgs.get(k*2);
+								fmRec[1] = fMImgs.get(k*2 +1);
 							}
 							else {
-								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2 + 1);
-								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2);
+								fmRec[0] = fMImgs.get(k*2 + 1);
+								fmRec[1] = fMImgs.get(k*2);
 							}
 							re.setFirstMarkImgs(fmRec);
 							j += 2;
@@ -340,20 +348,20 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		for (BlockAnswer ba:blocks) {
-			float realScore = 0, num = 0;
 			
 			if (!ba.getSteps().isEmpty()) {
+				float realScore = 0;
 				List<SingleAnswer> saL = ba.getSteps();
 				for (SingleAnswer sa:saL) {
 					realScore += Float.valueOf(sa.getScore());
 				}
+				if (realScore != 0)
+					ba.setScore(String.valueOf(realScore));
+				else
+					ba.setScore("0");
 			}
-			if (realScore != 0)
-				ba.setScore(String.valueOf(realScore));
-			else
-				ba.setScore("0");
 
-			num = markTaskM.insertAnswer(ba, teacid);
+			int num = markTaskM.insertAnswer(ba, teacid);
 			if (num < 0 || num > 2 || ba.getId() < 0) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
 						",pri key->" + ba.getId());
