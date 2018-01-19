@@ -309,7 +309,9 @@ public class SchoolController {
 		
 		UResp res = new UResp();
 
-		if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
+		String orgType = InfoUtil.retrieveSessAttr("orgType");
+		
+		if (orgType != null && orgType.compareTo("学校") == 0) {
 			String schId = InfoUtil.retrieveSessAttr("orgId");
 			GradeSubRoles gsr = schS.getGrSubRoles(schId);
 			res.setData(gsr);

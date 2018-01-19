@@ -101,7 +101,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		sum.setQuestionName(quesN);
 		sum.setQuestionType(mt.getQuesType());
 		
-		if (sum.getFullscore() > 20) {
+		if (sum.getFullscore() >= 20) {
 			sum.setComposable(false);
 			logger.debug("assembleTaskBrife(), " + sum.getQuesid() + " is not composable.");
 		}
@@ -200,7 +200,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		logger.info("requestPapers()，max number of retrieved papers is " + maxSize);
 		
 		int i = 0;
-		boolean remark = false;
 		if (startSeq == -1) {
 			int completed = paperC.getMarked(queS.get(0).getQuesid(), teacid);
 			for (QuesMarkSum que: queS) {
@@ -213,7 +212,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else {
 			i = startSeq;
-			remark = true;
 		}		
 		
 		for (int j=0; j<maxSize; j++) {
@@ -240,7 +238,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || 
 						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
-					if (remark) {
+					if (ba.isMarked()) {
 						saL = markTaskM.getMarkedQuesDiv(mark.getQuesid(), ba.getPaperId());
 					}
 					else
@@ -281,7 +279,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					imgs = paperImg.split(",");
 					
 					List<MarkAnsImg> markImgs = null;
-					if (remark)
+					if (ba.isMarked())
 						markImgs = markTaskM.getMarkAnsImgs(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
 					for (int k = 0; k < qreL.size(); k++) {
 						// page no is real pageno, it should not be greater than imgs.length
@@ -295,7 +293,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					    re.setAnsImg(imgs[re.getPageno()]);
 					    
 					    // maybe this is remark operation
-					    if (remark && markImgs != null && !markImgs.isEmpty()) {
+					    if (ba.isMarked() && markImgs != null && !markImgs.isEmpty()) {
 					    	logger.debug("requestPapers(), marked imgs->" + markImgs.toString());
 					    	MarkAnsImg mm = markImgs.get(k);
 					    	if (mm != null && mm.getPageno() == re.getPageno()) {
