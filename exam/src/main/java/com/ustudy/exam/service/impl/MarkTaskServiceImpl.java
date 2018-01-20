@@ -3,6 +3,9 @@ package com.ustudy.exam.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.DatatypeConverter;
+
 import java.io.ByteArrayInputStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -415,7 +418,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					
 					// upload mark image
 					String b64MarkImg = mark.split(",")[1];
-					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
+					byte[] markBytes = DatatypeConverter.parseBase64Binary(b64MarkImg);
 					
 					
 					if (OSSUtil.getClient() == null) {
