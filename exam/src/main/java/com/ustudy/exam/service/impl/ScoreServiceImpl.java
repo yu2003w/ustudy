@@ -25,6 +25,7 @@ import com.ustudy.exam.dao.RefAnswerDao;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.ScoreMapper;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
@@ -133,6 +134,11 @@ public class ScoreServiceImpl implements ScoreService {
             if(!recalculateQuestionScore(egsId, refAnswer.getQuesno(), refAnswer.getAnswer())){
                 return false;
             }
+        }
+        
+        ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
+        if(null != examSubject && null != examSubject.getExamid()){
+            calClsSubScore(examSubject.getExamid().intValue(), -1);
         }
         
         return true;
