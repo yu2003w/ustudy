@@ -424,7 +424,7 @@ public class ScoreServiceImpl implements ScoreService {
 		List<ScoreClass> scL = scoM.getScoreClass(eid, gid);
 		
 		// each time score for one grade calculated
-		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty()) && gid > 0) {
+		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty())) {
 			if (!calClsSubScore(eid, gid))
 				return new ArrayList<ScoreClass>();
 		}
