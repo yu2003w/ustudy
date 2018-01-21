@@ -131,6 +131,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				SummaryScore(egsId);
 				// 清除缓存
 				paperC.clearSubCache(String.valueOf(egsId));
+				// 更新考试状态
+				examDao.updateExamStatusByEgsid(egsId);
 			}
 
 			return true;

@@ -38,6 +38,8 @@ public interface ExamDao {
 	
 	Long getExamStudengCount(Long examid);
 	
+	void updateExamStatusByEgsid(Long egsId);
+	
 	List<Exam> getExamsByStatus(@Param("status") String status, @Param("sid") String sid);
 	
 	Exam getExamsById(Long id);
