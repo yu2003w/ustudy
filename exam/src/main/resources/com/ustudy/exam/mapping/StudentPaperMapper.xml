@@ -69,7 +69,7 @@
 		LEFT JOIN obj_answer oa ON p.id=oa.paperid 
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		where p.exam_grade_sub_id=#{egsId} and ee.schid=#{schId,jdbcType=VARCHAR} and 
-		      p.paper_status=2 and p.error_status=2
+		      p.paper_status='2' and p.error_status='2'
 	</select>
 	
 	<update id="updatePaperStatus" parameterType="java.util.Map">
