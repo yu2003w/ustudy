@@ -127,8 +127,15 @@ public class ScoreServiceImpl implements ScoreService {
 
     public boolean recalculateQuestionScore(Long egsId) throws Exception {
         logger.debug("egsId: " + egsId);
-        // TODO Auto-generated method stub
-        return false;
+        
+        List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+        for (RefAnswer refAnswer : refAnswers) {
+            if(!recalculateQuestionScore(egsId, refAnswer.getQuesno(), refAnswer.getAnswer())){
+                return false;
+            }
+        }
+        
+        return true;
         
     }
     
