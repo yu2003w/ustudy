@@ -17,7 +17,7 @@ import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.mapper.ExamMapper;
-import com.ustudy.exam.mapper.MarkProgressMapper;
+import com.ustudy.exam.mapper.MarkProgMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.model.GrClsBrife;
@@ -49,7 +49,7 @@ public class ExamServiceImpl implements ExamService {
 	private ExamMapper exM;
 	
 	@Autowired
-	private MarkProgressMapper mpM;
+	private MarkProgMapper mpM;
 
 	public List<Exam> getAllExams() {
 		return examDaoImpl.getAllExams();

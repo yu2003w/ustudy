@@ -56,11 +56,10 @@ public class ScoreController {
     }
 
     @RequestMapping(value = "/recalculate/{egsId}", method = RequestMethod.POST)
-    public Map recalculateQuestionsScore(@PathVariable Long egsId, HttpServletRequest request,
+    public Map recalculateEgsScore(@PathVariable Long egsId, HttpServletRequest request,
             HttpServletResponse response) {
 
-        logger.debug("recalculateQuestionScore().");
-        logger.debug("egsId: " + egsId);
+        logger.debug("recalculateEgsScore(), egs->" + egsId);
 
         Map result = new HashMap<>();
 
@@ -73,6 +72,7 @@ public class ScoreController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", e.getMessage());
+            logger.error("recalculateEgsScore(), failed with->" + e.getMessage());
             e.printStackTrace();
         }
 

@@ -14,11 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.dao.MarkProgressDao;
-import com.ustudy.exam.mapper.MarkProgressMapper;
+import com.ustudy.exam.mapper.MarkProgMapper;
 import com.ustudy.exam.model.statics.EgsMarkProgress;
 import com.ustudy.exam.model.statics.EgsMeta;
 import com.ustudy.exam.model.statics.ExamMarkProgress;
 import com.ustudy.exam.model.statics.QuesMarkMetrics;
+import com.ustudy.exam.model.statics.QuesMarkTask;
+import com.ustudy.exam.model.statics.TeaMarkMetrics;
+import com.ustudy.exam.model.statics.TeaMarkProgress;
 import com.ustudy.exam.service.MarkProgService;
 
 @Service
@@ -28,7 +31,7 @@ public class MarkProgServiceImpl implements MarkProgService {
 	private static final DecimalFormat fnum = new DecimalFormat("##0.00");
 	
 	@Autowired
-	private MarkProgressMapper mpM;
+	private MarkProgMapper mpM;
 	
 	@Autowired
     private MarkProgressDao dao;
@@ -301,5 +304,32 @@ public class MarkProgServiceImpl implements MarkProgService {
         
         return finalMarksCount;
     }
+
+	@Override
+	public List<TeaMarkProgress> getTeaMarkProg(String orgId, int egsid) {
+		
+		List<TeaMarkProgress> tmp = mpM.getTeaMarkProgress(egsid);
+		List<QuesMarkTask> qmt = mpM.getQuesMarkTask(egsid);
+		for (QuesMarkTask mt : qmt) {
+			Map<String, Integer> taskA = mt.calAssignedAmount();
+			
+			logger.debug("getTeaMarkProg(), mark task for " + mt.getQuesid() + 
+					" assigned as below:\n" + taskA.toString());
+			
+			for (TeaMarkProgress tm: tmp) {
+				if (taskA.containsKey(tm.getTeacId())) {
+					List<TeaMarkMetrics> tmms = tm.getQuestions();
+					for (TeaMarkMetrics tmm: tmms) {
+						if (tmm.getMarkStyle().equals(mt.getMarkStyle()) && tmm.getQuesId() == mt.getQuesid()) {
+							tmm.setTotal(taskA.get(tm.getTeacId()));
+						}
+					}
+				}
+			}
+		}
+		
+		logger.debug("getTeaMarkProg(), assembled info->" + tmp.toString());
+		return tmp;
+	}
 	
 }

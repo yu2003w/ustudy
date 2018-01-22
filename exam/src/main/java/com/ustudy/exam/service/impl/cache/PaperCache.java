@@ -240,10 +240,10 @@ public class PaperCache {
 			if (pr.getStartSeq() > 0) {
 				// get already marked papers
 				wanted = pr.getEndSeq() - pr.getStartSeq() + 1;
-				wanted = wanted > 0 ? wanted:MAX_THRES;
+				wanted = wanted > 0 ? wanted : MAX_THRES;
 			}
 			if (wanted > 0) {
-				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq() > 0 ? pr.getStartSeq():0, 
+				paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq() > 0 ? pr.getStartSeq() : 0,
 						wanted, isFinalMark, pr.getQid());
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
@@ -328,8 +328,8 @@ public class PaperCache {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
-		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
-				" , current batch is " + batch);
+		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + " , current batch is "
+				+ batch);
 
 		// allocated tasks
 		int count = 0, mid = 0;
@@ -370,15 +370,17 @@ public class PaperCache {
 		paperC.opsForValue().set(paperCacheKey, mtcL);
 
 		// Now paper cache, teacher paper cache initialized or request new papers
-		// for review already marked papers, need to get from teacher cache again rather than fresh papers
+		// for review already marked papers, need to get from teacher cache again rather
+		// than fresh papers
 		if (pr.getStartSeq() > 0) {
 			wanted = pr.getEndSeq() - pr.getStartSeq() + 1;
-			paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq(), 
-					wanted > 0 ? wanted : MAX_THRES, isFinalMark, pr.getQid());
+			paperM = this.getPapersFromTeaCache(msc.getCurAssign(), pr.getStartSeq(), wanted > 0 ? wanted : MAX_THRES,
+					isFinalMark, pr.getQid());
 			logger.info("getPapersForSingleQues(), fetch marked papers for teacher " + teacid);
 		}
-		
-		logger.debug("getPapersForSingleQues(), assigned new papers for teacher " + teacid + " -> " + paperM.toString());
+
+		logger.debug(
+				"getPapersForSingleQues(), assigned new papers for teacher " + teacid + " -> " + paperM.toString());
 		return paperM;
 
 	}
@@ -399,25 +401,23 @@ public class PaperCache {
 			logger.error("calAssignedAmount(), mark task is not set for question -> " + pr.getQid());
 			return -1;
 		}
-		int amount = 0, assigned = 0, teaN = 0;
+		int amount = 0;
 		if (pr.getAssmode().compareTo("平均") == 0) {
-			for (String tid : teaL) {
-				String cacheK = TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + pr.getQid();
-				if (tid.compareTo(teacid) != 0) {
-					MarkStaticsCache msc = teaPaperC.opsForValue().get(cacheK);
-					if (msc != null && msc.getTotal() > 0) {
-						assigned += msc.getTotal();
-						teaN++;
+			for (int i = 0; i < factor; i++) {
+				if (teaL.get(i).compareTo(teacid) == 0) {
+					if (i == factor - 1) {
+						// last teacher assigned for this question
+						amount = total / factor + total % factor;
+					} else {
+						amount = total / factor;
 					}
 				}
 			}
-			if (teaN > factor - 1) {
-				logger.error("calAssignedAmount(), cache goes wrong, need to reconstruct that. teacher " + "number is "
-						+ teaN);
-				return -1;
+			if (amount == 0) {
+				logger.warn("calAssignedAmount(), something goes wrong, assigned papers for " + teacid + 
+						" is " + amount);
 			}
-			amount = (total - assigned) / (factor - teaN);
-			logger.debug("calAssignedAmount(), assigned papers for " + teacid + " is " + amount);
+			logger.info("calAssignedAmount(), assigned papers for " + teacid + " is " + amount);
 		} else {
 			logger.error("calAssignedAmount(), " + pr.getAssmode() + " is not supported");
 			return -1;
@@ -448,7 +448,7 @@ public class PaperCache {
 			mt.setStatus(2);
 			msc.incrCompleted(1, score);
 		}
-		
+
 		// also need to update score in cache for final marks
 		updatePaperCache(quesid, pid, score, mt.getSeq(), isfinal);
 
@@ -464,8 +464,8 @@ public class PaperCache {
 	private List<PaperImgCache> getPapersFromTeaCache(Map<String, MarkTaskCache> task, int seq, int wanted,
 			boolean isfinal, String quesid) {
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
-		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + 
-				"\nkeys->" + task.keySet().toString() + ", startSeq->" + seq + ", wanted->" + wanted);
+		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + "\nkeys->"
+				+ task.keySet().toString() + ", startSeq->" + seq + ", wanted->" + wanted);
 		int i = 1, count = 0, mid = -1;
 		if (wanted > MAX_THRES)
 			wanted = MAX_THRES;
