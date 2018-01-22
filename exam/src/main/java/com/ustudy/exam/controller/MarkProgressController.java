@@ -1,5 +1,7 @@
 package com.ustudy.exam.controller;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +54,7 @@ public class MarkProgressController {
 	}
 	
 	@RequestMapping(value = "/teacher/mark/progress/{egsId}",  method = RequestMethod.GET)
-    public UResp getTeacherMarkProgress(@PathVariable Integer egsId, HttpServletResponse resp) {
+    public UResp getTeaMarkProgress(@PathVariable Integer egsId, HttpServletResponse resp) {
         logger.debug("getTeacherMarkProgress(), end point /teacher/mark/progress/"+egsId+" visited");
         
         UResp res = new UResp();
@@ -66,16 +68,31 @@ public class MarkProgressController {
         }
         
         try {
-            res.setData(mpS.getTeacherMarkProgress(orgId, egsId));
+            res.setData(mpS.getTeaMarkProg(orgId, egsId));
             res.setRet(true);            
         } catch (Exception e) {
             logger.error("getTeacherMarkProgress(), failed with exception->" + e.getMessage());
             resp.setStatus(500);
             res.setMessage("Failed to retrieve mark progress with->" + e.getMessage());
-            e.printStackTrace();
+            logger.error(Arrays.toString(e.getStackTrace()));
+            
         }
         
         return res;
     }
+	
+	@RequestMapping(value = "/markstart/{egsid}", method = RequestMethod.POST)
+	public UResp startMark(@PathVariable("egsid") int egsid, HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		return res;
+	}
+	
+	@RequestMapping(value = "/markpause/{egsid}", method = RequestMethod.POST)
+	public UResp pauseMark(@PathVariable("egsid") int egsid, HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		return res;
+	}
 	
 }

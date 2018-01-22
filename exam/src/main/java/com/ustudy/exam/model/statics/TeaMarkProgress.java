@@ -1,6 +1,7 @@
 package com.ustudy.exam.model.statics;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +103,20 @@ public class TeaMarkProgress implements Serializable {
 		this.markProgress = markProgress;
 	}
 
+	public void calMarkProgress() {
+		if (questions != null) {
+			int marked = 0, total = 0;
+			for (TeaMarkMetrics tmm: questions) {
+				marked += tmm.getMarked();
+				total += tmm.getTotal();
+			}
+			if (total != 0) {
+				DecimalFormat progf = new DecimalFormat("##0.00");
+				this.markProgress = progf.format((double)marked/total*100 + "%");
+			}
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return "TeaMarkProgress [teacId=" + teacId + ", teacName=" + teacName + ", gradeId=" + gradeId + ", gradeName="

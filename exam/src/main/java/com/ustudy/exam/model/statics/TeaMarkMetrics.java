@@ -15,9 +15,9 @@ public class TeaMarkMetrics implements Serializable {
 	
 	private String markStyle = null;
 	
-	private int marked = -1;
+	private int marked = 0;
 	
-	private int total = -1;
+	private int total = 0;
 	
 	public TeaMarkMetrics() {
 		super();
