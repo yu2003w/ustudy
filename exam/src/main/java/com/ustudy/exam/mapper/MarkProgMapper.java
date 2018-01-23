@@ -58,14 +58,17 @@ public interface MarkProgMapper {
 			+ "question.type not in ('单选题', '多选题', '判断题')")
 	public EgsMarkMetrics getOverallMarkMetrics(@Param("egsid") int egsid);
 	
-	@Select("select marktask.teacid as teacId, teacher.teacname as teacName, examgradesub.grade_id as gradeId, "
-			+ "grade.grade_name as gradeName, group_concat(quesid, '-', question.startno, '-', question.endno, "
-			+ "'-', marktype, '-', (select count(*) from answer where answer.teacid = marktask.teacid and "
+	@Select("select marktask.teacid as teacId, teacher.teacname as teacName, subject.name as subName, "
+			+ "school.schname as schName, examgradesub.grade_id as gradeId, grade.grade_name as gradeName, "
+			+ "group_concat(quesid, '-', question.startno, '-', question.endno, '-', marktype, '-', "
+			+ "(select count(*) from answer where answer.teacid = marktask.teacid and "
 			+ "answer.isviewed = 1 and answer.quesid = marktask.quesid)) as metrics from ustudy.marktask "
 			+ "join question on question.id = marktask.quesid "
 			+ "join teacher on marktask.teacid = teacher.teacid "
+			+ "left join school on school.id = teacher.orgid "
 			+ "join examgradesub on examgradesub.id = question.exam_grade_sub_id "
 			+ "join grade on examgradesub.grade_id = grade.id "
+			+ "left join subject on subject.id = examgradesub.sub_id "
 			+ "where examgradesub.id = #{egsid} group by teacid")
 	public List<TeaMarkProgress> getTeaMarkProgress(@Param("egsid") int egsid);
 	

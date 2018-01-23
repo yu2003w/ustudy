@@ -1,19 +1,15 @@
 package com.ustudy.exam.service.impl;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ustudy.exam.dao.MarkProgressDao;
 import com.ustudy.exam.mapper.MarkProgMapper;
 import com.ustudy.exam.model.statics.EgsMarkProgress;
 import com.ustudy.exam.model.statics.EgsMeta;
@@ -28,13 +24,13 @@ import com.ustudy.exam.service.MarkProgService;
 public class MarkProgServiceImpl implements MarkProgService {
 
 	private static final Logger logger = LogManager.getLogger(MarkProgServiceImpl.class);
-	private static final DecimalFormat fnum = new DecimalFormat("##0.00");
+	//private static final DecimalFormat fnum = new DecimalFormat("##0.00");
 	
 	@Autowired
 	private MarkProgMapper mpM;
 	
-	@Autowired
-    private MarkProgressDao dao;
+	//@Autowired
+    //private MarkProgressDao dao;
 	
 	@Override
 	public List<ExamMarkProgress> getExamMarkProg(String sid) {
@@ -106,6 +102,7 @@ public class MarkProgServiceImpl implements MarkProgService {
 	 * @param egsId 考试科目ID
 	 * @return
 	 */
+	/*
     public Collection<Map<String, Object>> getTeacherMarkProgress(String orgId, int egsId) {
 
         List<Map<String, Object>> teachers = dao.getEgsTeachers(orgId, egsId);
@@ -303,7 +300,7 @@ public class MarkProgServiceImpl implements MarkProgService {
         }
         
         return finalMarksCount;
-    }
+    } */
 
 	@Override
 	public List<TeaMarkProgress> getTeaMarkProg(String orgId, int egsid) {
@@ -325,6 +322,7 @@ public class MarkProgServiceImpl implements MarkProgService {
 						}
 					}
 				}
+				tm.calMarkProgress();
 			}
 		}
 		

@@ -20,6 +20,9 @@ public class TeaMarkProgress implements Serializable {
 	private String gradeId = null;
 	private String gradeName = null;
 	
+	private String schName = null;
+	private String subName = null;
+	
 	@JsonIgnore
 	private String metrics = null;
 	
@@ -51,6 +54,22 @@ public class TeaMarkProgress implements Serializable {
 
 	public String getMetrics() {
 		return metrics;
+	}
+
+	public String getSchName() {
+		return schName;
+	}
+
+	public void setSchName(String schName) {
+		this.schName = schName;
+	}
+
+	public String getSubName() {
+		return subName;
+	}
+
+	public void setSubName(String subName) {
+		this.subName = subName;
 	}
 
 	/*
@@ -112,7 +131,7 @@ public class TeaMarkProgress implements Serializable {
 			}
 			if (total != 0) {
 				DecimalFormat progf = new DecimalFormat("##0.00");
-				this.markProgress = progf.format((double)marked/total*100 + "%");
+				this.markProgress = progf.format((double)marked/total*100) + "%";
 			}
 		}
 	}
@@ -120,8 +139,8 @@ public class TeaMarkProgress implements Serializable {
 	@Override
 	public String toString() {
 		return "TeaMarkProgress [teacId=" + teacId + ", teacName=" + teacName + ", gradeId=" + gradeId + ", gradeName="
-				+ gradeName + ", metrics=" + metrics + ", markProgress=" + markProgress + ", questions=" + questions
-				+ "]";
+				+ gradeName + ", schName=" + schName + ", subName=" + subName + ", metrics=" + metrics
+				+ ", markProgress=" + markProgress + ", questions=" + questions + "]";
 	}
 	
 }
