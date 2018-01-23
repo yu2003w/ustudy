@@ -194,7 +194,8 @@ public class PaperCache {
 		for (TeaStatics ts : tsL) {
 			MarkStaticsCache ms = new MarkStaticsCache(ts.getMarked(), ts.calAverageS());
 			teaPaperC.opsForValue().set(TEA_PAPER_PREFIX + teacid + TEA_QUES_PREFIX + ts.getQuesid(), ms);
-			logger.info("initMetricsByTeacId(), statics cache for " + teacid + " is " + ms.toString());
+			logger.info("initMetricsByTeacId(), statics cache for " + teacid + ", quesid->" + ts.getQuesid() + 
+					" is " + ms.toString());
 		}
 		return true;
 	}
@@ -235,13 +236,19 @@ public class PaperCache {
 		List<PaperImgCache> paperM = null;
 		if (msc != null && msc.getCurAssign() != null) {
 			int wanted = msc.getTotal() - msc.getCompleted();
+
 			if (pr.getStartSeq() > 0) {
+				if (pr.getStartSeq() > msc.getTotal()) {
+					logger.warn("getPapersForSingleQues(), request start seq->" + pr.getStartSeq() + 
+							", total assigned->" + msc.getTotal());
+					return null;
+				}
 				// get already marked papers, it's remark scenario
 				wanted = pr.getEndSeq() - pr.getStartSeq() + 1;
 				wanted = wanted > 0 ? wanted : MAX_THRES;
 			}
 			if (wanted > 0) {
-				paperM = this.getPapersFromTeaCache(msc, pr.getStartSeq() > 0 ? pr.getStartSeq() : 0,
+				paperM = this.getPapersFromTeaCache(msc, pr.getStartSeq() > 0 ? pr.getStartSeq() : 0, 
 						wanted, isFinalMark, pr.getQid());
 				if (paperM != null && !paperM.isEmpty()) {
 					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
@@ -330,8 +337,8 @@ public class PaperCache {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
-		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + " , current batch is "
-				+ batch);
+		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
+				" , current batch is " + batch);
 
 		// allocated tasks
 		int count = 0, mid = 0;
@@ -344,32 +351,34 @@ public class PaperCache {
 		}
 
 		for (MarkTaskCache mt : mtcL) {
-			if (count < batch && mt.getStatus() == 0 && !msc.getCurAssign().containsKey(mt.getPaperid())) {
-				mt.setStatus(1);
-				mt.setTeacid(teacid);
-				paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
-				msc.getpList().add(mt.getPaperid());
+			if (!msc.getCurAssign().containsKey(mt.getPaperid())) {
+				if (count < batch && mt.getStatus() == 0) {
+					mt.setStatus(1);
+					mt.setTeacid(teacid);
+					paperM.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
+					msc.getpList().add(mt.getPaperid());
 
-				if (isFinalMark) {
-					// for final marks, number of returned records should be times of triple
-					// 1, final mark element 2, first mark element 3, first mark element
-					MarkTaskCache fm = firstMarkL.get(mt.getSeq());
-					paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-					fm = firstMarkL.get(mt.getSeq() + mid);
-					paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+					if (isFinalMark) {
+						// for final marks, number of returned records should be times of triple
+						// 1, final mark element 2, first mark element 3, first mark element
+						MarkTaskCache fm = firstMarkL.get(mt.getSeq());
+						paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+						fm = firstMarkL.get(mt.getSeq() + mid);
+						paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+					}
+
+					msc.getCurAssign().put(mt.getPaperid(), mt);
+					count++;
+				} else if (mt.getStatus() == 2 && mt.getTeacid().compareTo(teacid) == 0) {
+					// already marked papers
+					msc.getCurAssign().put(mt.getPaperid(), mt);
+					msc.getpList().add(mt.getPaperid());
 				}
-
-				msc.getCurAssign().put(mt.getPaperid(), mt);
-				count++;
-			} else if (mt.getStatus() == 2 && mt.getTeacid().compareTo(teacid) == 0) {
-				// already marked papers
-				msc.getCurAssign().put(mt.getPaperid(), mt);
-				msc.getpList().add(mt.getPaperid());
 			}
 		}
 
 		teaPaperC.opsForValue().set(cacheKey, msc);
-		logger.debug("getPapersForSingleQues(), paper seq for " + teacid + "," + pr.getQid() + 
+		logger.debug("getPapersForSingleQues(), paper seq for " + teacid + ", quesid->" + pr.getQid() + 
 				"->" + msc.getpList().toString());
 
 		// need to write back to redis cache again
@@ -505,24 +514,27 @@ public class PaperCache {
 				}
 			}
 			
-			logger.debug("getPapersFromTeaCache(), retrieved " + i + " papers from the beginning of " + seq);
+			logger.debug("getPapersFromTeaCache(), retrieved " + (i+1) + " papers from the beginning of " + seq);
 		}
 		else {
-			// maybe user refreshed browser, return from last batch
-			int start = pList.size() > wanted ? (pList.size() - wanted) : 0;
-			logger.debug("getPapersFromTeaCache(), retrieved papers in current batch starting from " + start);
-			for (; start < pList.size(); start++) {
-				MarkTaskCache mt = task.get(pList.get(start));
-				piC.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
-				if (isfinal) {
-					// for final marks, number of returned records should be times of triple
-					// 1, final mark element 2, first mark element 3, first mark element
-					MarkTaskCache fm = firstMarkL.get(mt.getSeq());
-					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-					fm = firstMarkL.get(mt.getSeq() + mid);
-					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+			// maybe user refreshed browser, get unmarked papers from cache
+			int count = 0;
+			for (i = 0; i < pList.size() && count < wanted; i++) {
+				MarkTaskCache mt = task.get(pList.get(i));
+				if (mt.getStatus() != 2) {
+					piC.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
+					if (isfinal) {
+						// for final marks, number of returned records should be times of triple
+						// 1, final mark element 2, first mark element 3, first mark element
+						MarkTaskCache fm = firstMarkL.get(mt.getSeq());
+						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+						fm = firstMarkL.get(mt.getSeq() + mid);
+						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
+					}
+					count++;
 				}
 			}
+			logger.debug("getPapersFromTeaCache(), " + count + " unmarked papers retrieved from cache.");
 		}
 
 		/*
