@@ -65,10 +65,10 @@ public interface MarkProgMapper {
 			+ "answer.isviewed = 1 and answer.quesid = marktask.quesid)) as metrics from ustudy.marktask "
 			+ "join question on question.id = marktask.quesid "
 			+ "join teacher on marktask.teacid = teacher.teacid "
-			+ "left join school on school.id = teacher.orgid "
+			+ "join school on school.id = teacher.orgid "
 			+ "join examgradesub on examgradesub.id = question.exam_grade_sub_id "
 			+ "join grade on examgradesub.grade_id = grade.id "
-			+ "left join subject on subject.id = examgradesub.sub_id "
+			+ "join subject on subject.id = examgradesub.sub_id "
 			+ "where examgradesub.id = #{egsid} group by teacid")
 	public List<TeaMarkProgress> getTeaMarkProgress(@Param("egsid") int egsid);
 	
