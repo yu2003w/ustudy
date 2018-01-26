@@ -501,7 +501,7 @@ public class PaperCache {
 		
 		// get paper ids from plist starting from seq specified
 		if (seq > 0) {
-			for (i = 0; i < (pList.size() - seq) && i < wanted; i++) {
+			for (i = 0; i < (pList.size() - seq + 1) && i < wanted; i++) {
 				MarkTaskCache mt = task.get(pList.get(i + seq - 1));
 				piC.add(new PaperImgCache(mt.getPaperid(), mt.getImg()));
 				if (isfinal) {
