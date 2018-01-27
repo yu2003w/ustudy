@@ -32,7 +32,7 @@
 		order by aveScore desc
 	</select>
 	
-	<insert id="saveScoreSubCls" parameterType="java.util.List">
+	<insert id="saveScoreSubCls" parameterType="com.ustudy.exam.model.statics.ScoreSubjectCls">
 	    insert into ustudy.scoreclssubject (cls_id, egs_id, ave_score, rank) values
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.egsId}, #{item.aveScore}, #{item.rank})
@@ -62,7 +62,7 @@
 	    order by rank, examgradesub.grade_id asc
 	</select>
 	
-	<insert id="saveScoreClass" parameterType="java.util.List" >
+	<insert id="saveScoreClass" parameterType="com.ustudy.exam.model.statics.ScoreClass" >
 	    insert into ustudy.scoreclass (cls_id, exam_id, ave_score, rank) values
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.examId}, #{item.aveScore}, #{item.rank})
