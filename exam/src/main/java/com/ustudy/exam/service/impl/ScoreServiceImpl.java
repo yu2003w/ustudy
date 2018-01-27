@@ -588,7 +588,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		// save class subject score
 		int ret = scoM.saveScoreSubCls(ssCl);
-		if (ret <= 0) {
+		if (ret < 0) {
 			logger.error("calClsSubScore(), save subject class score failed with ret->" + ret + 
 					", expected->" + ssCl.size());
 			throw new RuntimeException("calClsSubScore(), save subject class score failed");
@@ -597,7 +597,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		List<ScoreClass> scL = calScoreClass(ssCl, eid);
 		ret = scoM.saveScoreClass(scL);
-		if (ret <= 0) {
+		if (ret < 0) {
 			logger.error("calClsSubScore(), save class score failed with ret->" + ret + 
 					", expected->" + scL.size());
 			throw new RuntimeException("getClsScores(), save class score failed");
