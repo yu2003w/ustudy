@@ -203,6 +203,20 @@ public class ExamSubjectController {
         }
 
         if(service.updateExamSubjectStatus(egsId, release)){
+            
+            new Thread() {
+                public void run() {
+                    try {
+                        ExamSubject examSubject = service.getExamSubject(egsId);
+                        if(null != examSubject && examSubject.getExamid() > 0){
+                            scoreService.publishExamScore(examSubject.getExamid(), true);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                    }                    
+                }
+            }.start();
+            
             result.put("success", true);
             result.put("data", "更新成功");
         }else {
