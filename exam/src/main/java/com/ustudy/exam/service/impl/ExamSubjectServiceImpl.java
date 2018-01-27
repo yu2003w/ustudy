@@ -136,8 +136,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				// 清除缓存
 				paperC.clearSubCache(String.valueOf(egsId));
 				// 更新考试状态
-				examDao.updateExamStatusByEgsid(egsId);
+				examDao.updateExamStatusByEgsid(egsId,"2");
 			}else {
+			    // 更新考试状态
+			    examDao.updateExamStatusByEgsid(egsId,"1");
 			    scoC.setScoreColStatus(egsId.intValue(), false);
             }
 
