@@ -34,6 +34,7 @@ import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
+import com.ustudy.exam.service.impl.cache.ScoreCache;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -69,6 +70,9 @@ public class ScoreServiceImpl implements ScoreService {
     
     @Autowired
     private ScoreMapper scoM;
+    
+    @Autowired
+    private ScoreCache scoC;
 
     public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
         logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
@@ -566,6 +570,11 @@ public class ScoreServiceImpl implements ScoreService {
 		logger.info("calClsSubScore(), class score saved with ret->" + ret);
 		
 		return true;
+	}
+
+	@Override
+	public boolean isScoreCalculated(int egsid) {
+		return scoC.getScoreColStatus(egsid);
 	}
 	
 }

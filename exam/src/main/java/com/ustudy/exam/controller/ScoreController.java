@@ -211,4 +211,20 @@ public class ScoreController {
     	return res;
     }
     
+    @RequestMapping(value = "/collect/finished/", method = RequestMethod.GET)
+    public UResp isScoreCalculated(@PathVariable("egsid") int egsid, HttpServletResponse resp) {
+    	UResp res = new UResp();
+    	
+    	try {
+    		res.setData(service.isScoreCalculated(egsid));
+    		res.setRet(true);
+    		logger.debug("isScoreCalculated(), score collected status for esgid->" + egsid 
+    				+ " " + res.getData());
+    	} catch (Exception e) {
+    		logger.error("isScoreCalculated(), failed with->" + e.getMessage());
+    		resp.setStatus(500);
+    		res.setMessage("Failed with ->" + e.getMessage());
+    	}
+    	return res;
+    }
 }
