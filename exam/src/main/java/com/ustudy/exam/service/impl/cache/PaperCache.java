@@ -251,8 +251,8 @@ public class PaperCache {
 				paperM = this.getPapersFromTeaCache(msc, pr.getStartSeq() > 0 ? pr.getStartSeq() : 0, 
 						wanted, isFinalMark, pr.getQid());
 				if (paperM != null && !paperM.isEmpty()) {
-					logger.info("getPapersForSingleQues(), maybe user refreshed pages, return already assigned "
-							+ "tasks, batch ->" + paperM.size() + "," + paperM.toString());
+					logger.info("getPapersForSingleQues(), maybe user refreshed pages, returned batch size->" + paperM.size());
+					logger.debug("getPapersForSingleQues(), detailed batch->" + paperM.toString());
 					return paperM;
 				}
 			} else if (!isFinalMark && pr.getAssmode().compareTo("平均") == 0) {

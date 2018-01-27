@@ -211,7 +211,7 @@ public class ScoreController {
     	return res;
     }
     
-    @RequestMapping(value = "/collect/finished/", method = RequestMethod.GET)
+    @RequestMapping(value = "/collect/finished/{egsid}", method = RequestMethod.GET)
     public UResp isScoreCalculated(@PathVariable("egsid") int egsid, HttpServletResponse resp) {
     	UResp res = new UResp();
     	
