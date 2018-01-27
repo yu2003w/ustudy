@@ -188,16 +188,21 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		
 		if(scores.size() > 0){
 			Collections.sort(scores);
-			float score = 1000;
-			int index = 0;
-			for (Subscore subscore : scores) {
-				if(subscore.getScore() <= score){
-					if(subscore.getScore() < score){
-						index = index+1;
-					}
-					score = subscore.getScore();
-					subscore.setRank(index);
+			// updated by jared, need to accumulate rank when score equals
+			int rank =1;
+			for (int i = 0; i < scores.size(); i++) {
+				if (i == 0) {
+					scores.get(i).setRank(rank);
 				}
+				else {
+					if (scores.get(i).getScore().compareTo(scores.get(i-1).getScore()) == 0) {
+						scores.get(i).setRank(scores.get(i-1).getRank());
+					}
+					else {
+						scores.get(i).setRank(rank);
+					}
+				}
+				rank++;
 			}
 			scoreDaoImpl.deleteSubscores(egsId);
 			scoreDaoImpl.insertSubscores(scores);

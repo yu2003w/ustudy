@@ -240,17 +240,25 @@ public class ScoreServiceImpl implements ScoreService {
     				}
     				Collections.sort(exameeScores);
     				
-    				float score = 1000;
-    				int index = 0;
-    				for (ExameeScore exameeScore : exameeScores) {
-    					if(exameeScore.getScore() <= score){
-    						if(exameeScore.getScore() < score){
-    							index = index+1;
-    						}
-    						score = exameeScore.getScore();
-    						exameeScore.setRank(index);
+    				int rank = 1;
+    				// modified by jared, alreay sorted examinee scores
+    				// if score equals, rank should be the same, however, 
+    				// others' rank should be adjusted corresponding
+    				for (int i = 0; i < exameeScores.size(); i++) {
+    					if (i == 0) {
+    						exameeScores.get(i).setRank(rank);
     					}
+    					else {
+    						if (exameeScores.get(i).getScore().compareTo(exameeScores.get(i-1).getScore()) == 0) {
+    							exameeScores.get(i).setRank(exameeScores.get(i-1).getRank());
+    						}
+    						else {
+    							exameeScores.get(i).setRank(rank);
+    						}
+    					}
+    					rank++;
     				}
+    				
     				exameeScoreDao.deleteExameeScores(examId);
     				exameeScoreDao.insertExameeScores(exameeScores);
     			}
