@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -35,6 +40,7 @@ import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -133,17 +139,46 @@ public class ScoreServiceImpl implements ScoreService {
     public boolean recalculateQuestionScore(Long egsId) throws Exception {
         logger.debug("egsId: " + egsId);
         
-        List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
-        for (RefAnswer refAnswer : refAnswers) {
-            if(!recalculateQuestionScore(egsId, refAnswer.getQuesno(), refAnswer.getAnswer())){
-                return false;
+        new Thread() {
+            public void run() {                
+                /**
+                 * 创建线程池，并发量最大为5
+                 * LinkedBlockingDeque，表示执行任务或者放入队列
+                 */
+                ThreadPoolExecutor tpe = new ThreadPoolExecutor(20, 100, 0,
+                        TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                        new ThreadPoolExecutor.CallerRunsPolicy());
+                
+                //存储线程的返回值
+                List<Future<String>> results = new LinkedList<Future<String>>();
+                
+                List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                
+                for (RefAnswer refAnswer : refAnswers) {
+                    RecalculateQuestionScoreTask task = new RecalculateQuestionScoreTask(egsId, refAnswer, quesDaoImpl, multipleScoreSetDaoImpl, answerDaoImpl);
+                    Future<String> result = tpe.submit(task);
+                    results.add(result);
+                }
+                
+                //此函数表示不再接收新任务，
+                //如果不调用，awaitTermination将一直阻塞
+                tpe.shutdown();
+                //1天，模拟永远等待
+                try {
+                    tpe.awaitTermination(1, TimeUnit.DAYS);
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage());                    
+                }
+                
+                ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
+                if(null != examSubject && null != examSubject.getExamid()){
+                    calClsSubScore(examSubject.getExamid().intValue(), -1);
+                }
+                
+                scoC.setScoreColStatus(egsId.intValue(), true);
+                
             }
-        }
-        
-        ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
-        if(null != examSubject && null != examSubject.getExamid()){
-            calClsSubScore(examSubject.getExamid().intValue(), -1);
-        }
+        }.start();
         
         return true;
         
@@ -553,7 +588,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		// save class subject score
 		int ret = scoM.saveScoreSubCls(ssCl);
-		if (ret != ssCl.size()) {
+		if (ret <= 0) {
 			logger.error("calClsSubScore(), save subject class score failed with ret->" + ret + 
 					", expected->" + ssCl.size());
 			throw new RuntimeException("calClsSubScore(), save subject class score failed");
@@ -562,7 +597,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		List<ScoreClass> scL = calScoreClass(ssCl, eid);
 		ret = scoM.saveScoreClass(scL);
-		if (ret != scL.size()) {
+		if (ret <= 0) {
 			logger.error("calClsSubScore(), save class score failed with ret->" + ret + 
 					", expected->" + scL.size());
 			throw new RuntimeException("getClsScores(), save class score failed");

@@ -23,6 +23,7 @@ import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
+import com.ustudy.exam.service.impl.cache.ScoreCache;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -40,6 +41,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private PaperCache paperC;
+	
+	@Autowired
+    private ScoreCache scoC;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -133,7 +137,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				paperC.clearSubCache(String.valueOf(egsId));
 				// 更新考试状态
 				examDao.updateExamStatusByEgsid(egsId);
-			}
+			}else {
+			    scoC.setScoreColStatus(egsId.intValue(), false);
+            }
 
 			return true;
 		} catch (Exception e) {

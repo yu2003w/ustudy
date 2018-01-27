@@ -1,6 +1,7 @@
 package com.ustudy.exam.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
@@ -13,6 +14,8 @@ public interface StudentObjectAnswerDao {
 	void insertStudentObjectAnswer(StudentObjectAnswer answer);
 	
 	void updateStudentObjectAnswer(@Param("id")Long id, @Param("score")Integer score);
+	
+	void updateBatch(List<Map<String, Object>> scores);
 	
 	void insertStudentObjectAnswers(List<StudentObjectAnswer> answers);
 	
