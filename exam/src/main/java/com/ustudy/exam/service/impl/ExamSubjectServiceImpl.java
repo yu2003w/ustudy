@@ -277,12 +277,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							}
 						}
 						if(sc>0){
-							score = (float) sc/count;
+							score += (float) sc/count;
 						}
 					}
 				} else {
 					if (qes_scores.size() > 0) {
-						score = (float) qes_scores.get(0).get("score");
+						score += (float) qes_scores.get(0).get("score");
 					}
 				}
 			}

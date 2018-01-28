@@ -444,7 +444,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		List<Map<String, Object>> stepScores = subscoreDao.getStudentStepScores(stuId, examId, null);
 		for (Map<String, Object> map : stepScores) {
-		    float score = (int)map.get("score");
+		    float score = (float)map.get("score");
 		    subjectives = setScores(subjectives, map.get("id").toString(), score);
         }
 
