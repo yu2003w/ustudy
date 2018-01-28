@@ -449,8 +449,6 @@ public class ScoreServiceImpl implements ScoreService {
         }
 		
 		for (Entry<Long,List<Map<String,Object>>> entry : subjectives.entrySet()) {
-		    //List<Map<String,Object>> list = entry.getValue();
-		    //System.out.println(list.size());
 		    Collections.sort(entry.getValue(), new Comparator<Map<String,Object>>() {
 	            @Override
 	            public int compare(Map<String,Object> o1, Map<String,Object> o2) {
@@ -458,8 +456,6 @@ public class ScoreServiceImpl implements ScoreService {
 	                return Integer.valueOf(o1.get("quesno").toString()).compareTo(Integer.valueOf(o2.get("quesno").toString()));
 	            }
 	        });
-		    //System.out.println(list.size());
-		    //subjectives.put(entry.getKey(), list);
         }
 		
 		result.put("subjectives", subjectives);
