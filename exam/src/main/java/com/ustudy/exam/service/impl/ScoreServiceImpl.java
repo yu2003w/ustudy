@@ -386,7 +386,7 @@ public class ScoreServiceImpl implements ScoreService {
             int startno = (int)map.get("startno");
             String markMode = "单评";
             if(null != map.get("markMode")){
-                map.get("markMode").toString();
+                markMode = map.get("markMode").toString();
             }
             markModes.put(subId + "-" + startno, markMode);
 		}
