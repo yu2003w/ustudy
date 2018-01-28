@@ -269,11 +269,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							boolean isfinal = (boolean) map.get("isfinal");
 							if(isfinal){
 								count = 1;
-								sc = (float) qes_scores.get(0).get("score");
+								sc = (float) map.get("score");
 								break;
 							} else {
 								count = count + 1;
-								sc = sc + (float) qes_scores.get(0).get("score");
+								sc = sc + (float) map.get("score");
 							}
 						}
 						if(sc>0){
