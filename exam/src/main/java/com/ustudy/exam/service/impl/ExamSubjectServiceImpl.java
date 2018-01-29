@@ -23,6 +23,7 @@ import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
+import com.ustudy.exam.service.impl.cache.ScoreCache;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -40,6 +41,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private PaperCache paperC;
+	
+	@Autowired
+    private ScoreCache scoC;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -131,7 +135,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				SummaryScore(egsId);
 				// 清除缓存
 				paperC.clearSubCache(String.valueOf(egsId));
-			}
+				// 更新考试状态
+				examDao.updateExamStatusByEgsid(egsId,"2");
+			}else {
+			    // 更新考试状态
+			    examDao.updateExamStatusByEgsid(egsId,"1");
+			    scoC.setScoreColStatus(egsId.intValue(), false);
+            }
 
 			return true;
 		} catch (Exception e) {
@@ -178,16 +188,21 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		
 		if(scores.size() > 0){
 			Collections.sort(scores);
-			float score = 1000;
-			int index = 0;
-			for (Subscore subscore : scores) {
-				if(subscore.getScore() <= score){
-					if(subscore.getScore() < score){
-						index = index+1;
-					}
-					score = subscore.getScore();
-					subscore.setRank(index);
+			// updated by jared, need to accumulate rank when score equals
+			int rank =1;
+			for (int i = 0; i < scores.size(); i++) {
+				if (i == 0) {
+					scores.get(i).setRank(rank);
 				}
+				else {
+					if (scores.get(i).getScore().compareTo(scores.get(i-1).getScore()) == 0) {
+						scores.get(i).setRank(scores.get(i-1).getRank());
+					}
+					else {
+						scores.get(i).setRank(rank);
+					}
+				}
+				rank++;
 			}
 			scoreDaoImpl.deleteSubscores(egsId);
 			scoreDaoImpl.insertSubscores(scores);
@@ -254,20 +269,20 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							boolean isfinal = (boolean) map.get("isfinal");
 							if(isfinal){
 								count = 1;
-								sc = (float) qes_scores.get(0).get("score");
+								sc = (float) map.get("score");
 								break;
 							} else {
 								count = count + 1;
-								sc = sc + (float) qes_scores.get(0).get("score");
+								sc = sc + (float) map.get("score");
 							}
 						}
 						if(sc>0){
-							score = (float) sc/count;
+							score += (float) sc/count;
 						}
 					}
 				} else {
 					if (qes_scores.size() > 0) {
-						score = (float) qes_scores.get(0).get("score");
+						score += (float) qes_scores.get(0).get("score");
 					}
 				}
 			}

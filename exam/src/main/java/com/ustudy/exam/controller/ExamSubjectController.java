@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
+import com.ustudy.exam.service.ScoreService;
 
 @RestController
 @RequestMapping(value = "/")
@@ -29,6 +30,9 @@ public class ExamSubjectController {
 	
 	@Autowired
 	private ExamSubjectService service;
+	
+	@Autowired
+    private ScoreService scoreService;
 	
 	/**
 	 * 获取所有考试科目信息
@@ -186,8 +190,33 @@ public class ExamSubjectController {
         logger.debug("updateExamSubjectStatus().");
         
         Map result = new HashMap<>();
+        
+        if(release){
+            try {
+                scoreService.recalculateQuestionScore(egsId);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                result.put("success", false);
+                result.put("data", "更新失败");
+                return result;
+            }
+        }
 
         if(service.updateExamSubjectStatus(egsId, release)){
+            
+            new Thread() {
+                public void run() {
+                    try {
+                        ExamSubject examSubject = service.getExamSubject(egsId);
+                        if(null != examSubject && examSubject.getExamid() > 0){
+                            scoreService.publishExamScore(examSubject.getExamid(), true);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                    }                    
+                }
+            }.start();
+            
             result.put("success", true);
             result.put("data", "更新成功");
         }else {

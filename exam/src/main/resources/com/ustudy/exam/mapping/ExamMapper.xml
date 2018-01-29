@@ -18,10 +18,10 @@
 	<select id="getExams" parameterType="java.util.Map" resultMap="ExamResult">
 		SELECT e.* FROM exam e LEFT JOIN examschool ec ON e.id=ec.examid where schid=#{orgId}
 		<if test="finished == false">
-		 AND e.status &lt;&gt; 2
+		 AND e.status &lt;&gt; '2'
 		</if>
 		<if test="finished == true">
-		 AND e.status = 2
+		 AND e.status = '2'
 		</if>
 		<if test="gradeId > 0 and subjectId > 0">
 		 AND e.id IN (SELECT DISTINCT examid from examgradesub where grade_id=#{gradeId} AND sub_id=#{subjectId})
@@ -65,7 +65,7 @@
 	<!-- 根据类型查询得到Exam对象 -->
 	<select id="getExamsByStatus" resultMap="ExamResult">
 		select * from ustudy.exam join ustudy.examschool on ustudy.exam.id = ustudy.examschool.examid where 
-		examschool.schid=#{sid} and	exam.status=#{status}
+		examschool.schid=#{sid} and	exam.status=#{status,jdbcType=VARCHAR}
 	</select>
 
 	<!-- 根据ID查询得到一个Exam对象-->
@@ -109,6 +109,14 @@
 	
 	<update id="updateExamStatus" parameterType="java.util.Map">
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} where id=#{examid}
+	</update>
+	
+	<update id="updateExamStatusByEgsid" parameterType="java.util.Map">
+		UPDATE exam SET status=#{status,jdbcType=VARCHAR} 
+		WHERE id=(SELECT examid FROM examgradesub where id=#{egsId})
+		<if test="status == '2'">
+		AND (SELECT COUNT(examid) FROM examgradesub where id=#{egsId} AND status&lt;&gt;'2')=0
+		</if>
 	</update>
 
 	<select id="getTeacherExams" parameterType="String" resultType="java.util.Map">

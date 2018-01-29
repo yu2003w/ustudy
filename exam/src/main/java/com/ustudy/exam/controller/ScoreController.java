@@ -56,11 +56,10 @@ public class ScoreController {
     }
 
     @RequestMapping(value = "/recalculate/{egsId}", method = RequestMethod.POST)
-    public Map recalculateQuestionsScore(@PathVariable Long egsId, HttpServletRequest request,
+    public Map recalculateEgsScore(@PathVariable Long egsId, HttpServletRequest request,
             HttpServletResponse response) {
 
-        logger.debug("recalculateQuestionScore().");
-        logger.debug("egsId: " + egsId);
+        logger.debug("recalculateEgsScore(), egs->" + egsId);
 
         Map result = new HashMap<>();
 
@@ -73,6 +72,7 @@ public class ScoreController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", e.getMessage());
+            logger.error("recalculateEgsScore(), failed with->" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -211,4 +211,20 @@ public class ScoreController {
     	return res;
     }
     
+    @RequestMapping(value = "/collect/finished/{egsid}", method = RequestMethod.GET)
+    public UResp isScoreCalculated(@PathVariable("egsid") int egsid, HttpServletResponse resp) {
+    	UResp res = new UResp();
+    	
+    	try {
+    		res.setData(service.isScoreCalculated(egsid));
+    		res.setRet(true);
+    		logger.debug("isScoreCalculated(), score collected status for esgid->" + egsid 
+    				+ " " + res.getData());
+    	} catch (Exception e) {
+    		logger.error("isScoreCalculated(), failed with->" + e.getMessage());
+    		resp.setStatus(500);
+    		res.setMessage("Failed with ->" + e.getMessage());
+    	}
+    	return res;
+    }
 }

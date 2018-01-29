@@ -15,7 +15,7 @@
     <Logger name="org.springframework.beans.factory" level="DEBUG"/>
     <logger name="org.springframework.transaction" level="DEBUG" />
     <logger name="org.springframework.transaction.interceptor" level="DEBUG" />
-    <Root level="trace">
+    <Root level="USTUDYLOGLEVEL">
       <AppenderRef ref="logfile"/>
     </Root>
   </Loggers>

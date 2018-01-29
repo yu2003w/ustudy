@@ -1,0 +1,7 @@
+id,quesno,startno,endno,type,branch,choice_num,score,assign_mode,mark_mode,duration,teac_owner,exam_grade_sub_id
+NULL,71,71,71,解答题,不分科,0,17,平均,单评,0,NULL,1
+NULL,0,1,35,单选题,不分科,4,1,NULL,NULL,NULL,NULL,1
+NULL,0,61,70,填空题,不分科,0,2,平均,单评,0,NULL,1
+NULL,72,72,72,解答题,不分科,0,20,平均,双评,0,NULL,1
+NULL,0,36,40,多选题,不分科,7,2,NULL,NULL,NULL,NULL,1
+NULL,0,41,60,单选题,不分科,4,1,NULL,NULL,NULL,NULL,1

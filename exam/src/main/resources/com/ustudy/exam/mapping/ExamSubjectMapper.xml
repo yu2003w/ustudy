@@ -120,24 +120,28 @@
 	
 	<update id="updateExamSubjectStatus" parameterType="java.util.Map">
 		<if test="release !=null and release == true">
-			UPDATE examgradesub SET status=2 
+			UPDATE examgradesub SET status='2'
 		</if>
 		<if test="release !=null and release == false">
-			UPDATE examgradesub SET status=1 
+			UPDATE examgradesub SET status='1' 
 		</if>
 		WHERE examid=#{examId} AND grade_id=#{gradeId} AND sub_id=#{subjectId}
 	</update>
 	
 	<select id="getExamSubjectObjScores" parameterType="Long" resultType="java.util.Map">
-		SELECT SUM(oa.score) objScore,e.id FROM obj_answer oa 
-		LEFT JOIN paper p on oa.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
-		WHERE p.exam_grade_sub_id=#{egsId} GROUP BY e.id
+		SELECT IFNULL(SUM(oa.score),0) objScore,e.id FROM examinee e
+		LEFT JOIN paper p ON p.exam_code=e.exam_code
+		LEFT JOIN obj_answer oa on oa.paperid=p.id
+		WHERE p.exam_grade_sub_id=#{egsId} 
+		GROUP BY e.id
 	</select>
 	
 	<select id="getExamSubjectSubjScores" parameterType="Long" resultType="java.util.Map">
 		SELECT e.id,a.quesid,a.isviewed,a.isfinal,a.score from answer a
-		LEFT JOIN paper p on a.paperid=p.id LEFT JOIN examinee e ON p.exam_code=e.exam_code 
-		WHERE p.exam_grade_sub_id=#{egsId} ORDER BY e.id,a.quesid
+		LEFT JOIN paper p on a.paperid=p.id 
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code 
+		WHERE p.exam_grade_sub_id=#{egsId} 
+		ORDER BY e.id,a.quesid
 	</select>
 	
 	<select id="getExamSubjectMarkMode" parameterType="Long" resultType="java.util.Map">

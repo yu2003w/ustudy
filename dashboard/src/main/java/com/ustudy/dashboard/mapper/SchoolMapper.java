@@ -41,7 +41,7 @@ public interface SchoolMapper {
 	
 	@Insert("insert into ustudy.grade(grade_name, classes_num, schid) values (#{gr.gradeName}, #{gr.num}, "
 			+ "#{schid}) on duplicate key update grade_name=#{gr.gradeName}, classes_num=#{gr.num}, "
-			+ "schid=#{schid}")
+			+ "schid=#{schid}, id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys=true, keyProperty="gr.id")
 	public int createGrade(@Param("gr") Grade gr, @Param("schid") String schid);
 	

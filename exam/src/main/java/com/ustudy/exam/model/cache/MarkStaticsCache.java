@@ -1,6 +1,7 @@
 package com.ustudy.exam.model.cache;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +20,12 @@ public class MarkStaticsCache implements Serializable {
 	private int total = 0;
 	private int completed = 0;
 	private String avescore = null;
+	
+	// key is paper id to get better performance when updating mark result
 	private Map<String, MarkTaskCache> curAssign = null;
+	
+	// store paper ids by assigned sequences, this attribute is useful for remarking
+	private List<String> pList = null;
 	
 	public MarkStaticsCache() {
 		super();
@@ -85,10 +91,18 @@ public class MarkStaticsCache implements Serializable {
 		this.avescore = avescore;
 	}
 	
+	public List<String> getpList() {
+		return pList;
+	}
+
+	public void setpList(List<String> pList) {
+		this.pList = pList;
+	}
+
 	@Override
 	public String toString() {
 		return "MarkStaticsCache [total=" + total + ", completed=" + completed + ", avescore=" + avescore
-				+ ", curAssign=" + curAssign + "]";
+				+ ", curAssign=" + curAssign + ", pList=" + pList + "]";
 	}
 	
 }

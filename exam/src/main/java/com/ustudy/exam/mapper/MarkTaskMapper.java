@@ -77,6 +77,11 @@ public interface MarkTaskMapper {
 
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
+	
+	@Select("select answer_step.quesno, answer_step.score, question_step.score as fullscore "
+			+ "from answer_step join question_step on question_step.quesno = answer_step.quesno "
+			+ "where answer_id = (select id from ustudy.answer where quesid = #{qid} and paperid = #{pid})")
+	public List<SingleAnswer> getMarkedQuesDiv(@Param("qid") String quesid, @Param("pid") String paperid);
 
 	@Select("select mark_mode from ustudy.question where id = #{qid}")
 	public String getMarkMode(@Param("qid") String qid);
@@ -104,7 +109,7 @@ public interface MarkTaskMapper {
 	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, isfinal, "
 			+ "score) values (#{ba.quesid}, #{ba.paperId}, #{tid}, #{ba.mflag}, #{ba.isProblemPaper}, true, "
 			+ "#{ba.isfinal}, #{ba.score}) on duplicate key update mflag=#{ba.mflag}, isfinal=#{ba.isfinal}, "
-			+ "problem_paper=#{ba.isProblemPaper}, score=#{ba.score}")
+			+ "problem_paper=#{ba.isProblemPaper}, score=#{ba.score}, id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys = true, keyProperty = "ba.id")
 	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 

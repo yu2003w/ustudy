@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -25,6 +30,7 @@ import com.ustudy.exam.dao.RefAnswerDao;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.ScoreMapper;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
@@ -33,6 +39,8 @@ import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
+import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -68,6 +76,9 @@ public class ScoreServiceImpl implements ScoreService {
     
     @Autowired
     private ScoreMapper scoM;
+    
+    @Autowired
+    private ScoreCache scoC;
 
     public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
         logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
@@ -127,8 +138,49 @@ public class ScoreServiceImpl implements ScoreService {
 
     public boolean recalculateQuestionScore(Long egsId) throws Exception {
         logger.debug("egsId: " + egsId);
-        // TODO Auto-generated method stub
-        return false;
+        
+        new Thread() {
+            public void run() {                
+                /**
+                 * 创建线程池，并发量最大为5
+                 * LinkedBlockingDeque，表示执行任务或者放入队列
+                 */
+                ThreadPoolExecutor tpe = new ThreadPoolExecutor(20, 100, 0,
+                        TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                        new ThreadPoolExecutor.CallerRunsPolicy());
+                
+                //存储线程的返回值
+                List<Future<String>> results = new LinkedList<Future<String>>();
+                
+                List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                
+                for (RefAnswer refAnswer : refAnswers) {
+                    RecalculateQuestionScoreTask task = new RecalculateQuestionScoreTask(egsId, refAnswer, quesDaoImpl, multipleScoreSetDaoImpl, answerDaoImpl);
+                    Future<String> result = tpe.submit(task);
+                    results.add(result);
+                }
+                
+                //此函数表示不再接收新任务，
+                //如果不调用，awaitTermination将一直阻塞
+                tpe.shutdown();
+                //1天，模拟永远等待
+                try {
+                    tpe.awaitTermination(1, TimeUnit.DAYS);
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage());                    
+                }
+                
+                ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
+                if(null != examSubject && null != examSubject.getExamid()){
+                    calClsSubScore(examSubject.getExamid().intValue(), -1);
+                }
+                
+                scoC.setScoreColStatus(egsId.intValue(), true);
+                
+            }
+        }.start();
+        
+        return true;
         
     }
     
@@ -188,17 +240,25 @@ public class ScoreServiceImpl implements ScoreService {
     				}
     				Collections.sort(exameeScores);
     				
-    				float score = 1000;
-    				int index = 0;
-    				for (ExameeScore exameeScore : exameeScores) {
-    					if(exameeScore.getScore() <= score){
-    						if(exameeScore.getScore() < score){
-    							index = index+1;
-    						}
-    						score = exameeScore.getScore();
-    						exameeScore.setRank(index);
+    				int rank = 1;
+    				// modified by jared, alreay sorted examinee scores
+    				// if score equals, rank should be the same, however, 
+    				// others' rank should be adjusted corresponding
+    				for (int i = 0; i < exameeScores.size(); i++) {
+    					if (i == 0) {
+    						exameeScores.get(i).setRank(rank);
     					}
+    					else {
+    						if (exameeScores.get(i).getScore().compareTo(exameeScores.get(i-1).getScore()) == 0) {
+    							exameeScores.get(i).setRank(exameeScores.get(i-1).getRank());
+    						}
+    						else {
+    							exameeScores.get(i).setRank(rank);
+    						}
+    					}
+    					rank++;
     				}
+    				
     				exameeScoreDao.deleteExameeScores(examId);
     				exameeScoreDao.insertExameeScores(exameeScores);
     			}
@@ -326,7 +386,7 @@ public class ScoreServiceImpl implements ScoreService {
             int startno = (int)map.get("startno");
             String markMode = "单评";
             if(null != map.get("markMode")){
-                map.get("markMode").toString();
+                markMode = map.get("markMode").toString();
             }
             markModes.put(subId + "-" + startno, markMode);
 		}
@@ -384,10 +444,20 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		List<Map<String, Object>> stepScores = subscoreDao.getStudentStepScores(stuId, examId, null);
 		for (Map<String, Object> map : stepScores) {
-		    float score = (int)map.get("score");
+		    float score = (float)map.get("score");
 		    subjectives = setScores(subjectives, map.get("id").toString(), score);
         }
-
+		
+		for (Entry<Long,List<Map<String,Object>>> entry : subjectives.entrySet()) {
+		    Collections.sort(entry.getValue(), new Comparator<Map<String,Object>>() {
+	            @Override
+	            public int compare(Map<String,Object> o1, Map<String,Object> o2) {
+	                //升序
+	                return Integer.valueOf(o1.get("quesno").toString()).compareTo(Integer.valueOf(o2.get("quesno").toString()));
+	            }
+	        });
+        }
+		
 		result.put("subjectives", subjectives);
 		result.put("objectives", objectives);
 		
@@ -424,7 +494,7 @@ public class ScoreServiceImpl implements ScoreService {
 		List<ScoreClass> scL = scoM.getScoreClass(eid, gid);
 		
 		// each time score for one grade calculated
-		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty()) && gid > 0) {
+		if ((ssCl == null || ssCl.isEmpty() || scL == null || scL.isEmpty())) {
 			if (!calClsSubScore(eid, gid))
 				return new ArrayList<ScoreClass>();
 		}
@@ -536,7 +606,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		// save class subject score
 		int ret = scoM.saveScoreSubCls(ssCl);
-		if (ret != ssCl.size()) {
+		if (ret < 0) {
 			logger.error("calClsSubScore(), save subject class score failed with ret->" + ret + 
 					", expected->" + ssCl.size());
 			throw new RuntimeException("calClsSubScore(), save subject class score failed");
@@ -545,7 +615,7 @@ public class ScoreServiceImpl implements ScoreService {
 		
 		List<ScoreClass> scL = calScoreClass(ssCl, eid);
 		ret = scoM.saveScoreClass(scL);
-		if (ret != scL.size()) {
+		if (ret < 0) {
 			logger.error("calClsSubScore(), save class score failed with ret->" + ret + 
 					", expected->" + scL.size());
 			throw new RuntimeException("getClsScores(), save class score failed");
@@ -553,6 +623,11 @@ public class ScoreServiceImpl implements ScoreService {
 		logger.info("calClsSubScore(), class score saved with ret->" + ret);
 		
 		return true;
+	}
+
+	@Override
+	public boolean isScoreCalculated(int egsid) {
+		return scoC.getScoreColStatus(egsid);
 	}
 	
 }
