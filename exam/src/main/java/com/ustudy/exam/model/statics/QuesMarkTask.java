@@ -64,12 +64,9 @@ public class QuesMarkTask implements Serializable {
 		if (res == null || res.length < 1)
 			return dis;
 		
-		int factor = res.length;
+		int factor = res.length, left = this.total % factor;
 		for (int i=0; i<factor; i++) {
-			if (i == factor -1)
-				dis.put(res[i], this.total/factor + this.total%factor);
-			else
-				dis.put(res[i],	this.total/factor);
+			dis.put(res[i], this.total / factor + (i < left ? 1:0));
 		}
 		return dis;
 	}
