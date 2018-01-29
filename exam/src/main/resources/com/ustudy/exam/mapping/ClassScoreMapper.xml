@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.mapper.ScoreMapper">
+
+	<resultMap type="com.ustudy.exam.model.statics.ScoreSubjectCls" id="ScoreSubjectCls">
+		<result property="clsId"  column="clsId" />
+		<result property="egsId"  column="egsId" />
+		<result property="aveScore"  column="aveScore" />
+		<result property="rank"  column="rank" />
+		<result property="subjectName" column="subjectName" />
+	</resultMap>
+	
+	<resultMap type="com.ustudy.exam.model.statics.ScoreClass" id="ScoreClass">
+	    <result property="rank" column="rank"/>
+	    <result property="aveScore" column="aveScore"/>
+	    <result property="clsName" column="clsName"/>
+	    <result property="clsId"  column="clsId"/>
+	</resultMap>
+	
+	<select id="calScoreSubCls" resultMap="ScoreSubjectCls">
+		select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId, subject.name as subjectName, examgradesub.grade_id as gradeId
+		FROM ustudy.examinee
+		join ustudy.subscore on examinee.id = subscore.stuid
+		join ustudy.class on class.id = examinee.class_id
+		join examgradesub on examgradesub.id = subscore.exam_grade_sub_id
+		join ustudy.subject on subject.id = examgradesub.sub_id
+		where examgradesub.examid=#{eid}
+		<if test="gid > 0">
+			and examgradesub.grade_id=#{gid}
+		</if>
+		group by examinee.class_id, examgradesub.sub_id	, examgradesub.grade_id	
+		order by aveScore desc
+	</select>
+	
+	<insert id="saveScoreSubCls" parameterType="com.ustudy.exam.model.statics.ScoreSubjectCls">
+	    insert into ustudy.scoreclssubject (cls_id, egs_id, ave_score, rank) values
+	    <foreach collection="list" item="item" separator=",">
+	        (#{item.clsId}, #{item.egsId}, #{item.aveScore}, #{item.rank})
+	    </foreach>
+	    on duplicate key update ave_score=VALUES(ave_score), rank=VALUES(rank)
+	</insert>
+	
+	<select id="getScoreSubCls" resultMap="ScoreSubjectCls">
+	    select ave_score as aveScore, rank, cls_id as clsId, subject.name as subjectName from scoreclssubject
+	    join examgradesub on examgradesub.id = scoreclssubject.egs_id 
+	    join subject on subject.id = examgradesub.sub_id 
+	    where examgradesub.examid = #{eid} 
+	    <if test="gid > 0">
+	    and examgradesub.grade_id = #{gid}
+	    </if>
+	    order by cls_id
+	</select>
+	
+	<select id="getScoreClass" resultMap="ScoreClass">
+	    select ave_score as aveScore, rank, class.cls_name as clsName, class.id as clsId from ustudy.scoreclass
+	    join class on class.id = scoreclass.cls_id 
+	    join examgradesub on examgradesub.examid = scoreclass.exam_id
+	    where scoreclass.exam_id = #{eid}
+	    <if test="gid > 0">
+	    and examgradesub.grade_id = #{gid}
+	    </if>
+	    order by rank, examgradesub.grade_id asc
+	</select>
+	
+	<insert id="saveScoreClass" parameterType="com.ustudy.exam.model.statics.ScoreClass" >
+	    insert into ustudy.scoreclass (cls_id, exam_id, ave_score, rank) values
+	    <foreach collection="list" item="item" separator=",">
+	        (#{item.clsId}, #{item.examId}, #{item.aveScore}, #{item.rank})
+	    </foreach>
+	    on duplicate key update ave_score=VALUES(ave_score), rank=VALUES(rank)
+	</insert>
+	
+</mapper>

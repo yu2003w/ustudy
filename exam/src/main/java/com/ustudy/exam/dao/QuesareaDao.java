@@ -13,4 +13,6 @@ public interface QuesareaDao {
 	
 	void insertQuesareas(List<Quesarea> quesareas);
 	
+	List<Quesarea> getQuesareas(Long quesid);
+	
 }

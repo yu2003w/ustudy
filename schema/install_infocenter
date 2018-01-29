@@ -5,10 +5,11 @@ create table if not exists ustudy.class (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id INT NOT NULL,
 cls_name VARCHAR(32) NOT NULL,
-cls_type ENUM ('art','sci','none') NOT NULL,
-cls_owner VARCHAR(32),
+cls_type ENUM ('art','sci','none') NOT NULL DEFAULT 'none',
+cls_owner CHAR(11),
 PRIMARY KEY (id),
 INDEX(grade_id),
+UNIQUE KEY(grade_id, cls_name),
 FOREIGN KEY (grade_id)
     REFERENCES ustudy.grade(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -43,10 +44,9 @@ FOREIGN KEY (schid)
 
 create table if not exists ustudy.classsub (
 id INT NOT NULL AUTO_INCREMENT,
-sub_id int(11) DEFAULT NULL,
-sub_name VARCHAR(32) NOT NULL,
+sub_id int(11) NOT NULL,
 cls_id INT NOT NULL,
-sub_owner VARCHAR(32),
+sub_owner CHAR(11),
 PRIMARY KEY(id),
 INDEX(cls_id, sub_owner),
 FOREIGN KEY (cls_id)
@@ -55,30 +55,43 @@ FOREIGN KEY (cls_id)
 FOREIGN KEY (sub_owner)
     REFERENCES ustudy.teacher(teacid)
     ON UPDATE CASCADE ON DELETE SET NULL,
-FOREIGN KEY (sub_id, sub_name)
-    REFERENCES ustudy.subject(id, name)
-    ON UPDATE CASCADE ON DELETE SET NULL
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+# dictionary table for teacher role values
+create table if not exists ustudy.rolevalue (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(32) NOT NULL,
+PRIMARY KEY(id),
+UNIQUE KEY(name)
 ) ENGINE=InnoDB;
 
 create table if not exists ustudy.teacherroles (
 id INT NOT NULL AUTO_INCREMENT,
-role_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+role_id INT NOT NULL,
+teac_id CHAR(11) NOT NULL,
 INDEX(teac_id),
 PRIMARY KEY (id),
+UNIQUE KEY(role_id,teac_id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (role_id)
+    REFERENCES ustudy.rolevalue(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 # subject leader at department level
 create table if not exists ustudy.departsub (
 id INT NOT NULL AUTO_INCREMENT,
-sub_name varchar(32) NOT NULL,
-sub_owner varchar(32),
+sub_owner CHAR(11),
+sub_id int(11) NOT NULL,
 type ENUM('high','junior','primary','other'),
 schid varchar(32) NOT NULL,
 INDEX(sub_owner, schid, type),
+UNIQUE KEY(sub_id, type, schid),
 PRIMARY KEY (id),
 FOREIGN KEY (schid)
     REFERENCES ustudy.school(schid)
@@ -91,9 +104,9 @@ FOREIGN KEY (sub_owner)
 create table if not exists ustudy.teachersub (
 id INT NOT NULL AUTO_INCREMENT,
 sub_id int(11) NOT NULL,
-sub_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+teac_id CHAR(11) NOT NULL,
 INDEX(teac_id),
+UNIQUE KEY (sub_id, teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
@@ -106,9 +119,8 @@ FOREIGN KEY (sub_id)
 create table if not exists ustudy.teachergrade (
 id INT NOT NULL AUTO_INCREMENT,
 grade_id int(11) NOT NULL,
-grade_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
-INDEX(teac_id, grade_name),
+teac_id CHAR(11) NOT NULL,
+UNIQUE KEY(teac_id, grade_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
@@ -120,10 +132,10 @@ FOREIGN KEY (grade_id)
 
 create table if not exists ustudy.teacherclass (
 id INT NOT NULL AUTO_INCREMENT,
-class_id int(11) NOT NULL,
-class_name varchar(32) NOT NULL,
-teac_id varchar(32) NOT NULL,
+class_id INT(11) NOT NULL,
+teac_id CHAR(11) NOT NULL,
 INDEX(teac_id),
+UNIQUE KEY(class_id, teac_id),
 PRIMARY KEY (id),
 FOREIGN KEY (teac_id)
     REFERENCES ustudy.teacher(teacid)
@@ -135,7 +147,7 @@ FOREIGN KEY (class_id)
 
 create table if not exists ustudy.teacherjob (
 id INT NOT NULL AUTO_INCREMENT,
-teacid varchar(32) NOT NULL,
+teacid CHAR(11) NOT NULL,
 subject varchar(16) NOT NULL,
 grade_id INT NOT NULL,
 class_id INT,

@@ -2,6 +2,7 @@ package com.ustudy.info.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SubjectTeac implements Serializable {
@@ -16,24 +17,18 @@ public class SubjectTeac implements Serializable {
 	
 	@JsonProperty("teacher")
 	private TeacherBrife teac = null;
+	
+	@JsonIgnore
+	private String teacid = null;
+	
+	@JsonIgnore
+	private String teacname = null;
 
 	public SubjectTeac() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectTeac(String sub, TeacherBrife planner) {
-		super();
-		this.sub = sub;
-		this.teac = planner;
-	}
-	
-	public SubjectTeac(String sub, String teacid, String teacname) {
-		super();
-		this.sub = sub;
-		this.teac = new TeacherBrife(teacid, teacname);
-	}
-	
 	public String getSub() {
 		return sub;
 	}
@@ -50,9 +45,29 @@ public class SubjectTeac implements Serializable {
 		this.teac = teac;
 	}
 
+	public String getTeacid() {
+		return teacid;
+	}
+
+	public void setTeacid(String teacid) {
+		this.teacid = teacid;
+	}
+
+	public String getTeacname() {
+		return teacname;
+	}
+
+	public void setTeacname(String teacname) {
+		this.teacname = teacname;
+		if (teacname != null && this.teac == null) {
+			this.teac = new TeacherBrife(this.teacid, this.teacname);
+		}
+		
+	}
+
 	@Override
 	public String toString() {
-		return "SubjectTeac [sub=" + sub + ", teac=" + teac + "]";
+		return "SubjectTeac [sub=" + sub + ", teac=" + teac + ", teacid=" + teacid + ", teacname=" + teacname + "]";
 	}
 	
 }

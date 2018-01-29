@@ -1,90 +1,117 @@
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stu.data' INTO TABLE ustudy.student
+#SET foreign_key_checks = 0;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/school.csv' INTO TABLE ustudy.school
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE ustudy.users
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/orgowner.csv' INTO TABLE ustudy.orgowner
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/school.data' INTO TABLE ustudy.school
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teacher.csv' INTO TABLE ustudy.teacher
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/owners.data' INTO TABLE ustudy.orgowner
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/grade.csv' INTO TABLE ustudy.grade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teachers.data' INTO TABLE ustudy.teacher
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/class.csv' INTO TABLE ustudy.class
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teagrade.data' INTO TABLE ustudy.teachergrade
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teagrade.csv' INTO TABLE ustudy.teachergrade
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teasub.data' INTO TABLE ustudy.teachersub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/teasub.csv' INTO TABLE ustudy.teachersub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/tearoles.data' INTO TABLE ustudy.teacherroles
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/tearoles.csv' INTO TABLE ustudy.teacherroles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/grade.data' INTO TABLE ustudy.grade
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/gradesub.csv' INTO TABLE ustudy.gradesub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/gradesub.data' INTO TABLE ustudy.gradesub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/departsub.csv' INTO TABLE ustudy.departsub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/exam.data' INTO TABLE ustudy.exam
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/exam.csv' INTO TABLE ustudy.exam
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/examschool.data' INTO TABLE ustudy.examschool
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examschool.csv' INTO TABLE ustudy.examschool
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/examgradesub.data' INTO TABLE ustudy.examgradesub
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examgradesub.csv' INTO TABLE ustudy.examgradesub
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/quesanswer.data' INTO TABLE ustudy.quesanswer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/question.csv' INTO TABLE ustudy.question
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/quesdiv.data' INTO TABLE ustudy.quesanswerdiv
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesstep.csv' INTO TABLE ustudy.question_step
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/teascoretask.data' INTO TABLE ustudy.teacherscoretask
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/quesarea.csv' INTO TABLE ustudy.quesarea
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stupaper.data' INTO TABLE ustudy.stupaper
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.csv' INTO TABLE ustudy.marktask
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/stuanswer.data' INTO TABLE ustudy.stuanswer
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/examinee.csv' INTO TABLE ustudy.examinee
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/paper.csv' INTO TABLE ustudy.paper
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/mulscoreset.csv' INTO TABLE ustudy.multiple_score_set
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/refanswer.csv' INTO TABLE ustudy.refanswer
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/objanswer.csv' INTO TABLE ustudy.obj_answer
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.csv' INTO TABLE ustudy.marktask
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+#SET foreign_key_checks = 1;

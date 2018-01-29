@@ -47,7 +47,7 @@
 		<property name="poolProperties">
 			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
 				<property name="url"
-					value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
+					value="jdbc:mysql://localhost:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 				<property name="username" value="root" />
 				<property name="password" value="mysql" />
@@ -75,7 +75,15 @@
 		<!-- By default the servlet container sessions will be used. Uncomment 
 			this line to use shiro's native sessions (see the JavaDoc for more): -->
 		<!-- <property name="sessionMode" value="native"/> -->
+		<!-- <property name="sessionManager" ref="sesManager"/> -->
 	</bean>
+	
+	<!-- 
+	<bean id="sesManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+	    <property name="globalSessionTimeout" value="600000"/>
+	</bean>
+	-->
+	
 	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
 
 	<!-- Define the Shiro Realm implementation you want to use to connect to 
@@ -87,7 +95,8 @@
 		<property name="authenticationQuery"
 			value="select passwd from ustudy.teacher where teacid = ?" />
 		<property name="userRolesQuery"
-			value="select role_name from ustudy.teacherroles where teac_id = ?" />
+			value="select name from ustudy.teacherroles join ustudy.rolevalue on ustudy.rolevalue.id = 
+			ustudy.teacherroles.role_id where teac_id = ?" />
 		<property name="permissionsQuery"
 			value="select perm from ustudy.perms where role_name = ?" />
 	</bean>
@@ -123,7 +132,7 @@
 	</bean>
 
 	<!-- scan for mappers and make them autowired -->
-	<mybatis:scan base-package="com.ustudy.exam.mapper" />
+	<mybatis:scan base-package="com.ustudy.exam.mapper,com.ustudy.info.mapper" />
 	<!-- DAO接口所在包名，Spring会自动查找其下的类 ,包下的类需要使用@MapperScan注解,否则容器注入会失败 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ustudy.exam.dao" />
@@ -133,7 +142,7 @@
 	<!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
+		p:use-pool="true" p:database="0" p:host-name="localhost" p:port="6379"
 		p:timeout="100" />
 
 	<!-- redis template definition -->

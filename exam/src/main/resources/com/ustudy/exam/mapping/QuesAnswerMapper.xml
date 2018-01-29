@@ -18,40 +18,55 @@
     </resultMap>
 
 	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
-		SELECT * FROM quesanswer where exam_grade_sub_id=#{egsId}
+		SELECT * FROM question where exam_grade_sub_id=#{egsId} ORDER BY startno
+	</select>
+	
+	<select id="getQuesAnswer" parameterType="java.util.Map" resultMap="QuesAnswerResult">
+		SELECT * FROM question where id=#{quesId} and exam_grade_sub_id=#{egsId} limit 1
 	</select>
 	
 	<select id="getQuesAnswersByIds" parameterType="string" resultMap="QuesAnswerResult">
-		SELECT * FROM quesanswer where exam_grade_sub_id in (#{egsIds})
+		SELECT * FROM question where exam_grade_sub_id in (#{egsIds})
+	</select>
+	
+	<select id="getQuestions" parameterType="java.util.List" resultMap="QuesAnswerResult">
+		SELECT * FROM question where exam_grade_sub_id in
+		<foreach item="item" index="index" collection="egsIds" open="(" separator="," close=")">  
+		 #{item}  
+		</foreach>
 	</select>
 
 	<delete id="deleteQuesAnswers" parameterType="Long">
-		delete FROM quesanswer where exam_grade_sub_id=#{egsId}
+		delete FROM question where exam_grade_sub_id=#{egsId}
 	</delete>
 	
 	<delete id="deleteQuesAnswerByIds" parameterType="java.util.Map">
-		delete FROM quesanswer where exam_grade_sub_id=#{egsId} and id not in 
+		delete FROM question where exam_grade_sub_id=#{egsId} and id not in 
 		<foreach item="item" index="index" collection="quesAnswerIds" open="(" separator="," close=")">  
 		 #{item}  
 		</foreach>
 	</delete>
 
 	<insert id="insertQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into quesanswer (quesno,startno,endno,type,branch,choice_num,score,exam_grade_sub_id) values  
+		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score,branch) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.branch},#{item.choiceNum},#{item.score},#{item.examGradeSubId})  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score},#{item.branch})  
 	    </foreach>  
 	</insert>
 
 	<insert id="initQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into quesanswer (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score) values  
+		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})
 	    </foreach>  
 	</insert>
 	
 	<update id="updateQuesAnswer" parameterType="com.ustudy.exam.model.QuesAnswer">  
-        UPDATE quesanswer set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}
+        UPDATE question set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}
 	</update>
+	
+	<select id="getObjectQuestions" parameterType="Long" resultType="java.util.Map">
+		SELECT startno,endno,type FROM question where exam_grade_sub_id=#{egsId} AND type in ('单选题','多选题','判断题')
+	</select>
 
 </mapper>

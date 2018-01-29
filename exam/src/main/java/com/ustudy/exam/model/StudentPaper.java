@@ -105,5 +105,12 @@ public class StudentPaper implements Serializable {
 	public void setErrorStatus(String errorStatus) {
 		this.errorStatus = errorStatus;
 	}
+
+	@Override
+	public String toString() {
+		return "StudentPaper [id=" + id + ", stuNo=" + stuNo + ", stuExamNo=" + stuExamNo + ", examId=" + examId
+				+ ", gradeId=" + gradeId + ", subjectId=" + subjectId + ", egsId=" + egsId + ", batchNum=" + batchNum
+				+ ", paperImg=" + paperImg + ", paperStatus=" + paperStatus + ", errorStatus=" + errorStatus + "]";
+	}
 	
 }

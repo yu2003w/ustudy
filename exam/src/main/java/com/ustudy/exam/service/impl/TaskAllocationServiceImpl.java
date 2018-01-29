@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -23,6 +24,7 @@ import com.ustudy.exam.model.Grade;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.service.TaskAllocationService;
+import com.ustudy.info.util.InfoUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -59,16 +61,19 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 		JSONArray array = new JSONArray();
 		List<QuesAnswer> quesAnswers = quesAnswerDaoImpl.getQuesAnswers(egsId);
 		for (QuesAnswer quesAnswer : quesAnswers) {
-			JSONObject object = new JSONObject();
-			object.put("id", quesAnswer.getId());
-			if (quesAnswer.getStartno() == quesAnswer.getEndno()) {
-				object.put("questionName", "" + quesAnswer.getStartno());
-			} else {
-				object.put("questionName", quesAnswer.getStartno() + "-" + quesAnswer.getEndno());
-			}
-			object.put("type", quesAnswer.getType());
-
-			array.add(object);
+		    String type = quesAnswer.getType();
+		    if(null != type && !type.equals("单选题") && !type.equals("多选题") && !type.equals("判断题")){
+		        JSONObject object = new JSONObject();
+		        object.put("id", quesAnswer.getId());
+		        if (quesAnswer.getStartno() == quesAnswer.getEndno()) {
+		            object.put("questionName", "" + quesAnswer.getStartno());
+		        } else {
+		            object.put("questionName", quesAnswer.getStartno() + "-" + quesAnswer.getEndno());
+		        }
+		        object.put("type", type);
+		        
+		        array.add(object);
+		    }
 		}
 		return array;
 	}
@@ -123,7 +128,7 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 							grade.put("id", g.getId());
 							grade.put("gradeName", g.getGradeName());
 							grade.put("gradeType", true);
-							grade.put("gradeOwner", teacherMap.get(g.getGradeOwner().toString()));
+							grade.put("gradeOwner", teacherMap.get(g.getGradeOwner()));
 							grade.put("classNum", g.getClassesNum());
 							
 							JSONArray subjects = new JSONArray();					
@@ -131,8 +136,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 							if(null != gradesubs && gradesubs.size()>0){
 								for(Map gradesub : gradesubs){
 									JSONObject subject = new JSONObject();
-									subject.put("subject", gradesub.get("name").toString());
-									subject.put("teacher", teacherMap.get(gradesub.get("owner").toString()));
+									Object name = gradesub.get("name");
+									if(null != name){
+										subject.put("subject", name.toString());
+									}
+									Object owner = gradesub.get("owner");
+									if(null != owner){
+										subject.put("teacher", teacherMap.get(owner.toString()));
+									}
 									
 									subjects.add(subject);
 								}
@@ -155,8 +166,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 									if(null != classubs && classubs.size()>0){
 										for(Map sub : classubs){
 											JSONObject subject_ = new JSONObject();
-											subject_.put("subject", sub.get("name").toString());
-											subject_.put("teacher", teacherMap.get(sub.get("owner").toString()));
+											Object name = sub.get("name");
+											if(null != name){
+												subject_.put("subject", name.toString());
+											}
+											Object owner = sub.get("owner");
+											if(null != owner){
+												subject_.put("teacher", teacherMap.get(owner.toString()));
+											}
 											
 											subjects_.add(subject_);
 										}
@@ -194,7 +211,7 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 			object.put("gradeType", true);
 			object.put("classNum", grade.getClassesNum());
 			
-			List<Map> teachers = teacherDaoImpl.getTeachersBySchoolInGradeName(grade.getSchid(), grade.getGradeName());
+			List<Map<String, Object>> teachers = teacherDaoImpl.getTeachersBySchoolInGradeName(grade.getSchid(), grade.getGradeName());
 			Map<String, Map> teacherMap = getTeachersBySchoolInGradeName(teachers);
 			object.put("gradeOwner", teacherMap.get(grade.getGradeOwner()));
 			
@@ -203,8 +220,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 			if(null != gradeSubjects && gradeSubjects.size()>0){
 				for(Map gradesub : gradeSubjects){
 					JSONObject subject = new JSONObject();
-					subject.put("subject", gradesub.get("name").toString());
-					subject.put("teacher", teacherMap.get(gradesub.get("owner").toString()));
+					Object name = gradesub.get("name");
+					if(null != name){
+						subject.put("subject", name.toString());
+					}
+					Object owner = gradesub.get("owner");
+					if(null != owner){
+						subject.put("teacher", teacherMap.get(owner.toString()));
+					}
 					
 					subjects.add(subject);
 				}
@@ -227,8 +250,15 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 					if(null != classSubs && classSubs.size()>0){
 						for (Map classsub : classSubs) {
 							JSONObject subject = new JSONObject();
-							subject.put("subject", classsub.get("name").toString());
-							subject.put("teacher", teacherMap.get(classsub.get("owner").toString()));
+							
+							Object name = classsub.get("name");
+							if(null != name){
+								subject.put("subject", name.toString());
+							}
+							Object owner = classsub.get("owner");
+							if(null != owner){
+								subject.put("teacher", teacherMap.get(owner.toString()));
+							}
 							
 							classSub.add(subject);
 						}
@@ -248,14 +278,14 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 	
 	private Map<String, Map> getTeachersBySchoolId(String schoolId){
 		Map<String, Map> resaltMap = new HashMap<>(); 
-		List<Map> teachers = teacherDaoImpl.getTeachersBySchoolId(schoolId);
+		List<Map<String, Object>> teachers = teacherDaoImpl.getTeachersBySchoolId(schoolId);
 		for (Map map : teachers) {
 			resaltMap.put(map.get("id").toString(), map);
 		}
 		return resaltMap;
 	}
 	
-	private Map<String, Map> getTeachersBySchoolInGradeName(List<Map> teachers){
+	private Map<String, Map> getTeachersBySchoolInGradeName(List<Map<String, Object>> teachers){
 		Map<String, Map> resaltMap = new HashMap<>(); 
 		if(null != teachers && teachers.size()>0){
 			for (Map map : teachers) {
@@ -333,6 +363,92 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 			resaltMap.put(Long.valueOf((Integer) cla.get("id")), list);
 		}
 		return resaltMap;
+	}
+
+	public List<Map<String, Object>> getGradeNotaskTeachers(Long gradeId) throws Exception {
+		return teacherDaoImpl.getGradeNotaskTeachers(gradeId);
+	}
+
+	public JSONArray getSchoolTeachers() throws Exception {
+		
+		String schId = InfoUtil.retrieveSessAttr("orgId");
+        if (schId == null || schId.isEmpty()) {
+        	logger.error("getSchoolTeachers(), no school id found, maybe user not login");
+        	throw new RuntimeException("getSchoolTeachers(), no school id found, maybe user not login");
+        }
+		
+		JSONArray array = new JSONArray();
+		
+		List<Map<String, Object>> teachers = teacherDaoImpl.getSchoolTeachers(schId);
+		
+		Map<Long, Map<String, Object>> gradeMap = new HashMap<>();
+		Map<Long, Map<String, Object>> subMap = new HashMap<>();
+		Map<String, Map<String, Object>> teacMap = new HashMap<>();
+		Map<Long, Map<Long, List<String>>> summary = new HashMap<>();
+		
+		for (Map<String, Object> map : teachers) {
+			if(null != map.get("gradeId") && null != map.get("subId") && null != map.get("teacId")){
+				long gradeId = (int)map.get("gradeId");
+				Map<Long, List<String>> grades = summary.get(gradeId);
+				if(null == grades){
+					grades = new HashMap<>();
+					
+					Map<String, Object> gMap = new HashMap<>();
+					gMap.put("gradeId", gradeId);
+					gMap.put("gradeName", map.get("gradeName"));
+					gradeMap.put(gradeId, gMap);
+				}
+				
+				long subId = (int)map.get("subId");
+				List<String> subs = grades.get(subId);
+				if(null == subs){
+					subs = new ArrayList<>();
+					Map<String, Object> sMap = new HashMap<>();
+					sMap.put("subId", subId);
+					sMap.put("subName", map.get("subName"));
+					subMap.put(subId, sMap);
+				}
+				
+				String teacId = map.get("teacId").toString();
+				subs.add(teacId);
+				grades.put(subId, subs);
+				
+				Map<String, Object> tMap = new HashMap<>();
+				tMap.put("teacId", teacId);
+				tMap.put("teacName", map.get("teacName"));
+				teacMap.put(teacId, tMap);
+				
+				summary.put(gradeId, grades);
+			}
+		}
+		
+		for (Entry<Long,Map<Long,List<String>>> entry : summary.entrySet()) {
+			long gradeId = entry.getKey();
+			Map<String, Object> grade = gradeMap.get(gradeId);
+			if(null != grade){
+				Map<Long,List<String>> subjects = entry.getValue();
+				JSONArray subjectArray = new JSONArray();
+				for (Entry<Long,List<String>> sub : subjects.entrySet()) {
+					long subId = sub.getKey();
+					Map<String, Object> subject = subMap.get(subId);
+					if(null != subject){
+						List<String> teacs = sub.getValue();
+						JSONArray teacherArray = new JSONArray();
+						for (String teacId : teacs) {
+							if(null != teacMap.get(teacId)){
+								teacherArray.add(teacMap.get(teacId));
+							}
+						}
+						subject.put("teachers", teacherArray);
+					}
+					subjectArray.add(subject);
+				}
+				grade.put("subjects", subjectArray);
+			}
+			array.add(grade);
+		}
+		
+		return array;
 	}
 
 }

@@ -17,6 +17,7 @@ import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
+import com.ustudy.exam.model.cache.MarkUpdateResult;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.utility.ExamUtil;
 
@@ -73,7 +74,7 @@ public class MarkTaskController {
 			st = stS.getTaskPapers(teacid, quesR);
 		} catch (Exception e) {
 			logger.warn("getTaskPapers()" + e.getMessage());
-			String msg = "Failed to retrieve score task for teacher " + teacid;
+			String msg = "Failed to retrieve mark task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
@@ -85,7 +86,7 @@ public class MarkTaskController {
 	}
 	
 	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
-	public String updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
+	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
 		if (up == null) {
 			logger.warn("updateMarkResult(), request parameter is not valid");
 			try {
@@ -97,13 +98,14 @@ public class MarkTaskController {
 		else
 			logger.debug("updateMarkResult(), update marked result ->" + up.toString());
 		
-		String result = null;
+		List<MarkUpdateResult> mur= null;
 		try {
-			if (stS.updateMarkResult(up)) {
-				result = "update mark result successully";
+			mur = stS.updateMarkResult(up);
+			if (mur == null || mur.isEmpty()){
+				logger.error("updateMarkResult(), update mark result failed");
 			}
 			else
-				result = "update mark result failed";
+				logger.debug("updateMarkResult(), update mark result succeed");
 		} catch (Exception e) {
 			logger.warn("updateMarkResult()," + e.getMessage());
 			try {
@@ -113,7 +115,7 @@ public class MarkTaskController {
 			}
 		}
 		
-		return result;
+		return mur;
 	}
 
 	@RequestMapping(value="/marktasks/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
@@ -170,16 +172,17 @@ public class MarkTaskController {
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
 	public UResp createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
-		if (mt == null) {
-			logger.warn("createMarkTask(), received parameter is not valid");
+		if (mt == null || !mt.isvalid()) {
+			logger.error("createMarkTask(), received parameter is not valid");
 			res.setMessage("parameter invalid");
+			resp.setStatus(422);
 			return res;
 		}
 		
 		logger.debug("createMarkTask(), item to be created -> " + mt.toString());
 		try {
 			if (!stS.createMarkTask(mt)) {
-				logger.warn("createMarkTask(), failed to create mark task");
+				logger.error("createMarkTask(), failed to create mark task");
 				res.setMessage("Failed to create mark task");
 				resp.setStatus(500);
 				return res;
@@ -198,13 +201,40 @@ public class MarkTaskController {
 
 	@RequestMapping(value = "marktask/update/", method = RequestMethod.POST)
 	public UResp updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
-		return null;
-	}
-	
-	@RequestMapping(value = "marktask/delete/", method = RequestMethod.GET)
-	public UResp deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
 		
+		if (mt == null || !mt.isvalid()) {
+			logger.warn("updateMarkTask(), received parameter is invalid");
+			res.setMessage("parameter invalid");
+			return res;
+		}
+		logger.debug("updateMarkTask(), item to be updated --> " + mt.toString());
+		
+		try {
+			if (!stS.updateMarkTask(mt)) {
+				logger.warn("updateMarkTask(), failed to update mark task.");
+				res.setMessage("failed to update mark task specified");
+				res.setData(mt);
+				resp.setStatus(500);
+				return res;
+			}
+			logger.debug("deleteMarkTask(), mark task updated");
+		} catch (Exception e) {
+			logger.warn("updateMarkTask(), failed to update mark task with exception -> " + e.getMessage());
+			res.setMessage("failed to update mark task with exception -> " + e.getMessage());
+			resp.setStatus(500);
+			return res;
+		} 
+		
+		res.setRet(true);
+		return res; 
+		
+	}
+
+	@RequestMapping(value = "marktask/delete/", method = RequestMethod.POST)
+	public UResp deleteMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
+		UResp res = new UResp();
+
 		if (mt == null) {
 			logger.warn("deleteMarkTask(), received parameter is invalid");
 			res.setMessage("parameter invalid");

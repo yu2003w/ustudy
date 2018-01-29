@@ -77,31 +77,21 @@ else
   echo "Launched ustudy-dw container successfully"
 fi
 
-# start redis as cache
-docker run --rm -it --name redis -p 6379:6379 -v ${MYSQL_LOG_DIR}/../redis -d redis:3.2
-if [ $? != 0 ];then
-  echo "Failed to launch redis container"
-  docker stop ustudy-dw
-  exit 1
-else
-  echo "Launched redis container successfully"
-fi
-
 # start nginx as proxy for frontend services
 docker run --rm -it --name nginx -p 80:80 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
     -v ${WORK_DIR}/logs/nginx/:/var/log/nginx/ -d nginx:1.12
 if [ $? != 0 ]; then
   echo "Failed to launch nginx container"
-  docker stop ustudy-dw redis
+  docker stop ustudy-dw
   exit 1
 else
   echo "Launched nginx container successfully"
 fi
-docker cp nginx.conf nginx:/etc/nginx/nginx.conf
+docker cp ${SCHEMA_DIR}/../scripts/nginx.conf nginx:/etc/nginx/nginx.conf
 docker exec -u root nginx /bin/sh -c 'nginx -s reload'
 if [ $? != 0 ]; then
   echo "Failed update nginx configuration"
-  docker stop ustudy-dw redis nginx
+  docker stop ustudy-dw nginx
   exit 1
 else
   echo "Updated nginx configuration"

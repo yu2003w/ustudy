@@ -82,7 +82,7 @@
     <bean id="adminboard" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
         <property name="poolProperties">  
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
-                <property name="url" value="jdbc:mysql://172.26.58.15:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+                <property name="url" value="jdbc:mysql://localhost:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>  
                 <property name="password" value="mysql"/>
@@ -170,7 +170,7 @@
     <!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		p:use-pool="true" p:database="0" p:host-name="172.26.58.15" p:port="6379"
+		p:use-pool="true" p:database="0" p:host-name="localhost" p:port="6380"
 		p:timeout="100" />
 
 	<context:annotation-config />

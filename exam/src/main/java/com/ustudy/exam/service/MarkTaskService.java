@@ -7,6 +7,8 @@ import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
+import com.ustudy.exam.model.cache.MarkUpdateResult;
+import com.ustudy.exam.utility.OSSMetaInfo;
 
 public interface MarkTaskService {
 
@@ -18,7 +20,7 @@ public interface MarkTaskService {
 	 * each time, only one student's paper need to be updated afer mark completed
 	 * 
 	 */
-	public boolean updateMarkResult(QuestionPaper qp);
+	public List<MarkUpdateResult> updateMarkResult(QuestionPaper qp);
 	
 	/*
 	 * only certain roles could retrieve all mark tasks for certain subject
@@ -26,10 +28,18 @@ public interface MarkTaskService {
 	public List<MarkTask> getMarkTasksBySub(ExamGradeSub examgs);
 
 	public MarkTask getMarkTaskByEGSQuestion(ExamGradeSub examgs, String questionId);
-
-        public boolean createMarkTask(MarkTask mt);
-
-        public boolean updateMarkTask(MarkTask mt);
-
-        public boolean deleteMarkTask(MarkTask mt);
+	
+	public boolean createMarkTask(MarkTask mt);
+	
+	public boolean updateMarkTask(MarkTask mt);
+	
+	/**
+	 * Delete all mark task related with specified question id 
+	 * @param mt
+	 * @return
+	 */
+	public boolean deleteMarkTask(MarkTask mt);
+	
+	public OSSMetaInfo loadOSSInfo(String key);
+	
 }

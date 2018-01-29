@@ -5,6 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.QuesAnswerDiv" id="QuesAnswerDivResult">
         <id property="id" column="id"/>
         <result property="quesno" column="quesno"/>
+        <result property="type" column="type"/>
         <result property="branch" column="branch"/>
         <result property="score" column="score"/>
         <result property="quesid" column="quesid"/>
@@ -12,26 +13,27 @@
     </resultMap>
 
 	<select id="getAllQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
-		SELECT * FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
+		SELECT qs.*, q.exam_grade_sub_id FROM question_step qs LEFT JOIN question q ON qs.quesid = q.id 
+		WHERE q.exam_grade_sub_id=#{egsId} ORDER BY quesid
 	</select>
 	
 	<select id="getQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
-		SELECT * FROM quesanswerdiv where quesid=#{quesId}
+		SELECT * FROM question_step where quesid=#{quesId}
 	</select>
 
 	<delete id="deleteQuesAnswerDivs" parameterType="Long">
-		delete FROM quesanswerdiv where exam_grade_sub_id=#{egsId}
+		delete question_step FROM question_step LEFT JOIN question ON question_step.quesid = question.id WHERE question.exam_grade_sub_id = #{egsId}
 	</delete>
 
 	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into quesanswerdiv (quesno,branch,score,quesid,exam_grade_sub_id) values  
+		insert into question_step (quesno,branch,score,quesid,type) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.egsId})  
+	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.type, jdbcType=VARCHAR})  
 	    </foreach>  
 	</insert>
 	
 	<update id="updateQuesAnswerDiv" parameterType="com.ustudy.exam.model.QuesAnswerDiv">  
-        UPDATE quesanswerdiv set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid} WHERE id=#{id}
+        UPDATE question_step set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid}, type=#{type, jdbcType=VARCHAR} WHERE id=#{id}
 	</update>
 
 </mapper>

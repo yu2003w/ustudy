@@ -8,7 +8,13 @@ if [ $# != 1 ]; then
   exit 1
 fi
 
-# load data for infocenter.student
+# a little tricy here, if need to load data for development, move devconfig.data to config.data
+if [ "$1"x = "dev"x ]; then
+  docker exec ustudy-dw sh -c 'mv /root/mysql/schema/sample/configdev.csv /root/mysql/schema/sample/config.csv'
+else
+  docker exec ustudy-dw sh -c 'mv /root/mysql/schema/sample/configprod.csv /root/mysql/schema/sample/config.csv'
+fi
+
 docker exec ustudy-dw sh -c 'mysql -uroot -p"mysql" < /root/mysql/schema/load_data'
 if [ $? = 0 ]; then
   echo "load production data successful"

@@ -1,12 +1,23 @@
 package com.ustudy.exam.dispatch;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.ustudy.exam.model.QuesMarkSum;
 
-public class MarkTaskDispatcher {
-
-	private static final Logger logger = LogManager.getLogger(MarkTaskDispatcher.class);
+/**
+ * @author jared
+ * 
+ */
+public interface MarkTaskDispatcher {
 	
+	/**
+	 * student papers assigned to login user for specific question
+	 * task dispatch should be aware of dispatch mode, average, dynamic or ratio
+	 * 
+	 * @param quesid
+	 * @param batchNum
+	 *     -- number of papers required
+	 * @return
+	 */
+	public QuesMarkSum retrieveQuesMarkSum(String quesid, int batchNum);
 	
 	
 }

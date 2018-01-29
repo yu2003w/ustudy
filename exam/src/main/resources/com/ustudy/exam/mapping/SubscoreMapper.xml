@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.dao.SubscoreDao">
+
+	<delete id="deleteSubscores" parameterType="Long">
+		DELETE from subscore where exam_grade_sub_id=#{egsId}
+	</delete>
+
+	<insert id="insertSubscores" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+		insert into subscore (stuid,exam_grade_sub_id,score,sub_score,obj_score,rank) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.stuid},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
+	    </foreach>  
+	</insert>
+	
+	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
+		SELECT SUM(score) score,stuid from subscore 
+		where exam_grade_sub_id IN (SELECT id from examgradesub where examid=#{examId}) 
+		GROUP BY stuid
+	</select>
+	
+	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT ss.stuid,ee.name,ee.stuno,ee.gradeid,egs.id egsId,su.id subId,su.name subName,ifnull(ss.score,0) score,ifnull(ss.sub_score,0) subScore,ifnull(ss.obj_score,0) objScore
+		from examgradesub egs
+		LEFT JOIN (SELECT * from subscore where stuid=#{stuId}) ss ON egs.id=ss.exam_grade_sub_id
+		LEFT JOIN examinee ee ON ss.stuid=ee.id
+		LEFT JOIN subject su ON egs.sub_id=su.id
+		where egs.examid=#{examId}
+	</select>
+	
+	<select id="getStudentObjScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',a.quesno) id,a.score from obj_answer a 
+		LEFT JOIN paper p ON a.paperid=p.id 
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON egs.id = p.exam_grade_sub_id
+		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
+	
+	<select id="getStudentSubScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',q.startno) id,a.isfinal,a.isviewed,a.score from answer a
+		LEFT JOIN paper p ON a.paperid=p.id  
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON egs.id = p.exam_grade_sub_id
+		LEFT JOIN question q on a.quesid=q.id
+		WHERE e.id=#{stuId} and e.examid=#{examId} AND q.type != '填空题'
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
+	
+	<select id="getStudentStepScores" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT CONCAT(egs.sub_id,'-',ast.quesno) id,ast.score FROM answer_step ast 
+		LEFT JOIN answer a ON ast.answer_id=a.id
+		LEFT JOIN paper p ON a.paperid=p.id
+		LEFT JOIN examinee e ON p.exam_code=e.exam_code
+		LEFT JOIN examgradesub egs ON p.exam_grade_sub_id=egs.id
+		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		<if test="subjectId != null and subjectId > 0">
+			AND egs.sub_id=#{subjectId}
+		</if>
+	</select>
+
+</mapper>

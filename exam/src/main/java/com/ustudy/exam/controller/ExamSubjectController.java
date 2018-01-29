@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.ExamSubjectService;
+import com.ustudy.exam.service.ScoreService;
 
 @RestController
 @RequestMapping(value = "/")
@@ -26,6 +30,9 @@ public class ExamSubjectController {
 	
 	@Autowired
 	private ExamSubjectService service;
+	
+	@Autowired
+    private ScoreService scoreService;
 	
 	/**
 	 * 获取所有考试科目信息
@@ -84,6 +91,14 @@ public class ExamSubjectController {
 		return result;
 	}
 	
+	//TODO： Assemble exam subject info, related question info, related mark task info together
+	// so front end could reduce request
+	@RequestMapping(value = "/examsub/list/{eid}", method = RequestMethod.GET)
+	public UResp getExamSubBrife(@PathVariable int eid, HttpServletResponse resp) {
+		UResp res = new UResp();
+		return res;
+	}
+	
 	/**
 	 * 根据考试ID、年级ID获取考试科目信息
 	 * @param examId 考试ID
@@ -140,4 +155,106 @@ public class ExamSubjectController {
 
 		return result;
 	}
+	
+	/**
+	 * 获取最新一次考试信息
+	 * @return
+	 */
+	@RequestMapping(value = "/last/examsubjects", method = RequestMethod.GET)
+	public Map getLastExamSubjects() {
+		
+		logger.debug("getLastExamSubject().");
+		
+		Map result = new HashMap<>();
+
+		result.put("success", true);
+		result.put("data", service.getLastExamSubjects());
+
+		return result;
+	}
+    
+    /**
+     * 
+     * updateExamSubjectStatus[根据考试科目ID修改开始状态]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月13日 下午8:23:46
+     *
+     * @Title: updateExamSubjectStatus
+     * @param egsId 考试科目ID
+     * @param release 是否发布
+     * @return 返回状态
+     */
+    @RequestMapping(value = "/examsubject/status/{egsId}/{release}", method = RequestMethod.POST)
+    public Map updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release) {
+        
+        logger.debug("updateExamSubjectStatus().");
+        
+        Map result = new HashMap<>();
+        
+        if(release){
+            try {
+                scoreService.recalculateQuestionScore(egsId);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                result.put("success", false);
+                result.put("data", "更新失败");
+                return result;
+            }
+        }
+
+        if(service.updateExamSubjectStatus(egsId, release)){
+            
+            new Thread() {
+                public void run() {
+                    try {
+                        ExamSubject examSubject = service.getExamSubject(egsId);
+                        if(null != examSubject && examSubject.getExamid() > 0){
+                            scoreService.publishExamScore(examSubject.getExamid(), true);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                    }                    
+                }
+            }.start();
+            
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+    
+    /**
+     * 
+     * updateExamSubjectStatus[这里用一句话描述这个方法的作用]
+     * 创建人:  dulei
+     * 创建时间: 2017年12月13日 下午8:27:12
+     *
+     * @Title: updateExamSubjectStatus
+     * @param examId 考试ID
+     * @param gradeId 年级ID
+     * @param subjectId 科目ID
+     * @param release 是否发布
+     * @return 放回状态
+     */
+    @RequestMapping(value = "/examsubject/status/{examId}/{gradeId}/{subjectId}/{release}", method = RequestMethod.POST)
+    public Map updateExamSubjectStatus(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, @PathVariable Boolean release) {
+        
+        logger.debug("updateExamSubjectStatus().");
+        
+        Map result = new HashMap<>();
+
+        if(service.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
 }

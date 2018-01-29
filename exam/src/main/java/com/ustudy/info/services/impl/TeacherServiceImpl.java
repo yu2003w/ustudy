@@ -9,27 +9,27 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
+import com.ustudy.Item;
+import com.ustudy.info.mapper.SchoolMapper;
+import com.ustudy.info.mapper.TeaMapper;
+import com.ustudy.info.model.Subject;
+import com.ustudy.info.model.TeaProperty;
 import com.ustudy.info.model.Teacher;
 import com.ustudy.info.model.UElem;
 import com.ustudy.info.services.TeacherService;
 import com.ustudy.info.util.InfoUtil;
-import com.ustudy.info.util.TeacherRowMapper;
 import com.ustudy.info.util.UElemRowMapper;
 
 /**
@@ -45,80 +45,85 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Autowired
 	private JdbcTemplate jTea;
+	
+	@Autowired
+	private TeaMapper teaM;
 
+	@Autowired
+	private SchoolMapper schM;
+	
 	@Override
 	public List<Teacher> getList(int id) {
-		List<Teacher> teaL = null;
 
-		String sqlOrg = "select * from ustudy.teacher where id > ? and orgid = ? and orgtype = ? limit 10000";
-		try {
-
-			String orgT = InfoUtil.retrieveSessAttr("orgType");
-			String orgId = InfoUtil.retrieveSessAttr("orgId");
-			if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
-				throw new RuntimeException("getList(), it seemed user not logged in");
-			}
-
-			if (id < 0)
-				id = 0;
-
-			teaL = jTea.query(sqlOrg, new TeacherRowMapper(), id, orgId, orgT);
-			logger.debug("Fetched " + teaL.size() + " items of user");
-
-			for (Teacher tea : teaL) {
-				// Noted: for getList() service, front end doesn't need
-				// additional permissions related information
-				retrieveProp(tea);
-				logger.debug(tea.toString());
-			}
-
-		} catch (DataAccessException e) {
-			logger.warn("getList(), retrieve data from id " + id + " failed.");
-			logger.warn(e.getMessage());
+		String orgT = InfoUtil.retrieveSessAttr("orgType");
+		String orgId = InfoUtil.retrieveSessAttr("orgId");
+		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
+			logger.error("getList(), it seemed that user not logged in");
+			throw new RuntimeException("getList(), it seemed user not logged in");
 		}
+		
+		if (id < 0)
+			id = 0;
+		
+		List<Teacher> teaL = teaM.getTeaList(id, orgT, orgId);
+		for (Teacher tea : teaL) {
+			// Noted: for getList() service, front end doesn't need
+			// additional permissions related information
+			retrieveProp(tea);
+			logger.debug(tea.toString());
+		}
+		
 		return teaL;
 	}
 
 	@Override
-	@Transactional
-	public Teacher displayItem(int id) {
-		String sqlD = "select * from ustudy.teacher where id = ?";
-		Teacher item = jTea.queryForObject(sqlD, new TeacherRowMapper(), id);
-
+	public Teacher displayTeacher(int id) {
+		Teacher item = teaM.findTeaById(id);
 		retrieveProp(item);
 
 		return item;
 	}
 
 	private void retrieveProp(Teacher item) {
-		// retrieve subjects
-		String sqlD = "select sub_name as value from ustudy.teachersub where teac_id = ?";
-		List<UElem> subs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		item.setSubjects(subs);
+		// retrieve grades
+		List<Item> grs = teaM.getTeaGrade(item.getTeacId());
+		if (grs == null || grs.isEmpty()) {
+			logger.info("retrieveProp(), no grades found for " + item.getTeacId());
+		}
+		item.setGrades(grs);
 
+		// retrieve subjects
+		List<Item> subs = teaM.getTeaSubjects(item.getTeacId());
+		if (subs == null || subs.isEmpty()) {
+			logger.info("retrieveProp(), no subjects found for " + item.getTeacId());
+		}
+		item.setSubjects(subs);
+		
+		
 		// retrieve classes
-		sqlD = "select class_name as value from ustudy.teacherclass where teac_id = ?";
+		/*
+		sqlD = "select cls_name as value from ustudy.teacherclass left join ustudy.class on "
+				+ "teacherclass.class_id = ustudy.class.id where teac_id = ? and ustudy.teacherclass.class_id "
+				+ "IS NULL";
 		List<UElem> cls = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
 		item.setClasses(cls);
-
-		// retrieve grades
-		sqlD = "select grade_name as value from ustudy.teachergrade where teac_id = ?";
-		List<UElem> gs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId());
-		item.setGrades(gs);
-
-		// retrieve roles and exclude addi_{teac_id}
+		
+	    // retrieve roles and exclude addi_{teac_id}
 		String aRole = "addi_" + item.getTeacId();
 		sqlD = "select role_name as value from ustudy.teacherroles where teac_id = ? and role_name != ?";
-		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole);
+		List<UElem> rs = jTea.query(sqlD, new UElemRowMapper(), item.getTeacId(), aRole); */
+		
+		List<Item> rs = teaM.getTeaRoles(item.getTeacId());
 		// convert internal role to user readable role name
-		for (UElem e : rs) {
-			e.setValue(InfoUtil.getRolemapping().get(e.getValue()));
+		for (Item e : rs) {
+			e.setName(InfoUtil.getRolemapping().get(e.getName()));
 		}
 		logger.debug("retrieveProp(), roles -> " + rs.toString());
 		item.setRoles(rs);
 
 		// retrieve additional permissions
-		sqlD = "select * from ustudy.perms where role_name = ?";
+		String aRole = "addi_" + item.getTeacId();
+		String sqlD = "select * from ustudy.perms where role_name = ?";
 		List<UElem> ps = jTea.query(sqlD, new UElemRowMapper(), aRole);
 		item.setAddiPerms(ps);
 
@@ -127,9 +132,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public Teacher findTeacherById(String teaid) {
 		logger.debug("findTeacherById(), retrieve information for " + teaid);
-		String sqlT = "select * from ustudy.teacher where teacid = ?";
-		Teacher item = jTea.queryForObject(sqlT, new TeacherRowMapper(), teaid);
-		return item;
+		return teaM.findTeaByTeaId(teaid);
 	}
 
 	@Override
@@ -146,122 +149,109 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	@Transactional
-	public int createItem(Teacher item) {
-		logger.debug("createItem(), " + item);
-		// Noted: Schema for table ustudy.teacher is as below,
-		// id, teacid, teacname, passwd, orgType, orgId, ctime, lltime
-		String sqlTeac = "insert into ustudy.teacher values(?,?,?,?,?,?,?,?)";
-
-		// insert record into ustudy.teacher firstly, also auto generated keys is required.
-		KeyHolder keyH = new GeneratedKeyHolder();
-		int id = -1; // auto generated id
+	public int createTeacher(List<Teacher> teaS) {
+		
 		String msg = null;
 
 		String orgT = InfoUtil.retrieveSessAttr("orgType");
 		String orgId = InfoUtil.retrieveSessAttr("orgId");
 		if (orgT == null || orgT.isEmpty() || orgId == null || orgId.isEmpty()) {
-			throw new RuntimeException("createItem(), it seemed user not logged in");
+			throw new RuntimeException("createTeacher(), it seemed user not logged in");
 		}
-		item.setOrgid(orgId);
-		item.setOrgtype(orgT);
-
-		// need to retrieve auto id of teacher item which is returned back in header location
-		int num = jTea.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlTeac, Statement.RETURN_GENERATED_KEYS);
-				psmt.setNull(1, java.sql.Types.INTEGER);
-				psmt.setString(2, item.getTeacId());
-				psmt.setString(3, item.getTeacName());
-
-				// Noted: password should be set as last 6 digits of teacher id
-				// which is phone number
-				try {
-					MessageDigest md = MessageDigest.getInstance("MD5");
-					if (item.getPasswd() != null) {
-						md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
-					} else {
-						// if no passwd set for teacher, passwd should be last 6
-						// characters in teacId
-						if (item.getTeacId() == null || item.getTeacId().length() < 6) {
-							logger.warn("createItem(), teacher id contains less than 6 "
-									+ "characters, failed to populate password");
-							throw new RuntimeException("createItem(), failed to set password.");
-						}
-						String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
-								item.getTeacId().length());
-						md.update(pw.getBytes(), 0, 6);
-
+		
+		int ret = -1;
+		
+		for (Teacher item: teaS) {
+			item.setOrgid(orgId);
+			item.setOrgtype(orgT);
+			
+			try {
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				if (item.getPasswd() != null) {
+					md.update(item.getPasswd().getBytes(), 0, item.getPasswd().length());
+				} else {
+					// if no passwd set for teacher, passwd should be last 6 characters in teacId
+					if (item.getTeacId() == null || item.getTeacId().length() < 6) {
+						logger.error("createTeacher(), teacher id contains less than 6 characters, failed to "
+								+ "populate password");
+						throw new RuntimeException("createTeacher(), failed to set password.");
 					}
-
-					item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
-				} catch (NoSuchAlgorithmException ne) {
-					String emsg = "createItem(), failed to initialize MD5 algorithm.";
-					logger.warn(emsg);
-					throw new RuntimeException(emsg);
+					String pw = item.getTeacId().substring(item.getTeacId().length() - 6,
+							item.getTeacId().length());
+					md.update(pw.getBytes(), 0, 6);
 				}
 
-				psmt.setString(4, item.getPasswd());
-
-				// Noted: need to populate current user's orgtype, orgid
-				psmt.setString(5, orgT);
-				psmt.setString(6, orgId);
-
-				// teacher creation time should be set to current time
-				psmt.setString(7, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-				psmt.setNull(8, java.sql.Types.DATE);
-
-				return psmt;
+				item.setPasswd(String.format("%032x", new BigInteger(1, md.digest())));
+			} catch (NoSuchAlgorithmException ne) {
+				msg = "createTeacher(), failed to initialize MD5 algorithm.";
+				logger.warn(msg);
+				throw new RuntimeException(msg);
 			}
-		}, keyH);
-		if (num != 1) {
-			msg = "createItem(), return value for teacher insert is " + num;
-			logger.warn(msg);
-			throw new RuntimeException(msg);
+			
+			// set creation time
+			item.setcTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+			
+			// ready to insert teacher info to database
+			ret = teaM.createTeacher(item);
+			
+			if (ret < 0 || ret > 2) {
+				msg = "createTeacher(), insert failed with ret->" + ret;
+				logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+
+			if (item.getId() < 0) {
+				msg = "createTeacher(), invalid id " + item.getId();
+				logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			
+			logger.debug("createTeacher(), created ret->" + ret + ", generated id->" + item.getId());
+
+			// save teacher grades
+			if (item.getGrades() != null)
+				ret = saveTeaGrades(item.getGrades(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " grades populated for " + item.getTeacId());
+
+			if (item.getSubjects() != null)
+				ret = saveSubjects(item.getSubjects(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " subjects populated for " + item.getTeacId());
+			
+			// save classes
+			if (item.getClasses() != null)
+				ret = saveClasses(item.getClasses(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " classes populated for " + item.getTeacId());
+
+			// save roles
+			if (item.getRoles() != null) {
+				ret = saveRoles(item.getRoles(), item);
+			}
+			logger.debug("createTeacher(), " + ret + " roles is saved for " + item.getTeacId());
+
+			// save additional permission
+			if (item.getAddiPerms() != null)
+				ret = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
+			logger.debug("createTeacher()," + ret + " additional perms populated for " + item.getTeacId());
+
+			logger.debug("createTeacher(), teacher created->" + item);
+			
+			ret = item.getId();
+			
 		}
-
-		id = keyH.getKey().intValue();
-		if (id < 0) {
-			msg = "createItem() failed with invalid id " + id;
-			logger.warn(msg);
-			throw new RuntimeException(msg);
-		}
-
-		// save subjects
-		num = 0;
-		if (item.getSubjects() != null)
-			num = saveSubjects(item.getSubjects(), item.getTeacId());
-		logger.debug("createItem()," + num + " subjects populated for " + item.getTeacId());
-
-		// save grades
-		num = 0;
-		if (item.getGrades() != null)
-			num = saveGrades(item.getGrades(), item.getTeacId());
-		logger.debug("createItem()," + num + " grades populated for " + item.getTeacId());
-
-		// save classes
-		num = 0;
-		if (item.getClasses() != null)
-			num = saveClasses(item.getClasses(), item.getTeacId());
-		logger.debug("createItem()," + num + " classes populated for " + item.getTeacId());
-
-		// save roles
-		num = saveRoles(item.getRoles(), item);
-		logger.debug("createItem(), " + num + " roles is saved for " + item.getTeacId());
-
-		// save additional permission
-		num = 0;
-		if (item.getAddiPerms() != null)
-			num = saveAddiPerms(item.getAddiPerms(), item.getTeacId());
-		logger.debug("createItem()," + num + " additional perms populated for " + item.getTeacId());
-
-		return id;
+		
+		if (teaS.size() == 1)
+			return ret;
+		else
+			return teaS.size();
+		
 	}
 
 	@Override
-	public int updateItem(Teacher item, int id) {
+	public void updateTeacher(Teacher item, int id) {
+		
+		/*
 		String updateOrg = "update ustudy.teacher set ";
-		Teacher origin = displayItem(id);
+		Teacher origin = displayTeacher(id);
 		Map<String, String> orgDiff = item.compare(origin);
 		if (orgDiff.size() == 0) {
 			logger.info("No changes in orgowner and no need to update");
@@ -281,11 +271,20 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 		updateOrg += " where id = ?";
 		int num = jTea.update(updateOrg, id);
-		return num;
+		*/
+		
+		// currently only teacher name and teacid could be updated
+		int ret = teaM.updateTeacher(item, id);
+		if (ret != 1 && ret != 0) {
+			logger.error("updateTeacher(), failed to update teacher with ret->" + ret + ", " + item.toString());
+			throw new RuntimeException("updateTeacher(), failed to update teacher with ret->" + ret);
+		}
+		logger.debug("updateTeacher(), teacher updated with ret->" + ret);
+
 	}
 
 	@Override
-	public int delItemSet(String ids) {
+	public int delTeas(String ids) {
 		List<String> idsList = InfoUtil.parseIds(ids);
 		int len = idsList.size();
 		if (len == 0)
@@ -303,96 +302,77 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public int deleteItem(int id) {
+	public int deleteTeacher(int id) {
 		String sqlDel = "delete from ustudy.teacher where id = ?";
 		return jTea.update(sqlDel, id);
 	}
 
 	@Transactional
-	private int saveRoles(List<UElem> roles, Teacher item) {
-		String sqlRoles = "insert into ustudy.teacherroles values(?,?,?)";
-		String sqlDepSub = "insert into departsub values(?,?,?,?,?)";
-		String sqlGSub = "update gradesub set sub_owner = ? where grade_id = (select id from grade where schid "
-				+ "= ? and grade_name = (select grade_name from teachergrade where teac_id = ?)) and sub_name = ?";
-		String sqlGrO = "update grade set grade_owner = ? where schid =? and grade_name = "
-				+ "(select grade_name from teachergrade where teac_id = ?)";
+	private int saveRoles(List<Item> roles, Teacher item) {
+
 		String msg = null;
-		int num = 0;
+		int ret = 0;
+		// retrieve system defined roles firstly
+		List<Item> roL = schM.getRoles();
+		HashMap<String, String> roleMap = new HashMap<String, String>();
+		for (Item it: roL) {
+			roleMap.put(String.valueOf(it.getId()), it.getName());
+		}
+		
+		// actually, here only one role specified when creating teacher
+		for (Item u : roles) {
+			ret = teaM.saveRoles(u.getId(), item.getTeacId());
+			if (ret < 0 || ret >2) {
+				msg = "saveRoles(), save role failed with ret->" + ret;
+				logger.warn(msg);
+				throw new RuntimeException(msg);
+			}
 
-		if (roles != null) {
-			for (UElem u : roles) {
-				num = jTea.update(new PreparedStatementCreator() {
-					@Override
-					public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-						PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-						psmt.setNull(1, java.sql.Types.NULL);
-						String r = InfoUtil.getRolemapping().get(u.getValue());
-						if (r == null || r.isEmpty()) {
-							logger.warn("saveRoles, unsupported role " + u.getValue());
-							throw new RuntimeException("saveRoles, unsupported role " + u.getValue());
-						}
-						psmt.setString(2, r);
-						psmt.setString(3, item.getTeacId());
-						return psmt;
+			logger.debug("saveRoles(), Role saved -> " + u.toString() + ":" + item.getTeacId());
+			int subId = item.getSubjects().get(0).getId();
+			int grId = item.getGrades().get(0).getId();
+			
+			// if role is sleader, need to populate into corresponding departsub
+			String rv = roleMap.get(String.valueOf(u.getId()));
+			if (rv == null) {
+				logger.error("saveRoles(), undefined roles in request ->" + rv);
+				throw new RuntimeException("saveRoles(), undefined roles in request ->" + rv);
+			}
+			if (rv.compareTo("sleader") == 0) {
+				String grName = teaM.getGrName(grId);
+				List<String> grNameL = new ArrayList<String>();
+				grNameL.add(grName);
+				List<String> tyL = determineDepartType(grNameL);
+				logger.debug("saveRoles(), department info->" + tyL.toString());
+				for (String t : tyL) {
+					ret = teaM.saveDepartSubOwner(subId, item.getOrgid(), t, item.getTeacId());
+					if (ret != 1) {
+						msg = "saveRoles(), populate depart sub owner failed with ret->" + ret;
+						logger.warn(msg);
+						throw new RuntimeException(msg);
 					}
-				});
-				if (num != 1) {
-					msg = "saveRoles(), return value from role insert is " + num;
-					logger.warn(msg);
-					throw new RuntimeException(msg);
 				}
-
-				logger.debug("saveRoles(), Role saved -> " + u.getValue() + ":" + item.getTeacId());
-				// if role is sleader, need to populate into corresponding
-				// departsub
-				if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("sleader") == 0) {
-					List<String> tyL = determineDepartType(item.getGrades());
-					logger.debug("saveRoles()," + tyL.toString());
-					for (String t : tyL) {
-						num = jTea.update(sqlDepSub, null, item.getSubjects().get(0).getValue(), item.getTeacId(), t,
-								item.getOrgid());
-						if (num != 1) {
-							msg = "saveRoles(), return value from department subject insert is " + num;
-							logger.warn(msg);
-							throw new RuntimeException(msg);
-						}
-					}
-				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("pleader") == 0) {
-					logger.debug("saveRoles()," + item.getSubjects().get(0).getValue());
-					num = jTea.update(sqlGSub, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId(),
-							item.getSubjects().get(0).getValue());
-				} else if (InfoUtil.getRolemapping().get(u.getValue()).compareTo("gleader") == 0) {
-					// need to update grade owner
-					num = jTea.update(sqlGrO, item.getTeacId(), InfoUtil.retrieveSessAttr("orgId"), item.getTeacId());
-				}
+			} else if (rv.compareTo("pleader") == 0) {
+				logger.debug("saveRoles(), prepare subject leader " + subId + "," + grId);
+				ret = teaM.saveGrSubOwner(subId, grId, item.getTeacId());
+			} else if (rv.compareTo("gleader") == 0) {
+				// only one grade specified when creating teacher
+				ret = teaM.saveGrOwner(grId, item.getTeacId());
 			}
 		}
 
-		// Noted: a little tricky here, to populate additional permissions for
-		// the teacher,
-		// need to populate role as "addi_teachid" for the teacher
-		num = jTea.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement psmt = conn.prepareStatement(sqlRoles, Statement.RETURN_GENERATED_KEYS);
-				psmt.setNull(1, java.sql.Types.NULL);
-				psmt.setString(2, "addi_" + item.getTeacId());
-				psmt.setString(3, item.getTeacId());
-				return psmt;
-			}
-		});
-		if (num != 1) {
-			msg = "saveRoles(), return value from additional role insert is " + num;
-			logger.warn(msg);
-			throw new RuntimeException(msg);
-		}
+		/*
+		 *  TODO: a little tricky here, to populate additional permissions for
+		 *  the teacher, need to populate role as "addi_teachid" for the teacher
+		 *  save addi_teacid as role name into rolevalue firstly, then insert related 
+		 *  record into ustudy.teacherroles
+		 */ 
 
-		logger.debug("saveRoles(), populated additional roles for " + item.getTeacId());
 		if (roles != null)
-			num = roles.size() + 1;
+			ret = roles.size() + 1;
 		else
-			num = 1;
-		return num;
+			ret = 1;
+		return ret;
 
 	}
 
@@ -423,53 +403,42 @@ public class TeacherServiceImpl implements TeacherService {
 
 	}
 
-	private int saveSubjects(List<UElem> subs, String teachid) {
-		String sqlSub = "insert into ustudy.teachersub values(?,?,?)";
-		String msg = null;
-		for (UElem u : subs) {
-			int num = jTea.update(new PreparedStatementCreator() {
-				@Override
-				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-					PreparedStatement psmt = conn.prepareStatement(sqlSub, Statement.RETURN_GENERATED_KEYS);
-					psmt.setNull(1, java.sql.Types.NULL);
-					psmt.setString(2, u.getValue());
-					psmt.setString(3, teachid);
-					return psmt;
-				}
-			});
-			if (num != 1) {
-				msg = "saveSubjects(), return value from subject insert is " + num;
-				logger.warn(msg);
-				throw new RuntimeException(msg);
+	private int saveSubjects(List<Item> subs, String teacid) {
+		
+		List<Subject> subL = teaM.getSubs();
+		HashMap<String, String> subMap = new HashMap<String, String>();
+		for (Subject sub:subL) {
+			subMap.put(sub.getSubId(), sub.getSubName());
+		}
+		
+		for (Item u : subs) {
+			String sn = subMap.get(String.valueOf(u.getId()));
+			if (sn == null || sn.isEmpty()) {
+				logger.error("saveSubjects(), invalid sub id->" + u.getId());
+				throw new RuntimeException("saveSubjects(), invalid subject id");
+			}
+			int ret = teaM.saveTeaSub(u.getId(), teacid);
+			if (ret < 0 || ret > 2) {
+				logger.error("saveSubjects(), insert failed with ret->" + ret);
+				throw new RuntimeException("saveSubjects(), insert failed with ret->" + ret);
 			}
 
-			logger.debug("saveSubjects(), subjects saved -> " + u.getValue() + ":" + teachid);
+			logger.debug("saveSubjects(), subjects saved -> " + u.getId() + ":" + teacid);
 		}
 
 		return subs.size();
 	}
-
-	private int saveGrades(List<UElem> grades, String teachid) {
-		String sqlG = "insert into ustudy.teachergrade values(?,?,?)";
+	
+	private int saveTeaGrades(List<Item> grades, String teacid) {
 		String msg = null;
-		for (UElem u : grades) {
-			int num = jTea.update(new PreparedStatementCreator() {
-				@Override
-				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-					PreparedStatement psmt = conn.prepareStatement(sqlG, Statement.RETURN_GENERATED_KEYS);
-					psmt.setNull(1, java.sql.Types.NULL);
-					psmt.setString(2, u.getValue());
-					psmt.setString(3, teachid);
-					return psmt;
-				}
-			});
-			if (num != 1) {
-				msg = "saveGrades(), return value from grade insert is " + num;
-				logger.warn(msg);
+		for (Item it : grades) {
+			int ret = teaM.saveTeaGr(it.getId(), teacid);
+			if (ret != 1) {
+				msg = "saveTeaGrades(), insert failed with ret->" + ret + it.toString();
+				logger.error(msg);
 				throw new RuntimeException(msg);
 			}
-
-			logger.debug("saveGrades(), grades saved -> " + u.getValue() + ":" + teachid);
+			logger.debug("saveTeaGrades(), grades saved -> " + it.toString() + ":" + teacid);
 		}
 
 		return grades.size();
@@ -502,19 +471,15 @@ public class TeacherServiceImpl implements TeacherService {
 		return clss.size();
 	}
 
-	private List<String> determineDepartType(List<UElem> gL) {
+	private List<String> determineDepartType(List<String> gL) {
 		List<String> tL = new ArrayList<String>();
-		List<String> sGl = new ArrayList<String>();
-		for (UElem e : gL) {
-			sGl.add(e.getValue());
-		}
 
-		if (sGl.contains("高一") || sGl.contains("高二") || sGl.contains("高三"))
+		if (gL.contains("高一") || gL.contains("高二") || gL.contains("高三"))
 			tL.add("high");
-		if (sGl.contains("九年级") || sGl.contains("八年级") || sGl.contains("七年级"))
+		if (gL.contains("九年级") || gL.contains("八年级") || gL.contains("七年级"))
 			tL.add("junior");
-		if (sGl.contains("六年级") || sGl.contains("五年级") || sGl.contains("四年级") || sGl.contains("三年级")
-				|| sGl.contains("二年级") || sGl.contains("一年级"))
+		if (gL.contains("六年级") || gL.contains("五年级") || gL.contains("四年级") || gL.contains("三年级")
+				|| gL.contains("二年级") || gL.contains("一年级"))
 			tL.add("primary");
 		logger.debug("determineDepartType(), " + tL.toString());
 		return tL;
@@ -532,7 +497,9 @@ public class TeacherServiceImpl implements TeacherService {
 		}
 
 		String r = null;
-		if (rL.contains("org_owner")) {
+		if (rL.contains("cleaner")) {
+			r = "cleaner";
+		} else if (rL.contains("org_owner")) {
 			r = "org_owner";
 		} else if (rL.contains("leader")) {
 			r = "leader";
@@ -549,4 +516,43 @@ public class TeacherServiceImpl implements TeacherService {
 
 		return InfoUtil.getRolemapping().get(r);
 	}
+	
+	@Override
+	public void setLLTime(String tid) {
+		int ret = teaM.setLLTime(tid, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		if (ret != 1) {
+			logger.error("setLLTime(), failed to set lltime for " + tid);
+			throw new RuntimeException("setLLTime(), failed to set lltime for " + tid);
+		}
+		logger.debug("setLLTime(), update last login time for " + tid);
+	}
+
+	@Override
+	public TeaProperty getTeaProperty(String tid) {
+		TeaProperty tp = new TeaProperty();
+		
+		// retrieve grades information
+		List<Item> grs = teaM.getTeaGrade(tid);
+		if (grs == null || grs.isEmpty()) {
+			logger.info("getTeaProperty(), no grades found for " + tid);
+		}
+		tp.setGrades(grs);
+
+		// retrieve subjects information
+		List<Item> subs = teaM.getTeaSubjects(tid);
+		if (subs == null || subs.isEmpty()) {
+			logger.info("retrieveProp(), no subjects found for " + tid);
+		}
+		tp.setSubjects(subs);
+		
+		String role = InfoUtil.retrieveSessAttr("role");
+		if (role == null || role.isEmpty()) {
+			logger.error("retrieveProp(), did not find role for " + tid);
+			throw new RuntimeException("retrieveProp(), did not find role for " + tid);
+		}
+		
+		tp.setRole(role);
+		return tp;
+	}
+	
 }

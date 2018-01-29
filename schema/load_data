@@ -1,21 +1,31 @@
-LOAD DATA LOCAL INFILE '/root/mysql/schema/users.data' INTO TABLE ustudy.users
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/users.csv' REPLACE INTO TABLE ustudy.users
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/roles.data' INTO TABLE ustudy.roles
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/roles.csv' INTO TABLE ustudy.roles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/perms.data' INTO TABLE ustudy.perms
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/perms.csv' INTO TABLE ustudy.perms
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/subject.data' INTO TABLE ustudy.subject
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/subject.csv' INTO TABLE ustudy.subject
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.csv' INTO TABLE ustudy.rolevalue
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/config.csv' REPLACE INTO TABLE ustudy.config
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '$'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
 
