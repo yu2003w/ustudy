@@ -102,7 +102,7 @@ public class ScoreServiceImpl implements ScoreService {
                 //多选给分
                 Map<Integer, Integer> multipleScoreSets = null;
                 if(answer.length() > 1){
-                    multipleScoreSets = getMultipleScoreSet(egsId);
+                    multipleScoreSets = getMultipleScoreSet(answer,egsId);
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
@@ -111,18 +111,20 @@ public class ScoreServiceImpl implements ScoreService {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }
-                    }else{
+                    }else if(answer.length() >= studentAnswer.getAnswer().length()){
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
                             Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
-                            if(null != multipleScoreSets.get(correctCount)){
+                            if(correctCount == answer.split(",").length){
+                                studentScore = score;
+                            }else if(null != multipleScoreSets.get(correctCount)){
                                 studentScore = multipleScoreSets.get(correctCount);
                             }
                         }
                     }
                     
-                    if(studentAnswer.getScore() != studentScore){
+                    if(studentAnswer.getScore() != studentScore && studentScore >= 0){
                         answerDaoImpl.updateStudentObjectAnswer(studentAnswer.getId(), studentScore);
                     }
                 }
@@ -184,7 +186,7 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
     
-    private Map<Integer, Integer> getMultipleScoreSet(Long egsId){
+    private Map<Integer, Integer> getMultipleScoreSet(String answer, Long egsId){
         
         Map<Integer, Integer> map = new HashMap<>();
         
@@ -192,7 +194,9 @@ public class ScoreServiceImpl implements ScoreService {
         
         if(null != multipleScoreSets && multipleScoreSets.size() > 0){
             for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-                map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                if(multipleScoreSet.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
+                    map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                }
             }
         }
         

@@ -59,7 +59,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                 //多选给分
                 Map<Integer, Integer> multipleScoreSets = null;
                 if(answer.length() > 1){
-                    multipleScoreSets = getMultipleScoreSet(egsId);
+                    multipleScoreSets = getMultipleScoreSet(answer, egsId);
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
@@ -70,13 +70,17 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                             studentScore = score;
                         }
                     //多选题
-                    }else{
+                    }else if(answer.length() >= studentAnswer.getAnswer().length()){
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
                             Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
-                            if(null != multipleScoreSets.get(correctCount)){
-                                studentScore = multipleScoreSets.get(correctCount);
+                            if(correctCount > 0){
+                                if(correctCount == answer.split(",").length){
+                                    studentScore = score;
+                                }else if(null != multipleScoreSets.get(correctCount)){
+                                    studentScore = multipleScoreSets.get(correctCount);
+                                }
                             }
                         }
                     }
@@ -86,7 +90,6 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                         sc.put("id", studentAnswer.getId());
                         sc.put("score", studentScore);
                         scores.add(sc);
-                        //answerDaoImpl.updateStudentObjectAnswer(studentAnswer.getId(), studentScore);
                     }
                 }
                 
@@ -102,7 +105,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
         }
     }
     
-    private Map<Integer, Integer> getMultipleScoreSet(Long egsId){
+    private Map<Integer, Integer> getMultipleScoreSet(String answer, Long egsId){
         
         Map<Integer, Integer> map = new HashMap<>();
         
@@ -110,7 +113,9 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
         
         if(null != multipleScoreSets && multipleScoreSets.size() > 0){
             for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-                map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                if(multipleScoreSet.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
+                    map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                }
             }
         }
         
