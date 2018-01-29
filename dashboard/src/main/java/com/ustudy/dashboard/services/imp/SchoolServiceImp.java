@@ -76,8 +76,14 @@ public class SchoolServiceImp implements SchoolService {
 	
 	
 	private int createCleaner(String orgType, String orgId) {
-		String tname = "admin" + orgId;
+		// usually school id is composed of 10 digits number
+		String tname = orgId;
 		String msg = null;
+		
+		if (tname.length() > 11) {
+			logger.error("createCleaner(), length of school id exceeds 11 characters, create cleaner failed.");
+			throw new RuntimeException("length of school id exceeds 11 characters, create cleaner failed");
+		}
 		
 		logger.debug("createCleaner(), create cleaner for school " + orgId);
 		Teacher item = new Teacher(tname, tname, "学校", orgId);
