@@ -29,7 +29,7 @@ public interface MarkProgMapper {
 	
 	@Select("select question.id as quesid, startno, endno, mark_mode as markStyle, "
 			+ "group_concat(teacher.teacname, '-', teacher.teacid) as teaL, "
-			+ "(select count(*) from examinee where examinee.paper_status = '1' and examinee.examid = #{eid}) * "
+			+ "(select count(*) from paper where exam_grade_sub_id = #{egsid}) * "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 1, 2)) + "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 0, "
 			+ "(SELECT count(if(abs(ans1.score - ans2.score) >=5, 1, null)) "
@@ -43,10 +43,8 @@ public interface MarkProgMapper {
 			+ "group by question.id")
 	public List<QuesMarkMetrics> getQuesMarkMetricsByEgsId(@Param("eid") int eid, @Param("egsid") int egsid);
 	
-	@Select("select (select count(*) from examinee join examgradesub on examgradesub.examid = examinee.examid "
-			+ "where examinee.paper_status = '1' and examgradesub.id = #{egsid}) as num, "
-			+ "sum((select count(*) from examinee join examgradesub on examgradesub.examid = examinee.examid "
-			+ "where examinee.paper_status = '1' and examgradesub.id = #{egsid}) * "
+	@Select("select (select count(*) from paper where exam_grade_sub_id = #{egsid}) as num, "
+			+ "sum((select count(*) from paper where exam_grade_sub_id = #{egsid}) * "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 1, 2)) + "
 			+ "(select if (strcmp(question.mark_mode,'双评'), 0, "
 			+ "(select count(if(abs(ans1.score - ans2.score) >=5, 1, null)) from ustudy.answer ans1 "
@@ -75,11 +73,9 @@ public interface MarkProgMapper {
 	@Select("select question.id as quesid, marktask.marktype as markStyle ,"
 			+ "(CASE "
 			+ "when (strcmp(marktask.marktype, '标准') = 0 and strcmp(question.mark_mode, '单评') = 0) then "
-			+ "(select count(*) from examinee join examgradesub on examgradesub.examid = examinee.examid "
-			+ "where examinee.paper_status = '1' and examgradesub.id = #{egsid}) "
+			+ "(select count(*) from paper where exam_grade_sub_id = #{egsid}) "
 			+ "when (strcmp(marktask.marktype,'初评') = 0 and strcmp(question.mark_mode,'双评') = 0) then "
-			+ "(select count(*)*2 from examinee join examgradesub on examgradesub.examid = examinee.examid "
-			+ "where examinee.paper_status = '1' and examgradesub.id = #{egsid}) "
+			+ "(select count(*)*2 from paper where exam_grade_sub_id = #{egsid}) "
 			+ "when (strcmp(marktask.marktype,'终评') = 0 and strcmp(question.mark_mode,'双评') = 0) then "
 			+ "(select count(if(abs(ans1.score - ans2.score) >=5, 1, null)) from ustudy.answer ans1 "
 			+ "cross join ustudy.answer as ans2 where ans1.quesid = ans2.quesid and ans1.paperid = ans2.paperid "
