@@ -189,7 +189,7 @@ public class ExamServiceImpl implements ExamService {
 			String type = map.get("type").toString();
 			int startno = (int) map.get("startno");
 			int endno = (int) map.get("endno");
-			int score = (int) map.get("score");
+			float score = (float)map.get("score");
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
 				long objectCount = 0;

@@ -63,7 +63,7 @@ public interface MarkProgMapper {
 			+ "answer.isviewed = 1 and answer.quesid = marktask.quesid)) as metrics from ustudy.marktask "
 			+ "join question on question.id = marktask.quesid "
 			+ "join teacher on marktask.teacid = teacher.teacid "
-			+ "join school on school.id = teacher.orgid "
+			+ "join school on school.schid = teacher.orgid "
 			+ "join examgradesub on examgradesub.id = question.exam_grade_sub_id "
 			+ "join grade on examgradesub.grade_id = grade.id "
 			+ "join subject on subject.id = examgradesub.sub_id "
