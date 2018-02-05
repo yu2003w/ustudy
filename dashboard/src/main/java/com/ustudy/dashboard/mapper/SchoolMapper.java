@@ -32,7 +32,8 @@ public interface SchoolMapper {
 	
 	@Insert("insert into ustudy.school (schid, schname, type, province, city, district) values(#{schoolId}, "
 			+ "#{schoolName}, #{schoolType}, #{province}, #{city}, #{district}) on duplicate key update "
-			+ "type=#{schoolType}, province=#{province}, city=#{city}, district=#{district}")
+			+ "type=#{schoolType}, province=#{province}, city=#{city}, district=#{district}, "
+			+ "id=LAST_INSERT_ID(id)")
 	@Options(useGeneratedKeys=true)
 	public int createSchool(School item);
 	
@@ -49,7 +50,7 @@ public interface SchoolMapper {
 			+ "update sub_id=#{subId}, grade_id=#{gradeId}")
 	public int createGradeSub(@Param("subId") String subId, @Param("gradeId") int gradeId);
 	
-	@Select("select id as subId, name as courseName from ustudy.subject")
+	@Select("select id as subId, name as subName from ustudy.subject")
 	public List<Subject> getSubs();
 	
 	@Insert("insert into ustudy.class (grade_id, cls_name) values(#{grId}, #{clsN}) on duplicate key update "

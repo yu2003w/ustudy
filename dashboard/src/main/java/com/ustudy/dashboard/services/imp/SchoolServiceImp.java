@@ -76,8 +76,14 @@ public class SchoolServiceImp implements SchoolService {
 	
 	
 	private int createCleaner(String orgType, String orgId) {
-		String tname = "admin" + orgId;
+		// usually school id is composed of 10 digits number
+		String tname = orgId;
 		String msg = null;
+		
+		if (tname.length() > 11) {
+			logger.error("createCleaner(), length of school id exceeds 11 characters, create cleaner failed.");
+			throw new RuntimeException("length of school id exceeds 11 characters, create cleaner failed");
+		}
 		
 		logger.debug("createCleaner(), create cleaner for school " + orgId);
 		Teacher item = new Teacher(tname, tname, "学校", orgId);
@@ -267,10 +273,12 @@ public class SchoolServiceImp implements SchoolService {
 		HashSet<String> priS = new HashSet<String>();
 		
 		// before processing grade subs, need to subjects dictionary firstly
+		// TODO: Before creating school, frontend should retrieve subject list via 
+		// api /dashboard/config/sublist/, then put subId in grade array
 		List<Subject> subL = schM.getSubs();
 		HashMap<String, String> subMap = new HashMap<String, String>();
 		for (Subject sub:subL) {
-			subMap.put(sub.getCourseName(), sub.getSubId());
+			subMap.put(sub.getSubName(), sub.getSubId());
 		}
 		
 		int ret = -1;
@@ -310,9 +318,9 @@ public class SchoolServiceImp implements SchoolService {
 			logger.debug("updateSchool(), clear " + ret + " subjects for grade->" + gr.toString());
 			
 			for (Subject sub : subs) {
-				String subId = subMap.get(sub.getCourseName());
+				String subId = subMap.get(sub.getSubName());
 				if (subId == null || subId.isEmpty() || Integer.valueOf(subId) < 0) {
-					msg = "saveGrades(), subId->" + subId + " invalid for " + sub.getCourseName();
+					msg = "saveGrades(), subId->" + subId + " invalid for " + sub.getSubName();
 					logger.error(msg);
 					throw new RuntimeException(msg);
 				}
@@ -323,7 +331,7 @@ public class SchoolServiceImp implements SchoolService {
 					throw new RuntimeException(msg);
 				}
 				
-				depS.add(sub.getCourseName());
+				depS.add(sub.getSubName());
 			}
 
 			logger.debug("Num of subjects for " + schId + "," + gr.getGradeName() + " is " + subs.size());

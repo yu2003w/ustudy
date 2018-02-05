@@ -12,7 +12,7 @@ public class Subject implements Serializable {
 	private static final long serialVersionUID = -375085025372724305L;
 	
 	@JsonProperty("subject")
-	private String courseName = null;
+	private String subName = null;
 	
     @JsonProperty("id")
 	private String subId = null;
@@ -25,17 +25,17 @@ public class Subject implements Serializable {
 
 	public Subject(String courseName, String subId) {
 		super();
-		this.courseName = courseName;
+		this.subName = courseName;
 		this.subId = subId;
 	}
 
 
-	public String getCourseName() {
-		return courseName;
+	public String getSubName() {
+		return subName;
 	}
 
-	public void setCourseName(String courseName) {
-		this.courseName = courseName;
+	public void setSubName(String courseName) {
+		this.subName = courseName;
 	}
 
 	public String getSubId() {
@@ -48,7 +48,7 @@ public class Subject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Subject [courseName=" + courseName + ", subId=" + subId + "]";
+		return "Subject [courseName=" + subName + ", subId=" + subId + "]";
 	}
 
 	
