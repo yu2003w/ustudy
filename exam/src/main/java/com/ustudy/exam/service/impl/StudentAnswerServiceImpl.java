@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
@@ -246,6 +247,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 
     }
 
+    @Transactional
     public boolean deletePapers(Long egsId, Integer batchNum) {
         answerDaoImpl.deleteStudentObjectAnswers(egsId, batchNum);
         paperDaoImpl.deleteStudentPapers(egsId, batchNum);

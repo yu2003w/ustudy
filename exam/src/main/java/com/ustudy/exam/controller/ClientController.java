@@ -60,7 +60,7 @@ public class ClientController {
 	@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
 	public UResp saveExamTemplate(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
-		logger.info("saveTemplate(egsId: " + egsId + ",parameters: " + parameters + ").");
+		logger.info("saveTemplate(), egsId->" + egsId + ", parameters:->" + parameters);
 		
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);		
@@ -71,11 +71,11 @@ public class ClientController {
 		result = new UResp();
 		try {
 			result.setRet(cs.saveTemplates(egsId, parameters));
+			result.setRet(true);
 		} catch (Exception e) {
 			result.setRet(false);
 			result.setMessage(e.getMessage());
-			logger.error(e);
-			e.printStackTrace();
+			logger.error("saveExamTemplate(), " + e.getMessage());
 		}
 
 		return result;
