@@ -12,7 +12,7 @@ public class EgsMeta implements Serializable {
 	private int examId = 0;
 	private String examName = null;
 	
-	private int schoolId = 0;
+	private String schoolId = null;
 	private String schoolName = null;
 	
 	private int egsId = 0;
@@ -43,11 +43,11 @@ public class EgsMeta implements Serializable {
 		this.examName = examName;
 	}
 
-	public int getSchoolId() {
+	public String getSchoolId() {
 		return schoolId;
 	}
 
-	public void setSchoolId(int schoolId) {
+	public void setSchoolId(String schoolId) {
 		this.schoolId = schoolId;
 	}
 

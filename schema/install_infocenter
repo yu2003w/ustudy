@@ -20,9 +20,9 @@ FOREIGN KEY (cls_owner)
 
 create table if not exists ustudy.student (
 id INT NOT NULL AUTO_INCREMENT,
-name VARCHAR(100) NOT NULL,
-stuno CHAR(20) NOT NULL,
-schid INT NOT NULL,
+name varchar(100) NOT NULL,
+stuno varchar(20) NOT NULL,
+schid varchar(11) NOT NULL,
 grade ENUM('七年级', '八年级', '九年级', '高一','高二','高三'),
 classid INT,
 gradeid INT,
@@ -38,7 +38,7 @@ FOREIGN KEY (gradeid)
     REFERENCES ustudy.grade(id)
     ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY (schid)
-    REFERENCES ustudy.school(id)
+    REFERENCES ustudy.school(schid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -89,7 +89,7 @@ id INT NOT NULL AUTO_INCREMENT,
 sub_owner CHAR(11),
 sub_id int(11) NOT NULL,
 type ENUM('high','junior','primary','other'),
-schid varchar(32) NOT NULL,
+schid varchar(11) NOT NULL,
 INDEX(sub_owner, schid, type),
 UNIQUE KEY(sub_id, type, schid),
 PRIMARY KEY (id),

@@ -235,6 +235,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba = new BlockAnswer();
 					ba.setBasicInfo(pImg.get(j).getPaperid(), mark.getQuesid(), pImg.get(j).getImg());
 				}
+				logger.trace("requestPapers(), answer information: quesid->" + ba.getQuesid() + 
+						", paperid->" + ba.getPaperId() + ", ansimgs->" + ba.getPaperImg());
+				
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
 						mark.getFullscore());
 				List<SingleAnswer> saL = new ArrayList<SingleAnswer>();
@@ -264,6 +267,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba.setMarkRec(recs);
 					ba.setScoreGap(String.valueOf(
 							Math.abs(pImg.get(j+1).getScore() - pImg.get(j+2).getScore())));
+					logger.debug("requestPapers(), first mark records ->" + recs[0].toString() + 
+							"," + recs[1].toString());
 				}
 				
 				// set region informations for this question id
@@ -272,21 +277,36 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				String paperImg = ba.getPaperImg();
 				String [] imgs = null;
 				if (paperImg == null || paperImg.isEmpty()) {
-					logger.warn("requestPapers(), paper image is vacant for quesid " + mark.getQuesid() + 
+					logger.error("requestPapers(), paper image is vacant for quesid " + mark.getQuesid() + 
 							pImg.get(j).toString());
 				}
 				else {
 					List<FirstMarkImgRecord> fMImgs = null;
-					if (isfinal) 
+					if (isfinal) {
 						fMImgs = markTaskM.getFirstMarkImgs(mark.getQuesid(), pImg.get(j).getPaperid());
+						logger.debug("requestPapers(), final marked imgs for quesid->" + mark.getQuesid() + 
+								", paperid->" + pImg.get(j).getPaperid() + "imgs->" + fMImgs.toString());
+					}
 					imgs = paperImg.split(",");
 					
 					List<MarkAnsImg> markImgs = null;
-					if (ba.isMarked())
+					if (ba.isMarked()) {
 						markImgs = markTaskM.getMarkAnsImgs(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
+						logger.debug("requestPapers(), marked imgs for quesid->" + mark.getQuesid() + 
+								", paperid->" + pImg.get(j).getPaperid() + ", imgs->" + markImgs.toString());
+					}
+						
 					for (int k = 0; k < qreL.size(); k++) {
 						// page no is real pageno, it should not be greater than imgs.length
 						ImgRegion re = qreL.get(k);
+						logger.trace("requestPapers(), region->" + re.toString());
+						
+						/*
+						 * Noted: student papers is composed of several pages, 
+						 * and each page has several regions
+						 * One question maybe in several pages and regions
+						 * Pageno is started from 0
+						 */
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
 							throw new RuntimeException("requestPapers(), pageno " + re.getPageno() + 
@@ -294,35 +314,63 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						}
 						
 					    re.setAnsImg(imgs[re.getPageno()]);
-					    
+					 
 					    // maybe this is remark operation
 					    if (ba.isMarked() && markImgs != null && !markImgs.isEmpty()) {
-					    	logger.debug("requestPapers(), marked imgs->" + markImgs.toString());
-					    	MarkAnsImg mm = markImgs.get(k);
-					    	if (mm != null && mm.getPageno() == re.getPageno()) {
-					    		re.setMarkImg(mm.getMarkImg());
-					    		re.setAnsMarkImg(mm.getAnsMarkImg());
+					    	if (k < markImgs.size()) {
+					    		logger.debug("requestPapers(), region->" + re.getPageno() + 
+					    				", marked imgs->" + markImgs.get(k).toString());
+					    		MarkAnsImg mm = markImgs.get(k);
+						    	if (mm != null && mm.getPageno() == re.getPageno()) {
+						    		re.setMarkImg(mm.getMarkImg());
+						    		re.setAnsMarkImg(mm.getAnsMarkImg());
+						    	}
 					    	}
+					    	else {
+					    		logger.debug("requestPapers(), no marked imgs for region->" + re.getPageno());
+					    		re.setMarkImg(null);
+					    		re.setAnsMarkImg(null);
+					    	}
+					    	
 					    }
 						// for final marks, need to add marked papers here
 						if (isfinal) {
 							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];
-							if (fMImgs.get(k*2).getTeacid().compareTo(
-									pImg.get(j+1).getTeacid()) == 0) {
-								fmRec[0] = fMImgs.get(k*2);
-								fmRec[1] = fMImgs.get(k*2 +1);
+							
+							/*
+							 * first mark records order by pageno and contains two teachers' first mark records
+							 * need to loop "fMImgs" to get the corresponding
+							 */
+							for (FirstMarkImgRecord fm: fMImgs) {
+								if (fm.getPageno() == re.getPageno()) {
+									if (fm.getTeacid().equals(pImg.get(j+1).getTeacid())) {
+										fmRec[0] = fm;
+										if (fmRec[1] != null) 
+											break;
+									}
+									else if (fm.getTeacid().equals(pImg.get(j+2).getTeacid())) {
+										fmRec[1] = fm;
+										if (fmRec[0] != null)
+											break;
+									}
+									else {
+										logger.error("requestPapers(), unexpected first mark record->" + fm);
+										throw new RuntimeException("Unexpected first mark record->" + fm.toString());
+									}
+								}
 							}
-							else {
-								fmRec[0] = fMImgs.get(k*2 + 1);
-								fmRec[1] = fMImgs.get(k*2);
-							}
+
 							re.setFirstMarkImgs(fmRec);
-							j += 2;
+							logger.debug("requestPapers(), firstMarkImg[0]->" + fmRec[0].toString() + 
+									", firstMarkImg[1]->" + fmRec[1].toString());
 						}
 					}
+					
+					//for final marks, 3 paper image cache in one group
+					if (isfinal) {
+						j += 2;
+					}
 				}
-				
-				// need to populate and set mark img for first marks
 				
 				ba.setRegions(qreL);
 				blA.add(ba);

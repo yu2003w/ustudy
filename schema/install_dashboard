@@ -68,7 +68,7 @@ INDEX(name,loginname)
 
 create table if not exists ustudy.school (
 id INT NOT NULL AUTO_INCREMENT,
-schid  VARCHAR(32) NOT NULL,
+schid  VARCHAR(11) NOT NULL,
 schname VARCHAR(128) NOT NULL,
 type ENUM('高中', '初中', '完中', '九年制', '小学', '十二年制', '补习', '其他') NOT NULL,
 province  VARCHAR(32) NOT NULL,
@@ -98,7 +98,7 @@ id INT NOT NULL AUTO_INCREMENT,
 grade_name VARCHAR(32) NOT NULL,
 classes_num INT NOT NULL,
 grade_owner CHAR(11),
-schid VARCHAR(32) NOT NULL,
+schid VARCHAR(11) NOT NULL,
 PRIMARY KEY(id),
 UNIQUE KEY(schid, grade_name),
 FOREIGN KEY (schid)
@@ -141,7 +141,7 @@ UNIQUE KEY (exam_name)
 create table if not exists ustudy.examschool (
 id INT NOT NULL AUTO_INCREMENT,
 examid INT NOT NULL,
-schid VARCHAR(32) NOT NULL,
+schid VARCHAR(11) NOT NULL,
 PRIMARY KEY (id),
 INDEX(examid, schid),
 UNIQUE KEY(examid, schid),
