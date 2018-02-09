@@ -182,7 +182,7 @@ id int(11) NOT NULL AUTO_INCREMENT,
 exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 correct_answer_count smallint(6) DEFAULT NULL COMMENT '正确答案数',
 student_correct_count smallint(6) DEFAULT NULL COMMENT '学生答对数',
-score smallint(255) DEFAULT NULL,
+score float(3,1) DEFAULT '0',
 PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='多选题答案给分设置';
 
