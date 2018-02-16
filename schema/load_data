@@ -3,6 +3,11 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/users.csv' REPLACE INTO TABLE 
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.csv' INTO TABLE ustudy.rolevalue
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/roles.csv' INTO TABLE ustudy.roles
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
@@ -14,11 +19,6 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/perms.csv' INTO TABLE ustudy.p
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/subject.csv' INTO TABLE ustudy.subject
-  CHARACTER SET UTF8
-  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
-  LINES TERMINATED BY '\n'
-  IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/rolevalue.csv' INTO TABLE ustudy.rolevalue
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

@@ -60,14 +60,6 @@ FOREIGN KEY (sub_id)
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-# dictionary table for teacher role values
-create table if not exists ustudy.rolevalue (
-id INT NOT NULL AUTO_INCREMENT,
-name VARCHAR(32) NOT NULL,
-PRIMARY KEY(id),
-UNIQUE KEY(name)
-) ENGINE=InnoDB;
-
 create table if not exists ustudy.teacherroles (
 id INT NOT NULL AUTO_INCREMENT,
 role_id INT NOT NULL,

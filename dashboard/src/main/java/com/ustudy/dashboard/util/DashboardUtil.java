@@ -3,6 +3,7 @@ package com.ustudy.dashboard.util;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -44,4 +45,27 @@ public class DashboardUtil {
 		
 		return ret;
 	}
+	
+	private static ConcurrentHashMap<String, String> acctRoleM = 
+			new ConcurrentHashMap<String, String>();
+
+	public static ConcurrentHashMap<String, String> getAcctRoleMap() {
+		if(null == acctRoleM || acctRoleM.size()==0){
+			initRoleMapping();
+		}
+		return acctRoleM;
+	}
+	
+	public static void initRoleMapping() {
+		acctRoleM.put("operator", "运维");
+		acctRoleM.put("sales", "市场");
+		acctRoleM.put("reseller", "代理商");
+		acctRoleM.put("visitor", "临时帐号");
+		
+		acctRoleM.put("运维", "operator");
+		acctRoleM.put("市场", "sales");
+		acctRoleM.put("代理商", "reseller");
+		acctRoleM.put("临时帐号", "visitor");
+	}
+	
 }
