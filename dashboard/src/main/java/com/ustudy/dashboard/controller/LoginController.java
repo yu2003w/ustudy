@@ -33,13 +33,13 @@ public class LoginController {
 	AccountService accS;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
-	public Account login(HttpServletRequest request, HttpServletResponse response) {
+	public UResp login(HttpServletRequest request, HttpServletResponse response) {
 				
 		logger.debug("endpoint /login is visited");
 		String msg = null;
 		boolean status = true;
 		
-		Account user = null;
+		UResp res = new UResp();
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		
@@ -82,7 +82,7 @@ public class LoginController {
 			try {
 				Session ses = currentUser.getSession(true);
 				
-				user = accS.findUserByLoginName(currentUser.getPrincipal().toString());
+				Account user = accS.findUserByLoginName(currentUser.getPrincipal().toString());
 				
 				if (user != null) {
 					if (!accS.updateLLTime(user.getId())) {
@@ -92,24 +92,29 @@ public class LoginController {
 					ses.setAttribute("uid", user.getLoginname());
 					ses.setAttribute("uname", user.getFullname());
 					ses.setAttribute("role", DashboardUtil.getAcctRoleMap().get(user.getRoleName()));
+					res.setData(new UserBrife(ses.getAttribute("uid").toString(), 
+							ses.getAttribute("uname").toString(), 
+							DashboardUtil.getAcctRoleMap().get(ses.getAttribute("role").toString())));
+					res.setRet(true);
 				}
 				else {
 					logger.error("login(), failed to retrieve user information for " + currentUser.getPrincipal().toString());
 					response.setStatus(500);
 					response.setHeader("loginresult", "failed to retrieve user information");
+					res.setMessage("failed to retrieve user information");
 				} 
 				
 			} catch (Exception e) {
 				logger.error("login(), populate user information failed->" + e.getMessage());
 				response.setStatus(500);
 				response.setHeader("loginresult", "populate user information failed");
+				res.setMessage("populate user information failed");
 			}
-			
-			
 		} else {
 			logger.error(msg);
 			response.setStatus(500);
 			response.setHeader("loginresult", "authentication failed");
+			res.setMessage("authentication failed");
 		}
 		
 		/*
@@ -122,7 +127,7 @@ public class LoginController {
 		}
 		*/
 		
-		return user;
+		return res;
 		
 	}
 	
