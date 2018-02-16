@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.dashboard.model.Account;
+import com.ustudy.dashboard.model.UResp;
+import com.ustudy.dashboard.model.UserBrife;
 import com.ustudy.dashboard.services.AccountService;
 import com.ustudy.dashboard.util.DashboardUtil;
 
@@ -136,33 +138,36 @@ public class LoginController {
 	
 	
 	@RequestMapping(value="/loginId", method = RequestMethod.GET)
-	public Account getLoginUser(HttpServletResponse resp) {
+	public UResp getLoginUser(HttpServletResponse resp) {
 		logger.debug("endpoint /loginId is visited");
 		Subject cUser = null;
-		Account u = null;
+		UResp res = new UResp();
 		
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
 			logger.error("getLoginUser(), Failed to get subject --> " + e.getMessage());
-			return u;
+			res.setMessage("failed to get subject");
+			return res;
 		}
 		
 		if (cUser.getPrincipal() == null) {
 			logger.info("getLoginUser(), User didn't log in");
 			resp.setStatus(530);
 			resp.setHeader("Failure reason:", "No User logged in");
-			return u;
+			res.setMessage("No user logged in");
+			return res;
 		}
 		else {
 			//user already logged in, retrieve information from session storage
 			Session ses = cUser.getSession();
-			u = new Account(ses.getAttribute("uid").toString(), ses.getAttribute("uname").toString(), 
-					ses.getAttribute("role").toString());
-			logger.debug("getLoginUser(), user->" + u.toString());
+			res.setData(new UserBrife(ses.getAttribute("uid").toString(), ses.getAttribute("uname").toString(), 
+					DashboardUtil.getAcctRoleMap().get(ses.getAttribute("role").toString())));
+			res.setRet(true);
+			logger.debug("getLoginUser(), user->" + res.getData().toString());
 		}
 		
-		return u;
+		return res;
 		
 	}
 	
