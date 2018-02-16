@@ -52,11 +52,4 @@ rm ${WORK_DIR}/logs/dashboard/*
 docker run --rm --name dashboard -p 8081:8080 -v ${WORK_DIR}/dashboard/webapps/:/usr/local/tomcat/webapps \
     -v ${WORK_DIR}/logs/dashboard:/usr/local/tomcat/logs/ -d tomcat:9.0
 
-# deploy front end code 
-while [ ! -d ${WORK_DIR}/dashboard/webapps/dashboard/ ]
-do
-  echo "waiting for deploying frontend for dashboard"
-  sleep 10
-done
-cp -rf /mnt/repo/ustudy-console/dist/* ${WORK_DIR}/dashboard/webapps/dashboard/
 
