@@ -20,7 +20,7 @@ import com.ustudy.dashboard.model.OrgOwner;
 import com.ustudy.dashboard.services.OrgOwnerService;
 
 @RestController
-@RequestMapping("/dashboard/owner/")
+@RequestMapping("/owner/")
 public class OrgOwnerController {
 
 	private static final Logger logger = LogManager.getLogger(OrgOwnerController.class);

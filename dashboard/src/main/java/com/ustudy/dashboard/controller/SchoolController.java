@@ -20,7 +20,7 @@ import com.ustudy.dashboard.model.School;
 import com.ustudy.dashboard.services.SchoolService;
 
 @RestController
-@RequestMapping(value="/dashboard/school/")
+@RequestMapping(value="/school/")
 public class SchoolController {
 
 	private static final Logger logger = LogManager.getLogger(SchoolController.class);

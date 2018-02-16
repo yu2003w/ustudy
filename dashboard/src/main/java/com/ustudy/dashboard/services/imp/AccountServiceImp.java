@@ -54,8 +54,10 @@ public class AccountServiceImp implements AccountService {
 
 	public Account findUserByLoginName(String loginId) {
 		Account item = acctM.getUserByLoginName(loginId);
+
 		if (item != null)
 			item.convertRole();
+		
 		return item;
 	}
 

@@ -13,20 +13,20 @@ import com.ustudy.dashboard.model.Account;
 
 public interface AccountMapper {
 
-	@Select("select users.id, loginname as userId, fullname as userName, rolevalue.name as userType, "
-			+ "ctime as creationTime, ll_time as lastLoginTime, status as userStatus, province, city, "
+	@Select("select users.id as id, loginname, fullname, rolevalue.name as roleName, "
+			+ "ctime as createTime, ll_time as lastLoginTime, status, province, city, "
 			+ "district from users join roles on roles.user_name = users.loginname "
 			+ "join rolevalue on roles.role_id = rolevalue.id where loginname = #{loginname}")
 	public Account getUserByLoginName(String loginname);
 	
-	@Select("select users.id, loginname as userId, fullname as userName, rolevalue.name as userType, "
-			+ "ctime as creationTime, ll_time as lastLoginTime, status as userStatus, province, city, "
+	@Select("select users.id as id, loginname, fullname, rolevalue.name as roleName, "
+			+ "ctime as createTime, ll_time as lastLoginTime, status, province, city, "
 			+ "district from users join roles on roles.user_name = users.loginname "
 			+ "join rolevalue on roles.role_id = rolevalue.id where users.id > #{id} limit 10000")
 	public List<Account> getAccountList(int id);
 	
-	@Select("select users.id, loginname as userId, fullname as userName, rolevalue.name as userType, "
-			+ "ctime as creationTime, ll_time as lastLoginTime, status as userStatus, province, city, "
+	@Select("select users.id as id, loginname, fullname, rolevalue.name as roleName, "
+			+ "ctime as createTime, ll_time as lastLoginTime, status, province, city, "
 			+ "district from users join roles on roles.user_name = users.loginname "
 			+ "join rolevalue on roles.role_id = rolevalue.id where id = #{id}")
 	public Account getUserById(int id);

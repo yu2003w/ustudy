@@ -23,7 +23,6 @@ import com.ustudy.dashboard.services.AccountService;
 import com.ustudy.dashboard.util.DashboardUtil;
 
 @RestController
-@RequestMapping(value="/dashboard/")
 public class LoginController {
 
 	private static final Logger logger = LogManager.getLogger(LoginController.class);

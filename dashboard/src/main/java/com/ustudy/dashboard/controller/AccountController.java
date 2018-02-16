@@ -20,7 +20,7 @@ import com.ustudy.dashboard.model.Account;
 import com.ustudy.dashboard.services.AccountService;
 
 @RestController
-@RequestMapping(value="/dashboard/user/")
+@RequestMapping(value="/user/")
 public class AccountController {
 
 	private static final Logger logger = LogManager.getLogger(AccountController.class);

@@ -50,7 +50,7 @@ public class DashboardUtil {
 			new ConcurrentHashMap<String, String>();
 
 	public static ConcurrentHashMap<String, String> getAcctRoleMap() {
-		if(null == acctRoleM || acctRoleM.size()==0){
+		if(null == acctRoleM || acctRoleM.size() == 0){
 			initRoleMapping();
 		}
 		return acctRoleM;
