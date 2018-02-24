@@ -74,7 +74,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
+                            Integer correctCount = ExamUtil.getStudentCorrectCount(studentAnswer.getAnswer(), answer);
                             if(correctCount > 0){
                                 if(correctCount == answer.split(",").length){
                                     studentScore = score;
@@ -120,24 +120,6 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
         }
         
         return map;
-    }
-    
-    private int getStudentCorrectCount(String stuAnswer, String correctAnswer){
-        
-        int studentCorrectCount = 0;
-        
-        String[] stuAnswers = stuAnswer.split(",");
-        for (String answer : stuAnswers) {
-            if(correctAnswer.contains(answer)){
-                studentCorrectCount++;
-            }else {
-                studentCorrectCount = 0;
-                break;
-            }
-        }
-        
-        return studentCorrectCount;
-        
     }
     
 }

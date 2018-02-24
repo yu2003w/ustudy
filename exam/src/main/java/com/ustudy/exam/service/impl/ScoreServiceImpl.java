@@ -40,6 +40,7 @@ import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
 
 import net.sf.json.JSONArray;
@@ -115,7 +116,7 @@ public class ScoreServiceImpl implements ScoreService {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
+                            Integer correctCount = ExamUtil.getStudentCorrectCount(studentAnswer.getAnswer(), answer);
                             if(correctCount == answer.split(",").length){
                                 studentScore = score;
                             }else if(null != multipleScoreSets.get(correctCount)){
@@ -203,24 +204,6 @@ public class ScoreServiceImpl implements ScoreService {
         return map;
     }
     
-    private int getStudentCorrectCount(String stuAnswer, String correctAnswer){
-        
-        int studentCorrectCount = 0;
-        
-        String[] stuAnswers = stuAnswer.split(",");
-        for (String answer : stuAnswers) {
-            if(correctAnswer.contains(answer)){
-                studentCorrectCount++;
-            }else {
-                studentCorrectCount = 0;
-                break;
-            }
-        }
-        
-        return studentCorrectCount;
-        
-    }
-
     public boolean publishExamScore(Long examId, Boolean release) throws Exception {
     	
     	if (release) {
