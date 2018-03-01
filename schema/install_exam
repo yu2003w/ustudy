@@ -48,8 +48,8 @@ FOREIGN KEY (quesid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-# tables for paper templates, each question block may distribute in 
-# several pages
+# tables for paper templates, each question block may distribute in serveral regions which 
+# may reside in several pages or in the same page
 create table if not exists ustudy.quesarea (
 id int(11) NOT NULL AUTO_INCREMENT,
 exam_grade_sub_id int(11) NOT NULL COMMENT '考试科目ID',
@@ -214,13 +214,16 @@ create table if not exists ustudy.answer_img (
 id INT NOT NULL AUTO_INCREMENT,
 mark_img VARCHAR(128),
 ans_mark_img VARCHAR(128),
-pageno int(11) NOT NULL, 
+qarea_id int(11) NOT NULL, 
 ans_id INT NOT NULL,
 INDEX(ans_id),
 PRIMARY KEY (id),
-UNIQUE KEY (ans_id, pageno),
+UNIQUE KEY (ans_id, qarea_id),
 FOREIGN KEY(ans_id)
     REFERENCES ustudy.answer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(qarea_id)
+    REFERENCES ustudy.quesarea(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

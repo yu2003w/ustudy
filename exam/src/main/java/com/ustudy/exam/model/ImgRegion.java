@@ -20,6 +20,8 @@ public class ImgRegion implements Serializable {
 	 */
 	private static final long serialVersionUID = -4273191630745702664L;
 
+	private int id = 0;
+	
 	// origin images corresponding to the question block
 	private String quesImg = null;
 	
@@ -76,6 +78,14 @@ public class ImgRegion implements Serializable {
 		this.ansMarkImgData = ansMarkImgData;
 		this.markImg = markImg;
 		this.markImgData = markImgData;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getQuesImg() {
@@ -176,8 +186,8 @@ public class ImgRegion implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ImgRegion [quesImg=" + quesImg + ", ansImg=" + ansImg + ", pageno=" + pageno + ", posx=" + posx
-				+ ", posy=" + posy + ", width=" + width + ", height=" + height + ", ansMarkImg=" + ansMarkImg
+		return "ImgRegion [id=" + id + ", quesImg=" + quesImg + ", ansImg=" + ansImg + ", pageno=" + pageno + ", posx="
+				+ posx + ", posy=" + posy + ", width=" + width + ", height=" + height + ", ansMarkImg=" + ansMarkImg
 				+ ", ansMarkImgData=" + ansMarkImgData + ", markImg=" + markImg + ", markImgData=" + markImgData
 				+ ", firstMarkImgs=" + Arrays.toString(firstMarkImgs) + "]";
 	}

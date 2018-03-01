@@ -86,7 +86,7 @@ public interface MarkTaskMapper {
 	@Select("select mark_mode from ustudy.question where id = #{qid}")
 	public String getMarkMode(@Param("qid") String qid);
 
-	@Select("select file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
+	@Select("select id, file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 
@@ -113,8 +113,8 @@ public interface MarkTaskMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "ba.id")
 	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 
-	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id) values (#{ir.markImg}, "
-			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
+	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values (#{ir.markImg}, "
+			+ "#{ir.ansMarkImg}, #{ir.id}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
 			+ "ans_mark_img=#{ir.ansMarkImg}")
 	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid);
 

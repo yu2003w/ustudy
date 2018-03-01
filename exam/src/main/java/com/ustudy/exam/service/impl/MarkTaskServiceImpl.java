@@ -430,7 +430,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 			}
 						
-			if (!saveAnsImgByPage(ba.getRegions(), ba.getId(), teacid)) {
+			if (!saveAnsImgByRegion(ba.getRegions(), ba.getId(), teacid)) {
 				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
 				throw new RuntimeException("updateMarkResult(), save answer images failed");
 			}
@@ -447,7 +447,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return murL;
 	}
 
-	private boolean saveAnsImgByPage(List<ImgRegion> irs, int id, String teacid) {
+	private boolean saveAnsImgByRegion(List<ImgRegion> irs, int id, String teacid) {
 		
 		if (irs == null || irs.isEmpty()) {
 			logger.error("saveAnsImgByPage(), regions are absent.");
