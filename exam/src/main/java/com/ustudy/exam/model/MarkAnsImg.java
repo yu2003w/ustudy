@@ -9,7 +9,7 @@ public class MarkAnsImg implements Serializable {
 	 */
 	private static final long serialVersionUID = -2018947918329941273L;
 
-	private int pageno = -1;
+	private int regionId = -1;
 	private String markImg = null;
 	private String ansMarkImg = null;
 	
@@ -18,19 +18,19 @@ public class MarkAnsImg implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MarkAnsImg(int pageno, String markImg, String ansMarkImg) {
+	public MarkAnsImg(int regionId, String markImg, String ansMarkImg) {
 		super();
-		this.pageno = pageno;
+		this.regionId = regionId;
 		this.markImg = markImg;
 		this.ansMarkImg = ansMarkImg;
 	}
 
-	public int getPageno() {
-		return pageno;
+	public int getRegionId() {
+		return regionId;
 	}
 
-	public void setPageno(int pageno) {
-		this.pageno = pageno;
+	public void setRegionId(int regionId) {
+		this.regionId = regionId;
 	}
 
 	public String getMarkImg() {
@@ -51,7 +51,7 @@ public class MarkAnsImg implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MarkAnsImg [pageno=" + pageno + ", markImg=" + markImg + ", ansMarkImg=" + ansMarkImg + "]";
+		return "MarkAnsImg [regionId=" + regionId + ", markImg=" + markImg + ", ansMarkImg=" + ansMarkImg + "]";
 	}
 	
 }

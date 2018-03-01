@@ -321,13 +321,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					    		logger.debug("requestPapers(), region->" + re.getPageno() + 
 					    				", marked imgs->" + markImgs.get(k).toString());
 					    		MarkAnsImg mm = markImgs.get(k);
-						    	if (mm != null && mm.getPageno() == re.getPageno()) {
+						    	if (mm != null && mm.getRegionId() == re.getId()) {
 						    		re.setMarkImg(mm.getMarkImg());
 						    		re.setAnsMarkImg(mm.getAnsMarkImg());
 						    	}
 					    	}
 					    	else {
-					    		logger.debug("requestPapers(), no marked imgs for region->" + re.getPageno());
+					    		logger.warn("requestPapers(), no marked imgs for region->" + re.toString());
 					    		re.setMarkImg(null);
 					    		re.setAnsMarkImg(null);
 					    	}
@@ -450,7 +450,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	private boolean saveAnsImgByRegion(List<ImgRegion> irs, int id, String teacid) {
 		
 		if (irs == null || irs.isEmpty()) {
-			logger.error("saveAnsImgByPage(), regions are absent.");
+			logger.error("saveAnsImgByRegion(), regions are absent.");
 			return false;
 		}
 		
@@ -471,11 +471,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					
 					if (OSSUtil.getClient() == null) {
 						// need to initialize OSSMetaInfo
-						logger.info("saveAnsImgByPage(), initialize OSSClient before use");
+						logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
 						synchronized(OSSMetaInfo.class) {
 							if (OSSUtil.getClient() == null) {
 								OSSMetaInfo omi = cgM.getOSSInfo("oss");
-								logger.debug("saveAnsImgByPage(), OSS Client init with->" + omi.toString());
+								logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
 								OSSUtil.initOSS(omi);
 							}
 						}
@@ -486,12 +486,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					// upload answer&mark image
 					OSSUtil.putObject(ir.getAnsImg(), ir.getMarkImg(), ir.getAnsMarkImg(), x, y, w, h);
 				} catch (Exception e) {
-					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
+					logger.error("saveAnsImgByRegion(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
 				int ret = markTaskM.insertAnsImg(ir, id);
 				if (ret > 2 || ret < 0) {
-					logger.error("saveAnsImgByPage(), failed to save answer images, returned " + ret);
+					logger.error("saveAnsImgByRegion(), failed to save answer images, returned " + ret);
 					return false;
 				}				
 			}

@@ -43,14 +43,14 @@ public class OSSUtil {
     	try {    		
     		ossClient.putObject(bucketName, key, file);
     	} catch (OSSException oe) {
-    		logger.warn("Caught an OSSException");
-    		logger.warn("Error Message: " + oe.getErrorMessage());
-    		logger.warn("Error Code: " + oe.getErrorCode());
+    		logger.error("Caught an OSSException");
+    		logger.error("Error Message: " + oe.getErrorMessage());
+    		logger.error("Error Code: " + oe.getErrorCode());
     		throw new Exception("can not put object due to oss exception", oe);
     	} catch (ClientException ce) {
-    		logger.warn("Caught an ClientException");
-    		logger.warn("Error Message: " + ce.getErrorMessage());
-    		logger.warn("Error Code: " + ce.getErrorCode());
+    		logger.error("Caught an ClientException");
+    		logger.error("Error Message: " + ce.getErrorMessage());
+    		logger.error("Error Code: " + ce.getErrorCode());
     		throw new Exception("can not put object due to client exception", ce);
     	}
     }
@@ -64,14 +64,14 @@ public class OSSUtil {
     	try {
     		ossClient.putObject(bucketName, key, inputStream);
     	} catch (OSSException oe) {
-    		logger.warn("Caught an OSSException");
-    		logger.warn("Error Message: " + oe.getErrorMessage());
-    		logger.warn("Error Code: " + oe.getErrorCode());
+    		logger.error("Caught an OSSException");
+    		logger.error("Error Message: " + oe.getErrorMessage());
+    		logger.error("Error Code: " + oe.getErrorCode());
     		throw new Exception("can not put object due to oss exception", oe);
     	} catch (ClientException ce) {
-    		logger.warn("Caught an ClientException");
-    		logger.warn("Error Message: " + ce.getErrorMessage());
-    		logger.warn("Error Code: " + ce.getErrorCode());
+    		logger.error("Caught an ClientException");
+    		logger.error("Error Message: " + ce.getErrorMessage());
+    		logger.error("Error Code: " + ce.getErrorCode());
     		throw new Exception("can not put object due to client exception", ce);
     	}
     }
