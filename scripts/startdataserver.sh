@@ -65,6 +65,7 @@ rm -rf ${MYSQL_LOG_DIR}/*
 # add more mysql logs
 docker run --rm -it --name ustudy-dw -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
     -v ${WORK_DIR}/mysql/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
+    -v ${SCHEMA_DIR}/../scripts/master-mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf \
     -p 13306:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
     --log-error=/var/log/mysql/mysqld.log  \
     --general_log=1 --general_log_file /var/log/mysql/gen.log \
