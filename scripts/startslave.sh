@@ -33,7 +33,7 @@ rm -rf ${MYSQL_LOG_DIR}/*
 
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
-docker run --rm -it --name ustudy-dw-2 -v ${WORK_DIR}/slave/data:/var/lib/mysql \
+docker run --rm -it --name ustudy-dw-2 --hostname dw-slave -v ${WORK_DIR}/slave/data:/var/lib/mysql \
     -v ${WORK_DIR}/slave/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
     -v ${SCHEMA_DIR}/../scripts/slave-mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf \
     -p 13307:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
