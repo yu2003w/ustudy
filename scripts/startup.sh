@@ -13,6 +13,7 @@ docker stop uredis ustudy
 
 WORK_DIR=$1
 SOURCE_DIR=$2
+OS_NAME=`uname -s`
 echo "Working directory is " ${WORK_DIR}
 echo "Source directory is " ${SOURCE_DIR}
 
@@ -40,7 +41,10 @@ echo "Deploying exam.war successfully"
 # before launching tomcat, clear logs generated last time
 echo "clear logs generated in ${WORK_DIR}/ustudy/logs/"
 rm ${WORK_DIR}/logs/ustudy/*
-
+if [ $OS_NAME = "Darwin" ]; then
+  mkdir -p ${WORK_DIR}/ustudy/redis
+  chmod -R 777 ${WORK_DIR}/ustudy
+fi
 # start redis as cache
 docker run --rm -it --name uredis -p 6379:6379 -v ${WORK_DIR}/ustudy/redis:/data -d redis:3.2
 if [ $? != 0 ];then
@@ -48,6 +52,11 @@ if [ $? != 0 ];then
   exit 1
 else
   echo "Launched redis container successfully"
+fi
+
+if [ $OS_NAME = "Darwin" ]; then
+  mkdir -p ${WORK_DIR}/logs/ustudy
+  chmod -R 777 ${WORK_DIR}/logs
 fi
 
 docker run --rm --name ustudy -p 8080:8080 -v ${WORK_DIR}/ustudy/webapps/:/usr/local/tomcat/webapps \
