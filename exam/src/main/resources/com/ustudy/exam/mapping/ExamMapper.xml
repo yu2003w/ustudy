@@ -111,11 +111,15 @@
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} where id=#{examid}
 	</update>
 	
+	<update id="updateEgsStatus" parameterType="java.util.Map">
+		UPDATE examgradesub SET status=#{status,jdbcType=VARCHAR} where examid=#{examid}
+	</update>
+
 	<update id="updateExamStatusByEgsid" parameterType="java.util.Map">
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} 
 		WHERE id=(SELECT examid FROM examgradesub where id=#{egsId})
-		<if test="status == '2'">
-		AND (SELECT COUNT(examid) FROM examgradesub where id=#{egsId} AND status&lt;&gt;'2')=0
+		<if test='status == "2"'>
+		AND (SELECT COUNT(examid) FROM examgradesub where examid=(SELECT examid FROM examgradesub where id=#{egsId}) AND status&lt;&gt;'2')=0
 		</if>
 	</update>
 

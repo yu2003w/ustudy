@@ -211,6 +211,8 @@ public class ScoreServiceImpl implements ScoreService {
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
     		if(count == 0){    			
     			examDao.updateExamStatus(examId, "2");
+                // update the status of all the sub-exams accordingly.
+                examDao.updateEgsStatus(examId, "2");
     			
     			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
     			if(scores.size() > 0){
@@ -254,6 +256,8 @@ public class ScoreServiceImpl implements ScoreService {
             }
     	} else {
     		examDao.updateExamStatus(examId, "1");
+            // update the status of all the sub-exams accordingly.
+            examDao.updateEgsStatus(examId, "1");
 		}
         
         return true;

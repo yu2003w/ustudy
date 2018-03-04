@@ -52,4 +52,6 @@ public interface ExamDao {
 
 	void updateExamStatus(@Param("examid")Long examid, @Param("status")String status);
 
+	void updateEgsStatus(@Param("examid")Long examid, @Param("status")String status);
+
 }
