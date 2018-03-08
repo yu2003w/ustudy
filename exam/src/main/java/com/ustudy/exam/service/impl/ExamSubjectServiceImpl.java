@@ -217,8 +217,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("objScore")) {
 				long studentId = (int) map.get("id");
-				BigDecimal score = (BigDecimal) map.get("objScore");
-				result.put(studentId, score.floatValue());
+				Object score = map.get("objScore");
+				result.put(studentId, Float.parseFloat(score.toString()));
 			}
 		}
 

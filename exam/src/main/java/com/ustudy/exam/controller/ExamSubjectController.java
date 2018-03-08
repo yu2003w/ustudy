@@ -195,27 +195,29 @@ public class ExamSubjectController {
             try {
                 scoreService.recalculateQuestionScore(egsId);
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(), e);
                 result.put("success", false);
                 result.put("data", "更新失败");
                 return result;
             }
         }
 
+        // Don't automatically publish the score of the whole exam after one subject is published.
+
         if(service.updateExamSubjectStatus(egsId, release)){
             
-            new Thread() {
-                public void run() {
-                    try {
-                        ExamSubject examSubject = service.getExamSubject(egsId);
-                        if(null != examSubject && examSubject.getExamid() > 0){
-                            scoreService.publishExamScore(examSubject.getExamid(), true);
-                        }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
-                    }                    
-                }
-            }.start();
+            // new Thread() {
+            //     public void run() {
+            //         try {
+            //             ExamSubject examSubject = service.getExamSubject(egsId);
+            //             if(null != examSubject && examSubject.getExamid() > 0){
+            //                 scoreService.publishExamScore(examSubject.getExamid(), true);
+            //             }
+            //         } catch (Exception e) {
+            //             logger.error(e.getMessage());
+            //         }                    
+            //     }
+            // }.start();
             
             result.put("success", true);
             result.put("data", "更新成功");
