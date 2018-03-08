@@ -122,7 +122,7 @@
         <property name="dataSource" ref="adminboard" />
         <property name="permissionsLookupEnabled" value="true"/>
         <property name="authenticationQuery" value="select passwd from ustudy.users where loginname = ?" />
-        <property name="userRolesQuery" value="select role_name from ustudy.roles where user_name = ?" />
+        <property name="userRolesQuery" value="select name from ustudy.roles join ustudy.rolevalue on roles.role_id = rolevalue.id where user_name = ?" />
         <property name="permissionsQuery" value="select perm from ustudy.perms where role_name = ?"/>
     </bean>
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>

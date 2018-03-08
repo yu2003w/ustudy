@@ -95,7 +95,7 @@ public interface MarkTaskMapper {
 			+ "ustudy.answer.isfinal = false order by pageno")
 	public List<FirstMarkImgRecord> getFirstMarkImgs(@Param("qid") String quesid, @Param("pid") String paperid);
 
-	@Select("select qarea_id as qareaId, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer "
+	@Select("select qarea_id as regionId, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer "
 			+ "join ustudy.answer_img on ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and "
 			+ "paperid=#{pid} and answer.teacid=#{tid} order by qarea_id")
 	public List<MarkAnsImg> getMarkAnsImgs(@Param("qid") String quesid, @Param("pid") String paperid, 
