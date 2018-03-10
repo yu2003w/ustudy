@@ -23,6 +23,7 @@ public class MarkTaskBrife implements Serializable {
 	private String id = null;
 	private String examId = null;
 	private String examName = null;
+	private String egsId = null;
 	private String teacherId = null;
 	private String teacherName = null;
 	private String subject = null;
@@ -48,11 +49,12 @@ public class MarkTaskBrife implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MarkTaskBrife(String examId, String examName, String teacherId, String teacherName,
+	public MarkTaskBrife(String examId, String examName, String egsId, String teacherId, String teacherName,
 			String subject, String grade, String markType, String quesno, String startno, String endno) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
+		this.egsId = egsId;
 		this.teacherId = teacherId;
 		this.teacherName = teacherName;
 		this.subject = subject;
@@ -63,11 +65,12 @@ public class MarkTaskBrife implements Serializable {
 		this.endno = endno;
 	}
 
-	public MarkTaskBrife(String examId, String examName, String teacherId, String teacherName,
+	public MarkTaskBrife(String examId, String examName, String egsId, String teacherId, String teacherName,
 			String subject, String grade, String markType, String progress) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
+		this.egsId = egsId;
 		this.teacherId = teacherId;
 		this.teacherName = teacherName;
 		this.subject = subject;
@@ -98,6 +101,15 @@ public class MarkTaskBrife implements Serializable {
 
 	public void setExamName(String examName) {
 		this.examName = examName;
+	}
+
+
+	public String getEgsId() {
+		return egsId;
+	}
+
+	public void setEgsId(String egsId) {
+		this.egsId = egsId;
 	}
 
 	public String getTeacherId() {
@@ -204,7 +216,7 @@ public class MarkTaskBrife implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MarkTaskBrife [id=" + id + ", examId=" + examId + ", examName=" + examName + ", teacherId=" + teacherId
+		return "MarkTaskBrife [id=" + id + ", examId=" + examId + ", examName=" + examName + ", egsId=" + egsId + ", teacherId=" + teacherId
 				+ ", teacherName=" + teacherName + ", subject=" + subject + ", grade=" + grade + ", markType="
 				+ markType + ", progress=" + progress + ", quesno=" + quesno + ", startno=" + startno + ", endno="
 				+ endno + ", quesType=" + quesType + ", summary=" + summary + ", papers=" + papers + "]";

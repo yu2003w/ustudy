@@ -289,6 +289,7 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
 			subject.put("answerSet", map.get("answerSet"));
+			subject.put("markSwitch", map.get("markSwitch"));
 			subject.put("taskDispatch", map.get("taskDispatch"));
 
 			String answerPaper = "";

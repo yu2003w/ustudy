@@ -34,7 +34,8 @@ public interface MarkTaskMapper {
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
 
 	@Select("select examid as examId, (select exam_name from ustudy.exam where ustudy.exam.id = examid) as "
-			+ "examName, (select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
+			+ "examName, (select exam_grade_sub_id from ustudy.question where id = #{qid}) as egsId, " 
+			+ "(select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
 			+ "(select grade_name from ustudy.grade where ustudy.grade.id = grade_id) as grade, quesno, "
 			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.question on "
 			+ "ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = "

@@ -30,6 +30,12 @@ public interface ExamSubjectDao {
 	void saveOriginalData(@Param("id")Long id, @Param("answerPaper")String answerPaper, @Param("xmlServerPath")String xmlServerPath, @Param("originalData") String originalData);
 	
 	void isAanswerSeted(Long id);
+
+	boolean getMarkSwitch(Long id);
+
+	void updateMarkSwitchById(@Param("egsId")Long egsId, @Param("switch")Boolean release);
+
+	void updateMarkSwitch(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("switch")Boolean release);
 	
 	void isTaskDispatch(Long id);
     

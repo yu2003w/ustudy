@@ -104,6 +104,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
+	public boolean getMarkSwitch(Long id) {
+		logger.debug("getMarkSwitch -> id:" + id);
+		return daoImpl.getMarkSwitch(id);
+	}
+
 	public boolean isTaskDispatch(Long id) {
 		try {
 			daoImpl.isTaskDispatch(id);
@@ -124,6 +129,32 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return null;
 		}
 
+	}
+
+	public boolean updateMarkSwitch(Long egsId, Boolean release) {
+		try {
+			daoImpl.updateMarkSwitchById(egsId, release);
+
+			// TODO: 清除缓存
+			//paperC.clearSubCache(String.valueOf(egsId));
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public boolean updateMarkSwitch(Long examId, Long gradeId, Long subjectId, Boolean release) {
+		try {
+			daoImpl.updateMarkSwitch(examId, gradeId, subjectId, release);
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return false;
 	}
 
 	public boolean updateExamSubjectStatus(Long egsId, Boolean release) {

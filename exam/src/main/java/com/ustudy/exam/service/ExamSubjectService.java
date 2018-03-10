@@ -28,6 +28,8 @@ public interface ExamSubjectService {
 
 	boolean isAanswerSeted(Long id);
 	
+	boolean getMarkSwitch(Long id);
+
 	boolean isTaskDispatch(Long id);
 	
 }

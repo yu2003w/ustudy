@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.xml.bind.DatatypeConverter;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
@@ -45,6 +47,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskServiceImpl.class);
 	
+	@Resource
+    private ExamSubjectDao examSubjectDao;
+
 	@Autowired
 	private MarkTaskMapper markTaskM;
 	
@@ -386,6 +391,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	@Override
 	@Transactional
 	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up) {
+
+		//if (examSubjectDao.getMarkSwitch())
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();

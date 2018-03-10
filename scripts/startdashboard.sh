@@ -13,6 +13,7 @@ docker stop dredis dashboard
 
 WORK_DIR=$1
 SOURCE_DIR=$2
+OS_NAME=`uname -s`
 echo "Working directory is " ${WORK_DIR}
 echo "Source directory is " ${SOURCE_DIR}
 if [ -d ${WORK_DIR}/dashboard/webapps/dashboard ]; then
@@ -23,6 +24,9 @@ if [ -d ${WORK_DIR}/dashboard/webapps/dashboard ]; then
   fi
 else
   mkdir -p ${WORK_DIR}/dashboard/webapps/
+  if [ $OS_NAME = "Darwin" ]; then
+    chmod -R 777 ${WORK_DIR}/dashboard
+  fi
   if [ $? != 0 ]; then
     echo "Failed to create directory" ${WORK_DIR}/dashboard/webapps/
     exit 1
@@ -35,7 +39,6 @@ if [ $? != 0 ]; then
   exit 1
 fi
 echo "Deploying dashboard.war successfully"
-
 # start redis cache for dashboard module, each tomcat had one redis instance
 docker run --rm -it --name dredis -p 6380:6379 -v ${WORK_DIR}/dashboard/redis:/data -d redis:3.2
 if [ $? != 0 ];then
