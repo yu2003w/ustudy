@@ -259,4 +259,64 @@ public class ExamSubjectController {
 
         return result;
     }
+
+    /**
+     * 
+     * updateMarkSwitch
+     * 创建人:  liqi
+     * 创建时间: 2018.3.10
+     *
+     * @Title: updateMarkSwitch
+     * @param examId 考试ID
+     * @param gradeId 年级ID
+     * @param subjectId 科目ID
+     * @param release 是否开启阅卷
+     * @return 阅卷开关结果
+     */
+    @RequestMapping(value = "/examsubject/markswitch/{examId}/{gradeId}/{subjectId}/{release}", method = RequestMethod.POST)
+    public Map updateMarkSwitch(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, @PathVariable Boolean release) {
+        
+        logger.debug("updateMarkSwitch().");
+        
+        Map result = new HashMap<>();
+
+        if(service.updateMarkSwitch(examId, gradeId, subjectId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     * updateMarkSwitch
+     * 创建人:  liqi
+     * 创建时间: 2018.3.10
+     *
+     * @Title: updateMarkSwitch
+     * @param egsId 考试科目ID
+     * @param release 是否开启阅卷
+     * @return 阅卷开关结果
+     */
+    @RequestMapping(value = "/examsubject/markswitch/{egsId}/{release}", method = RequestMethod.POST)
+    public Map updateMarkSwitch(@PathVariable Long egsId, @PathVariable Boolean release) {
+        
+        logger.debug("updateMarkSwitch().");
+        
+        Map result = new HashMap<>();
+
+        if(service.updateMarkSwitch(egsId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
 }

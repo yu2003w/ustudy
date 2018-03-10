@@ -35,6 +35,7 @@ import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.TeacherCache;
@@ -390,9 +391,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Override
 	@Transactional
-	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up) {
+	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up, Long egsId) {
 
-		//if (examSubjectDao.getMarkSwitch())
+		ExamSubject es = examSubjectDao.getMarkSwitchById(egsId);
+		if ( es.getMarkSwitch() == false) {
+			logger.error("updateMarkResult(), the marking is already paused.");
+			throw new RuntimeException("updateMarkResult(), the marking is paused");			
+		}
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();

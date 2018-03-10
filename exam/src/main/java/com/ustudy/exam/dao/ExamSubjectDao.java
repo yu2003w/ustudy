@@ -22,6 +22,8 @@ public interface ExamSubjectDao {
 	List<ExamSubject> getExamSubjectByExamIdAndGradeIdAndSubjectId(@Param("examId") Long examId, @Param("gradeId") Long gradeId, @Param("subjectId") Long subjectId);
 	
 	ExamSubject getExamSubjectById(Long id);
+
+	ExamSubject getMarkSwitchById(Long id);
 	
 	void saveBlankAnswerPaper(@Param("id")Long id, @Param("fileName") String fileName);
 	
@@ -31,11 +33,9 @@ public interface ExamSubjectDao {
 	
 	void isAanswerSeted(Long id);
 
-	boolean getMarkSwitch(Long id);
+	void updateMarkSwitchById(@Param("egsId")Long egsId, @Param("release")Boolean release);
 
-	void updateMarkSwitchById(@Param("egsId")Long egsId, @Param("switch")Boolean release);
-
-	void updateMarkSwitch(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("switch")Boolean release);
+	void updateMarkSwitch(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("release")Boolean release);
 	
 	void isTaskDispatch(Long id);
     

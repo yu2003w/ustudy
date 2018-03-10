@@ -104,9 +104,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	public boolean getMarkSwitch(Long id) {
+	public boolean getMarkSwitchById(Long id) {
 		logger.debug("getMarkSwitch -> id:" + id);
-		return daoImpl.getMarkSwitch(id);
+		ExamSubject es = daoImpl.getMarkSwitchById(id);
+		return es.getMarkSwitch();
 	}
 
 	public boolean isTaskDispatch(Long id) {

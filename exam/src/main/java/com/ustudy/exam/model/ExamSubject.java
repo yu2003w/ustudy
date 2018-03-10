@@ -21,7 +21,7 @@ public class ExamSubject implements Serializable {
 	private int template;
 	private int objItemNum;
 	private int subItemNum;
-	private int markSwitch;
+	private boolean markSwitch;
 	private int taskDispatch;
 	private String answerSeted ;
 	private int uploadBathCount ;
@@ -154,11 +154,11 @@ public class ExamSubject implements Serializable {
 		this.subItemNum = subItemNum;
 	}
 
-	public int getMarkSwitch() {
+	public boolean getMarkSwitch() {
 		return markSwitch;
 	}
 
-	public void setMarkSwitch(int markSwitch) {
+	public void setMarkSwitch(boolean markSwitch) {
 		this.markSwitch = markSwitch;
 	}
 

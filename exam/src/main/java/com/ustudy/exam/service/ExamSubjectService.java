@@ -21,14 +21,18 @@ public interface ExamSubjectService {
 	boolean updateExamSubjectStatus(Long egsId, Boolean release);
 	
 	boolean updateExamSubjectStatus(Long examId, Long gradeId, Long subjectId, Boolean release);
+
+	boolean updateMarkSwitch(Long egsId, Boolean release);
 	
+	boolean updateMarkSwitch(Long examId, Long gradeId, Long subjectId, Boolean release);
+
 	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
 	boolean saveBlankQuestionsPaper(Long id, String fileName);
 
 	boolean isAanswerSeted(Long id);
 	
-	boolean getMarkSwitch(Long id);
+	boolean getMarkSwitchById(Long id);
 
 	boolean isTaskDispatch(Long id);
 	

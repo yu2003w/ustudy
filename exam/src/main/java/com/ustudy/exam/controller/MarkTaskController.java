@@ -85,8 +85,8 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
-	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
+	@RequestMapping(value="/marktask/paper/update/{egsId}", method = RequestMethod.POST)
+	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp, @PathVariable Long egsId) {
 		if (up == null) {
 			logger.warn("updateMarkResult(), request parameter is not valid");
 			try {
@@ -100,7 +100,7 @@ public class MarkTaskController {
 		
 		List<MarkUpdateResult> mur= null;
 		try {
-			mur = stS.updateMarkResult(up);
+			mur = stS.updateMarkResult(up, egsId);
 			if (mur == null || mur.isEmpty()){
 				logger.error("updateMarkResult(), update mark result failed");
 			}
