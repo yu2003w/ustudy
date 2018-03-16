@@ -1,6 +1,5 @@
 package com.ustudy.exam.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,8 +17,10 @@ import org.springframework.stereotype.Service;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
@@ -30,7 +31,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	private static final Logger logger = LogManager.getLogger(ExamSubjectServiceImpl.class);
 
-	@Resource
+	@Autowired
 	private ExamSubjectDao daoImpl;
 	
 	@Resource
@@ -44,6 +45,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
     private ScoreCache scoC;
+	
+	@Autowired
+	private MarkTaskMapper mtM;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -93,16 +97,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	public boolean isAanswerSeted(Long id) {
-		try {
-			daoImpl.isAanswerSeted(id);
-			return true;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		return false;
-	}
+//	public boolean isAanswerSeted(Long id) {
+//		try {
+//			daoImpl.isAanswerSeted(id);
+//			return true;
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
 
 	public boolean getMarkSwitchById(Long id) {
 		logger.debug("getMarkSwitch -> id:" + id);
@@ -110,16 +114,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return es.getMarkSwitch();
 	}
 
-	public boolean isTaskDispatch(Long id) {
-		try {
-			daoImpl.isTaskDispatch(id);
-			return true;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		return false;
-	}
+//	public boolean isTaskDispatch(Long id) {
+//		try {
+//			daoImpl.isTaskDispatch(id);
+//			return true;
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
 
 	public List<ExamSubject> getLastExamSubjects() {
 
@@ -340,6 +344,35 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 
 		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
+	 * 
+	 * Check whether all questions' answer are set at runtime rather than determine that via
+	 * fields in table of database. As settings are allowed to be changed before examination completed.
+	 */
+	@Override
+	public boolean isAnswerSet(Long id) {
+		
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.ExamSubjectService#isMarkTaskDispatched(java.lang.Long)
+	 * Check whether all questions' mark task are already dispatched
+	 */
+	@Override
+	public boolean isMarkTaskDispatched(int id) {
+		
+		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		for (MarkTask mt: mtL) {
+			if (!mt.isvalid()) {
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
