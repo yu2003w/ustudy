@@ -3,12 +3,12 @@ package com.ustudy.exam.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.ExamSubject;
 
-@MapperScan
+@Mapper
 public interface ExamSubjectDao {
 
 	List<ExamSubject> getAllExamSubject(@Param("subjectId") Long subjectId, @Param("gradeId") Long gradeId, @Param("start") String start, @Param("end") String end, @Param("examName") String examName);

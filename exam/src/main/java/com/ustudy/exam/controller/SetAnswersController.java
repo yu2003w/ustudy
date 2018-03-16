@@ -1,8 +1,5 @@
 package com.ustudy.exam.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,66 +13,64 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.exam.service.ExamSubjectService;
-import com.ustudy.exam.service.SetAnswersService;
+import com.ustudy.UResp;
+import com.ustudy.exam.service.AnswerService;
 
 import net.sf.json.JSONObject;
 
 @RestController
 @RequestMapping(value = "/setanswers")
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SetAnswersController {
 
 	private static final Logger logger = LogManager.getLogger(SetAnswersController.class);
 
 	@Autowired
-	private SetAnswersService service;
+	private AnswerService ansSer;
 	
 	@Autowired
-	private ExamSubjectService esService;
+	private ExamSubjectService exSubSer;
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
-	public Map getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, HttpServletResponse response) {
+	public UResp getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, 
+			HttpServletResponse response) {
 
-		logger.debug("getQuesAnswers().");
-		logger.debug("egsId: " + egsId);
+		logger.debug("getQuesAnswers(), retrieving answers for " + egsId);
 
-		Map result = new HashMap<>();
+		UResp res = new UResp();
 
 		try {
-			result.put("success", true);
-			result.put("data", service.getQuesAnswer(egsId));
+			res.setData(ansSer.getQuesAnswer(egsId));
+			res.setRet(true);
 		} catch (Exception e) {
-			result.put("success", false);
-			result.put("message", e.getMessage());
-			e.printStackTrace();
+			res.setMessage("retrieve answers failed with exception->" + e.getMessage());
+			logger.error("getQuesAnswers(), retrieved answers failed for " + egsId + ", " + e.getMessage());
 		}
 
-		return result;
+		return res;
 	}
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
-	public Map saveQuesAnswers(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request,
-			HttpServletResponse response) {
+	public UResp saveQuesAnswers(@PathVariable Long egsId, @RequestBody String paras, 
+			HttpServletRequest request,	HttpServletResponse response) {
 
-		logger.debug("saveQuesAnswers().");
-		logger.debug("egsId: " + egsId + ",parameters=" + parameters);
-
-		Map result = new HashMap<>();
+		logger.debug("saveQuesAnswers(), save answers for " + egsId + " with parameters->" + paras);
+		
+		UResp res = new UResp();
 
 		try {
-			JSONObject data = JSONObject.fromObject(parameters);
-			if (service.saveQuesAnswers(egsId, data) && esService.isAanswerSeted(egsId)) {
-				result.put("success", true);
-			} else {
-				result.put("success", false);
+			JSONObject data = JSONObject.fromObject(paras);
+			if (ansSer.saveQuesAnswers(egsId, data) && exSubSer.isAnswerSet(egsId)) {
+				res.setRet(true);
 			}
+			
 		} catch (Exception e) {
-			result.put("success", false);
-			result.put("message", e.getMessage());
+			res.setMessage("save answers failed with exception->" + e.getMessage());
+			logger.error("saveQuesAnswers(), save answers for " + egsId + 
+					" failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 
-		return result;
+		return res;
 	}
 
 }

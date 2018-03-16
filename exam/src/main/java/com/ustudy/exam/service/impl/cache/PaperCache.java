@@ -119,18 +119,19 @@ public class PaperCache {
 		for (MarkTaskCache mtc : mtcL) {
 			PaperScoreCache[] ps = vIds.get(mtc.getPaperid());
 			if (ps != null) {
+				logger.trace("cachePapers(), " + ps[0] + ps[1]);
 				String teacid = null;
 				if (dMark) {
-					teacid = firstTeaL.get(((i + 1) % teaN) - 1);
+					teacid = firstTeaL.get(i % teaN);
 				}
 				// assign teacher to proper paper
-				if (ps[0] != null && ps[0].getTeacid().compareTo(teacid) == 0) {
+				if (ps[0] != null && (dMark && ps[0].getTeacid().compareTo(teacid) == 0)) {
 					logger.trace("cachePapers(), ps[0]" + ps[0].toString());
 					mtc.setStatus(2);
 					mtc.setTeacid(ps[0].getTeacid());
 					mtc.setScore(ps[0].getScore());
 					ps[0] = null;
-				} else if (ps[1] != null && ps[1].getTeacid().compareTo(teacid) == 0) {
+				} else if (ps[1] != null && (dMark && ps[1].getTeacid().compareTo(teacid) == 0)) {
 					logger.trace("cachePapers(), ps[1]" + ps[1].toString());
 					mtc.setStatus(2);
 					mtc.setTeacid(ps[1].getTeacid());

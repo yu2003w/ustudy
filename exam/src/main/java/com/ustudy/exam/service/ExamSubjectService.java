@@ -29,11 +29,27 @@ public interface ExamSubjectService {
 	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
 	boolean saveBlankQuestionsPaper(Long id, String fileName);
-
-	boolean isAanswerSeted(Long id);
 	
 	boolean getMarkSwitchById(Long id);
 
-	boolean isTaskDispatch(Long id);
+	/**
+	 * 
+	 * check related records to find out whether answer is set or not
+	 * Not a good design to determine that depends on field in table of database
+	 * 
+	 * @param id
+	 * @return
+	 */
+	boolean isAnswerSet(Long id);
+	
+	/**
+	 * check related records to find out whether mark task is dispatched or not
+	 * Not a good design to determine that depends on field in table of database as 
+	 * settings could be changed at runtime.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	boolean isMarkTaskDispatched(int id);
 	
 }

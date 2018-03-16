@@ -18,9 +18,11 @@ import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.mapper.ExamMapper;
 import com.ustudy.exam.mapper.MarkProgMapper;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.model.GrClsBrife;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.statics.EgsMarkMetrics;
@@ -50,6 +52,9 @@ public class ExamServiceImpl implements ExamService {
 	
 	@Autowired
 	private MarkProgMapper mpM;
+	
+	@Autowired
+	private MarkTaskMapper mtM;
 
 	public List<Exam> getAllExams() {
 		return examDaoImpl.getAllExams();
@@ -151,7 +156,7 @@ public class ExamServiceImpl implements ExamService {
 		return counts;
 	}
 
-	private Map<Long, Long> getSubjectPaperCounts(Long examId) {
+	/*private Map<Long, Long> getSubjectPaperCounts(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -163,9 +168,9 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
-	private Map<Long, Long> getSubjectAnswers(Long examId) {
+	/*private Map<Long, Long> getSubjectAnswers(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -177,7 +182,7 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
 	private Map<Long, Map<String, Long>> getSubjectQuestions(Long examId) {
 
@@ -190,6 +195,10 @@ public class ExamServiceImpl implements ExamService {
 			int startno = (int) map.get("startno");
 			int endno = (int) map.get("endno");
 			float score = (float)map.get("score");
+			
+			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
+			map.put("taskDispatch", this.isMarkTaskDispatched((int)egsId) == true ? 1:0);
+			
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
 				long objectCount = 0;
@@ -314,7 +323,7 @@ public class ExamServiceImpl implements ExamService {
 			}
 			subject.put("egsId", egsId);
 
-			long paperCount = 0;
+//			long paperCount = 0;
 			/* commented by Jared
 			if (null != subjectPaperCounts.get(egsId)) {
 				paperCount = subjectPaperCounts.get(egsId);
@@ -559,4 +568,15 @@ public class ExamServiceImpl implements ExamService {
 		return egL;
 	}
 
+	private boolean isMarkTaskDispatched(int id) {
+		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		for (MarkTask mt: mtL) {
+			if (!mt.isvalid()) {
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }

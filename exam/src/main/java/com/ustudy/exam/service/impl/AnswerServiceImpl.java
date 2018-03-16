@@ -19,15 +19,15 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.QuesAnswerDiv;
 import com.ustudy.exam.model.RefAnswer;
-import com.ustudy.exam.service.SetAnswersService;
+import com.ustudy.exam.service.AnswerService;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Service
-public class SetAnswersServiceImpl implements SetAnswersService {
+public class AnswerServiceImpl implements AnswerService {
 
-	private static final Logger logger = LogManager.getLogger(SetAnswersServiceImpl.class);
+	private static final Logger logger = LogManager.getLogger(AnswerServiceImpl.class);
 
 	@Resource
 	private QuesAnswerDao quesAnswerDaoImpl;

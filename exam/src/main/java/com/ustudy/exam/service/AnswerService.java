@@ -4,7 +4,7 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
-public interface SetAnswersService {
+public interface AnswerService {
 
 	Map<String, Object> getQuesAnswer(Long egsId) throws Exception;
 	
