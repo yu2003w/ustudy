@@ -169,6 +169,6 @@ public interface MarkTaskMapper {
 			+ "from question left join marktask on marktask.quesid = question.id "
 			+ "where question.exam_grade_sub_id = 1 and question.type not in ('单选题', '多选题', '判断题') "
 			+ "group by question.id")
-	public List<MarkTask> getMarkTasksByEgs(@Param("egs") int egs);
+	public List<MarkTask> getMarkTasksByEgs(@Param("egs") Long egs);
 	
 }

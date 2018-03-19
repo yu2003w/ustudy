@@ -14,13 +14,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
@@ -48,6 +51,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private MarkTaskMapper mtM;
+	
+	@Autowired
+	private QuesAnswerDao qaDao;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -353,9 +359,20 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	 * fields in table of database. As settings are allowed to be changed before examination completed.
 	 */
 	@Override
-	public boolean isAnswerSet(Long id) {
+	public UResp isAnswerSet(Long id) {
 		
-		return false;
+		UResp res = new UResp();
+		// retrieve answer settings for egs firstly
+		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(id);
+		for (QuesAnswer qa: quesAns) {
+			if (!qa.isValid()) {
+				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
+				res.setMessage("answer setting for question is not completed->" + qa.toString());
+				return res;
+			}
+		}
+		res.setRet(true);
+		return res;
 	}
 
 	/* (non-Javadoc)
@@ -363,16 +380,19 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	 * Check whether all questions' mark task are already dispatched
 	 */
 	@Override
-	public boolean isMarkTaskDispatched(int id) {
-		
+	public UResp isMarkTaskDispatched(Long id) {
+		UResp res = new UResp();
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
 		for (MarkTask mt: mtL) {
 			if (!mt.isvalid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
-				return false;
+				res.setMessage("mark task assignment is not completed for " + mt.getQuestionId());
+				return res;
 			}
 		}
-		return true;
+		
+		res.setRet(true);
+		return res;
 	}
 
 }

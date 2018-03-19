@@ -2,6 +2,7 @@ package com.ustudy.exam.service;
 
 import java.util.List;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamSubject;
 
 public interface ExamSubjectService {
@@ -40,7 +41,7 @@ public interface ExamSubjectService {
 	 * @param id
 	 * @return
 	 */
-	boolean isAnswerSet(Long id);
+	UResp isAnswerSet(Long id);
 	
 	/**
 	 * check related records to find out whether mark task is dispatched or not
@@ -50,6 +51,6 @@ public interface ExamSubjectService {
 	 * @param id
 	 * @return
 	 */
-	boolean isMarkTaskDispatched(int id);
+	UResp isMarkTaskDispatched(Long id);
 	
 }

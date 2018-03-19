@@ -59,7 +59,7 @@ public class SetAnswersController {
 
 		try {
 			JSONObject data = JSONObject.fromObject(paras);
-			if (ansSer.saveQuesAnswers(egsId, data) && exSubSer.isAnswerSet(egsId)) {
+			if (ansSer.saveQuesAnswers(egsId, data) && exSubSer.isAnswerSet(egsId).isRet()) {
 				res.setRet(true);
 			}
 			

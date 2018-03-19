@@ -41,7 +41,7 @@ public class ExamServiceImpl implements ExamService {
 	@Resource
 	private ExamDao examDaoImpl;
 
-	@Resource
+	@Autowired
 	private QuesAnswerDao questionDaoImpl;
 
 	@Resource
@@ -197,7 +197,8 @@ public class ExamServiceImpl implements ExamService {
 			float score = (float)map.get("score");
 			
 			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
-			map.put("taskDispatch", this.isMarkTaskDispatched((int)egsId) == true ? 1:0);
+			map.put("taskDispatch", this.isMarkTaskDispatched(egsId) == true ? 1:0);
+			map.put("answerSet", this.isAnswerSet(egsId) == true ? 1:0);
 			
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
@@ -568,11 +569,24 @@ public class ExamServiceImpl implements ExamService {
 		return egL;
 	}
 
-	private boolean isMarkTaskDispatched(int id) {
+	private boolean isMarkTaskDispatched(Long id) {
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
 		for (MarkTask mt: mtL) {
 			if (!mt.isvalid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isAnswerSet(Long id) {
+		
+		// retrieve answer settings for egs firstly
+		List<QuesAnswer> quesAns = questionDaoImpl.getQuesAnswerForValidation(id);
+		for (QuesAnswer qa: quesAns) {
+			if (!qa.isValid()) {
+				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
 				return false;
 			}
 		}

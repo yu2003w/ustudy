@@ -54,7 +54,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                 
                 //分数
                 QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, refAnswer.getQuesid());
-                int score = quesAnswer.getScore();
+                float score = quesAnswer.getScore();
                 
                 //多选给分
                 Map<Integer, Integer> multipleScoreSets = null;
@@ -63,7 +63,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
-                    int studentScore = 0;
+                    float studentScore = 0;
                     //单选、判断题
                     if(answer.length() == 1){
                         if(studentAnswer.getAnswer().equals(answer)){

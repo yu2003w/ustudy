@@ -29,6 +29,15 @@
 		SELECT * FROM question where exam_grade_sub_id in (#{egsIds})
 	</select>
 	
+	<!-- Added by Jared on March 18, 2018 -->
+	<select id="getQuesAnswerForValidation" parameterType="Long" resultMap="QuesAnswerResult">
+	    select question.id, question.quesno, question.startno, question.endno, question.type, 
+	    question.branch, question.choice_num, question.score, 
+	    group_concat(question_step.quesno, "-", question_step.score) as steps from question 
+	    left join question_step on question.id = question_step.quesid 
+	    where exam_grade_sub_id = #{egsId} group by question.id order by quesno
+	</select>
+	
 	<select id="getQuestions" parameterType="java.util.List" resultMap="QuesAnswerResult">
 		SELECT * FROM question where exam_grade_sub_id in
 		<foreach item="item" index="index" collection="egsIds" open="(" separator="," close=")">  

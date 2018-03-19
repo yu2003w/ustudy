@@ -17,6 +17,8 @@ choice_num INT NOT NULL,
 score float(3,1) NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
 mark_mode ENUM ('单评', '双评'),
+# score difference for double check
+scorediff float(3,1) default 0,
 #time out duration for screen this question
 duration INT,
 teac_owner CHAR(11),

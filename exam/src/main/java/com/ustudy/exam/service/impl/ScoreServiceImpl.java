@@ -98,7 +98,7 @@ public class ScoreServiceImpl implements ScoreService {
                 
                 //分数
                 QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, refAnswer.getQuesid());
-                int score = quesAnswer.getScore();
+                float score = quesAnswer.getScore();
                 
                 //多选给分
                 Map<Integer, Integer> multipleScoreSets = null;
@@ -107,7 +107,7 @@ public class ScoreServiceImpl implements ScoreService {
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
-                    int studentScore = 0;
+                    float studentScore = 0;
                     if(answer.length() == 1){
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
