@@ -172,7 +172,7 @@ public class MarkTask implements Serializable {
 	 * @return
 	 * 
 	 */
-	public boolean isvalid() {
+	public boolean isValid() {
 		if (this.questionId == null || this.questionId.isEmpty() || 
 				(this.teachersIds == null || this.teachersIds.isEmpty())) {
 			return false;

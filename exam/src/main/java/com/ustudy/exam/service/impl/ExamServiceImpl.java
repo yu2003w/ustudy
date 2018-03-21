@@ -196,10 +196,6 @@ public class ExamServiceImpl implements ExamService {
 			int endno = (int) map.get("endno");
 			float score = (float)map.get("score");
 			
-			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
-			map.put("taskDispatch", this.isMarkTaskDispatched(egsId) == true ? 1:0);
-			map.put("answerSet", this.isAnswerSet(egsId) == true ? 1:0);
-			
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
 				long objectCount = 0;
@@ -299,8 +295,6 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
 			subject.put("answerSet", map.get("answerSet"));
-			subject.put("markSwitch", map.get("markSwitch"));
-			subject.put("taskDispatch", map.get("taskDispatch"));
 
 			String answerPaper = "";
 			if (null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")) {
@@ -323,14 +317,20 @@ public class ExamServiceImpl implements ExamService {
 				egsId = (int) map.get("egsId");
 			}
 			subject.put("egsId", egsId);
-
-//			long paperCount = 0;
+			
+			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
+			subject.put("taskDispatch", this.isMarkTaskDispatched(egsId));
+			subject.put("answerSet", this.isAnswerSet(egsId));
+			logger.trace("summary(), taskDispatch->" + subject.get("taskDispatch") + 
+					", answerSet->" + subject.get("answerSet"));
+			
 			/* commented by Jared
+			long paperCount = 0;
 			if (null != subjectPaperCounts.get(egsId)) {
 				paperCount = subjectPaperCounts.get(egsId);
-			} 
-			*/
-			EgsMarkMetrics emm = mpM.getOverallMarkMetrics((int)egsId);
+			} */
+			
+			EgsMarkMetrics emm = mpM.getOverallMarkMetrics(egsId);
 			if (emm == null) {
 				logger.error("summary(), failed to retrieve mark metrics for egs->" + egsId);
 				throw new RuntimeException("failed to retrieve mark metrics for egs->" + egsId);
@@ -572,7 +572,7 @@ public class ExamServiceImpl implements ExamService {
 	private boolean isMarkTaskDispatched(Long id) {
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
 		for (MarkTask mt: mtL) {
-			if (!mt.isvalid()) {
+			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
 				return false;
 			}

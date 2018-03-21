@@ -384,7 +384,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		UResp res = new UResp();
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
 		for (MarkTask mt: mtL) {
-			if (!mt.isvalid()) {
+			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
 				res.setMessage("mark task assignment is not completed for " + mt.getQuestionId());
 				return res;
