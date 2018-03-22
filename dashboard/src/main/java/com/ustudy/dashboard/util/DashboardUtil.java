@@ -39,8 +39,7 @@ public class DashboardUtil {
 				ret.add(String.valueOf(obj.getInt("id")));
 			}
 		} catch (JsonException je) {
-			logger.info(je.getMessage());
-			logger.warn("Invalid json data in request for parsing");	
+			logger.error("parseIds(), invalid json data->" + je.getMessage());	
 		}
 		
 		return ret;

@@ -18,14 +18,18 @@
 	</resultMap>
 	
 	<select id="calScoreSubCls" resultMap="ScoreSubjectCls">
-		select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId,
-		subject.name as subjectName FROM ustudy.examinee
+		select avg(score) as aveScore, class.id as clsId, examgradesub.id as egsId, subject.name as subjectName, examgradesub.grade_id as gradeId
+		FROM ustudy.examinee
 		join ustudy.subscore on examinee.id = subscore.stuid
 		join ustudy.class on class.id = examinee.class_id
 		join examgradesub on examgradesub.id = subscore.exam_grade_sub_id
 		join ustudy.subject on subject.id = examgradesub.sub_id
-		where examgradesub.examid = #{eid} and examgradesub.grade_id = #{gid}
-		group by examinee.class_id, examgradesub.sub_id	order by aveScore desc
+		where examgradesub.examid=#{eid}
+		<if test="gid > 0">
+			and examgradesub.grade_id=#{gid}
+		</if>
+		group by examinee.class_id, examgradesub.sub_id	, examgradesub.grade_id	
+		order by aveScore desc
 	</select>
 	
 	<insert id="saveScoreSubCls" parameterType="com.ustudy.exam.model.statics.ScoreSubjectCls">
@@ -33,7 +37,7 @@
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.egsId}, #{item.aveScore}, #{item.rank})
 	    </foreach>
-	    on duplicate key update ave_score=#{item.aveScore}, rank=#{item.rank}
+	    on duplicate key update ave_score=VALUES(ave_score), rank=VALUES(rank)
 	</insert>
 	
 	<select id="getScoreSubCls" resultMap="ScoreSubjectCls">
@@ -63,7 +67,7 @@
 	    <foreach collection="list" item="item" separator=",">
 	        (#{item.clsId}, #{item.examId}, #{item.aveScore}, #{item.rank})
 	    </foreach>
-	    on duplicate key update ave_score=#{item.aveScore}, rank=#{item.rank}
+	    on duplicate key update ave_score=VALUES(ave_score), rank=VALUES(rank)
 	</insert>
 	
 </mapper>

@@ -311,6 +311,7 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 							quesAnswerDiv.setQuesno(String.valueOf(j));
 							quesAnswerDiv.setBranch(branch);
 							quesAnswerDiv.setScore(score);
+							quesAnswerDiv.setType("填空题");
 							if (startno > 0 && null != quesids.get(startno)) {
 								quesAnswerDiv.setQuesid(quesids.get(startno));
 							}
@@ -327,6 +328,11 @@ public class SetAnswersServiceImpl implements SetAnswersService {
 				            
 				            if (null != child.get("quesno"))
 				                quesAnswerDiv.setQuesno(child.getString("quesno"));
+				            if (null != child.get("type")){
+                                quesAnswerDiv.setType(child.getString("type"));
+				            } else {
+				                quesAnswerDiv.setType("解答题");
+                            }
 				            if (null != child.get("branch"))
 				                quesAnswerDiv.setBranch(child.getString("branch"));
 				            if (null != child.get("score"))

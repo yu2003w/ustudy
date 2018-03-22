@@ -8,6 +8,7 @@ import com.ustudy.exam.model.MarkTaskBrife;
 import com.ustudy.exam.model.QuesComb;
 import com.ustudy.exam.model.QuestionPaper;
 import com.ustudy.exam.model.cache.MarkUpdateResult;
+import com.ustudy.exam.utility.OSSMetaInfo;
 
 public interface MarkTaskService {
 
@@ -38,5 +39,7 @@ public interface MarkTaskService {
 	 * @return
 	 */
 	public boolean deleteMarkTask(MarkTask mt);
+	
+	public OSSMetaInfo loadOSSInfo(String key);
 	
 }

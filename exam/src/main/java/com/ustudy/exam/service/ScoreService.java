@@ -26,4 +26,6 @@ public interface ScoreService {
 	 */
 	public List<ScoreClass> getClsScores(int eid, int gid);
 	
+	public boolean isScoreCalculated(int egsid);
+	
 }

@@ -45,7 +45,7 @@
 		LEFT JOIN examinee e ON p.exam_code=e.exam_code
 		LEFT JOIN examgradesub egs ON egs.id = p.exam_grade_sub_id
 		LEFT JOIN question q on a.quesid=q.id
-		WHERE e.id=#{stuId} and e.examid=#{examId} 
+		WHERE e.id=#{stuId} and e.examid=#{examId} AND q.type != '填空题'
 		<if test="subjectId != null and subjectId > 0">
 			AND egs.sub_id=#{subjectId}
 		</if>

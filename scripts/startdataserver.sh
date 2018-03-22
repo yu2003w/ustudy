@@ -87,7 +87,7 @@ if [ $? != 0 ]; then
 else
   echo "Launched nginx container successfully"
 fi
-docker cp /mnt/repo/ustudy/scripts/nginx.conf nginx:/etc/nginx/nginx.conf
+docker cp ${SCHEMA_DIR}/../scripts/nginx.conf nginx:/etc/nginx/nginx.conf
 docker exec -u root nginx /bin/sh -c 'nginx -s reload'
 if [ $? != 0 ]; then
   echo "Failed update nginx configuration"

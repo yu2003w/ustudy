@@ -14,7 +14,7 @@ endno INT,
 type ENUM('单选题','多选题','判断题','填空题','解答题','证明题','作文题','论述题') NOT NULL,
 branch varchar(16) default '不分科',
 choice_num INT NOT NULL,
-score int NOT NULL,
+score float(3,1) NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
 mark_mode ENUM ('单评', '双评'),
 #time out duration for screen this question
@@ -80,9 +80,10 @@ FOREIGN KEY (exam_grade_sub_id)
 create table if not exists ustudy.question_step (
 id INT NOT NULL AUTO_INCREMENT,
 quesid INT(11) NOT NULL,
+type enum('填空题','解答题','证明题','作文题','论述题') NOT NULL DEFAULT '解答题',
 quesno varchar(16) NOT NULL,
 branch varchar(16) default '不分科',
-score INT NOT NULL,
+score float(3,1) NOT NULL,
 PRIMARY KEY (id),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
@@ -127,7 +128,7 @@ create table if not exists ustudy.examinee (
 id int(11) NOT NULL AUTO_INCREMENT,
 exam_code varchar(20) NOT NULL COMMENT '考号',
 examid int(11) NOT NULL COMMENT '考试ID',
-schid int(11) NOT NULL COMMENT '学校ID',
+schid varchar(11) NOT NULL COMMENT '学校ID',
 gradeid int(11) NOT NULL COMMENT '年级ID',
 class_id INT(11) COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',
@@ -165,7 +166,7 @@ create table if not exists ustudy.obj_answer (
 id int(11) NOT NULL AUTO_INCREMENT,
 paperid int(11) NOT NULL COMMENT '所属学生答题卡',
 quesno int(11) NOT NULL COMMENT '题号',
-score int(11) DEFAULT '0' COMMENT '得分',
+score float(3,1) DEFAULT '0' COMMENT '得分',
 answer varchar(16) DEFAULT NULL COMMENT '答案',
 answerHas int(11) DEFAULT NULL COMMENT '答案数值表示',
 PRIMARY KEY(id),

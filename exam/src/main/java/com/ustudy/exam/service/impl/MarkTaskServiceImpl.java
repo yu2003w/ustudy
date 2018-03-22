@@ -3,6 +3,9 @@ package com.ustudy.exam.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.DatatypeConverter;
+
 import java.io.ByteArrayInputStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
 import com.ustudy.exam.model.PaperRequest;
@@ -33,6 +37,7 @@ import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.TeacherCache;
 import com.ustudy.exam.utility.ExamUtil;
+import com.ustudy.exam.utility.OSSMetaInfo;
 import com.ustudy.exam.utility.OSSUtil;
 
 @Service
@@ -48,6 +53,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Autowired
 	private TeacherCache teaC;
+	
+	@Autowired
+	private ConfigMapper cgM;
 	
 	@Override
 	public List<MarkTaskBrife> getMarkTaskBrife(String teacid) {
@@ -96,7 +104,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		sum.setQuestionName(quesN);
 		sum.setQuestionType(mt.getQuesType());
 		
-		if (sum.getFullscore() > 20) {
+		if (sum.getFullscore() >= 20) {
 			sum.setComposable(false);
 			logger.debug("assembleTaskBrife(), " + sum.getQuesid() + " is not composable.");
 		}
@@ -195,7 +203,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		logger.info("requestPapers()，max number of retrieved papers is " + maxSize);
 		
 		int i = 0;
-		boolean remark = false;
 		if (startSeq == -1) {
 			int completed = paperC.getMarked(queS.get(0).getQuesid(), teacid);
 			for (QuesMarkSum que: queS) {
@@ -208,7 +215,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		else {
 			i = startSeq;
-			remark = true;
 		}		
 		
 		for (int j=0; j<maxSize; j++) {
@@ -229,13 +235,21 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba = new BlockAnswer();
 					ba.setBasicInfo(pImg.get(j).getPaperid(), mark.getQuesid(), pImg.get(j).getImg());
 				}
+				logger.trace("requestPapers(), answer information: quesid->" + ba.getQuesid() + 
+						", paperid->" + ba.getPaperId() + ", ansimgs->" + ba.getPaperImg());
+				
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), 
 						mark.getFullscore());
 				List<SingleAnswer> saL = new ArrayList<SingleAnswer>();
 				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || 
 						mark.getQuesno().compareTo("0") == 0) {
 					// need to retrieve detailed information of sub questions for this question block
-					saL = markTaskM.getQuesDiv(mark.getQuesid());
+					if (ba.isMarked()) {
+						saL = markTaskM.getMarkedQuesDiv(mark.getQuesid(), ba.getPaperId());
+					}
+					else
+						saL = markTaskM.getQuesDiv(mark.getQuesid());
+					
 				}
 				
 				ba.setSteps(saL);
@@ -253,6 +267,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					ba.setMarkRec(recs);
 					ba.setScoreGap(String.valueOf(
 							Math.abs(pImg.get(j+1).getScore() - pImg.get(j+2).getScore())));
+					logger.debug("requestPapers(), first mark records ->" + recs[0].toString() + 
+							"," + recs[1].toString());
 				}
 				
 				// set region informations for this question id
@@ -261,54 +277,100 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				String paperImg = ba.getPaperImg();
 				String [] imgs = null;
 				if (paperImg == null || paperImg.isEmpty()) {
-					logger.warn("requestPapers(), paper image is vacant for quesid " + mark.getQuesid() + 
+					logger.error("requestPapers(), paper image is vacant for quesid " + mark.getQuesid() + 
 							pImg.get(j).toString());
 				}
 				else {
 					List<FirstMarkImgRecord> fMImgs = null;
-					if (isfinal) 
+					if (isfinal) {
 						fMImgs = markTaskM.getFirstMarkImgs(mark.getQuesid(), pImg.get(j).getPaperid());
+						logger.debug("requestPapers(), final marked imgs for quesid->" + mark.getQuesid() + 
+								", paperid->" + pImg.get(j).getPaperid() + "imgs->" + fMImgs.toString());
+					}
 					imgs = paperImg.split(",");
+					
 					List<MarkAnsImg> markImgs = null;
-					if (remark)
+					if (ba.isMarked()) {
 						markImgs = markTaskM.getMarkAnsImgs(mark.getQuesid(), pImg.get(j).getPaperid(), teacid);
-					for (ImgRegion re: qreL) {
+						logger.debug("requestPapers(), marked imgs for quesid->" + mark.getQuesid() + 
+								", paperid->" + pImg.get(j).getPaperid() + ", imgs->" + markImgs.toString());
+					}
+						
+					for (int k = 0; k < qreL.size(); k++) {
+						// page no is real pageno, it should not be greater than imgs.length
+						ImgRegion re = qreL.get(k);
+						logger.trace("requestPapers(), region->" + re.toString());
+						
+						/*
+						 * Noted: student papers is composed of several pages, 
+						 * and each page has several regions
+						 * One question maybe in several pages and regions
+						 * Pageno is started from 0
+						 */
 						if (re.getPageno() + 1 > imgs.length) {
 							logger.error("requestPapers(), pageno not matched with real images ->" + imgs);
 							throw new RuntimeException("requestPapers(), pageno " + re.getPageno() + 
 									" not matched with " + paperImg.toString());
 						}
-					
+						
 					    re.setAnsImg(imgs[re.getPageno()]);
-					    
+					 
 					    // maybe this is remark operation
-					    if (remark && markImgs != null && !markImgs.isEmpty()) {
-					    	logger.debug("requestPapers(), marked imgs->" + markImgs.toString());
-					    	MarkAnsImg mm = markImgs.get(re.getPageno());
-					    	if (mm != null) {
-					    		re.setMarkImg(mm.getMarkImg());
-					    		re.setAnsMarkImg(mm.getAnsMarkImg());
+					    if (ba.isMarked() && markImgs != null && !markImgs.isEmpty()) {
+					    	if (k < markImgs.size()) {
+					    		logger.debug("requestPapers(), region->" + re.getPageno() + 
+					    				", marked imgs->" + markImgs.get(k).toString());
+					    		MarkAnsImg mm = markImgs.get(k);
+						    	if (mm != null && mm.getPageno() == re.getPageno()) {
+						    		re.setMarkImg(mm.getMarkImg());
+						    		re.setAnsMarkImg(mm.getAnsMarkImg());
+						    	}
 					    	}
+					    	else {
+					    		logger.debug("requestPapers(), no marked imgs for region->" + re.getPageno());
+					    		re.setMarkImg(null);
+					    		re.setAnsMarkImg(null);
+					    	}
+					    	
 					    }
 						// for final marks, need to add marked papers here
 						if (isfinal) {
 							FirstMarkImgRecord[] fmRec = new FirstMarkImgRecord[2];
-							if (fMImgs.get((re.getPageno()-1)*2).getTeacid().compareTo(
-									pImg.get(j+1).getTeacid()) == 0) {
-								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2);
-								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2 +1);
+							
+							/*
+							 * first mark records order by pageno and contains two teachers' first mark records
+							 * need to loop "fMImgs" to get the corresponding
+							 */
+							for (FirstMarkImgRecord fm: fMImgs) {
+								if (fm.getPageno() == re.getPageno()) {
+									if (fm.getTeacid().equals(pImg.get(j+1).getTeacid())) {
+										fmRec[0] = fm;
+										if (fmRec[1] != null) 
+											break;
+									}
+									else if (fm.getTeacid().equals(pImg.get(j+2).getTeacid())) {
+										fmRec[1] = fm;
+										if (fmRec[0] != null)
+											break;
+									}
+									else {
+										logger.error("requestPapers(), unexpected first mark record->" + fm);
+										throw new RuntimeException("Unexpected first mark record->" + fm.toString());
+									}
+								}
 							}
-							else {
-								fmRec[0] = fMImgs.get((re.getPageno() - 1)*2 + 1);
-								fmRec[1] = fMImgs.get((re.getPageno() - 1)*2);
-							}
+
 							re.setFirstMarkImgs(fmRec);
-							j += 2;
+							logger.debug("requestPapers(), firstMarkImg[0]->" + fmRec[0].toString() + 
+									", firstMarkImg[1]->" + fmRec[1].toString());
 						}
 					}
+					
+					//for final marks, 3 paper image cache in one group
+					if (isfinal) {
+						j += 2;
+					}
 				}
-				
-				// need to populate and set mark img for first marks
 				
 				ba.setRegions(qreL);
 				blA.add(ba);
@@ -335,18 +397,20 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		
 		for (BlockAnswer ba:blocks) {
-			float realScore = 0, num = 0;
 			
 			if (!ba.getSteps().isEmpty()) {
+				float realScore = 0;
 				List<SingleAnswer> saL = ba.getSteps();
 				for (SingleAnswer sa:saL) {
 					realScore += Float.valueOf(sa.getScore());
 				}
+				if (realScore != 0)
+					ba.setScore(String.valueOf(realScore));
+				else
+					ba.setScore("0");
 			}
-			if (realScore != 0)
-				ba.setScore(String.valueOf(realScore));
 
-			num = markTaskM.insertAnswer(ba, teacid);
+			int num = markTaskM.insertAnswer(ba, teacid);
 			if (num < 0 || num > 2 || ba.getId() < 0) {
 				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num + 
 						",pri key->" + ba.getId());
@@ -402,7 +466,21 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					
 					// upload mark image
 					String b64MarkImg = mark.split(",")[1];
-					byte[] markBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(b64MarkImg);
+					byte[] markBytes = DatatypeConverter.parseBase64Binary(b64MarkImg);
+					
+					
+					if (OSSUtil.getClient() == null) {
+						// need to initialize OSSMetaInfo
+						logger.info("saveAnsImgByPage(), initialize OSSClient before use");
+						synchronized(OSSMetaInfo.class) {
+							if (OSSUtil.getClient() == null) {
+								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								logger.debug("saveAnsImgByPage(), OSS Client init with->" + omi.toString());
+								OSSUtil.initOSS(omi);
+							}
+						}
+					}
+					
 					OSSUtil.putObject(ir.getMarkImg(), new ByteArrayInputStream(markBytes));
 					
 					// upload answer&mark image
@@ -564,6 +642,19 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		
 		logger.debug("deleteMarkTask(), " + ret + " mark task records cleared" );
 		return true;
+	}
+
+	@Override
+	public OSSMetaInfo loadOSSInfo(String key) {
+		
+		if (key == null || key.isEmpty()) {
+			logger.error("loadOSSInfo(), load oss info failed, key is empty");
+			throw new RuntimeException("load oss info failed, key is empty");
+		}
+		
+		OSSMetaInfo omi = cgM.getOSSInfo(key);
+		logger.debug("loadOSSInfo(), oss info->" + omi.toString());
+		return omi;
 	}
 	
 }

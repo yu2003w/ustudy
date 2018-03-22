@@ -76,8 +76,14 @@ public class SchoolServiceImp implements SchoolService {
 	
 	
 	private int createCleaner(String orgType, String orgId) {
-		String tname = "admin" + orgId;
+		// usually school id is composed of 10 digits number
+		String tname = orgId;
 		String msg = null;
+		
+		if (tname.length() > 11) {
+			logger.error("createCleaner(), length of school id exceeds 11 characters, create cleaner failed.");
+			throw new RuntimeException("length of school id exceeds 11 characters, create cleaner failed");
+		}
 		
 		logger.debug("createCleaner(), create cleaner for school " + orgId);
 		Teacher item = new Teacher(tname, tname, "学校", orgId);
@@ -146,8 +152,9 @@ public class SchoolServiceImp implements SchoolService {
 			throw new RuntimeException("updateSchool(), failed with ret " + ret);
 		}
 		
-		// For grades, need to compare which should be updated, origin ones should not be deleted
-		// delete origin grades may result in grade id changes and related exam information maybe lost
+		// For grades, need to compare which should be deleted, 
+		// origin grades should not be deleted and "insert into ... on duplicate key update" 
+		// delete origin grades may result in grade id changes and related exam information would lost
 		List<Grade> oriGr = schM.getGrades(data.getSchoolId());
 		HashMap<String, Grade> oGM = new HashMap<String, Grade>();
 		for (Grade gr: oriGr) {
@@ -161,42 +168,46 @@ public class SchoolServiceImp implements SchoolService {
 			if (og == null) {
 				// newly added grade
 				fin.add(gr);
-				oGM.remove(gr.getGradeName());
 			}
 			else {
 				fin.add(gr);
+				oGM.remove(gr.getGradeName());
 			}
 		}
 		
-		logger.debug("updateSchool(), grades needs to be removed->" + oGM.values());
-		Set<Entry<String, Grade>> rgr = oGM.entrySet();
-		String ids = null;
-		boolean first = true;
-		
-		for (Entry<String, Grade> en: rgr) {
-			if (first) {
-				ids = String.valueOf(en.getValue().getId());
-				first = false;
+		if (oGM.size() > 0) {
+			logger.debug("updateSchool(), grades needs to be removed->" + oGM.values());
+			Set<Entry<String, Grade>> rgr = oGM.entrySet();
+			String ids = null;
+			boolean first = true;
+			
+			for (Entry<String, Grade> en: rgr) {
+				if (first) {
+					ids = String.valueOf(en.getValue().getId());
+					first = false;
+				}
+				else {
+					ids += "," + String.valueOf(en.getValue().getId());
+				}
 			}
-			else {
-				ids += "," + String.valueOf(en.getValue().getId());
+			
+			if (!ids.isEmpty()) {
+				ret = schM.delGrade(ids);
+				if (ret < 1) {
+					logger.error("updateSchool(), faile to delete grade with ret->" + ret);
+					throw new RuntimeException("updateSchool(), faile to delete grade with ret->" + ret);
+				}
+				logger.debug("updateSchool(), grades to be deleted->" + ids);
 			}
-		}
-		
-		if (!ids.isEmpty()) {
-			ret = schM.delGrade(ids);
-			if (ret < 1) {
-				logger.error("updateSchool(), faile to delete grade with ret->" + ret);
-				throw new RuntimeException("updateSchool(), faile to delete grade with ret->" + ret);
-			}
-			logger.debug("updateSchool(), grades to be deleted->" + ids);
 		}
 		
 		logger.debug("updateSchool(), grades needs to added and updated->" + fin.toString());
-		ret = saveGrades(fin, data.getSchoolId());	
+		if (fin.size() > 0) {
+			ret = saveGrades(fin, data.getSchoolId());	
+			
+			logger.info("updateSchool()," + fin.size() + " grade items saved into database");
+		}
 		
-		logger.info("updateSchool()," + fin.size() + " grade items saved into database");
-
 	}
 
 	@Override
@@ -262,10 +273,12 @@ public class SchoolServiceImp implements SchoolService {
 		HashSet<String> priS = new HashSet<String>();
 		
 		// before processing grade subs, need to subjects dictionary firstly
+		// TODO: Before creating school, frontend should retrieve subject list via 
+		// api /dashboard/config/sublist/, then put subId in grade array
 		List<Subject> subL = schM.getSubs();
 		HashMap<String, String> subMap = new HashMap<String, String>();
 		for (Subject sub:subL) {
-			subMap.put(sub.getCourseName(), sub.getSubId());
+			subMap.put(sub.getSubName(), sub.getSubId());
 		}
 		
 		int ret = -1;
@@ -300,13 +313,14 @@ public class SchoolServiceImp implements SchoolService {
 			
 			// need to update grade related subjects, delete firstly then insert again
 			// when update school and update existed grades, need to do delete firstly
+			// TODO: DO update instead of delete, insert
 			ret = schM.delGradeSubs(gr.getId());
 			logger.debug("updateSchool(), clear " + ret + " subjects for grade->" + gr.toString());
 			
 			for (Subject sub : subs) {
-				String subId = subMap.get(sub.getCourseName());
+				String subId = subMap.get(sub.getSubName());
 				if (subId == null || subId.isEmpty() || Integer.valueOf(subId) < 0) {
-					msg = "saveGrades(), subId->" + subId + " invalid for " + sub.getCourseName();
+					msg = "saveGrades(), subId->" + subId + " invalid for " + sub.getSubName();
 					logger.error(msg);
 					throw new RuntimeException(msg);
 				}
@@ -317,7 +331,7 @@ public class SchoolServiceImp implements SchoolService {
 					throw new RuntimeException(msg);
 				}
 				
-				depS.add(sub.getCourseName());
+				depS.add(sub.getSubName());
 			}
 
 			logger.debug("Num of subjects for " + schId + "," + gr.getGradeName() + " is " + subs.size());

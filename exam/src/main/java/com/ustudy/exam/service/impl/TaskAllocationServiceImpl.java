@@ -61,16 +61,19 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 		JSONArray array = new JSONArray();
 		List<QuesAnswer> quesAnswers = quesAnswerDaoImpl.getQuesAnswers(egsId);
 		for (QuesAnswer quesAnswer : quesAnswers) {
-			JSONObject object = new JSONObject();
-			object.put("id", quesAnswer.getId());
-			if (quesAnswer.getStartno() == quesAnswer.getEndno()) {
-				object.put("questionName", "" + quesAnswer.getStartno());
-			} else {
-				object.put("questionName", quesAnswer.getStartno() + "-" + quesAnswer.getEndno());
-			}
-			object.put("type", quesAnswer.getType());
-
-			array.add(object);
+		    String type = quesAnswer.getType();
+		    if(null != type && !type.equals("单选题") && !type.equals("多选题") && !type.equals("判断题")){
+		        JSONObject object = new JSONObject();
+		        object.put("id", quesAnswer.getId());
+		        if (quesAnswer.getStartno() == quesAnswer.getEndno()) {
+		            object.put("questionName", "" + quesAnswer.getStartno());
+		        } else {
+		            object.put("questionName", quesAnswer.getStartno() + "-" + quesAnswer.getEndno());
+		        }
+		        object.put("type", type);
+		        
+		        array.add(object);
+		    }
 		}
 		return array;
 	}

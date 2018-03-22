@@ -1,0 +1,12 @@
+id,name,type
+NULL,语文,0
+NULL,数学,0
+NULL,英语,0
+NULL,物理,4
+NULL,生物,4
+NULL,化学,4
+NULL,政治,3
+NULL,历史,3
+NULL,地理,3
+NULL,文综,1
+NULL,理综,2

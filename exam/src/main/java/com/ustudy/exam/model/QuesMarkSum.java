@@ -172,8 +172,8 @@ public class QuesMarkSum implements Serializable {
 		return composable;
 	}
 
-	public void setComposable(boolean highScore) {
-		this.composable = highScore;
+	public void setComposable(boolean comp) {
+		this.composable = comp;
 	}
 
 	@Override

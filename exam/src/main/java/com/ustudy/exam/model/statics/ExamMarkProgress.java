@@ -13,7 +13,7 @@ public class ExamMarkProgress implements Serializable {
 	private int examId = 0;
 	private String examName = null;
 	
-	private int schoolId = 0;
+	private String schoolId = null;
 	private String schoolName = null;
 	
 	private List<EgsMarkProgress> egs = null;
@@ -24,7 +24,7 @@ public class ExamMarkProgress implements Serializable {
 	}
 
 	
-	public ExamMarkProgress(int examId, String examName, int schoolId, String schoolName) {
+	public ExamMarkProgress(int examId, String examName, String schoolId, String schoolName) {
 		super();
 		this.examId = examId;
 		this.examName = examName;
@@ -49,11 +49,11 @@ public class ExamMarkProgress implements Serializable {
 		this.examName = examName;
 	}
 
-	public int getSchoolId() {
+	public String getSchoolId() {
 		return schoolId;
 	}
 
-	public void setSchoolId(int schoolId) {
+	public void setSchoolId(String schoolId) {
 		this.schoolId = schoolId;
 	}
 
