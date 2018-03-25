@@ -51,7 +51,11 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<version>6.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -95,6 +99,7 @@
 	</dependencies>
 
 	<build>
+	    <finalName>mmadapter</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

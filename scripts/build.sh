@@ -33,6 +33,20 @@ else
   exit 1
 fi
 
+if [ -d ${SRC_DIR}/mmadapter ]; then
+  cd ${SRC_DIR}/mmadapter/
+  mvn clean
+  if [ $OS_NAME = "Darwin" ]; then
+    find . -name "applicationContext.xml" | xargs sed -i "" "s/localhost/${InternalIP}/g"
+  else
+    find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
+  fi
+  mvn clean package -DskipTests
+else
+  echo "${SRC_DIR}/mmadapter/ not existed. Please check again"
+  exit 1
+fi
+
 if [ -d ${SRC_DIR}/exam/ ]; then
   cd ${SRC_DIR}/exam/
   mvn clean
@@ -73,7 +87,4 @@ else
   echo "nginx.conf not found. Please check again"
   exit 1
 fi
-
-
-
 

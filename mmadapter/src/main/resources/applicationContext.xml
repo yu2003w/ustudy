@@ -89,11 +89,10 @@
 	<bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
 		<property name="dataSource" ref="repData" />
 		<property name="permissionsLookupEnabled" value="true" />
-		<property name="authenticationQuery"
-			value="select passwd from ustudy.teacher where teacid = ?" />
-		<property name="userRolesQuery"
-			value="select name from ustudy.teacherroles join ustudy.rolevalue on ustudy.rolevalue.id = 
-			ustudy.teacherroles.role_id where teac_id = ?" />
+		<property name="authenticationQuery" value="select passwd from ustudy.teacher where teacid = ?" />
+		<property name="userRolesQuery"  
+		    value="select name from ustudy.teacherroles join ustudy.rolevalue on ustudy.rolevalue.id = 
+		    ustudy.teacherroles.role_id where teac_id = ?" />
 		<property name="permissionsQuery"
 			value="select perm from ustudy.perms where role_name = ?" />
 	</bean>
@@ -125,7 +124,9 @@
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="repData" />
 		<!-- 自动扫描mapping.xml文件 -->  
-        <property name="mapperLocations" value="classpath:com/ustudy/mmadapter/mapping/*.xml"></property>  
+        <!--  
+        <property name="mapperLocations" value="classpath:com/ustudy/mmadapter/mapping/*.xml"></property>
+        -->  
 	</bean>
 
 	<!-- scan for mappers and make them autowired -->
