@@ -14,7 +14,6 @@ import com.ustudy.mmadapter.UResp;
 import com.ustudy.mmadapter.service.SchoolService;
 
 @RestController
-@RequestMapping(value = "/adapter/")
 public class SchoolController {
 
 	private static final Logger logger = LogManager.getLogger(SchoolController.class);
@@ -22,7 +21,7 @@ public class SchoolController {
 	@Autowired
 	private SchoolService schS;
 	
-	@RequestMapping(value = "/info/schools/", method = RequestMethod.GET)
+	@RequestMapping(value = "/info/schools", method = RequestMethod.GET)
 	public UResp getSchoolsByKey(@RequestParam(value = "schoolName", required = false) String key, 
 			HttpServletResponse resp) {
 		

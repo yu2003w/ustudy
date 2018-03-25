@@ -8,7 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>mmadapter</name>
+	<name>adapter</name>
 	<description>Adapter for micro msg program</description>
 
 	<parent>

@@ -46,7 +46,7 @@
 				<property name="url"
 					value="jdbc:mysql://localhost:13307/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-				<property name="username" value="cc-client" />
+				<property name="username" value="CC-CLIENT" />
 				<property name="password" value="ustudy@2018" />
 				<property name="testWhileIdle" value="true" />
 				<property name="testOnBorrow" value="true" />

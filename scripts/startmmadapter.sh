@@ -37,7 +37,7 @@ fi
 echo "Deploying mmadapter.war successfully"
 
 # before launching tomcat, clear logs generated last time
-echo "clear logs generated in ${WORK_DIR}/logs/dashboard/"
+echo "clear logs generated in ${WORK_DIR}/logs/mmadapter/"
 rm ${WORK_DIR}/logs/mmadapter/*
 
 docker run --rm --name mmadapter -p 8082:8080 -v ${WORK_DIR}/mmadapter/webapps/:/usr/local/tomcat/webapps \
