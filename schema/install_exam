@@ -17,6 +17,8 @@ choice_num INT NOT NULL,
 score float(3,1) NOT NULL,
 assign_mode ENUM ('平均', '动态', '比例'),
 mark_mode ENUM ('单评', '双评'),
+# score difference for double check
+scorediff float(3,1) default 0,
 #time out duration for screen this question
 duration INT,
 teac_owner CHAR(11),
@@ -48,8 +50,8 @@ FOREIGN KEY (quesid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-# tables for paper templates, each question block may distribute in 
-# several pages
+# tables for paper templates, each question block may distribute in serveral regions which 
+# may reside in several pages or in the same page
 create table if not exists ustudy.quesarea (
 id int(11) NOT NULL AUTO_INCREMENT,
 exam_grade_sub_id int(11) NOT NULL COMMENT '考试科目ID',
@@ -182,7 +184,7 @@ id int(11) NOT NULL AUTO_INCREMENT,
 exam_grade_sub_id int(11) DEFAULT NULL COMMENT '考试科目ID',
 correct_answer_count smallint(6) DEFAULT NULL COMMENT '正确答案数',
 student_correct_count smallint(6) DEFAULT NULL COMMENT '学生答对数',
-score smallint(255) DEFAULT NULL,
+score float(3,1) DEFAULT '0',
 PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='多选题答案给分设置';
 
@@ -214,13 +216,16 @@ create table if not exists ustudy.answer_img (
 id INT NOT NULL AUTO_INCREMENT,
 mark_img VARCHAR(128),
 ans_mark_img VARCHAR(128),
-pageno int(11) NOT NULL, 
+qarea_id int(11) NOT NULL, 
 ans_id INT NOT NULL,
 INDEX(ans_id),
 PRIMARY KEY (id),
-UNIQUE KEY (ans_id, pageno),
+UNIQUE KEY (ans_id, qarea_id),
 FOREIGN KEY(ans_id)
     REFERENCES ustudy.answer(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(qarea_id)
+    REFERENCES ustudy.quesarea(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

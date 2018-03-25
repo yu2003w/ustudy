@@ -120,14 +120,13 @@ public class AccountController {
 		logger.debug(item.toString());
 		String result = null;
 		try {
-		    int index = accS.createItem(item);
+		    int index = accS.createAccount(item);
 		    logger.debug("createItem(), item created successfully with id " + index);
 		    //set header location
-		    resp.setHeader("Location", 
-		    	builder.path("/user/view/{index}").buildAndExpand(index).toString());
+		    resp.setHeader("Location", builder.path("/user/view/{index}").buildAndExpand(index).toString());
 		    result = "create item successfully";
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error("createItem() failed->" + e.getMessage());
 			result = "create item failed";
 			resp.setStatus(500);
 		}
@@ -140,7 +139,7 @@ public class AccountController {
 		logger.debug("endpoint /user/update/" + id + " is visited.");
 		String result = null;
 		try {
-			int numOfRows = accS.updateItem(data, id);
+			int numOfRows = accS.updateAccount(data, id);
 			if (numOfRows == 1)
 				logger.debug("updateItem(), update item successfully");
 			else {

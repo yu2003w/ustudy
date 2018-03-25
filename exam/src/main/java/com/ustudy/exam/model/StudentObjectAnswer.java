@@ -9,7 +9,7 @@ public class StudentObjectAnswer implements Serializable {
 	private Long id;
 	private Long paperid;
 	private int quesno;
-	private int score;
+	private float score;
 	private String answer;
 	private int answerHas;
 	
@@ -37,11 +37,11 @@ public class StudentObjectAnswer implements Serializable {
 		this.quesno = quesno;
 	}
 	
-	public int getScore() {
+	public float getScore() {
 		return score;
 	}
 	
-	public void setScore(int score) {
+	public void setScore(float score) {
 		this.score = score;
 	}
 	

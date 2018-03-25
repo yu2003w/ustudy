@@ -1,6 +1,7 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +27,11 @@ public class MarkTask implements Serializable {
 	// duration for specific question
 	private int timeLimit = 0;
 	
+	// teachers includes both first/second round mark with format 'markType'-'teacid'
+	// need to parse contents when setting this field
+	@JsonIgnore
+	private String teachers = null;
+	
 	@JsonIgnore
 	private String markMode = null;
 	
@@ -49,6 +55,37 @@ public class MarkTask implements Serializable {
 		this.subjectId = egs.getSubjectId();
 	}
 	
+	public String getTeachers() {
+		return teachers;
+	}
+
+	public void setTeachers(String teachers) {
+		this.teachers = teachers;
+		
+		// need to parse teachers here
+		String[] data = this.teachers.split(",");
+		if (data != null) {
+			for (int i = 0; i < data.length; i++) {
+				String [] elem = data[i].split("-");
+				if (elem != null && elem.length == 2) {
+					if (elem[0].compareTo("初评") == 0 || elem[0].compareTo("标准") == 0) {
+						if (teachersIds == null) {
+							teachersIds = new ArrayList<String>();
+						}
+						teachersIds.add(elem[1]);
+					}
+					else if (elem[0].compareTo("终评") == 0) {
+						if (finalMarkTeachersIds == null) {
+							finalMarkTeachersIds = new ArrayList<String>();
+						}
+						finalMarkTeachersIds.add(elem[1]);
+					}
+				}
+			}
+		}
+		
+	}
+
 	public String getExamId() {
 		return examId;
 	}
@@ -128,7 +165,6 @@ public class MarkTask implements Serializable {
 	public void setMarkMode(String markMode) {
 		this.markMode = markMode;
 	}
-
 	
 	/**
 	 * check whether parameter is valid, for example, quesid is valid or not, 
@@ -136,22 +172,26 @@ public class MarkTask implements Serializable {
 	 * @return
 	 * 
 	 */
-	public boolean isvalid() {
-		if (this.questionId == null || this.questionId.isEmpty()) {
+	public boolean isValid() {
+		if (this.questionId == null || this.questionId.isEmpty() || 
+				(this.teachersIds == null || this.teachersIds.isEmpty())) {
 			return false;
 		}
-		if ((this.teachersIds == null || this.teachersIds.isEmpty()) && (this.finalMarkTeachersIds == null ||
+		if (this.markMode.compareTo("双评") == 0 && (this.finalMarkTeachersIds == null ||
 				this.finalMarkTeachersIds.isEmpty())) {
 			return false;
 		}
 		
 		return true;
 	}
+	
+	
 	@Override
 	public String toString() {
 		return "MarkTask [examId=" + examId + ", gradeId=" + gradeId + ", subjectId=" + subjectId + ", questionId="
 				+ questionId + ", ownerId=" + ownerId + ", teachersIds=" + teachersIds + ", finalMarkTeachersIds="
-				+ finalMarkTeachersIds + ", type=" + type + ", timeLimit=" + timeLimit + ", markMode=" + markMode + "]";
+				+ finalMarkTeachersIds + ", type=" + type + ", timeLimit=" + timeLimit + ", teachers=" + teachers
+				+ ", markMode=" + markMode + "]";
 	}
 	
 }

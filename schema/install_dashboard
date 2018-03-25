@@ -18,15 +18,22 @@ PRIMARY KEY (`id`),
 INDEX(name)  
 ) ENGINE=InnoDB;
 
+# dictionary table for role values, including both teachers' role and users' role
+create table if not exists ustudy.rolevalue (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(20) NOT NULL,
+UNIQUE KEY(name),
+PRIMARY KEY(id)
+) ENGINE=InnoDB;
+
 create table if not exists ustudy.users (
 id INT NOT NULL AUTO_INCREMENT,
 loginname CHAR(11) NOT NULL,
 fullname varchar(32) NOT NULL,
 passwd varchar(32) NOT NULL,
-ugroup ENUM ('运维', '市场', '代理商', '临时') NOT NULL,
 ctime datetime DEFAULT NULL,
 ll_time datetime DEFAULT NULL,
-status ENUM ('在线', '离线'),
+status ENUM ('在线', '离线') NOT NULL default '离线',
 province varchar(32) NOT NULL,
 city varchar(32) NOT NULL,
 district varchar(32) NOT NULL,
@@ -36,12 +43,15 @@ PRIMARY KEY (id)
 
 create table if not exists ustudy.roles (
 id INT NOT NULL AUTO_INCREMENT,
-role_name varchar(32) NOT NULL,
+role_id INT NOT NULL,
 user_name CHAR(11) NOT NULL,
 INDEX(user_name),
 PRIMARY KEY (id),
 FOREIGN KEY (user_name)
     REFERENCES ustudy.users(loginname)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (role_id)
+    REFERENCES ustudy.rolevalue(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -164,6 +174,7 @@ status ENUM('0', '1', '2') NOT NULL,
 temp_upload BOOL default false,
 obj_item_num INT default 0,
 sub_item_num INT default 0,
+mark_switch BOOL default false,
 task_dispatch BOOL default false,
 answer_set BOOL DEFAULT '0' COMMENT '标准答案是否设置',
 upload_bath_count int(11) DEFAULT '10' COMMENT '批量上传数量',

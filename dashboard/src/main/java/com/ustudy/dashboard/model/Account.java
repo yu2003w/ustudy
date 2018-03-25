@@ -1,18 +1,17 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ustudy.dashboard.util.DashboardUtil;
 
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = -5386334949501785419L;
 	
-	private String id = null;
+	private int id = 0;
 	
 	// Noted: login name is the phone number
 	@JsonProperty("userId")
@@ -34,7 +33,7 @@ public class Account implements Serializable {
 	
 	@JsonProperty("userStatus")
 	private String status = null;
-	
+
 	private String province = null;
 	private String city = null;
 	private String district = null;
@@ -48,44 +47,23 @@ public class Account implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Account(String id, String loginname, String fullname, String passwd, String roleName, String createTime,
-			String lastLoginTime, String status, String province, String city, String district) {
+	public Account(String loginname, String fullname, String roleName) {
 		super();
-		this.id = id;
-		this.loginname = loginname;
-		this.fullname = fullname;
-		this.passwd = passwd;
-		this.roleName = roleName;
-		this.createTime = createTime;
-		this.lastLoginTime = lastLoginTime;
-		this.status = status;
-		this.province = province;
-		this.city = city;
-		this.district = district;
-	}
-
-	// constructor without field of password
-	public Account(String id, String loginname, String fullname, String roleName, String createTime,
-			String lastLoginTime, String status, String province, String city, String district) {
-		super();
-		this.id = id;
 		this.loginname = loginname;
 		this.fullname = fullname;
 		this.roleName = roleName;
-		this.createTime = createTime;
-		this.lastLoginTime = lastLoginTime;
-		this.status = status;
-		this.province = province;
-		this.city = city;
-		this.district = district;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	
-	public void setId(String id) {
+
+	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setAddiPerms(List<String> addiPerms) {
+		this.addiPerms = addiPerms;
 	}
 
 	public String getLoginname() {
@@ -183,31 +161,10 @@ public class Account implements Serializable {
 				+ ", status=" + status + ", province=" + province + ", city=" + city + ", district=" + district
 				+ ", addiPerms=" + addiPerms + "]";
 	}
-
-	public Map<String,String> compare(Account item) {
-		if (this == item) {
-			return null;
-		}
-		HashMap<String, String> comRes = new HashMap<String,String>();
-		if (this.getLoginname() != null && this.getLoginname() != item.getLoginname())
-			comRes.put("loginname", this.getLoginname());
-		if (this.getFullname() != null && this.getFullname() != item.getFullname())
-			comRes.put("fullname", this.getFullname());
-		if (this.getPasswd() != null && this.getPasswd() != item.getPasswd())
-			comRes.put("passwd", this.getPasswd());
-		if (this.getRoleName() != null && this.getRoleName() != item.getRoleName())
-			comRes.put("ugroup", this.getRoleName());
-		if (this.getProvince() != null && this.getProvince() != item.getProvince()) {
-			comRes.put("province", this.getProvince());
-		}
-		if (this.getCity() != null && this.getCity() != item.getCity()) {
-			comRes.put("city", this.getCity());
-		}
-		if (this.getDistrict() != null && this.getDistrict() != item.getDistrict()) {
-			comRes.put("district", this.getDistrict());
-		}
-		return comRes;
-		
+	
+	public void convertRole() {
+		this.roleName = DashboardUtil.getAcctRoleMap().get(this.roleName);
 	}
+	
 }
 

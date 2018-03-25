@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.xml.bind.DatatypeConverter;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
@@ -33,6 +35,7 @@ import com.ustudy.exam.model.BlockAnswer;
 import com.ustudy.exam.model.ExamGradeSub;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.MarkTaskBrife;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.service.MarkTaskService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.TeacherCache;
@@ -45,6 +48,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 	private static final Logger logger = LogManager.getLogger(MarkTaskServiceImpl.class);
 	
+	@Resource
+    private ExamSubjectDao examSubjectDao;
+
 	@Autowired
 	private MarkTaskMapper markTaskM;
 	
@@ -321,13 +327,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					    		logger.debug("requestPapers(), region->" + re.getPageno() + 
 					    				", marked imgs->" + markImgs.get(k).toString());
 					    		MarkAnsImg mm = markImgs.get(k);
-						    	if (mm != null && mm.getPageno() == re.getPageno()) {
+						    	if (mm != null && mm.getRegionId() == re.getId()) {
 						    		re.setMarkImg(mm.getMarkImg());
 						    		re.setAnsMarkImg(mm.getAnsMarkImg());
 						    	}
 					    	}
 					    	else {
-					    		logger.debug("requestPapers(), no marked imgs for region->" + re.getPageno());
+					    		logger.warn("requestPapers(), no marked imgs for region->" + re.toString());
 					    		re.setMarkImg(null);
 					    		re.setAnsMarkImg(null);
 					    	}
@@ -385,7 +391,13 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	
 	@Override
 	@Transactional
-	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up) {
+	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up, Long egsId) {
+
+		ExamSubject es = examSubjectDao.getMarkSwitchById(egsId);
+		if ( es.getMarkSwitch() == false) {
+			logger.error("updateMarkResult(), the marking is already paused.");
+			throw new RuntimeException("updateMarkResult(), the marking is paused");			
+		}
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
 		List<BlockAnswer> blocks = up.getBlocks();
@@ -430,7 +442,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				}
 			}
 						
-			if (!saveAnsImgByPage(ba.getRegions(), ba.getId(), teacid)) {
+			if (!saveAnsImgByRegion(ba.getRegions(), ba.getId(), teacid)) {
 				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
 				throw new RuntimeException("updateMarkResult(), save answer images failed");
 			}
@@ -447,10 +459,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return murL;
 	}
 
-	private boolean saveAnsImgByPage(List<ImgRegion> irs, int id, String teacid) {
+	private boolean saveAnsImgByRegion(List<ImgRegion> irs, int id, String teacid) {
 		
 		if (irs == null || irs.isEmpty()) {
-			logger.error("saveAnsImgByPage(), regions are absent.");
+			logger.error("saveAnsImgByRegion(), regions are absent.");
 			return false;
 		}
 		
@@ -471,11 +483,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					
 					if (OSSUtil.getClient() == null) {
 						// need to initialize OSSMetaInfo
-						logger.info("saveAnsImgByPage(), initialize OSSClient before use");
+						logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
 						synchronized(OSSMetaInfo.class) {
 							if (OSSUtil.getClient() == null) {
 								OSSMetaInfo omi = cgM.getOSSInfo("oss");
-								logger.debug("saveAnsImgByPage(), OSS Client init with->" + omi.toString());
+								logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
 								OSSUtil.initOSS(omi);
 							}
 						}
@@ -486,12 +498,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					// upload answer&mark image
 					OSSUtil.putObject(ir.getAnsImg(), ir.getMarkImg(), ir.getAnsMarkImg(), x, y, w, h);
 				} catch (Exception e) {
-					logger.error("saveAnsImgByPage(), failed to upload image to oss -> " + e.getMessage());
+					logger.error("saveAnsImgByRegion(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
 				int ret = markTaskM.insertAnsImg(ir, id);
 				if (ret > 2 || ret < 0) {
-					logger.error("saveAnsImgByPage(), failed to save answer images, returned " + ret);
+					logger.error("saveAnsImgByRegion(), failed to save answer images, returned " + ret);
 					return false;
 				}				
 			}

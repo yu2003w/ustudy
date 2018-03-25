@@ -1,6 +1,5 @@
 package com.ustudy.exam.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,11 +14,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
+import com.ustudy.exam.model.MarkTask;
+import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Subscore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
@@ -30,7 +34,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	private static final Logger logger = LogManager.getLogger(ExamSubjectServiceImpl.class);
 
-	@Resource
+	@Autowired
 	private ExamSubjectDao daoImpl;
 	
 	@Resource
@@ -44,6 +48,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
     private ScoreCache scoC;
+	
+	@Autowired
+	private MarkTaskMapper mtM;
+	
+	@Autowired
+	private QuesAnswerDao qaDao;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.debug("getExamSubjects");
@@ -93,27 +103,33 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	public boolean isAanswerSeted(Long id) {
-		try {
-			daoImpl.isAanswerSeted(id);
-			return true;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		return false;
+//	public boolean isAanswerSeted(Long id) {
+//		try {
+//			daoImpl.isAanswerSeted(id);
+//			return true;
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
+
+	public boolean getMarkSwitchById(Long id) {
+		logger.debug("getMarkSwitch -> id:" + id);
+		ExamSubject es = daoImpl.getMarkSwitchById(id);
+		return es.getMarkSwitch();
 	}
 
-	public boolean isTaskDispatch(Long id) {
-		try {
-			daoImpl.isTaskDispatch(id);
-			return true;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		return false;
-	}
+//	public boolean isTaskDispatch(Long id) {
+//		try {
+//			daoImpl.isTaskDispatch(id);
+//			return true;
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
 
 	public List<ExamSubject> getLastExamSubjects() {
 
@@ -124,6 +140,32 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return null;
 		}
 
+	}
+
+	public boolean updateMarkSwitch(Long egsId, Boolean release) {
+		try {
+			daoImpl.updateMarkSwitchById(egsId, release);
+
+			// TODO: 清除缓存
+			//paperC.clearSubCache(String.valueOf(egsId));
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public boolean updateMarkSwitch(Long examId, Long gradeId, Long subjectId, Boolean release) {
+		try {
+			daoImpl.updateMarkSwitch(examId, gradeId, subjectId, release);
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return false;
 	}
 
 	public boolean updateExamSubjectStatus(Long egsId, Boolean release) {
@@ -217,8 +259,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("objScore")) {
 				long studentId = (int) map.get("id");
-				BigDecimal score = (BigDecimal) map.get("objScore");
-				result.put(studentId, score.floatValue());
+				Object score = map.get("objScore");
+				result.put(studentId, Float.parseFloat(score.toString()));
 			}
 		}
 
@@ -308,6 +350,49 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 
 		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
+	 * 
+	 * Check whether all questions' answer are set at runtime rather than determine that via
+	 * fields in table of database. As settings are allowed to be changed before examination completed.
+	 */
+	@Override
+	public UResp isAnswerSet(Long id) {
+		
+		UResp res = new UResp();
+		// retrieve answer settings for egs firstly
+		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(id);
+		for (QuesAnswer qa: quesAns) {
+			if (!qa.isValid()) {
+				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
+				res.setMessage("answer setting for question is not completed->" + qa.toString());
+				return res;
+			}
+		}
+		res.setRet(true);
+		return res;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.ExamSubjectService#isMarkTaskDispatched(java.lang.Long)
+	 * Check whether all questions' mark task are already dispatched
+	 */
+	@Override
+	public UResp isMarkTaskDispatched(Long id) {
+		UResp res = new UResp();
+		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		for (MarkTask mt: mtL) {
+			if (!mt.isValid()) {
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				res.setMessage("mark task assignment is not completed for " + mt.getQuestionId());
+				return res;
+			}
+		}
+		
+		res.setRet(true);
+		return res;
 	}
 
 }

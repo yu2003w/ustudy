@@ -18,9 +18,11 @@ import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.mapper.ExamMapper;
 import com.ustudy.exam.mapper.MarkProgMapper;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.model.GrClsBrife;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.statics.EgsMarkMetrics;
@@ -39,7 +41,7 @@ public class ExamServiceImpl implements ExamService {
 	@Resource
 	private ExamDao examDaoImpl;
 
-	@Resource
+	@Autowired
 	private QuesAnswerDao questionDaoImpl;
 
 	@Resource
@@ -50,6 +52,9 @@ public class ExamServiceImpl implements ExamService {
 	
 	@Autowired
 	private MarkProgMapper mpM;
+	
+	@Autowired
+	private MarkTaskMapper mtM;
 
 	public List<Exam> getAllExams() {
 		return examDaoImpl.getAllExams();
@@ -151,7 +156,7 @@ public class ExamServiceImpl implements ExamService {
 		return counts;
 	}
 
-	private Map<Long, Long> getSubjectPaperCounts(Long examId) {
+	/*private Map<Long, Long> getSubjectPaperCounts(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -163,9 +168,9 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
-	private Map<Long, Long> getSubjectAnswers(Long examId) {
+	/*private Map<Long, Long> getSubjectAnswers(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -177,7 +182,7 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
 	private Map<Long, Map<String, Long>> getSubjectQuestions(Long examId) {
 
@@ -190,6 +195,7 @@ public class ExamServiceImpl implements ExamService {
 			int startno = (int) map.get("startno");
 			int endno = (int) map.get("endno");
 			float score = (float)map.get("score");
+			
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
 				long objectCount = 0;
@@ -289,7 +295,6 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
 			subject.put("answerSet", map.get("answerSet"));
-			subject.put("taskDispatch", map.get("taskDispatch"));
 
 			String answerPaper = "";
 			if (null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")) {
@@ -312,14 +317,20 @@ public class ExamServiceImpl implements ExamService {
 				egsId = (int) map.get("egsId");
 			}
 			subject.put("egsId", egsId);
-
-			long paperCount = 0;
+			
+			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
+			subject.put("taskDispatch", this.isMarkTaskDispatched(egsId));
+			subject.put("answerSet", this.isAnswerSet(egsId));
+			logger.trace("summary(), taskDispatch->" + subject.get("taskDispatch") + 
+					", answerSet->" + subject.get("answerSet"));
+			
 			/* commented by Jared
+			long paperCount = 0;
 			if (null != subjectPaperCounts.get(egsId)) {
 				paperCount = subjectPaperCounts.get(egsId);
-			} 
-			*/
-			EgsMarkMetrics emm = mpM.getOverallMarkMetrics((int)egsId);
+			} */
+			
+			EgsMarkMetrics emm = mpM.getOverallMarkMetrics(egsId);
 			if (emm == null) {
 				logger.error("summary(), failed to retrieve mark metrics for egs->" + egsId);
 				throw new RuntimeException("failed to retrieve mark metrics for egs->" + egsId);
@@ -558,4 +569,28 @@ public class ExamServiceImpl implements ExamService {
 		return egL;
 	}
 
+	private boolean isMarkTaskDispatched(Long id) {
+		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		for (MarkTask mt: mtL) {
+			if (!mt.isValid()) {
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isAnswerSet(Long id) {
+		
+		// retrieve answer settings for egs firstly
+		List<QuesAnswer> quesAns = questionDaoImpl.getQuesAnswerForValidation(id);
+		for (QuesAnswer qa: quesAns) {
+			if (!qa.isValid()) {
+				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }

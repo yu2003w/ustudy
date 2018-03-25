@@ -12,6 +12,7 @@ fi
 SRC_DIR=$1
 InternalIP=$2
 TRACE_LEVEL=$3
+OS_NAME=`uname -s`
 
 if [ ! -d ${SRC_DIR} ]; then
   echo "Source directory ${SRC_DIR} not existed"
@@ -21,7 +22,11 @@ fi
 if [ -d ${SRC_DIR}/dashboard/ ]; then
   cd ${SRC_DIR}/dashboard/
   mvn clean
-  find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
+  if [ $OS_NAME = "Darwin" ]; then
+    find . -name "applicationContext.xml" | xargs sed -i "" "s/localhost/${InternalIP}/g"
+  else
+    find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
+  fi
   mvn clean package -DskipTests
 else
   echo "${SRC_DIR}/dashboard/ not existed. Please check again"
@@ -31,11 +36,17 @@ fi
 if [ -d ${SRC_DIR}/exam/ ]; then
   cd ${SRC_DIR}/exam/
   mvn clean
-  # replace ip configurations
-  find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
-
-  # setting log levels
-  find . -type f -name "log4j2.xml" | xargs sed -i "s/USTUDYLOGLEVEL/${TRACE_LEVEL}/g"
+  if [ $OS_NAME = "Darwin" ]; then  
+    # replace ip configurations
+    find . -name "applicationContext.xml" | xargs sed -i "" "s/localhost/${InternalIP}/g"
+    # setting log levels
+    find . -type f -name "log4j2.xml" | xargs sed -i "" "s/USTUDYLOGLEVEL/${TRACE_LEVEL}/g"
+  else
+    # replace ip configurations
+    find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
+    # setting log levels
+    find . -type f -name "log4j2.xml" | xargs sed -i "s/USTUDYLOGLEVEL/${TRACE_LEVEL}/g"
+  fi
   mvn clean package -DskipTests
 else
   echo "${SRC_DIR}/exam/ not existed. Please check again"
@@ -43,12 +54,26 @@ else
 fi
 
 # replace nginx to configure host ip address
-if [ -d ${SRC_DIR}/scripts/ ]; then
-  cd ${SRC_DIR}/scripts/
-  sed -i "s/prodhost/${InternalIP}/g" nginx.conf
+if [ -d ${SRC_DIR}/dockerfile/nginx/ ]; then
+  cd ${SRC_DIR}/dockerfile/nginx/
+  if [ $OS_NAME = "Darwin" ]; then
+    sed -i "" "s/prodhost/${InternalIP}/g" nginx.conf
+  else
+    sed -i "s/prodhost/${InternalIP}/g" nginx.conf
+  fi
+  
+  docker build --rm -t nginx-ustudy:1.12 .
+  if [ $? = 0 ];then
+    echo "build nginx image nginx-ustudy:1.12 successfully"
+  else
+    echo "build nginx image failed"
+    exit 1
+  fi
 else
   echo "nginx.conf not found. Please check again"
   exit 1
 fi
+
+
 
 

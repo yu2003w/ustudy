@@ -109,7 +109,17 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/objanswer.csv' INTO TABLE ustu
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
-LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/marktask.csv' INTO TABLE ustudy.marktask
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/answer.csv' INTO TABLE ustudy.answer
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/ansimg.csv' INTO TABLE ustudy.answer_img
+  CHARACTER SET UTF8
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/ansstep.csv' INTO TABLE ustudy.answer_step
   CHARACTER SET UTF8
   FIELDS TERMINATED BY ',' ENCLOSED BY '"'
   LINES TERMINATED BY '\n'

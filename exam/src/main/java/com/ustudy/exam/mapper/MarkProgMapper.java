@@ -54,7 +54,7 @@ public interface MarkProgMapper {
 			+ "sum((select count(*) from ustudy.answer where isviewed=1 and answer.quesid = question.id)) "
 			+ "as marked from question where exam_grade_sub_id = #{egsid} and "
 			+ "question.type not in ('单选题', '多选题', '判断题')")
-	public EgsMarkMetrics getOverallMarkMetrics(@Param("egsid") int egsid);
+	public EgsMarkMetrics getOverallMarkMetrics(@Param("egsid") long egsid);
 	
 	@Select("select marktask.teacid as teacId, teacher.teacname as teacName, subject.name as subName, "
 			+ "school.schname as schName, examgradesub.grade_id as gradeId, grade.grade_name as gradeName, "

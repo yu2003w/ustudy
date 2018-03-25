@@ -83,7 +83,7 @@ public class LoginController {
 					ses.setAttribute("role", userS.findPriRoleById(tea.getUid()));
 					ses.setAttribute("uid", currentUser.getPrincipal().toString());
 				} else {
-					logger.warn("login(), failed to retrieve user information for id " + currentUser.getPrincipal());
+					logger.error("login(), failed to retrieve user information for " + currentUser.getPrincipal());
 					response.setStatus(404);
 					response.setHeader("loginresult", "failed to retrieve user information");
 					return tea;
@@ -92,14 +92,14 @@ public class LoginController {
 				logger.debug("login()," + tea.toString());
 				
 			} catch (Exception e) {
-				logger.warn("login(), session failed -> " + e.getMessage());
+				logger.error("login(), session failed -> " + e.getMessage());
 				response.setStatus(404);
 				response.setHeader("loginresult", "session operation failed");
 				return tea;
 			}
 			
 		} else {
-			logger.warn(msg);
+			logger.error(msg);
 			response.setStatus(404);
 			response.setHeader("loginresult", "authencation failed");
 		}
@@ -131,11 +131,11 @@ public class LoginController {
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
-			logger.warn("getLoginUser(),Failed to get subject --> " + e.getMessage());
+			logger.error("getLoginUser(),Failed to get subject --> " + e.getMessage());
 			return u;
 		}
 		if (cUser.getPrincipal() == null) {
-			logger.warn("getLoginUser(), User didn't log in");
+			logger.info("getLoginUser(), User didn't log in");
 			resp.setStatus(530);
 			resp.setHeader("Failure reason:", "No User logged in");
 			return u;

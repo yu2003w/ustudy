@@ -85,8 +85,8 @@ public class MarkTaskController {
 		return st;
 	}
 	
-	@RequestMapping(value="/marktask/paper/update/", method = RequestMethod.POST)
-	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp) {
+	@RequestMapping(value="/marktask/paper/update/{egsId}", method = RequestMethod.POST)
+	public List<MarkUpdateResult> updateMarkResult(@RequestBody @Valid QuestionPaper up, HttpServletResponse resp, @PathVariable Long egsId) {
 		if (up == null) {
 			logger.warn("updateMarkResult(), request parameter is not valid");
 			try {
@@ -100,7 +100,7 @@ public class MarkTaskController {
 		
 		List<MarkUpdateResult> mur= null;
 		try {
-			mur = stS.updateMarkResult(up);
+			mur = stS.updateMarkResult(up, egsId);
 			if (mur == null || mur.isEmpty()){
 				logger.error("updateMarkResult(), update mark result failed");
 			}
@@ -172,7 +172,7 @@ public class MarkTaskController {
 	@RequestMapping(value = "marktask/create/", method = RequestMethod.POST)
 	public UResp createMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
-		if (mt == null || !mt.isvalid()) {
+		if (mt == null || !mt.isValid()) {
 			logger.error("createMarkTask(), received parameter is not valid");
 			res.setMessage("parameter invalid");
 			resp.setStatus(422);
@@ -203,7 +203,7 @@ public class MarkTaskController {
 	public UResp updateMarkTask(@RequestBody @Valid MarkTask mt, HttpServletResponse resp) {
 		UResp res = new UResp();
 		
-		if (mt == null || !mt.isvalid()) {
+		if (mt == null || !mt.isValid()) {
 			logger.warn("updateMarkTask(), received parameter is invalid");
 			res.setMessage("parameter invalid");
 			return res;

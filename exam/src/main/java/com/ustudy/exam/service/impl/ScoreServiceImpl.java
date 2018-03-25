@@ -40,6 +40,7 @@ import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
 
 import net.sf.json.JSONArray;
@@ -97,7 +98,7 @@ public class ScoreServiceImpl implements ScoreService {
                 
                 //分数
                 QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, refAnswer.getQuesid());
-                int score = quesAnswer.getScore();
+                float score = quesAnswer.getScore();
                 
                 //多选给分
                 Map<Integer, Integer> multipleScoreSets = null;
@@ -106,7 +107,7 @@ public class ScoreServiceImpl implements ScoreService {
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
-                    int studentScore = 0;
+                    float studentScore = 0;
                     if(answer.length() == 1){
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
@@ -115,7 +116,7 @@ public class ScoreServiceImpl implements ScoreService {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
+                            Integer correctCount = ExamUtil.getStudentCorrectCount(studentAnswer.getAnswer(), answer);
                             if(correctCount == answer.split(",").length){
                                 studentScore = score;
                             }else if(null != multipleScoreSets.get(correctCount)){
@@ -203,24 +204,6 @@ public class ScoreServiceImpl implements ScoreService {
         return map;
     }
     
-    private int getStudentCorrectCount(String stuAnswer, String correctAnswer){
-        
-        int studentCorrectCount = 0;
-        
-        String[] stuAnswers = stuAnswer.split(",");
-        for (String answer : stuAnswers) {
-            if(correctAnswer.contains(answer)){
-                studentCorrectCount++;
-            }else {
-                studentCorrectCount = 0;
-                break;
-            }
-        }
-        
-        return studentCorrectCount;
-        
-    }
-
     public boolean publishExamScore(Long examId, Boolean release) throws Exception {
     	
     	if (release) {
@@ -228,6 +211,8 @@ public class ScoreServiceImpl implements ScoreService {
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
     		if(count == 0){    			
     			examDao.updateExamStatus(examId, "2");
+                // update the status of all the sub-exams accordingly.
+                examDao.updateEgsStatus(examId, "2");
     			
     			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
     			if(scores.size() > 0){
@@ -271,6 +256,8 @@ public class ScoreServiceImpl implements ScoreService {
             }
     	} else {
     		examDao.updateExamStatus(examId, "1");
+            // update the status of all the sub-exams accordingly.
+            examDao.updateEgsStatus(examId, "1");
 		}
         
         return true;

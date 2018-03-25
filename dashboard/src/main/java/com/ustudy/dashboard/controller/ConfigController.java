@@ -12,7 +12,6 @@ import com.ustudy.dashboard.model.UResp;
 import com.ustudy.dashboard.services.ConfigService;
 
 @RestController
-@RequestMapping(value = "/dashboard/")
 public class ConfigController {
 
 	private static final Logger logger = LogManager.getLogger(ConfigController.class);
@@ -20,7 +19,7 @@ public class ConfigController {
 	@Autowired
 	private ConfigService confS;
 	
-	@RequestMapping(value = "config/sublist/")
+	@RequestMapping(value = "/config/sublist/")
 	public UResp getSubList(HttpServletResponse resp) {
 		UResp res = new UResp();
 		
