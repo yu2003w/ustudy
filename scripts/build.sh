@@ -54,16 +54,26 @@ else
 fi
 
 # replace nginx to configure host ip address
-if [ -d ${SRC_DIR}/scripts/ ]; then
-  cd ${SRC_DIR}/scripts/
+if [ -d ${SRC_DIR}/dockerfile/nginx/ ]; then
+  cd ${SRC_DIR}/dockerfile/nginx/
   if [ $OS_NAME = "Darwin" ]; then
     sed -i "" "s/prodhost/${InternalIP}/g" nginx.conf
   else
     sed -i "s/prodhost/${InternalIP}/g" nginx.conf
   fi
+  
+  docker build --rm -t nginx-ustudy:1.12 .
+  if [ $? = 0 ];then
+    echo "build nginx image nginx-ustudy:1.12 successfully"
+  else
+    echo "build nginx image failed"
+    exit 1
+  fi
 else
   echo "nginx.conf not found. Please check again"
   exit 1
 fi
+
+
 
 
