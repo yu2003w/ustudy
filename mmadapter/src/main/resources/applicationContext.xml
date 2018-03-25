@@ -39,15 +39,15 @@
 		</property>
 	</bean>
 
-	<bean id="examCenter" class="org.apache.tomcat.jdbc.pool.DataSource"
+	<bean id="repData" class="org.apache.tomcat.jdbc.pool.DataSource"
 		destroy-method="close">
 		<property name="poolProperties">
 			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
 				<property name="url"
-					value="jdbc:mysql://localhost:13306/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
+					value="jdbc:mysql://localhost:13307/ustudy?characterEncoding=UTF-8&amp;serverTimezone=UTC" />
 				<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-				<property name="username" value="mmc2018" />
-				<property name="password" value="mmc2018@Ustudy" />
+				<property name="username" value="cc-client" />
+				<property name="password" value="ustudy@2018" />
 				<property name="testWhileIdle" value="true" />
 				<property name="testOnBorrow" value="true" />
 				<property name="validationInterval" value="30000" />
@@ -87,7 +87,7 @@
 		your back-end -->
 	<!-- security datasource: -->
 	<bean id="authRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
-		<property name="dataSource" ref="examCenter" />
+		<property name="dataSource" ref="repData" />
 		<property name="permissionsLookupEnabled" value="true" />
 		<property name="authenticationQuery"
 			value="select passwd from ustudy.teacher where teacid = ?" />
@@ -118,14 +118,14 @@
 	<tx:annotation-driven transaction-manager="txManager" />
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="examCenter" />
+		<property name="dataSource" ref="repData" />
 	</bean>
 
 	<!-- sql session factory for mybatis -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="examCenter" />
+		<property name="dataSource" ref="repData" />
 		<!-- 自动扫描mapping.xml文件 -->  
-        <property name="mapperLocations" value="classpath:com/ustudy/exam/mapping/*.xml"></property>  
+        <property name="mapperLocations" value="classpath:com/ustudy/mmadapter/mapping/*.xml"></property>  
 	</bean>
 
 	<!-- scan for mappers and make them autowired -->
@@ -134,7 +134,7 @@
 	<!-- spring data redis related configurations -->
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		p:use-pool="true" p:database="0" p:host-name="localhost" p:port="6379"
+		p:use-pool="true" p:database="0" p:host-name="localhost" p:port="6380"
 		p:timeout="100" />
 
 	<!-- redis template definition -->
