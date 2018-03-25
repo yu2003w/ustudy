@@ -96,7 +96,7 @@ if [ $OS_NAME = "Darwin" ]; then
   chmod -R 777 ${WORK_DIR}/logs/nginx
 fi
 # start nginx as proxy for frontend services
-docker run --rm -it --name nginx -p 80:80 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
+docker run --rm -it --name nginx -p 443:443 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
     -v ${WORK_DIR}/logs/nginx/:/var/log/nginx/ -d nginx-ustudy:1.12
 if [ $? != 0 ]; then
   echo "Failed to launch nginx container"
