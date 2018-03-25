@@ -22,6 +22,8 @@ public class SchoolServiceImpl implements SchoolService {
 	@Override
 	public List<School> getSchoolsByKey(String key) {
 		
+		// need to refine key before executing sql
+		key = "%" + key + "%";
 		List<School> schL = schM.getSchoolsByKey(key);
 		
 		logger.trace("getSchoolsByKey(), schools retrieved by " + key + ":" + schL.toString());

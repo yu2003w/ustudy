@@ -11,7 +11,7 @@ import com.ustudy.mmadapter.model.School;
 public interface SchoolMapper {
 
 	@Select("select school.schname as schoolName, school.schid as schoolId from school where "
-			+ "school.schname like '%#{key}%' limit 10;")
+			+ "school.schname like #{key} limit 10;")
 	List<School> getSchoolsByKey(String key);
 	
 }

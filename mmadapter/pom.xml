@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ustudy</groupId>
-	<artifactId>mmadapter</artifactId>
+	<artifactId>adapter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>adapter</name>
+	<name>mmadapter</name>
 	<description>Adapter for micro msg program</description>
 
 	<parent>
