@@ -68,7 +68,7 @@ public interface SchoolMapper {
 	@Select("select id, grade_name as gradeName, classes_num as num from ustudy.grade where schid=#{sId}")
 	public List<Grade> getGrades(@Param("sId") String schId);
 	
-	@Select("select sub_id as subId, name as courseName from ustudy.gradesub join ustudy.subject on "
+	@Select("select sub_id as subId, name as subName from ustudy.gradesub join ustudy.subject on "
 			+ "ustudy.gradesub.sub_id = ustudy.subject.id where ustudy.gradesub.grade_id=#{gid}")
 	public List<Subject> getGradeSub(@Param("gid") int gid);
 	

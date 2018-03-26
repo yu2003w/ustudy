@@ -23,9 +23,9 @@ public class Subject implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Subject(String courseName, String subId) {
+	public Subject(String subName, String subId) {
 		super();
-		this.subName = courseName;
+		this.subName = subName;
 		this.subId = subId;
 	}
 
@@ -34,8 +34,8 @@ public class Subject implements Serializable {
 		return subName;
 	}
 
-	public void setSubName(String courseName) {
-		this.subName = courseName;
+	public void setSubName(String subName) {
+		this.subName = subName;
 	}
 
 	public String getSubId() {
@@ -48,7 +48,7 @@ public class Subject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Subject [courseName=" + subName + ", subId=" + subId + "]";
+		return "Subject [subName=" + subName + ", subId=" + subId + "]";
 	}
 
 	
