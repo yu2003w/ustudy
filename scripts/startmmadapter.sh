@@ -16,7 +16,7 @@ SOURCE_DIR=$2
 echo "Working directory is " ${WORK_DIR}
 echo "Source directory is " ${SOURCE_DIR}
 if [ -d ${WORK_DIR}/mmadapter/webapps/mmadapter ]; then
-  rm -rf ${WORK_DIR}/mmadapter/webapps/mmadapter  ${WORK_DIR}/mmadapter/webapps/mmadapter.war
+  rm -rf ${WORK_DIR}/mmadapter/webapps/mmadapter  ${WORK_DIR}/mmadapter/webapps/adapter.war
   if [ $? != 0 ]; then
     echo "Failed to delete deployed mmadapter.war"
     exit 1
@@ -29,7 +29,7 @@ else
   fi
 fi
 
-cp -f ${SOURCE_DIR}/ustudy/mmadapter/target/mmadapter.war ${WORK_DIR}/mmadapter/webapps/mmadapter.war
+cp -f ${SOURCE_DIR}/ustudy/mmadapter/target/adapter.war ${WORK_DIR}/mmadapter/webapps/adapter.war
 if [ $? != 0 ]; then
   echo "Failed to copy mmadapter.war into destination directory"
   exit 1

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ustudy</groupId>
-	<artifactId>adapter</artifactId>
+	<artifactId>mmadapter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -99,7 +99,7 @@
 	</dependencies>
 
 	<build>
-	    <finalName>mmadapter</finalName>
+	    <finalName>adapter</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
