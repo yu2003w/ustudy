@@ -294,7 +294,7 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("subjectId", map.get("subjectId"));
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
-			subject.put("answerSet", map.get("answerSet"));
+			subject.put("markSwitch", map.get("markSwitch"));
 
 			String answerPaper = "";
 			if (null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")) {

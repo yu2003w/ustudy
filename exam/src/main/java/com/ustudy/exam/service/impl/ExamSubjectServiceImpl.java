@@ -56,9 +56,15 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	private QuesAnswerDao qaDao;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
-		logger.debug("getExamSubjects");
+		logger.trace("getExamSubjects(), retrieving all exam subjects.");
 
-		return daoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
+		// set answerSet and taskDispatch based on calculation
+		List<ExamSubject> esL = daoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
+		for (ExamSubject es: esL) {
+			es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
+			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
+		}
+		return esL;
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId) {

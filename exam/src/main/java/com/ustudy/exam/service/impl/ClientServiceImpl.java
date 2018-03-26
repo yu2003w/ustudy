@@ -670,7 +670,7 @@ public class ClientServiceImpl implements ClientService {
                 object.put("examName", exam.getExamName());
 
                 object.put("templatStatus", examSubject.getTemplate());
-                object.put("answerScoreStatus", examSubject.getAnswerSeted());
+                object.put("answerScoreStatus", examSubject.getAnswerSet());
                 object.put("teachTaskStatus", examSubject.getTaskDispatch());
                 object.put("tcaStatus", examSubject.getExamAnswer());
                 object.put("uploadBathCount", examSubject.getUploadBathCount());
