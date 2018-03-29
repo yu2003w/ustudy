@@ -19,7 +19,7 @@
         <result property="objItemNum" column="obj_item_num"/>
         <result property="subItemNum" column="sub_item_num"/>
         <result property="markSwitch" column="mark_switch"/>
-        <result property="answerSeted" column="answer_set"/>
+        <result property="answerSet" column="answer_set"/>
         <result property="uploadBathCount" column="upload_bath_count"/>
         <result property="blankAnswerPaper" column="blank_answer_paper"/>
         <result property="blankQuestionsPaper" column="blank_questions_paper"/>
