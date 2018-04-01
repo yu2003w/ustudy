@@ -58,33 +58,45 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.trace("getExamSubjects(), retrieving all exam subjects.");
 
-		// set answerSet and taskDispatch based on calculation
 		List<ExamSubject> esL = daoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
-		for (ExamSubject es: esL) {
-			es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
-			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
-		}
+		// set answerSet and taskDispatch based on calculation
+		populateExamSubStatus(esL);
 		return esL;
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId) {
 		logger.debug("getExamSubjects -> examId:" + examId);
-		return daoImpl.getAllExamSubjectByExamId(examId);
+		List<ExamSubject> esL = daoImpl.getAllExamSubjectByExamId(examId);
+		// set answerSet and taskDispatch based on calculation
+		populateExamSubStatus(esL);
+		return esL;
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId) {
 		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId);
-		return daoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
+		
+		List<ExamSubject> esL = daoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
+		// set answerSet and taskDispatch based on calculation
+		populateExamSubStatus(esL);
+		return esL;
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId) {
 		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
-		return daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
+		
+		List<ExamSubject> esL = daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
+		// set answerSet and taskDispatch based on calculation
+		populateExamSubStatus(esL);
+		return esL;
 	}
 
 	public ExamSubject getExamSubject(Long id) {
 		logger.debug("getExamSubject -> id:" + id);
-		return daoImpl.getExamSubjectById(id);
+		ExamSubject es = daoImpl.getExamSubjectById(id);
+		// set status for exam subject
+		es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
+		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
+		return es;
 	}
 
 	public boolean saveBlankAnswerPaper(Long id, String fileName) {
@@ -109,33 +121,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-//	public boolean isAanswerSeted(Long id) {
-//		try {
-//			daoImpl.isAanswerSeted(id);
-//			return true;
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			e.printStackTrace();
-//		}
-//		return false;
-//	}
-
 	public boolean getMarkSwitchById(Long id) {
 		logger.debug("getMarkSwitch -> id:" + id);
 		ExamSubject es = daoImpl.getMarkSwitchById(id);
 		return es.getMarkSwitch();
 	}
-
-//	public boolean isTaskDispatch(Long id) {
-//		try {
-//			daoImpl.isTaskDispatch(id);
-//			return true;
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			e.printStackTrace();
-//		}
-//		return false;
-//	}
 
 	public List<ExamSubject> getLastExamSubjects() {
 
@@ -401,4 +391,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return res;
 	}
 
+	private void populateExamSubStatus(List<ExamSubject> esL) {
+		logger.trace("populateExamSubStatus(), populate answer set and task dispatch status for examsubjects");
+		for (ExamSubject es: esL) {
+			es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
+			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
+		}
+	}
 }
