@@ -129,10 +129,10 @@ FOREIGN KEY (quesid)
 create table if not exists ustudy.examinee (
 id int(11) NOT NULL AUTO_INCREMENT,
 exam_code varchar(20) NOT NULL COMMENT '考号',
-examid int(11) NOT NULL COMMENT '考试ID',
+examid int NOT NULL COMMENT '考试ID',
 schid varchar(11) NOT NULL COMMENT '学校ID',
-gradeid int(11) NOT NULL COMMENT '年级ID',
-class_id INT(11) COMMENT '班级ID',
+gradeid int NOT NULL COMMENT '年级ID',
+class_id INT COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',
 name varchar(100) NOT NULL COMMENT '学生姓名',
 stuno varchar(20) DEFAULT NULL COMMENT '学号',
@@ -140,8 +140,18 @@ paper_status char(1) DEFAULT '1' COMMENT '考生状态(0：缺考，1：正常)'
 PRIMARY KEY (id),
 UNIQUE KEY (exam_code, examid),
 KEY name (name,exam_code,gradeid,schid),
-KEY gradeid (gradeid),
-KEY schid (schid)
+FOREIGN KEY (examid)
+    REFERENCES ustudy.exam(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (class_id)
+    REFERENCES ustudy.class(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (gradeid)
+    REFERENCES ustudy.grade(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (schid)
+    REFERENCES ustudy.school(schid)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
 # tables for student paper

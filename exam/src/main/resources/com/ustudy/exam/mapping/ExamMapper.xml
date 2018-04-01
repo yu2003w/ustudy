@@ -53,7 +53,7 @@
 	
 	<select id="getExamSummary" parameterType="Long" resultType="java.util.Map">
 		SELECT g.grade_name AS gradeName,g.id AS gradeId,s.name AS subjectName,s.id AS subjectId,egs.status AS status,
-		egs.temp_upload AS template,egs.mark_switch AS markSwitch,egs.answer_set AS answerSet,egs.task_dispatch AS taskDispatch,egs.id AS egsId, 
+		egs.temp_upload AS template,egs.mark_switch AS markSwitch,egs.id AS egsId, 
 		egs.blank_answer_paper AS answerPaper,egs.blank_questions_paper AS questionsPaper,DATE_FORMAT(e.exam_date,'%Y-%m-%d') AS examDate from examgradesub egs 
 		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s on egs.sub_id=s.id LEFT JOIN exam e ON egs.examid=e.id where egs.examid=#{examid}
 	</select>
