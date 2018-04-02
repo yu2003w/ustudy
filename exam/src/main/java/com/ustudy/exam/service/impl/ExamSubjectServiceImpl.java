@@ -24,7 +24,7 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
-import com.ustudy.exam.model.Subscore;
+import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
@@ -205,12 +205,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		Map<Long, Float> objScores = getObjScores(egsId);
 		Map<Long, Float> subjScores = getSubjScores(egsId);
 		
-		List<Subscore> scores = new ArrayList<>();
+		List<SubScore> scores = new ArrayList<>();
 		for (Entry<Long, Float> objs : objScores.entrySet()) {
-			Subscore subscore = new Subscore();
+			SubScore subscore = new SubScore();
 			subscore.setEgsId(egsId);
 			long studentId = objs.getKey();
-			subscore.setStuid(studentId);
+			subscore.setStuId(studentId);
 			float objScore = objs.getValue();
 			float subjScore = 0;
 			if(null != subjScores.get(studentId)){

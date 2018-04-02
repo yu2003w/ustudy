@@ -20,7 +20,7 @@ LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/perms.csv' INTO TABLE ustudy.p
   IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/subject.csv' INTO TABLE ustudy.subject
   CHARACTER SET UTF8
-  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  FIELDS TERMINATED BY ',' ENCLOSED BY '$'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE '/root/mysql/schema/sample/config.csv' REPLACE INTO TABLE ustudy.config

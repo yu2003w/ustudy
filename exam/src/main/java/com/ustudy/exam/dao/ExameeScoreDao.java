@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.ExameeScore;
+import com.ustudy.exam.model.score.StudentScore;
 
 @MapperScan
 public interface ExameeScoreDao {
@@ -15,7 +16,7 @@ public interface ExameeScoreDao {
 	
 	void insertExameeScores(List<ExameeScore> exameeScores);
 	
-	List<Map<String, Object>> getExameeScores(@Param("examId")Long examId, @Param("schId")Long schId, @Param("gradeId")Long gradeId, 
+	List<StudentScore> getExameeScores(@Param("examId")Long examId, @Param("schId")Long schId, @Param("gradeId")Long gradeId, 
 	        @Param("classId")Long classId, @Param("branch")String branch, @Param("text")String text);
 	
 	List<Map<String, Object>> getStudentScores(@Param("examId")Long examId, @Param("schId")Long schId, @Param("gradeId")Long gradeId, 

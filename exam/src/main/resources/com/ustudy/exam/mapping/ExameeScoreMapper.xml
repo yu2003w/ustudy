@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ustudy.exam.dao.ExameeScoreDao">
 
+    <resultMap type="com.ustudy.exam.model.score.StudentScore" id="StudentScore">
+        <result property="exameeId" column="exameeId"/>
+        <result property="exameeNo" column="exameeNo"/>
+        <result property="examId" column="examId"/>
+        <result property="exameeName" column="exameeName"/>
+        <result property="schName" column="schName"/>
+        <result property="className" column="className"/>
+        <result property="score" column="score"/>
+	    <result property="rank" column="rank"/>
+	</resultMap>
+	
 	<delete id="deleteExameeScores" parameterType="Long">
 		DELETE from exameescore where exam_id=#{examId}
 	</delete>
@@ -13,12 +24,17 @@
 	    </foreach>  
 	</insert>
 	
-	<select id="getExameeScores" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT es.examee_id stuExamId,ee.exam_code stuExamNo,es.exam_id examId,ee.name,sc.schname,cl.cls_name clsName,es.score,es.rank from exameescore es 
-		LEFT JOIN examinee ee ON es.examee_id=ee.id 
-		LEFT JOIN school sc ON ee.schid=sc.id 
-		LEFT JOIN class cl ON ee.class_id=cl.id
-		where es.exam_id=ee.examid and es.exam_id=#{examId}
+	<select id="getExameeScores" parameterType="java.util.Map" resultType="StudentScore">
+		select ee.id as stuExamId, ee.exam_code as stuExamNo, ee.examid as examId, ee.name, school.schname, 
+        class.cls_name as className, escore.score, escore.rank, 
+        group_concat(subject.name, "-", subscore.score, "-", subscore.rank) as aggrscore from examinee as ee
+        left join exameescore as escore on (ee.id = escore.examee_id and ee.examid = escore.exam_id) 
+        left join school on school.schid = ee.schid 
+        left join class on class.id = ee.class_id 
+        left join subscore on subscore.stuid = ee.id 
+        join examgradesub as egs on egs.id = subscore.exam_grade_sub_id 
+        join subject on subject.id = egs.sub_id
+        where ee.examid = #{examId} group by ee.id
 		<if test="schId !=null and schId > 0">
 			AND ee.schid=#{schId}
 		</if>
@@ -32,9 +48,9 @@
 			AND (ee.name LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%') OR ee.exam_code LIKE CONCAT('%',#{text, jdbcType=VARCHAR},'%')) 
 		</if>
 		<if test="branch !=null and branch != ''">
-			AND cl.cls_type=#{branch, jdbcType=VARCHAR}
+			AND class.cls_type=#{branch, jdbcType=VARCHAR}
 		</if>
-		ORDER BY es.rank
+		ORDER BY escore.rank
 	</select>
 	
 	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">

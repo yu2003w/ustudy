@@ -29,7 +29,7 @@ public class ScoreController {
 	private static final Logger logger = LogManager.getLogger(ScoreController.class);
 
 	@Autowired
-	private ScoreService service;
+	private ScoreService scoreS;
 	
 	@RequestMapping(value = "/recalculate/{egsId}/{quesno}/{answer}", method = RequestMethod.POST)
     public Map recalculateQuestionScore(@PathVariable Long egsId, @PathVariable Integer quesno, @PathVariable String answer, HttpServletRequest request,
@@ -41,7 +41,7 @@ public class ScoreController {
         Map result = new HashMap<>();
 
         try {
-            if (service.recalculateQuestionScore(egsId, quesno, answer)) {
+            if (scoreS.recalculateQuestionScore(egsId, quesno, answer)) {
                 result.put("success", true);
             } else {
                 result.put("success", false);
@@ -64,7 +64,7 @@ public class ScoreController {
         Map result = new HashMap<>();
 
         try {
-            if (service.recalculateQuestionScore(egsId)) {
+            if (scoreS.recalculateQuestionScore(egsId)) {
                 result.put("success", true);
             } else {
                 result.put("success", false);
@@ -88,7 +88,7 @@ public class ScoreController {
 
         try {
         	if (release) {
-        		if (service.publishExamScore(examId, release)) {
+        		if (scoreS.publishExamScore(examId, release)) {
         			result.put("success", true);
         			result.put("message", "考试成绩发布成功");
         		} else {
@@ -96,7 +96,7 @@ public class ScoreController {
         			result.put("message", "考试成绩发布失败");
         		}
         	} else {
-        		if (service.publishExamScore(examId, release)) {
+        		if (scoreS.publishExamScore(examId, release)) {
         			result.put("success", true);
         			result.put("message", "考试成绩取消发布成功");
         		} else {
@@ -107,6 +107,7 @@ public class ScoreController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", e.getMessage());
+            logger.error("publishExamScore(), failed with exception->" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -118,7 +119,9 @@ public class ScoreController {
      * getStudentSubjects[统计考生成绩]
      * 创建人:  dulei
      * 创建时间: 2017年12月20日 下午10:48:54
-     *
+     * 
+     * Updated by Jared on April 01, 2018, rename the method name and refactor code
+     * 
      * @Title: getStudentSubjects
      * @param examId 考试ID
      * @param schId 学校ID
@@ -130,24 +133,26 @@ public class ScoreController {
      * @return
      */
     @RequestMapping(value = "/students/subjects/{examId}")
-    public Map getStudentSubjects(@PathVariable Long examId,
+    public Map getStudentScores(@PathVariable Long examId,
             @RequestParam(required=false,defaultValue="0") Long schId, 
             @RequestParam(required=false,defaultValue="0") Long gradeId, 
             @RequestParam(required=false,defaultValue="0") Long classId, 
             @RequestParam(required=false,defaultValue="0") Long subjectId, 
             @RequestParam(required=false,defaultValue="") String branch, 
-            @RequestParam(required=false,defaultValue="") String text) {
+            @RequestParam(required=false,defaultValue="") String key) {
         
-        logger.info("getStudentSubjects(examId:"+examId+",schId:"+schId+",gradeId:"+gradeId+",classId:"+classId+",subjectId:"+subjectId+",branch:"+branch+",text:"+text+").");
+        logger.info("getStudentScores(), examId:" + examId + ", schId:" + schId + ",gradeId:" + gradeId +
+        		",classId:" + classId + ",subjectId:" + subjectId + ",branch:" + branch + ",key:" + key);
         
         Map result = new HashMap<>();
         
         try {
-            result.put("data", service.getStudentSubjects(examId, schId, gradeId, classId, subjectId, branch, text));
+            result.put("data", scoreS.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, key));
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", e.getMessage());
+            logger.error("getStudentScores(), failed with exception->" + e.getMessage());
             e.printStackTrace();
         }
         
@@ -173,7 +178,7 @@ public class ScoreController {
     	Map result = new HashMap<>();
     	
     	try {
-            result.put("data", service.getStudentScores(stuId, examId));
+            result.put("data", scoreS.getStudentScores(stuId, examId));
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
@@ -198,7 +203,7 @@ public class ScoreController {
     	}
     	
     	try {
-    		List<ScoreClass> scL= service.getClsScores(eid, gid);
+    		List<ScoreClass> scL= scoreS.getClsScores(eid, gid);
     		res.setData(scL);
     		res.setRet(true);
     		res.setMessage("retrieve class score information succeeded.");
@@ -216,7 +221,7 @@ public class ScoreController {
     	UResp res = new UResp();
     	
     	try {
-    		res.setData(service.isScoreCalculated(egsid));
+    		res.setData(scoreS.isScoreCalculated(egsid));
     		res.setRet(true);
     		logger.debug("isScoreCalculated(), score collected status for esgid->" + egsid 
     				+ " " + res.getData());
