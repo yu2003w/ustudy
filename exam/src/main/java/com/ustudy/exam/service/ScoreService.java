@@ -2,10 +2,9 @@ package com.ustudy.exam.service;
 
 import java.util.List;
 
+import com.ustudy.exam.model.score.ExameeSubScore;
 import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
-
-import net.sf.json.JSONObject;
 
 public interface ScoreService {
 
@@ -17,7 +16,7 @@ public interface ScoreService {
 	
 	List<StudentScore> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text) throws Exception;
 	
-	JSONObject getStudentScores(Long stuId, Long examId) throws Exception;
+	ExameeSubScore getDetailedExameeScore(Long exameeId, Long examId) throws Exception;
 	
 	/**
 	 * @param eid

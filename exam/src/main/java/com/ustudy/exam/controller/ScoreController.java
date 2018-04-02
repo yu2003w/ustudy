@@ -132,61 +132,66 @@ public class ScoreController {
      * @param text 考生姓名或考号
      * @return
      */
-    @RequestMapping(value = "/students/subjects/{examId}")
-    public Map getStudentScores(@PathVariable Long examId,
+    @RequestMapping(value = "/students/subjects/{examId}", method = RequestMethod.GET)
+    public UResp getStudentScores(@PathVariable Long examId,
             @RequestParam(required=false,defaultValue="0") Long schId, 
             @RequestParam(required=false,defaultValue="0") Long gradeId, 
             @RequestParam(required=false,defaultValue="0") Long classId, 
             @RequestParam(required=false,defaultValue="0") Long subjectId, 
             @RequestParam(required=false,defaultValue="") String branch, 
-            @RequestParam(required=false,defaultValue="") String key) {
+            @RequestParam(required=false,defaultValue="") String key, HttpServletResponse resp) {
         
         logger.info("getStudentScores(), examId:" + examId + ", schId:" + schId + ",gradeId:" + gradeId +
         		",classId:" + classId + ",subjectId:" + subjectId + ",branch:" + branch + ",key:" + key);
         
-        Map result = new HashMap<>();
+        UResp res = new UResp();
         
         try {
-            result.put("data", scoreS.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, key));
-            result.put("success", true);
+        	res.setData(scoreS.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, key));
+            res.setRet(true);
         } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.getMessage());
+            res.setMessage(e.getMessage());
             logger.error("getStudentScores(), failed with exception->" + e.getMessage());
+            resp.setStatus(500);
             e.printStackTrace();
         }
         
-        return result;
+        return res;
     }
     
     /**
      * 
-     * getStudentScores[考生的分明细]
+     * getDetailedScores[考生的分明细]
+     * retrieve detailed scored for specified examinee
      * 创建人:  dulei
      * 创建时间: 2017年12月21日 下午9:00:15
      *
+     * Updated by Jared on April 02, 2018
+     * 
      * @Title: getStudentScores
      * @param stuId 考生ID
      * @param examId 考试ID
      * @return
      */
-    @RequestMapping(value = "/student/scores/{stuId}/{examId}")
-    public Map getStudentScores(@PathVariable Long stuId, @PathVariable Long examId) {
+    @RequestMapping(value = "/student/scores/{stuId}/{examId}", method = RequestMethod.GET)
+    public UResp getDetailedScores(@PathVariable Long stuId, @PathVariable Long examId, 
+    		HttpServletResponse resp) {
     	
-    	logger.info("getStudentScores(stuId:"+stuId+",examId:"+examId+")");
+    	logger.trace("getStudentScores(), stuId:"+stuId+",examId:"+examId);
     	
-    	Map result = new HashMap<>();
+    	UResp res = new UResp();
     	
     	try {
-            result.put("data", scoreS.getStudentScores(stuId, examId));
-            result.put("success", true);
+    		res.setData(scoreS.getDetailedExameeScore(stuId, examId));
+    		res.setRet(true);
         } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.getMessage());
+        	res.setMessage(e.getMessage());
+            logger.error("getStudentScores(), failed with exception->" + e.getMessage());
+            resp.setStatus(500);
             e.printStackTrace();
         }
     	
-    	return result;
+    	return res;
     }
 
     @RequestMapping(value = "/cls/{eid}/{gid}/", method = RequestMethod.GET)
