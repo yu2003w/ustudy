@@ -73,7 +73,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Resource
     private SubscoreDao subscoreDao;
     
-    @Resource
+    @Autowired
     private ExameeScoreDao exameeScoreDao;
     
     @Autowired
@@ -266,7 +266,8 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     /* 
-     * Retrieve student scores based on different filter conditions
+     * Retrieve student scores based on different filter conditions，including examinee scores 
+     * and subject scores
      * (non-Javadoc)
      * @see com.ustudy.exam.service.ScoreService#getStudentScores(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.String, java.lang.String)
      */
@@ -283,55 +284,13 @@ public class ScoreServiceImpl implements ScoreService {
                 branch = "";
             }
         }
-        
-        /*List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
-        if(null != exameeScores && exameeScores.size() > 0){
-            Map<Long, JSONArray> studentScores = getScores(examId, schId, gradeId, classId, subjectId, branch, text);
-            for (Map<String, Object> map : exameeScores) {
-                long stuid = (int)map.get("stuExamId");
-                JSONArray scores = studentScores.get(stuid);
-                if(null != scores){
-                    map.put("scores", scores);
-                    array.add(map);
-                }
-            }
-        }*/
 
         List<StudentScore> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, 
         		classId, branch, text);
-        /*if(null != exameeScores && exameeScores.size() > 0){
-            Map<Long, JSONArray> studentScores = getSubjectScores(examId, schId, gradeId, classId, subjectId, branch, text);
-            for (Map<String, Object> map : exameeScores) {
-                long stuid = (int)map.get("stuExamId");
-                JSONArray scores = studentScores.get(stuid);
-                if(null != scores){
-                    map.put("scores", scores);
-                    array.add(map);
-                }
-            }
-        }*/
+
+        logger.debug("getStudentScores(), number of items retrieved is " + exameeScores.size());
         return exameeScores;
     }
-    
-/*    private Map<Long, JSONArray> getSubjectScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text){
-        
-        Map<Long, JSONArray> result = new HashMap<>();
-        
-        List<Map<String, Object>> studentScores = exameeScoreDao.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
-        for (Map<String, Object> map : studentScores) {
-            long stuid = (int)map.get("stuid");
-            JSONArray array = result.get(stuid);
-            if(null == array){
-                array = new JSONArray();
-            }
-            array.add(map);
-            
-            result.put(stuid, array);
-        }
-        
-        return result;
-        
-    }*/
 
 	public JSONObject getStudentScores(Long stuId, Long examId) throws Exception {
 		
