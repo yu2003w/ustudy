@@ -4,7 +4,7 @@
 
     <resultMap type="com.ustudy.exam.model.score.StudentScore" id="StudentScore">
         <result property="exameeId" column="exameeId"/>
-        <result property="exameeNo" column="exameeNo"/>
+        <result property="exameeNO" column="exameeNO"/>
         <result property="examId" column="examId"/>
         <result property="exameeName" column="exameeName"/>
         <result property="schName" column="schName"/>
@@ -24,9 +24,9 @@
 	    </foreach>  
 	</insert>
 	
-	<select id="getExameeScores" parameterType="java.util.Map" resultType="StudentScore">
-		select ee.id as stuExamId, ee.exam_code as stuExamNo, ee.examid as examId, ee.name, school.schname, 
-        class.cls_name as className, escore.score, escore.rank, 
+	<select id="getExameeScores" parameterType="java.util.Map" resultMap="StudentScore">
+		select ee.id as exameeId, ee.exam_code as exameeNO, ee.examid as examId, ee.name as exameeName, 
+		school.schname as schName, class.cls_name as className, escore.score, escore.rank, 
         group_concat(subject.name, "-", subscore.score, "-", subscore.rank) as aggrscore from examinee as ee
         left join exameescore as escore on (ee.id = escore.examee_id and ee.examid = escore.exam_id) 
         left join school on school.schid = ee.schid 
@@ -50,9 +50,10 @@
 		<if test="branch !=null and branch != ''">
 			AND class.cls_type=#{branch, jdbcType=VARCHAR}
 		</if>
-		ORDER BY escore.rank
+		ORDER BY ee.exam_code
 	</select>
 	
+	<!-- 
 	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT ss.stuid,su.id,su.name,ss.score,ss.rank from subscore ss 
 		LEFT JOIN examgradesub egs ON ss.exam_grade_sub_id=egs.id
@@ -82,5 +83,6 @@
 		</if>
 		ORDER BY ss.rank
 	</select>
+	-->
 
 </mapper>

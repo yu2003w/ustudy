@@ -3,13 +3,13 @@ package com.ustudy.exam.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.score.StudentScore;
 
-@MapperScan
+@Mapper
 public interface ExameeScoreDao {
 
 	void deleteExameeScores(Long examId);
