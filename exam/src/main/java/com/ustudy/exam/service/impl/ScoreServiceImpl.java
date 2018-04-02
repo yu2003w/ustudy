@@ -36,6 +36,7 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
+import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
@@ -264,9 +265,13 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
 
-    public JSONArray getStudentSubjects(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text) throws Exception {
-        
-        JSONArray array = new JSONArray();
+    /* 
+     * Retrieve student scores based on different filter conditions
+     * (non-Javadoc)
+     * @see com.ustudy.exam.service.ScoreService#getStudentScores(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.String, java.lang.String)
+     */
+    public List<StudentScore> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, 
+    		Long subjectId, String branch, String text) throws Exception {
         
         if (null != branch && branch.trim().length() > 0) {
             branch = branch.trim();
@@ -279,9 +284,9 @@ public class ScoreServiceImpl implements ScoreService {
             }
         }
         
-        List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
+        /*List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
         if(null != exameeScores && exameeScores.size() > 0){
-            Map<Long, JSONArray> studentScores = getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
+            Map<Long, JSONArray> studentScores = getScores(examId, schId, gradeId, classId, subjectId, branch, text);
             for (Map<String, Object> map : exameeScores) {
                 long stuid = (int)map.get("stuExamId");
                 JSONArray scores = studentScores.get(stuid);
@@ -290,12 +295,25 @@ public class ScoreServiceImpl implements ScoreService {
                     array.add(map);
                 }
             }
-        }
+        }*/
 
-        return array;
+        List<StudentScore> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, 
+        		classId, branch, text);
+        /*if(null != exameeScores && exameeScores.size() > 0){
+            Map<Long, JSONArray> studentScores = getSubjectScores(examId, schId, gradeId, classId, subjectId, branch, text);
+            for (Map<String, Object> map : exameeScores) {
+                long stuid = (int)map.get("stuExamId");
+                JSONArray scores = studentScores.get(stuid);
+                if(null != scores){
+                    map.put("scores", scores);
+                    array.add(map);
+                }
+            }
+        }*/
+        return exameeScores;
     }
     
-    private Map<Long, JSONArray> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text){
+/*    private Map<Long, JSONArray> getSubjectScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text){
         
         Map<Long, JSONArray> result = new HashMap<>();
         
@@ -313,7 +331,7 @@ public class ScoreServiceImpl implements ScoreService {
         
         return result;
         
-    }
+    }*/
 
 	public JSONObject getStudentScores(Long stuId, Long examId) throws Exception {
 		

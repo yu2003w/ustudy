@@ -27,8 +27,6 @@ parent_id INT NOT NULL,
 # child subject id
 sub_id INT NOT NULL COMMENT '分科科目id',
 score float(4,1) DEFAULT '0.0' COMMENT '总分数',
-sub_score float(4,1) DEFAULT '0.0' COMMENT '主观题分数',
-obj_score float(4,1) DEFAULT '0.0' COMMENT '客观题分数',
 rank INT DEFAULT '0' COMMENT '排名',
 PRIMARY KEY(id),
 UNIQUE KEY (parent_id, sub_id),

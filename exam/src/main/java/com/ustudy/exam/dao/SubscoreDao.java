@@ -6,14 +6,14 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
 
-import com.ustudy.exam.model.Subscore;
+import com.ustudy.exam.model.score.SubScore;
 
 @MapperScan
 public interface SubscoreDao {
 
 	void deleteSubscores(Long egsId);
 	
-	void insertSubscores(List<Subscore> subscores);
+	void insertSubscores(List<SubScore> subscores);
 	
 	List<Map<String, Object>> getExamScores(Long examId);
 	

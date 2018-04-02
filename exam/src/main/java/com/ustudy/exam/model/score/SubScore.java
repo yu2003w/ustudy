@@ -1,20 +1,36 @@
-package com.ustudy.exam.model;
+package com.ustudy.exam.model.score;
 
 import java.io.Serializable;
+import java.util.List;
 
-public class Subscore implements Serializable, Comparable<Subscore> {
+public class SubScore implements Serializable, Comparable<SubScore> {
 
     private static final long serialVersionUID = -1704696113960776084L;
 
     private Long id;
-    private Long stuid;
+    private Long stuId;
     private Long egsId;
-    private Float score;
+    private String subName = null;
+	private Float score;
     private Float subScore;
     private Float objScore;
     private int rank;
+    
+    private List<SubChildScore> subCSL = null;
 
-    public Long getId() {
+    public SubScore() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+    
+	public SubScore(String subName, Float score, int rank) {
+		super();
+		this.subName = subName;
+		this.score = score;
+		this.rank = rank;
+	}
+
+	public Long getId() {
         return id;
     }
 
@@ -22,12 +38,12 @@ public class Subscore implements Serializable, Comparable<Subscore> {
         this.id = id;
     }
 
-    public Long getStuid() {
-        return stuid;
+    public Long getStuId() {
+        return stuId;
     }
 
-    public void setStuid(Long stuid) {
-        this.stuid = stuid;
+    public void setStuId(Long stuid) {
+        this.stuId = stuid;
     }
 
     public Long getEgsId() {
@@ -70,7 +86,15 @@ public class Subscore implements Serializable, Comparable<Subscore> {
         this.rank = rank;
     }
 
-    public int compareTo(Subscore ss) {
+    public String getSubName() {
+		return subName;
+	}
+
+	public void setSubName(String subName) {
+		this.subName = subName;
+	}
+	
+    public int compareTo(SubScore ss) {
         if (this.getScore() > ss.getScore()) {
             return -1;
         } else if (this.getScore() < ss.getScore()) {
@@ -79,5 +103,20 @@ public class Subscore implements Serializable, Comparable<Subscore> {
             return 0;
         }
     }
+
+	public List<SubChildScore> getSubCSL() {
+		return subCSL;
+	}
+
+	public void setSubCSL(List<SubChildScore> subCSL) {
+		this.subCSL = subCSL;
+	}
+
+	@Override
+	public String toString() {
+		return "SubScore [id=" + id + ", stuId=" + stuId + ", egsId=" + egsId + ", subName=" + subName + ", score="
+				+ score + ", subScore=" + subScore + ", objScore=" + objScore + ", rank=" + rank + ", subCSL=" + subCSL
+				+ "]";
+	}
 
 }
