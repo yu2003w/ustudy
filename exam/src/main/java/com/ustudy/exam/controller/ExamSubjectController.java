@@ -29,7 +29,7 @@ public class ExamSubjectController {
 	private static final Logger logger = LogManager.getLogger(ExamSubjectController.class);
 	
 	@Autowired
-	private ExamSubjectService service;
+	private ExamSubjectService exSubS;
 	
 	@Autowired
     private ScoreService scoreService;
@@ -50,7 +50,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(subjectId, gradeId, start, end, examName));
+		result.put("data", exSubS.getExamSubjects(subjectId, gradeId, start, end, examName));
 
 		return result;
 	}
@@ -69,7 +69,7 @@ public class ExamSubjectController {
 
 		result.put("success", true);
 		
-		List<ExamSubject> examSubjects = service.getExamSubjects(examId);
+		List<ExamSubject> examSubjects = exSubS.getExamSubjects(examId);
 		Map<String, Map<String, Object>> grades = new HashMap<>();
 		for (ExamSubject examSubject : examSubjects) {
 			Map<String, Object> grade = grades.get("" + examSubject.getGradeId());
@@ -113,7 +113,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(examId, gradeId));
+		result.put("data", exSubS.getExamSubjects(examId, gradeId));
 
 		return result;
 	}
@@ -133,7 +133,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(examId, gradeId, subjectId));
+		result.put("data", exSubS.getExamSubjects(examId, gradeId, subjectId));
 
 		return result;
 	}
@@ -151,7 +151,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubject(id));
+		result.put("data", exSubS.getExamSubject(id));
 
 		return result;
 	}
@@ -168,7 +168,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getLastExamSubjects());
+		result.put("data", exSubS.getLastExamSubjects());
 
 		return result;
 	}
@@ -187,7 +187,8 @@ public class ExamSubjectController {
     @RequestMapping(value = "/examsubject/status/{egsId}/{release}", method = RequestMethod.POST)
     public Map updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release) {
         
-        logger.debug("updateExamSubjectStatus().");
+        logger.debug("updateExamSubjectStatus(), " + (release == true? "release": "withdraw") + 
+        		" score results");
         
         Map result = new HashMap<>();
         
@@ -204,7 +205,7 @@ public class ExamSubjectController {
 
         // Don't automatically publish the score of the whole exam after one subject is published.
 
-        if(service.updateExamSubjectStatus(egsId, release)){
+        if(exSubS.updateExamSubjectStatus(egsId, release)){
             
             // new Thread() {
             //     public void run() {
@@ -249,7 +250,7 @@ public class ExamSubjectController {
         
         Map result = new HashMap<>();
 
-        if(service.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
+        if(exSubS.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
             result.put("success", true);
             result.put("data", "更新成功");
         }else {
@@ -280,7 +281,7 @@ public class ExamSubjectController {
         
         Map result = new HashMap<>();
 
-        if(service.updateMarkSwitch(examId, gradeId, subjectId, release)){
+        if(exSubS.updateMarkSwitch(examId, gradeId, subjectId, release)){
             result.put("success", true);
             result.put("data", "更新成功");
         }else {
@@ -309,7 +310,7 @@ public class ExamSubjectController {
         
         Map result = new HashMap<>();
 
-        if(service.updateMarkSwitch(egsId, release)){
+        if(exSubS.updateMarkSwitch(egsId, release)){
             result.put("success", true);
             result.put("data", "更新成功");
         }else {

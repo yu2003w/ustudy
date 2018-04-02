@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ustudy.exam.dao.SubscoreDao">
 
+    <resultMap type="com.ustudy.exam.model.score.ExameeSubScore" id="ExameeSubScore">
+        <result property="exameeId" column="exameeId"/>
+        <result property="exameeNO" column="exameeNO"/>
+        <result property="exameeName" column="exameeName"/>
+        <result property="clsName" column="clsName"/>
+        <result property="score" column="score"/>
+	</resultMap>
+	
 	<delete id="deleteSubscores" parameterType="Long">
 		DELETE from subscore where exam_grade_sub_id=#{egsId}
 	</delete>
@@ -9,7 +17,7 @@
 	<insert id="insertSubscores" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into subscore (stuid,exam_grade_sub_id,score,sub_score,obj_score,rank) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.stuid},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
+	        (#{item.stuId},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
 	    </foreach>  
 	</insert>
 	
@@ -19,13 +27,16 @@
 		GROUP BY stuid
 	</select>
 	
-	<select id="getStudentScores" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT ss.stuid,ee.name,ee.stuno,ee.gradeid,egs.id egsId,su.id subId,su.name subName,ifnull(ss.score,0) score,ifnull(ss.sub_score,0) subScore,ifnull(ss.obj_score,0) objScore
-		from examgradesub egs
-		LEFT JOIN (SELECT * from subscore where stuid=#{stuId}) ss ON egs.id=ss.exam_grade_sub_id
-		LEFT JOIN examinee ee ON ss.stuid=ee.id
-		LEFT JOIN subject su ON egs.sub_id=su.id
-		where egs.examid=#{examId}
+	<select id="getExameeSubScores" parameterType="java.util.Map" resultMap="ExameeSubScore">
+		select ee.id as exameeId, ee.exam_code as exameeNO, class.cls_name as clsName, 
+		ee.name as exameeName, group_concat(subject.name, '-', coalesce(subscore.score, 'NULL'), '-',
+		coalesce(subscore.rank, 'NULL'), '-', coalesce(subscore.obj_score, 'NULL'), '-', 
+		coalesce(subscore.sub_score, 'NULL')) as aggrscores from examinee as ee 
+		join class on class.id = ee.class_id 
+		join examgradesub as egs on egs.examid = ee.examid 
+		join subject on subject.id = egs.sub_id 
+		left join subscore on (subscore.stuid = ee.id and subscore.exam_grade_sub_id = egs.id) 
+		where ee.examid = #{examId} and ee.id = #{exameeId}
 	</select>
 	
 	<select id="getStudentObjScores" parameterType="java.util.Map" resultType="java.util.Map">

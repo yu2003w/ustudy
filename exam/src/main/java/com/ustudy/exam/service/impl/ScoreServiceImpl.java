@@ -36,6 +36,7 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
+import com.ustudy.exam.model.score.ExameeSubScore;
 import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
@@ -43,9 +44,6 @@ import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
 import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -70,7 +68,7 @@ public class ScoreServiceImpl implements ScoreService {
 	@Resource
     private ExamDao examDao;
     
-    @Resource
+    @Autowired
     private SubscoreDao subscoreDao;
     
     @Autowired
@@ -292,11 +290,19 @@ public class ScoreServiceImpl implements ScoreService {
         return exameeScores;
     }
 
-	public JSONObject getStudentScores(Long stuId, Long examId) throws Exception {
+	/* 
+	 * Assemble detailed scores for specified examinee
+	 * (non-Javadoc)
+	 * @see com.ustudy.exam.service.ScoreService#getDetailedExameeScore(java.lang.Long, java.lang.Long)
+	 */
+	public ExameeSubScore getDetailedExameeScore(Long exameeId, Long examId) throws Exception {
 		
-		JSONObject object = new JSONObject();
+		ExameeSubScore examSubS = subscoreDao.getExameeSubScores(exameeId, examId);
 		
-		List<Map<String, Object>> scores = subscoreDao.getStudentScores(stuId, examId);
+		return examSubS;
+		/*JSONObject object = new JSONObject();
+		
+		List<Map<String, Object>> scores = subscoreDao.getStudentScores(exameeId, examId);
 		if(scores.size()>0){
 			JSONArray array = new JSONArray();
 			Map<String, Map<Long, List<Map<String, Object>>>> questions = getQuestions(stuId, examId);
@@ -339,7 +345,7 @@ public class ScoreServiceImpl implements ScoreService {
 			object.put("subjects", array);
 		}
 		
-		return object;
+		return object;*/
 	}
 	
 	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
@@ -362,7 +368,7 @@ public class ScoreServiceImpl implements ScoreService {
 		Map<Long, List<Map<String, Object>>> objectives = new HashMap<>();
 		List<Map<String, Object>> objScores = subscoreDao.getStudentObjScores(stuId, examId, null);
 		for (Map<String, Object> map : objScores) {
-		    float score = (int)map.get("score");
+		    float score = (float)map.get("score");
 		    objectives = setScores(objectives, map.get("id").toString(), score);
         }
 		
