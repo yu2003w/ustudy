@@ -57,15 +57,15 @@ public class DashboardUtil {
 	}
 	
 	public static void initRoleMapping() {
-		acctRoleM.put("operator", "运维");
-		acctRoleM.put("sales", "市场");
-		acctRoleM.put("reseller", "代理商");
-		acctRoleM.put("visitor", "临时帐号");
+		acctRoleM.put("d_operator", "运维");
+		acctRoleM.put("d_sales", "市场");
+		acctRoleM.put("d_reseller", "代理商");
+		acctRoleM.put("d_visitor", "临时帐号");
 		
-		acctRoleM.put("运维", "operator");
-		acctRoleM.put("市场", "sales");
-		acctRoleM.put("代理商", "reseller");
-		acctRoleM.put("临时帐号", "visitor");
+		acctRoleM.put("运维", "d_operator");
+		acctRoleM.put("市场", "d_sales");
+		acctRoleM.put("代理商", "d_reseller");
+		acctRoleM.put("临时帐号", "d_visitor");
 	}
 	
 }

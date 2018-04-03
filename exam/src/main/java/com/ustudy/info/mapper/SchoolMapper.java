@@ -39,7 +39,7 @@ public interface SchoolMapper {
 			+ "ustudy.grade.id=#{gid}")
 	public Grade getGradeInfo(@Param("gid") String gid);
 	
-	@Select("select id, name from ustudy.rolevalue where name not like 'addi%' and name != 'cleaner'")
+	@Select("select id, name from ustudy.rolevalue where name not like 'addi%' and name not like 'd_%' and name != 'cleaner'")
 	public List<Item> getRoles();
 	
 	@Select("select id, grade_name as name from ustudy.grade where schid=#{schId}")

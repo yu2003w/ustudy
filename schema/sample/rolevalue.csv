@@ -7,7 +7,7 @@ NULL,pleader
 NULL,cteacher
 NULL,teacher
 NULL,cleaner
-NULL,operator
-NULL,sales
-NULL,reseller
-NULL,visitor
+NULL,d_operator
+NULL,d_sales
+NULL,d_reseller
+NULL,d_visitor
