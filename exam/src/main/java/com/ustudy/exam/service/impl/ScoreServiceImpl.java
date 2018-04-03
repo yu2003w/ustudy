@@ -305,10 +305,12 @@ public class ScoreServiceImpl implements ScoreService {
 		for (DetailedSubScore dss: examSubS.getSubScores()) {
 			if (dss.getScore() != -1) {
 				dss.setObjQuesL(subscoreDao.getObjQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+				logger.trace("getDetailedExameeScore(), obj ques score->" + dss.getObjQuesL());
 				dss.setSubQuesL(subscoreDao.getSubQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+				logger.trace("getDetailedExameeScore(), subject ques score->" + dss.getSubQuesL());
 			}
 		}
-		logger.trace("getDetailedExameeScore(), assembled->" + examSubS.toString());
+		
 		return examSubS;
 		/*JSONObject object = new JSONObject();
 		

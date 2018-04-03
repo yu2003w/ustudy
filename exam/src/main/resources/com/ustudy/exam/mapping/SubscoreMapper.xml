@@ -90,7 +90,7 @@
 		join paper on obj_answer.paperid = paper.id 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join examinee as ee on ee.exam_code = paper.exam_code 
-		where egs.id = #{egsId} and ee.exam_code = #{exameeNo}
+		where egs.id = #{egsId} and ee.exam_code = #{exameeNO}
 	</select>
 	
 	<select id="getSubQuesScore" resultMap="SubjectQuesScore" resultType="java.util.List">
@@ -98,7 +98,7 @@
 		join paper on paper.id = answer.paperid 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join question on question.id = answer.quesid 
-		where egs.id = #{egsId} and paper.exam_code = #{exameeNo} 
+		where egs.id = #{egsId} and paper.exam_code = #{exameeNO} 
 		group by question.quesno order by question.quesno
 	</select>
 	
