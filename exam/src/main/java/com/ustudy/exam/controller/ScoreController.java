@@ -177,7 +177,7 @@ public class ScoreController {
     public UResp getDetailedScores(@PathVariable Long stuId, @PathVariable Long examId, 
     		HttpServletResponse resp) {
     	
-    	logger.trace("getStudentScores(), stuId:"+stuId+",examId:"+examId);
+    	logger.trace("getDetailedScores(), exameeId:" + stuId + ",examId:" + examId);
     	
     	UResp res = new UResp();
     	
