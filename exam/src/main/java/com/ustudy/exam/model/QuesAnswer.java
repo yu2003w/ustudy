@@ -182,7 +182,7 @@ public class QuesAnswer implements Serializable {
 		}
 		
 		// need to check steps to make sure sum of step scores equals to that of question score
-		if (steps != null && !steps.isEmpty()) {
+		if (steps != null && !steps.isEmpty() && this.type.compareTo("填空题") != 0) {
 			float scoSum = 0;
 			String[] sts = steps.split(",");
 			for (String st: sts) {

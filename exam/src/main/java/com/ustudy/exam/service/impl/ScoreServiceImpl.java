@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,6 +35,7 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
+import com.ustudy.exam.model.score.DetailedSubScore;
 import com.ustudy.exam.model.score.ExameeSubScore;
 import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
@@ -295,10 +295,17 @@ public class ScoreServiceImpl implements ScoreService {
 	 * (non-Javadoc)
 	 * @see com.ustudy.exam.service.ScoreService#getDetailedExameeScore(java.lang.Long, java.lang.Long)
 	 */
+    @Override
 	public ExameeSubScore getDetailedExameeScore(Long exameeId, Long examId) throws Exception {
 		
 		ExameeSubScore examSubS = subscoreDao.getExameeSubScores(exameeId, examId);
+		logger.debug("getDetailedExameeScore(), retrieved metainfo->" + examSubS.toString());
 		
+		//populate object/subject question scores for each subject
+		for (DetailedSubScore dss: examSubS.getSubScores()) {
+			dss.setObjQuesL(subscoreDao.getObjQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+			dss.setSubQuesL(subscoreDao.getSubQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+		}
 		return examSubS;
 		/*JSONObject object = new JSONObject();
 		
@@ -348,7 +355,7 @@ public class ScoreServiceImpl implements ScoreService {
 		return object;*/
 	}
 	
-	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
+/*	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
 		
 		Map<String, Map<Long, List<Map<String, Object>>>> result = new HashMap<>();
 		
@@ -436,9 +443,9 @@ public class ScoreServiceImpl implements ScoreService {
 		result.put("objectives", objectives);
 		
 		return result;
-	}
+	}*/
 	
-	private Map<Long, List<Map<String, Object>>> setScores(Map<Long, List<Map<String, Object>>> scores,String id, float score){
+/*	private Map<Long, List<Map<String, Object>>> setScores(Map<Long, List<Map<String, Object>>> scores,String id, float score){
 	    
 	    if (null != id && id.indexOf("-")>=0) {
 	        String[] ids = id.split("-");
@@ -459,7 +466,7 @@ public class ScoreServiceImpl implements ScoreService {
 	    }
 	    
 	    return scores;
-	}
+	}*/
 
 	@Override
 	public List<ScoreClass> getClsScores(int eid, int gid) {

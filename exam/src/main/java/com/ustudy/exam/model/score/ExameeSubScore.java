@@ -90,15 +90,16 @@ public class ExameeSubScore implements Serializable {
 			String []ssL = this.aggrscores.split(",");
 			for (String sc: ssL) {
 				String [] paras = sc.split("-");
-				if (paras != null && paras.length == 5) {
+				if (paras != null && paras.length == 7) {
 					if (this.subScores == null) {
 						this.subScores = new ArrayList<DetailedSubScore>();
 					}
-					subScores.add(new DetailedSubScore(paras[0], 
-							paras[1].compareTo("NULL") == 0? -1: Float.valueOf(paras[1]), 
-							paras[2].compareTo("NULL") == 0? -1: Integer.valueOf(paras[2]),
-							paras[3].compareTo("NULL") == 0? -1: Float.valueOf(paras[3]),
-							paras[4].compareTo("NULL") == 0? -1: Float.valueOf(paras[4])));
+					subScores.add(new DetailedSubScore(Integer.valueOf(paras[0]), paras[1],  
+							paras[2].compareTo("NULL") == 0? -1: Float.valueOf(paras[2]), 
+							paras[3].compareTo("NULL") == 0? -1: Integer.valueOf(paras[3]),
+							paras[4].compareTo("NULL") == 0? -1: Float.valueOf(paras[4]),
+							paras[5].compareTo("NULL") == 0? -1: Float.valueOf(paras[5]),
+							paras[6]));
 
 				}
 			}
