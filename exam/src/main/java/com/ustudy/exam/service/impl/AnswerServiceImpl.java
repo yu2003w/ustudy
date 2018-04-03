@@ -288,37 +288,65 @@ public class AnswerServiceImpl implements AnswerService {
 
 			if (null != subjective.get("type")) {
 				if (subjective.getString("type").equals("填空题")) {
-					int startno = 0;
-					int endno = 0;
-					if (null != subjective.get("startno")){
-						startno = subjective.getInt("startno");
-					}
-					if (null != subjective.get("endno")){
-						endno = subjective.getInt("endno");
-					}
-					if(startno > 0 && endno > 0 && startno <= endno){
-						String branch = "不分科";
-						int score = 1;
-						if (null != subjective.get("branch")){
-							branch = subjective.getString("branch");
-						}
-						if (null != subjective.get("score")){
-							score = subjective.getInt("score");
-						}
-						for (int j = startno; j <= endno; j++) {
-							QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
-							quesAnswerDiv.setEgsId(egsId);
-							quesAnswerDiv.setQuesno(String.valueOf(j));
-							quesAnswerDiv.setBranch(branch);
-							quesAnswerDiv.setScore(score);
-							quesAnswerDiv.setType("填空题");
-							if (startno > 0 && null != quesids.get(startno)) {
-								quesAnswerDiv.setQuesid(quesids.get(startno));
-							}
-							
-							quesAnswerDivs.add(quesAnswerDiv);
-						}
-					}
+				    if (null != subjective.get("child") && !subjective.get("child").equals(null)) {
+				        JSONArray childs = subjective.getJSONArray("child");
+                        for (int j = 0; j < childs.size(); j++) {
+                            JSONObject child = childs.getJSONObject(j);
+                            QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+                            
+                            if (null != child.get("quesno"))
+                                quesAnswerDiv.setQuesno(child.getString("quesno"));
+                            if (null != child.get("type")){
+                                quesAnswerDiv.setType(child.getString("type"));
+                            } else {
+                                quesAnswerDiv.setType("填空题");
+                            }
+                            if (null != child.get("branch"))
+                                quesAnswerDiv.setBranch(child.getString("branch"));
+                            if (null != child.get("score"))
+                                quesAnswerDiv.setScore(child.getInt("score"));
+                            if (null != child.get("quesid")) {
+                                quesAnswerDiv.setQuesid(Long.valueOf(child.getInt("quesid")));
+                            }else {
+                                quesAnswerDiv.setQuesid(Long.valueOf(subjective.getInt("quesno")));
+                            }
+                            quesAnswerDiv.setEgsId(egsId);
+                            
+                            quesAnswerDivs.add(quesAnswerDiv);
+                        }
+				    }else {
+				        int startno = 0;
+				        int endno = 0;
+				        if (null != subjective.get("startno")){
+				            startno = subjective.getInt("startno");
+				        }
+				        if (null != subjective.get("endno")){
+				            endno = subjective.getInt("endno");
+				        }
+				        if(startno > 0 && endno > 0 && startno <= endno){
+				            String branch = "不分科";
+				            int score = 1;
+				            if (null != subjective.get("branch")){
+				                branch = subjective.getString("branch");
+				            }
+				            if (null != subjective.get("score")){
+				                score = subjective.getInt("score");
+				            }
+				            for (int j = startno; j <= endno; j++) {
+				                QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+				                quesAnswerDiv.setEgsId(egsId);
+				                quesAnswerDiv.setQuesno(String.valueOf(j));
+				                quesAnswerDiv.setBranch(branch);
+				                quesAnswerDiv.setScore(score);
+				                quesAnswerDiv.setType("填空题");
+				                if (startno > 0 && null != quesids.get(startno)) {
+				                    quesAnswerDiv.setQuesid(quesids.get(startno));
+				                }
+				                
+				                quesAnswerDivs.add(quesAnswerDiv);
+				            }
+				        }
+                    }
 				} else {
 				    if (null != subjective.get("child") && !subjective.get("child").equals(null)) {
 				        JSONArray childs = subjective.getJSONArray("child");
