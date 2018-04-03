@@ -10,6 +10,17 @@
         <result property="score" column="score"/>
 	</resultMap>
 	
+	<resultMap type="com.ustudy.exam.model.score.ObjQuesScore" id="ObjQuesScore">
+        <result property="quesno" column="quesno"/>
+        <result property="score" column="score"/>
+        <result property="answer" column="answer"/>
+	</resultMap>
+	
+	<resultMap type="com.ustudy.exam.model.score.SubjectQuesScore" id="SubjectQuesScore">
+        <result property="quesno" column="quesno"/>
+        <result property="aggrscore" column="aggrscore"/>
+	</resultMap>
+	
 	<delete id="deleteSubscores" parameterType="Long">
 		DELETE from subscore where exam_grade_sub_id=#{egsId}
 	</delete>
@@ -29,9 +40,9 @@
 	
 	<select id="getExameeSubScores" parameterType="java.util.Map" resultMap="ExameeSubScore">
 		select ee.id as exameeId, ee.exam_code as exameeNO, class.cls_name as clsName, 
-		ee.name as exameeName, group_concat(subject.name, '-', coalesce(subscore.score, 'NULL'), '-',
-		coalesce(subscore.rank, 'NULL'), '-', coalesce(subscore.obj_score, 'NULL'), '-', 
-		coalesce(subscore.sub_score, 'NULL')) as aggrscores from examinee as ee 
+		ee.name as exameeName, group_concat(egs.id, '-', subject.name, '-', coalesce(subscore.score, 'NULL'), 
+		'-', coalesce(subscore.rank, 'NULL'), '-', coalesce(subscore.obj_score, 'NULL'), '-', 
+		coalesce(subscore.sub_score, 'NULL'), '-', coalesce(subscore.mark_img, 'NULL')) as aggrscores from examinee as ee 
 		join class on class.id = ee.class_id 
 		join examgradesub as egs on egs.examid = ee.examid 
 		join subject on subject.id = egs.sub_id 
@@ -74,4 +85,21 @@
 		</if>
 	</select>
 
+    <select id="getObjQuesScore" resultMap="ObjQuesScore" resultType="java.util.List">
+		select obj_answer.quesno, obj_answer.score, obj_answer.answer from obj_answer 
+		join paper on obj_answer.paperid = paper.id 
+		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
+		join examinee as ee on ee.exam_code = paper.exam_code 
+		where egs.id = #{egsId} and ee.exam_code = #{exameeNo}
+	</select>
+	
+	<select id="getSubQuesScore" resultMap="SubjectQuesScore" resultType="java.util.List">
+		select question.quesno, group_concat(answer.score, '-', answer.isfinal) as aggrscore from answer 
+		join paper on paper.id = answer.paperid 
+		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
+		join question on question.id = answer.quesid 
+		where egs.id = #{egsId} and paper.exam_code = #{exameeNo} 
+		group by question.quesno order by question.quesno
+	</select>
+	
 </mapper>
