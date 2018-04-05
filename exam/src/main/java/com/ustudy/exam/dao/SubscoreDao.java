@@ -24,7 +24,7 @@ public interface SubscoreDao {
 	
 	List<ObjQuesScore> getObjQuesScore(@Param("exameeNO") String exameeNO, @Param("egsId") int egsId);
 	
-	List<SubjectQuesScore> getSubQuesScore(@Param("exameeNo") String exameeNo, @Param("egsId") int egsId);
+	List<SubjectQuesScore> getSubQuesScore(@Param("exameeNO") String exameeNo, @Param("egsId") int egsId);
 	
 	List<Map<String, Object>> getStudentObjScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
 	

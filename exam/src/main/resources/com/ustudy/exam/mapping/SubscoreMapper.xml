@@ -14,6 +14,7 @@
         <result property="quesno" column="quesno"/>
         <result property="score" column="score"/>
         <result property="answer" column="answer"/>
+        <result property="refans" column="refans"/>
 	</resultMap>
 	
 	<resultMap type="com.ustudy.exam.model.score.SubjectQuesScore" id="SubjectQuesScore">
@@ -86,11 +87,13 @@
 	</select>
 
     <select id="getObjQuesScore" resultMap="ObjQuesScore" resultType="java.util.List">
-		select obj_answer.quesno, obj_answer.score, obj_answer.answer from obj_answer 
+		select obj_answer.quesno, obj_answer.score, obj_answer.answer, refanswer.answer as refans 
+		from obj_answer 
 		join paper on obj_answer.paperid = paper.id 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
+		join refanswer on (refanswer.exam_grade_sub_id = egs.id and obj_answer.quesno = refanswer.quesno) 
 		join examinee as ee on ee.exam_code = paper.exam_code 
-		where egs.id = #{egsId} and ee.exam_code = #{exameeNo}
+		where egs.id = #{egsId} and ee.exam_code = #{exameeNO}
 	</select>
 	
 	<select id="getSubQuesScore" resultMap="SubjectQuesScore" resultType="java.util.List">
@@ -98,7 +101,7 @@
 		join paper on paper.id = answer.paperid 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join question on question.id = answer.quesid 
-		where egs.id = #{egsId} and paper.exam_code = #{exameeNo} 
+		where egs.id = #{egsId} and paper.exam_code = #{exameeNO} 
 		group by question.quesno order by question.quesno
 	</select>
 	
