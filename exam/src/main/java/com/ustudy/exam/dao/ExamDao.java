@@ -23,6 +23,12 @@ public interface ExamDao {
 	List<Map<String, Object>> getExamSummary(Long examid);
 	
 	List<Map<String, Object>> getGradeStudentCounts(Long examid);
+
+	List<Map<String, Object>> getEgsStudentCounts(@Param("examid")long examid, @Param("artMathCount")long artMathCount);	
+
+	Long getArtMathCount(Long examid);	
+
+	Long getBranchCount(Long examid);	
 	
 	List<Map<String, Object>> getSubjectPaperCounts(Long examid);
 	
