@@ -3,6 +3,8 @@ package com.ustudy.exam.model.score;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SubScore implements Serializable, Comparable<SubScore> {
 
     private static final long serialVersionUID = -1704696113960776084L;
@@ -16,6 +18,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
     private Float objScore;
     private int rank;
     
+    @JsonProperty("childScores")
     private List<SubChildScore> subCSL = null;
 
     public SubScore() {

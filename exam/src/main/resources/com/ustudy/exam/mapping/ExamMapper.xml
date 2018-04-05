@@ -89,6 +89,29 @@
 		SELECT count(id) count,gradeId from examinee where examid=#{examid} GROUP BY gradeId
 	</select>
 
+	<select id="getEgsStudentCounts" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT count(ee.id) AS count, egs.id AS egsId FROM examinee ee JOIN examgradesub egs ON (ee.examid = egs.examid AND ee.gradeid = egs.grade_id)
+		JOIN subject sub ON (egs.sub_id = sub.id) JOIN class cls ON (ee.class_id = cls.id) WHERE (egs.examid = #{examid})
+		<if test="artMathCount &gt; 0">
+			AND ((sub.type = 0 AND sub.name = '数学' AND cls.cls_type = 'sci') || (sub.type = 0 AND sub.name = '数学(文)' AND cls.cls_type = 'art') || 
+			(sub.type = 0 AND sub.name != '数学' AND sub.name != '数学(文)') || ((sub.type = 1 OR sub.type = 3) AND cls.cls_type = 'art') ||
+			((sub.type = 2 OR sub.type = 4) AND cls.cls_type = 'sci'))
+		</if>
+		<if test="artMathCount = 0">
+			AND ((sub.type = 0 AND sub.name != '数学(文)') || ((sub.type = 1 OR sub.type = 3) AND cls.cls_type = 'art') || 
+			((sub.type = 2 OR sub.type = 4) AND cls.cls_type = 'sci'))
+		</if>
+		GROUP BY egs.id
+	</select>
+
+	<select id="getArtMathCount" parameterType="Long" resultType="Long">
+		SELECT count(1) FROM subject sub JOIN examgradesub egs ON sub.id = egs.sub_id WHERE egs.examid = #{examid} AND sub.name = '数学(文)'
+	</select>
+
+	<select id="getBranchCount" parameterType="Long" resultType="Long">
+		SELECT count(1) FROM class WHERE (cls_type = 'art' OR cls_type = 'sci') AND grade_id in (SELECT grade_id FROM examgradesub WHERE examid = #{examid})
+	</select>
+
 	<select id="getSubjectPaperCounts" parameterType="Long" resultType="java.util.Map">
 		SELECT count(p.id) count,p.exam_grade_sub_id as egsId from paper p 
 		LEFT JOIN examgradesub egs ON egs.id=p.exam_grade_sub_id 
