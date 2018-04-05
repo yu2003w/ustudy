@@ -47,6 +47,9 @@ PRIMARY KEY (id),
 INDEX(quesid, quesno),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (exam_grade_sub_id)
+    REFERENCES ustudy.examgradesub(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

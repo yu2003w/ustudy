@@ -99,7 +99,7 @@ public class ExameeSubScore implements Serializable {
 							paras[3].compareTo("NULL") == 0? -1: Integer.valueOf(paras[3]),
 							paras[4].compareTo("NULL") == 0? -1: Float.valueOf(paras[4]),
 							paras[5].compareTo("NULL") == 0? -1: Float.valueOf(paras[5]),
-							paras[6]));
+							paras[6].compareTo("NULL") == 0? null: paras[6]));
 
 				}
 			}
