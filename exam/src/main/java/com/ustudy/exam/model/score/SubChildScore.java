@@ -27,6 +27,13 @@ public class SubChildScore implements Serializable {
 		this.rank = rank;
 	}
 
+	public SubChildScore(String subName, float score, int rank) {
+		super();
+		this.subName = subName;
+		this.score = score;
+		this.rank = rank;
+	}
+
 	public int getRank() {
 		return rank;
 	}
@@ -61,7 +68,7 @@ public class SubChildScore implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "SubChildScore [rank=" + rank + ", score=" + score + ", subId=" + subId + ", subName=" + subName + "]";
+		return "SubChildScore [subId=" + subId + ", subName=" + subName + ", score=" + score + ", rank=" + rank + "]";
 	}
 
 }

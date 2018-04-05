@@ -23,7 +23,12 @@ public class StudentScore implements Serializable {
 	private float score = 0;
 	private int rank = 0;
 	
-	// subject scores aggregated with format 'subject name' + '-' + 'score' + '-' + 'rank'
+	/*
+	 *  subject scores aggregated with format 
+	 *  'subject name' + '-' + 'score' + '-' + 'rank' + '$' + childsubscore
+	 *  child subscore is also aggregated with format as below,
+	 *  'subject name' + '-' + 'score' + '-' + 'rank' + ":" + ...
+	 */
 	@JsonIgnore
 	private String aggrscore = null;
 	
@@ -118,14 +123,34 @@ public class StudentScore implements Serializable {
 			//splist subscores firstly
 			String []scL = this.aggrscore.split(",");
 			for (String sc:scL) {
-				String []props = sc.split("-");
-				if (props != null && props.length == 3) {
-					SubScore ssc = new SubScore(props[0], Float.valueOf(props[1]), Integer.valueOf(props[2]));
-					if (this.subScores == null) {
-						this.subScores = new ArrayList<SubScore>();
+				String []props = sc.split("$");
+				if (props != null) {
+					String []data = props[0].split("-");
+					SubScore ssc = null;
+					if (data != null && data.length == 3) {
+						ssc = new SubScore(data[0], Float.valueOf(data[1]), Integer.valueOf(data[2]));
+						
+						if (props.length ==2) {
+							// need to parse child subscore
+							String []cdata = props[1].split(":");
+							for (String para:cdata) {
+								String [] ch = para.split("-");
+								if (ch != null && ch.length == 3) {
+									SubChildScore scs = new SubChildScore(ch[0], Float.valueOf(ch[1]), Integer.valueOf(ch[2]));
+									if (ssc.getSubCSL() == null) {
+										ssc.setSubCSL(new ArrayList<SubChildScore>());
+									}
+									ssc.getSubCSL().add(scs);
+								}
+							}
+						}
+						if (this.subScores == null) {
+							this.subScores = new ArrayList<SubScore>();
+						}
+						this.subScores.add(ssc);
 					}
-					this.subScores.add(ssc);
 				}
+				
 			}
 		}
 		
