@@ -129,6 +129,9 @@ public class ExamServiceImpl implements ExamService {
 		if (null != examSubjects && examSubjects.size() > 0) {
 
 			Map<Long, Long> gradeStudentCounts = getGradeStudentCounts(examId);
+
+			Map<Long, Long> egsStudentCounts = getEgsStudentCounts(examId);
+
 			/* comment out by jared
 			Map<Long, Long> subjectPaperCounts = getSubjectPaperCounts(examId);
 			Map<Long, Long> subjectAnswers = getSubjectAnswers(examId);
@@ -136,7 +139,7 @@ public class ExamServiceImpl implements ExamService {
 			Map<Long, Map<String, Long>> subjectQuestions = getSubjectQuestions(examId);
 
 			// return summary(examSubjects, gradeStudentCounts, subjectPaperCounts, subjectAnswers, subjectQuestions);
-			return summary(examSubjects, gradeStudentCounts, subjectQuestions);
+			return summary(examSubjects, gradeStudentCounts, egsStudentCounts, subjectQuestions);
 		}
 
 		return null;
@@ -153,6 +156,26 @@ public class ExamServiceImpl implements ExamService {
 			counts.put(gradeId, count);
 		}
 
+		return counts;
+	}
+
+	private Map<Long, Long> getEgsStudentCounts(Long examId) {
+
+		Map<Long, Long> counts = new HashMap<>();
+
+		long branchCount = examDaoImpl.getBranchCount(examId);
+
+		// has branch art or sci
+		if (branchCount > 0) {
+			long artMathCount = examDaoImpl.getArtMathCount(examId);
+
+			List<Map<String, Object>> egsStudentCounts = examDaoImpl.getEgsStudentCounts(examId, artMathCount);
+			for (Map<String, Object> map : egsStudentCounts) {
+				long egsId = (int) map.get("egsId");
+				long count = (long) map.get("count");
+				counts.put(egsId, count);
+			}
+		}
 		return counts;
 	}
 
@@ -260,10 +283,11 @@ public class ExamServiceImpl implements ExamService {
 		return counts;
 	}
 
-	private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts,
+	private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts, Map<Long, Long> egsStudentCounts, 
 			Map<Long, Map<String, Long>> subjectQuestions) {
 
 		JSONArray result = new JSONArray();
+		// exam meta data
 		JSONArray array = new JSONArray();
 
 		Map<Long, List<JSONObject>> subjects = new HashMap<>();
@@ -272,7 +296,9 @@ public class ExamServiceImpl implements ExamService {
 			long gradeId = (int) map.get("gradeId");
 			String gradeName = String.valueOf(map.get("gradeName"));
 			String examDate = String.valueOf(map.get("examDate"));
+			Long egsId = (int) map.get("egsId");
 			List<JSONObject> list = subjects.get(gradeId);
+			long gradeStudentCount = 0;
 			if (null == list) {
 				list = new ArrayList<>();
 				JSONObject object = new JSONObject();
@@ -285,8 +311,17 @@ public class ExamServiceImpl implements ExamService {
 					count = gradeStudentCounts.get(gradeId);
 				}
 				object.put("studentCount", count);
+				gradeStudentCount = count;
 
 				array.add(object);
+			} else {
+				for (int i = 0; i < array.size(); i++) {
+					JSONObject object = array.getJSONObject(i);
+					if (gradeId == object.getLong("gradeId")) {
+						gradeStudentCount = object.getLong("studentCount");
+						break;
+					}
+				}
 			}
 
 			JSONObject subject = new JSONObject();
@@ -295,6 +330,14 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
 			subject.put("markSwitch", map.get("markSwitch"));
+
+			long count = 0;
+			if (null != egsStudentCounts.get(egsId)) {
+				count = egsStudentCounts.get(egsId);
+			} else {
+				count = gradeStudentCount;
+			}
+			subject.put("studentCount", count);
 
 			String answerPaper = "";
 			if (null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")) {
@@ -312,10 +355,6 @@ public class ExamServiceImpl implements ExamService {
 			}
 			subject.put("questionsPaper", questionsPaper);
 
-			long egsId = 0;
-			if (null != map.get("egsId")) {
-				egsId = (int) map.get("egsId");
-			}
 			subject.put("egsId", egsId);
 			
 			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
