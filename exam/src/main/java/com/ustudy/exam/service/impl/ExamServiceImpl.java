@@ -296,7 +296,7 @@ public class ExamServiceImpl implements ExamService {
 			long gradeId = (int) map.get("gradeId");
 			String gradeName = String.valueOf(map.get("gradeName"));
 			String examDate = String.valueOf(map.get("examDate"));
-			Long egsId = (int) map.get("egsId");
+			Long egsId = (Long)map.get("egsId");
 			List<JSONObject> list = subjects.get(gradeId);
 			long gradeStudentCount = 0;
 			if (null == list) {
