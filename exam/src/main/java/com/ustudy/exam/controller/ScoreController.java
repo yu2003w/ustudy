@@ -64,7 +64,7 @@ public class ScoreController {
         Map result = new HashMap<>();
 
         try {
-            if (scoreS.recalculateQuestionScore(egsId)) {
+            if (scoreS.calEgsScore(egsId)) {
                 result.put("success", true);
             } else {
                 result.put("success", false);

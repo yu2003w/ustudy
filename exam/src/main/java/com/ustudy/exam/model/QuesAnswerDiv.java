@@ -10,7 +10,7 @@ public class QuesAnswerDiv implements Serializable {
 	private String quesno;
 	private String type;
 	private String branch;
-	private int score;
+	private float score;
 	private Long quesid;
 	private Long egsId;
 
@@ -54,11 +54,11 @@ public class QuesAnswerDiv implements Serializable {
 		this.branch = branch;
 	}
 
-	public int getScore() {
+	public float getScore() {
 		return score;
 	}
 
-	public void setScore(int score) {
+	public void setScore(float score) {
 		this.score = score;
 	}
 
@@ -68,6 +68,12 @@ public class QuesAnswerDiv implements Serializable {
 
 	public void setQuesid(Long quesid) {
 		this.quesid = quesid;
+	}
+
+	@Override
+	public String toString() {
+		return "QuesAnswerDiv [id=" + id + ", quesno=" + quesno + ", type=" + type + ", branch=" + branch + ", score="
+				+ score + ", quesid=" + quesid + ", egsId=" + egsId + "]";
 	}
 
 }

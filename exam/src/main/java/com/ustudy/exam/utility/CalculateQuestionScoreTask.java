@@ -10,56 +10,50 @@ import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.ustudy.exam.dao.MultipleScoreSetDao;
-import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.model.MultipleScoreSet;
-import com.ustudy.exam.model.QuesAnswer;
-import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
-import com.ustudy.exam.service.impl.ScoreServiceImpl;
+import com.ustudy.exam.model.score.ScoreRule;
 
-public class RecalculateQuestionScoreTask implements Callable<String> {
+public class CalculateQuestionScoreTask implements Callable<String> {
     
-    private static final Logger logger = LogManager.getLogger(ScoreServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(CalculateQuestionScoreTask.class);
     
     private Long egsId; 
-    private RefAnswer refAnswer; 
-    private QuesAnswerDao quesDaoImpl;    
-    private MultipleScoreSetDao multipleScoreSetDaoImpl;    
+    private ScoreRule sr;    
     private StudentObjectAnswerDao answerDaoImpl;
 
-    public RecalculateQuestionScoreTask(Long egsId,RefAnswer refAnswer,QuesAnswerDao quesDaoImpl,MultipleScoreSetDao multipleScoreSetDaoImpl,StudentObjectAnswerDao answerDaoImpl) {
-        this.egsId = egsId;
-        this.refAnswer = refAnswer;
-        this.quesDaoImpl = quesDaoImpl;
-        this.multipleScoreSetDaoImpl = multipleScoreSetDaoImpl;
-        this.answerDaoImpl = answerDaoImpl;
-    }
-    
-    @Override
+	public CalculateQuestionScoreTask(Long egsId, ScoreRule sr, StudentObjectAnswerDao answerDaoImpl) {
+		super();
+		this.egsId = egsId;
+		this.sr = sr;
+		this.answerDaoImpl = answerDaoImpl;
+	}
+
+	@Override
     public String call() throws Exception {
         
-        logger.debug("egsId: " + egsId + ",quesno=" + refAnswer.getQuesno() + ",answer=" + refAnswer.getAnswer());
+        logger.debug("CalculateQuestionScoreTask:call(), egsId: " + egsId + ",quesno=" + sr.getQuesno() + 
+        		",answer=" + sr.getAnswer());
         
-        if (egsId > 0 && refAnswer.getQuesno() > 0 && null != refAnswer.getAnswer()) {
+        if (egsId > 0 && sr.getQuesno() > 0 && null != sr.getAnswer()) {
             
-            int quesno = refAnswer.getQuesno();
-            String answer = refAnswer.getAnswer().trim().toUpperCase();
+            int quesno = sr.getQuesno();
             
             List<StudentObjectAnswer> answers = answerDaoImpl.getQuestionAnswer(egsId, quesno);
             List<Map<String, Object>> scores = new ArrayList<>();
             
             if(null != answers && answers.size() > 0){
-                
                 //分数
-                QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, refAnswer.getQuesid());
-                float score = quesAnswer.getScore();
-                
+                // QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, sr.getQuesid());
+                // float score = quesAnswer.getScore();
+            	
+            	String answer = sr.getAnswer().trim().toUpperCase();
+                float score = sr.getScore();
                 //多选给分
-                Map<Integer, Integer> multipleScoreSets = null;
+                Map<Integer, Float> multipleScoreSets = null;
                 if(answer.length() > 1){
-                    multipleScoreSets = getMultipleScoreSet(answer, egsId);
+                	multipleScoreSets = getMultipleScoreSet(answer, sr.getMulScoreSet());
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
@@ -78,7 +72,7 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
                             if(correctCount > 0){
                                 if(correctCount == answer.split(",").length){
                                     studentScore = score;
-                                }else if(null != multipleScoreSets.get(correctCount)){
+                                }else if(multipleScoreSets.containsKey(correctCount)){
                                     studentScore = multipleScoreSets.get(correctCount);
                                 }
                             }
@@ -105,16 +99,13 @@ public class RecalculateQuestionScoreTask implements Callable<String> {
         }
     }
     
-    private Map<Integer, Integer> getMultipleScoreSet(String answer, Long egsId){
+    private Map<Integer, Float> getMultipleScoreSet(String answer, List<MultipleScoreSet> mssL){
         
-        Map<Integer, Integer> map = new HashMap<>();
-        
-        List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
-        
-        if(null != multipleScoreSets && multipleScoreSets.size() > 0){
-            for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-                if(multipleScoreSet.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
-                    map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+        Map<Integer, Float> map = new HashMap<>();
+        if(null != mssL && mssL.size() > 0){
+            for (MultipleScoreSet mss : mssL) {
+                if(mss.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
+                    map.put(mss.getStudentCorrectCount(), mss.getScore());
                 }
             }
         }

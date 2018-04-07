@@ -293,10 +293,10 @@ public class ExamServiceImpl implements ExamService {
 		Map<Long, List<JSONObject>> subjects = new HashMap<>();
 
 		for (Map<String, Object> map : examSubjects) {
-			long gradeId = (int) map.get("gradeId");
+			Long gradeId = Long.parseLong(String.valueOf(map.get("gradeId")));
 			String gradeName = String.valueOf(map.get("gradeName"));
 			String examDate = String.valueOf(map.get("examDate"));
-			Long egsId = (Long)map.get("egsId");
+			Long egsId = Long.parseLong(String.valueOf(map.get("egsId"))); 
 			List<JSONObject> list = subjects.get(gradeId);
 			long gradeStudentCount = 0;
 			if (null == list) {

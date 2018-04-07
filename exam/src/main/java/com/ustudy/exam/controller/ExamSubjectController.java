@@ -194,9 +194,9 @@ public class ExamSubjectController {
         
         if(release){
             try {
-                scoreService.recalculateQuestionScore(egsId);
+                scoreService.calEgsScore(egsId);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("updateExamSubjectStatus(), " + e.getMessage(), e);
                 result.put("success", false);
                 result.put("data", "更新失败");
                 return result;
