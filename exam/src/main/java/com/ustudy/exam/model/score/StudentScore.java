@@ -14,9 +14,9 @@ public class StudentScore implements Serializable {
 	 */
 	private static final long serialVersionUID = 2054059124472157556L;
 	
-	private int exameeId = 0;
+	private long exameeId = 0;
 	private String exameeNO = null;
-	private int examId = 0;
+	private long examId = 0;
 	private String exameeName = null;
 	private String schName = null;
 	private String className = null;
@@ -40,11 +40,11 @@ public class StudentScore implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public int getExameeId() {
+	public long getExameeId() {
 		return exameeId;
 	}
 
-	public void setExameeId(int exameeId) {
+	public void setExameeId(long exameeId) {
 		this.exameeId = exameeId;
 	}
 
@@ -56,11 +56,11 @@ public class StudentScore implements Serializable {
 		this.exameeNO = exameeNO;
 	}
 
-	public int getExamId() {
+	public long getExamId() {
 		return examId;
 	}
 
-	public void setExamId(int examId) {
+	public void setExamId(long examId) {
 		this.examId = examId;
 	}
 

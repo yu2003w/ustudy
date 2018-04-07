@@ -60,5 +60,11 @@ public class StudentObjectAnswer implements Serializable {
 	public void setAnswerHas(int answerHas) {
 		this.answerHas = answerHas;
 	}
+
+	@Override
+	public String toString() {
+		return "StudentObjectAnswer [id=" + id + ", paperid=" + paperid + ", quesno=" + quesno + ", score=" + score
+				+ ", answer=" + answer + ", answerHas=" + answerHas + "]";
+	}
 	
 }

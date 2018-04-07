@@ -19,7 +19,7 @@ public class ExameeSubScore implements Serializable {
 	 */
 	private static final long serialVersionUID = 5812989883709669198L;
 	
-	private int exameeId = 0;
+	private long exameeId = 0;
 	private String exameeNO = null;
 	private String exameeName = null;
 	private String clsName = null;
@@ -44,11 +44,11 @@ public class ExameeSubScore implements Serializable {
 		this.aggrscores = aggrscores;
 	}
 
-	public int getExameeId() {
+	public long getExameeId() {
 		return exameeId;
 	}
 
-	public void setExameeId(int exameeId) {
+	public void setExameeId(long exameeId) {
 		this.exameeId = exameeId;
 	}
 

@@ -22,9 +22,9 @@ public interface SubscoreDao {
 	
 	ExameeSubScore getExameeSubScores(@Param("exameeId")Long exameeId, @Param("examId")Long examId);
 	
-	List<ObjQuesScore> getObjQuesScore(@Param("exameeNO") String exameeNO, @Param("egsId") int egsId);
+	List<ObjQuesScore> getObjQuesScore(@Param("exameeNO") String exameeNO, @Param("egsId") long egsId);
 	
-	List<SubjectQuesScore> getSubQuesScore(@Param("exameeNO") String exameeNo, @Param("egsId") int egsId);
+	List<SubjectQuesScore> getSubQuesScore(@Param("exameeNO") String exameeNo, @Param("egsId") long egsId);
 	
 	List<Map<String, Object>> getStudentObjScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
 	

@@ -9,9 +9,9 @@ public class SubScore implements Serializable, Comparable<SubScore> {
 
     private static final long serialVersionUID = -1704696113960776084L;
 
-    private Long id;
-    private Long stuId;
-    private Long egsId;
+    private long id;
+    private long stuId;
+    private long egsId;
     private String subName = null;
 	private Float score;
     private Float subScore;
