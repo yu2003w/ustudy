@@ -10,7 +10,7 @@ public interface ScoreService {
 
 	boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception;
 	
-	boolean calEgsScore(Long egsId) throws Exception;
+	boolean calObjScoreOfEgs(Long egsId) throws Exception;
 	
 	boolean publishExamScore(Long examId, Boolean release) throws Exception;
 	

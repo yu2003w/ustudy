@@ -139,7 +139,8 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
 
-    public boolean calEgsScore(Long egsId) throws Exception {
+    @Override
+    public boolean calObjScoreOfEgs(Long egsId) throws Exception {
         logger.debug("calEgsScore(), calculate egs score for " + egsId);
         
         new Thread() {

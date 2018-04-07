@@ -64,7 +64,7 @@ public class ScoreController {
         Map result = new HashMap<>();
 
         try {
-            if (scoreS.calEgsScore(egsId)) {
+            if (scoreS.calObjScoreOfEgs(egsId)) {
                 result.put("success", true);
             } else {
                 result.put("success", false);
@@ -80,38 +80,37 @@ public class ScoreController {
     }
 
     @RequestMapping(value = "/publish/{examId}/{release}", method = RequestMethod.POST)
-    public Map publishExamScore(@PathVariable Long examId, @PathVariable Boolean release) {
+    public UResp publishExamScore(@PathVariable Long examId, @PathVariable Boolean release, 
+    		HttpServletResponse resp) {
 
         logger.debug("publishExamScore(examId:"+examId+",release:"+release+").");
 
-        Map result = new HashMap<>();
+        UResp res = new UResp();
 
         try {
         	if (release) {
         		if (scoreS.publishExamScore(examId, release)) {
-        			result.put("success", true);
-        			result.put("message", "考试成绩发布成功");
+        			res.setRet(true);
+        			res.setMessage("考试成绩发布成功");
         		} else {
-        			result.put("success", false);
-        			result.put("message", "考试成绩发布失败");
+        			res.setMessage("考试成绩发布失败");
         		}
         	} else {
         		if (scoreS.publishExamScore(examId, release)) {
-        			result.put("success", true);
-        			result.put("message", "考试成绩取消发布成功");
+        			res.setRet(true);
+        			res.setMessage("考试成绩取消发布成功");
         		} else {
-        			result.put("success", false);
-        			result.put("message", "考试成绩取消发布失败");
+        			res.setMessage("考试成绩取消发布失败");
         		}
 			}
         } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.getMessage());
+            res.setMessage(e.getMessage());
             logger.error("publishExamScore(), failed with exception->" + e.getMessage());
+            resp.setStatus(500);
             e.printStackTrace();
         }
 
-        return result;
+        return res;
     }
     
     /**
