@@ -27,6 +27,17 @@
 		<collection property="questions" javaType="ArrayList" column="id" ofType="com.ustudy.exam.model.QuesAnswer" select="com.ustudy.exam.dao.QuesAnswerDao.getQuesAnswers"/>
     </resultMap>
 
+	<resultMap type="com.ustudy.exam.model.MarkImage" id="MarkImageResult">
+        <result property="paperId" column="paperid"/>
+		<result property="quesId" column="quesid"/>
+        <result property="qareaId" column="qarea_id"/>
+        <result property="pageNo" column="pageno"/>
+        <result property="paperImg" column="paper_img"/>
+        <result property="markImg" column="mark_img"/>
+        <result property="posX" column="posx"/>
+        <result property="posY" column="posy"/>
+    </resultMap>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
@@ -168,4 +179,52 @@
 		SELECT COUNT(1) from examgradesub where examid=#{examId} AND status &lt;&gt; '2';
 	</select>
 
+	<select id="getDblMarkImgs" parameterType="Long" resultMap="MarkImageResult">
+		SELECT qp.quesid, qp.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
+		FROM (SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 2) qp 
+		JOIN paper p ON qp.paperid = p.id 
+		JOIN answer ans ON qp.quesid = ans.quesid AND qp.paperid = ans.paperid 
+		JOIN answer_img ansi ON ans.id = ansi.ans_id 
+		JOIN quesarea qa ON ansi.qarea_id = qa.id
+		WHERE p.exam_grade_sub_id=#{egsId}
+		ORDER BY paperid, pageno, posx, posy
+	</select>
+
+	<insert id="updateDblMarkImgs" parameterType="java.util.Map">
+	    insert into ustudy.dmark_img (quesid, paperid, qarea_id, mark_img) values
+	        (#{quesId}, #{paperId}, #{qareaId}, #{markImg})
+	    on duplicate key update mark_img=VALUES(mark_img)
+	</insert>
+
+	<select id="getFinalMarkImgs" parameterType="Long" resultMap="MarkImageResult">
+		SELECT ans.quesid, ans.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
+		FROM (SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 1) qp 
+		JOIN paper p ON qp.paperid = p.id 
+		JOIN answer ans ON qp.quesid = ans.quesid AND qp.paperid = ans.paperid 
+		JOIN answer_img ansi ON ans.id = ansi.ans_id
+		JOIN quesarea qa ON ansi.qarea_id = qa.id
+		WHERE p.exam_grade_sub_id=#{egsId}
+		UNION
+		SELECT ans.quesid, ans.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
+		FROM answer ans 
+		JOIN paper p ON ans.paperid = p.id 
+		JOIN answer_img ansi ON ans.id = ansi.ans_id 
+		JOIN quesarea qa ON ansi.qarea_id = qa.id 
+		WHERE ans.isfinal = 1 AND p.exam_grade_sub_id=#{egsId}
+		UNION
+		SELECT di.quesid, di.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
+		FROM dmark_img di
+		JOIN paper p ON di.paperid = p.id 
+		JOIN quesarea qa ON di.qarea_id = qa.id 
+		WHERE p.exam_grade_sub_id=#{egsId}
+		ORDER BY paperid, pageno, posx, posy
+	</select>
+
+	<update id="updateMarkImg" parameterType="java.util.Map">
+		UPDATE subscore ss
+		JOIN examinee ee ON ss.stuid = ee.id
+		JOIN paper p ON ss.exam_grade_sub_id = p.exam_grade_sub_id AND p.exam_code = ee.exam_code
+		SET mark_img=#{markImg} 
+		WHERE p.id = ${paperId}
+	</update>
 </mapper>

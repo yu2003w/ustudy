@@ -254,3 +254,23 @@ FOREIGN KEY (answer_id)
     REFERENCES ustudy.answer(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+create table if not exists ustudy.dmark_img (
+id INT NOT NULL AUTO_INCREMENT,
+mark_img VARCHAR(128),
+quesid int(11) NOT NULL, 
+paperid int(11) NOT NULL, 
+qarea_id int(11) NOT NULL, 
+INDEX(quesid, paperid),
+PRIMARY KEY (id),
+UNIQUE KEY (quesid, paperid, qarea_id),
+FOREIGN KEY(quesid)
+    REFERENCES ustudy.question(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(paperid)
+    REFERENCES ustudy.paper(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(qarea_id)
+    REFERENCES ustudy.quesarea(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
