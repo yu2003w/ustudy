@@ -19,6 +19,7 @@ import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
+import com.ustudy.exam.dao.SubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.mapper.ConfigMapper;
@@ -26,7 +27,11 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
+<<<<<<< HEAD
 import com.ustudy.exam.model.MarkImage;
+=======
+import com.ustudy.exam.model.Subject;
+>>>>>>> ab8475704c25af5d8205155d029b56946ce66451
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
@@ -40,10 +45,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	private static final Logger logger = LogManager.getLogger(ExamSubjectServiceImpl.class);
 
 	@Autowired
-	private ExamSubjectDao daoImpl;
+	private ExamSubjectDao egsDaoImpl;
 	
-	@Resource
+	@Autowired
 	private SubscoreDao scoreDaoImpl;
+	
+	@Autowired
+	private SubjectDao subjectDaoImpl;
 
 	@Resource
 	private ExamDao examDao;
@@ -66,7 +74,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.trace("getExamSubjects(), retrieving all exam subjects.");
 
-		List<ExamSubject> esL = daoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
+		List<ExamSubject> esL = egsDaoImpl.getAllExamSubject(subjectId, gradeId, start, end, examName);
 		// set answerSet and taskDispatch based on calculation
 		populateExamSubStatus(esL);
 		return esL;
@@ -74,7 +82,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public List<ExamSubject> getExamSubjects(Long examId) {
 		logger.debug("getExamSubjects -> examId:" + examId);
-		List<ExamSubject> esL = daoImpl.getAllExamSubjectByExamId(examId);
+		List<ExamSubject> esL = egsDaoImpl.getAllExamSubjectByExamId(examId);
 		// set answerSet and taskDispatch based on calculation
 		populateExamSubStatus(esL);
 		return esL;
@@ -83,7 +91,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId) {
 		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId);
 		
-		List<ExamSubject> esL = daoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
+		List<ExamSubject> esL = egsDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
 		// set answerSet and taskDispatch based on calculation
 		populateExamSubStatus(esL);
 		return esL;
@@ -92,7 +100,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId) {
 		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
 		
-		List<ExamSubject> esL = daoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
+		List<ExamSubject> esL = egsDaoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 		// set answerSet and taskDispatch based on calculation
 		populateExamSubStatus(esL);
 		return esL;
@@ -100,7 +108,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public ExamSubject getExamSubject(Long id) {
 		logger.debug("getExamSubject -> id:" + id);
-		ExamSubject es = daoImpl.getExamSubjectById(id);
+		ExamSubject es = egsDaoImpl.getExamSubjectById(id);
 		// set status for exam subject
 		es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
 		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
@@ -110,7 +118,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public boolean saveBlankAnswerPaper(Long id, String fileName) {
 		logger.debug("saveBlankAnswerPaper -> id:" + id + ",fileName:" + fileName);
 		try {
-			daoImpl.saveBlankAnswerPaper(id, fileName);
+			egsDaoImpl.saveBlankAnswerPaper(id, fileName);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,9 +129,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public boolean saveBlankQuestionsPaper(Long id, String fileName) {
 		logger.debug("saveBlankQuestionsPaper -> id:" + id + ",fileName:" + fileName);
 		try {
-			daoImpl.saveBlankQuestionsPaper(id, fileName);
+			egsDaoImpl.saveBlankQuestionsPaper(id, fileName);
 			return true;
 		} catch (Exception e) {
+			logger.debug("saveBlankQuestionsPaper(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 		return false;
@@ -131,7 +140,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public boolean getMarkSwitchById(Long id) {
 		logger.debug("getMarkSwitch -> id:" + id);
-		ExamSubject es = daoImpl.getMarkSwitchById(id);
+		ExamSubject es = egsDaoImpl.getMarkSwitchById(id);
 		return es.getMarkSwitch();
 	}
 
@@ -148,7 +157,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public boolean updateMarkSwitch(Long egsId, Boolean release) {
 		try {
-			daoImpl.updateMarkSwitchById(egsId, release);
+			egsDaoImpl.updateMarkSwitchById(egsId, release);
 
 			// TODO: 清除缓存
 			//paperC.clearSubCache(String.valueOf(egsId));
@@ -163,7 +172,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public boolean updateMarkSwitch(Long examId, Long gradeId, Long subjectId, Boolean release) {
 		try {
-			daoImpl.updateMarkSwitch(examId, gradeId, subjectId, release);
+			egsDaoImpl.updateMarkSwitch(examId, gradeId, subjectId, release);
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -315,26 +324,28 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return true;
 	}
 
-	public boolean updateExamSubjectStatus(Long egsId, Boolean release) {
+	@Override
+	public boolean updateEgsScoreStatus(Long egsId, Boolean release) {
+		
+		logger.debug("updateEgsScoreStatus(), egsid=" + egsId + ", release=" + release);
 		try {
-			daoImpl.updateExamSubjectStatusById(egsId, release);
-
+			egsDaoImpl.updateExamSubjectStatusById(egsId, release);
 			if (release) {
-			    // 分数汇总
-				SummaryScore(egsId);
+			    // calculate subscore for egs
+				SummaryEgsScore(egsId);
 				// 清除缓存
 				paperC.clearSubCache(String.valueOf(egsId));
 				// 更新考试状态
+				// TODO: possibly need to optimize logic and sql instructions here
 				examDao.updateExamStatusByEgsid(egsId,"2");
 			}else {
 			    // 更新考试状态
 			    examDao.updateExamStatusByEgsid(egsId,"1");
 			    scoC.setScoreColStatus(egsId.intValue(), false);
             }
-
 			return true;
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("updateEgsScoreStatus(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -343,7 +354,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public boolean updateExamSubjectStatus(Long examId, Long gradeId, Long subjectId, Boolean release) {
 		try {
-			daoImpl.updateExamSubjectStatus(examId, gradeId, subjectId, release);
+			egsDaoImpl.updateExamSubjectStatus(examId, gradeId, subjectId, release);
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -352,7 +363,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
-	private void SummaryScore(Long egsId) {
+	private void SummaryEgsScore(Long egsId) {
 		Map<Long, Float> objScores = getObjScores(egsId);
 		Map<Long, Float> subjScores = getSubjScores(egsId);
 		
@@ -395,6 +406,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 			scoreDaoImpl.deleteSubscores(egsId);
 			scoreDaoImpl.insertSubscores(scores);
+			//TODO: need to add logic for calculating sub child scores
+			Subject sub = subjectDaoImpl.getSubjectByEgsId(egsId);
+			if (sub.getChildSubIds().size() > 0) {
+				logger.info("summaryEgsScore(), need to calculate child subject scores together for "
+						+ "subject->" + sub.toString());
+			}
+			
 		}
 	}
 
@@ -402,7 +420,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		Map<Long, Float> result = new HashMap<>();
 
-		List<Map<String, Object>> scores = daoImpl.getExamSubjectObjScores(egsId);
+		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectObjScores(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("objScore")) {
 				long studentId = (int) map.get("id");
@@ -421,7 +439,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		Map<Long, Map<Long, List<Map<String, Object>>>> questScores = new HashMap<>();
 
-		List<Map<String, Object>> scores = daoImpl.getExamSubjectSubjScores(egsId);
+		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectSubjScores(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("quesid")) {
 				long studentId = (int) map.get("id");
@@ -487,7 +505,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		Map<Long, String> result = new HashMap<>();
 
-		List<Map<String, Object>> scores = daoImpl.getExamSubjectMarkMode(egsId);
+		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectMarkMode(egsId);
 		for (Map<String, Object> map : scores) {
 			if (null != map.get("id") && null != map.get("markMode")) {
 				long questionId = (int) map.get("id");

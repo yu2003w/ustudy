@@ -37,13 +37,14 @@ import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.score.DetailedSubScore;
 import com.ustudy.exam.model.score.ExameeSubScore;
+import com.ustudy.exam.model.score.ScoreRule;
 import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
 import com.ustudy.exam.utility.ExamUtil;
-import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
+import com.ustudy.exam.utility.CalculateQuestionScoreTask;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -56,7 +57,7 @@ public class ScoreServiceImpl implements ScoreService {
 	@Resource
 	private MultipleScoreSetDao multipleScoreSetDaoImpl;
 	
-	@Resource
+	@Autowired
 	private RefAnswerDao refAnswerDaoImpl;
 	
 	@Resource
@@ -100,7 +101,7 @@ public class ScoreServiceImpl implements ScoreService {
                 float score = quesAnswer.getScore();
                 
                 //多选给分
-                Map<Integer, Integer> multipleScoreSets = null;
+                Map<Integer, Float> multipleScoreSets = null;
                 if(answer.length() > 1){
                     multipleScoreSets = getMultipleScoreSet(answer,egsId);
                 }
@@ -138,8 +139,9 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
 
-    public boolean recalculateQuestionScore(Long egsId) throws Exception {
-        logger.debug("egsId: " + egsId);
+    @Override
+    public boolean calObjScoreOfEgs(Long egsId) throws Exception {
+        logger.debug("calEgsScore(), calculate egs score for " + egsId);
         
         new Thread() {
             public void run() {                
@@ -147,17 +149,19 @@ public class ScoreServiceImpl implements ScoreService {
                  * 创建线程池，并发量最大为5
                  * LinkedBlockingDeque，表示执行任务或者放入队列
                  */
-                ThreadPoolExecutor tpe = new ThreadPoolExecutor(20, 100, 0,
+                ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
                         TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
                         new ThreadPoolExecutor.CallerRunsPolicy());
                 
                 //存储线程的返回值
                 List<Future<String>> results = new LinkedList<Future<String>>();
                 
-                List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
                 
-                for (RefAnswer refAnswer : refAnswers) {
-                    RecalculateQuestionScoreTask task = new RecalculateQuestionScoreTask(egsId, refAnswer, quesDaoImpl, multipleScoreSetDaoImpl, answerDaoImpl);
+                for (ScoreRule sr : scoreRules) {
+                    CalculateQuestionScoreTask task = new CalculateQuestionScoreTask(egsId, sr, 
+                    		answerDaoImpl);
                     Future<String> result = tpe.submit(task);
                     results.add(result);
                 }
@@ -169,7 +173,9 @@ public class ScoreServiceImpl implements ScoreService {
                 try {
                     tpe.awaitTermination(1, TimeUnit.DAYS);
                 } catch (InterruptedException e) {
-                    logger.error(e.getMessage());                    
+                    logger.error("calEgsScore() in new thread->" + e.getMessage());                    
+                } catch (Exception ex) {
+                	logger.error("calEgsScore() in new thread->" + ex.getMessage());
                 }
                 
                 ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
@@ -186,9 +192,9 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
     
-    private Map<Integer, Integer> getMultipleScoreSet(String answer, Long egsId){
+    private Map<Integer, Float> getMultipleScoreSet(String answer, Long egsId){
         
-        Map<Integer, Integer> map = new HashMap<>();
+        Map<Integer, Float> map = new HashMap<>();
         
         List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
         

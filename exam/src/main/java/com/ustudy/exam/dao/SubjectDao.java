@@ -11,4 +11,5 @@ public interface SubjectDao {
 
 	List<Subject> getAllSubject();
 	
+	Subject getSubjectByEgsId(Long egsId);
 }

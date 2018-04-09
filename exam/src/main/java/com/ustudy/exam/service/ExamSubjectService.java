@@ -19,7 +19,7 @@ public interface ExamSubjectService {
 	
 	List<ExamSubject> getLastExamSubjects();
 	
-	boolean updateExamSubjectStatus(Long egsId, Boolean release);
+	boolean updateEgsScoreStatus(Long egsId, Boolean release);
 	
 	boolean updateExamSubjectStatus(Long examId, Long gradeId, Long subjectId, Boolean release);
 

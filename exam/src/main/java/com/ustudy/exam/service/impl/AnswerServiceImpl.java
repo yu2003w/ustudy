@@ -43,7 +43,7 @@ public class AnswerServiceImpl implements AnswerService {
 
 	public Map<String, Object> getQuesAnswer(Long egsId) throws Exception {
 
-		logger.info("getQuesAnswer -> egsId=" + egsId);
+		logger.info("getQuesAnswer(), egsId=" + egsId);
 
 		try {
 			Map<String, Object> result = new HashMap<>();
@@ -396,7 +396,7 @@ public class AnswerServiceImpl implements AnswerService {
 					JSONObject score = scores.getJSONObject(j);
 					if (null != score.get("count") && null != score.get("score")) {
 						int studentCorrectCount = score.getInt("count");
-						int score_ = score.getInt("score");
+						float score_ = Float.valueOf(score.getString("score"));
 						MultipleScoreSet multipleScoreSet = new MultipleScoreSet();
 						multipleScoreSet.setExamGradeSubId(egsId);
 						multipleScoreSet.setCorrectAnswerCount(correctAnswerCount);

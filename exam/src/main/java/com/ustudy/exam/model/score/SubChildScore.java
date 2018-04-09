@@ -2,6 +2,8 @@ package com.ustudy.exam.model.score;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class SubChildScore implements Serializable {
 
 	/**
@@ -9,7 +11,8 @@ public class SubChildScore implements Serializable {
 	 */
 	private static final long serialVersionUID = 6590093362364537127L;
 	
-	private int subId = 0;
+	@JsonIgnore
+	private long subId = 0;
 	private String subName = null;
 	private float score = 0;
 	private int rank = 0;
@@ -19,7 +22,7 @@ public class SubChildScore implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public SubChildScore(int subId, String subName, float score, int rank) {
+	public SubChildScore(long subId, String subName, float score, int rank) {
 		super();
 		this.subId = subId;
 		this.subName = subName;
@@ -50,11 +53,11 @@ public class SubChildScore implements Serializable {
 		this.score = score;
 	}
 	
-	public int getSubId() {
+	public long getSubId() {
 		return subId;
 	}
 	
-	public void setSubId(int subId) {
+	public void setSubId(long subId) {
 		this.subId = subId;
 	}
 	

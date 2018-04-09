@@ -14,7 +14,7 @@ public class DetailedSubScore implements Serializable {
 	private static final long serialVersionUID = -4655835902259079695L;
 
 	@JsonIgnore
-	private int egsId = 0;
+	private long egsId = 0;
 
 	private String subName = null;
 	private float score = 0;
@@ -46,11 +46,11 @@ public class DetailedSubScore implements Serializable {
 		this.markImg = markImg;
 	}
 
-	public int getEgsId() {
+	public long getEgsId() {
 		return egsId;
 	}
 
-	public void setEgsId(int egsId) {
+	public void setEgsId(long egsId) {
 		this.egsId = egsId;
 	}
 

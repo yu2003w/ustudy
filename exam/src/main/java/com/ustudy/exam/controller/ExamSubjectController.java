@@ -193,10 +193,11 @@ public class ExamSubjectController {
         Map result = new HashMap<>();
         
         if(release){
+        	// first, calculate score of object questions for specified egs
             try {
-                scoreService.recalculateQuestionScore(egsId);
+                scoreService.calObjScoreOfEgs(egsId);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("updateExamSubjectStatus(), " + e.getMessage(), e);
                 result.put("success", false);
                 result.put("data", "更新失败");
                 return result;
@@ -205,7 +206,8 @@ public class ExamSubjectController {
 
         // Don't automatically publish the score of the whole exam after one subject is published.
 
-        if(exSubS.updateExamSubjectStatus(egsId, release)){
+        // score summation for specified exam grade subject
+        if(exSubS.updateEgsScoreStatus(egsId, release)){
             
             // new Thread() {
             //     public void run() {
