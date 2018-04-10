@@ -27,11 +27,8 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
-<<<<<<< HEAD
 import com.ustudy.exam.model.MarkImage;
-=======
 import com.ustudy.exam.model.Subject;
->>>>>>> ab8475704c25af5d8205155d029b56946ce66451
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
@@ -188,7 +185,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				{paperid: xx, quesid: xx, qarea_id: xx, paper_img: xx, 
 				mark_img: xx, x: xx, y: xx}
 			  */
-			List<MarkImage> dmis = daoImpl.getDblMarkImgs(egsId);
+			List<MarkImage> dmis = egsDaoImpl.getDblMarkImgs(egsId);
         	  /* 1.2 upload the images to oss and insert to dmark_img table
         	  */
         	if (uploadMarkImgs(dmis) == false) {
@@ -196,7 +193,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
         	}
 
         	// 2. get the list of all marking images
-        	List<MarkImage> finalMarkImgs = daoImpl.getFinalMarkImgs(egsId);
+        	List<MarkImage> finalMarkImgs = egsDaoImpl.getFinalMarkImgs(egsId);
 
         	// 3. merge the whole paper image, upload to oss and insert to subscore table
         	if (mergePaperImg(finalMarkImgs) == false) {
@@ -272,7 +269,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 
 			// 2. insert into dmark_img table
-			daoImpl.updateDblMarkImgs(mi1.getQuesId(), mi1.getPaperId(), mi1.getQareaId(), targetName);
+			egsDaoImpl.updateDblMarkImgs(mi1.getQuesId(), mi1.getPaperId(), mi1.getQareaId(), targetName);
 
 			// MarkImage dblMarkImg = new MarkImage(mi1.getPaperId(), mi1.getQuesId(), mi1.getQareaId(), mi1.getPageNo(), mi1.getPaperImg(), 
 			// 	targetName, mi1.getPosX(), mi1.getPosY());
@@ -300,7 +297,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					if(!prePaperImg.isEmpty()) {
 						String targetName = "AM_" + prePaperImg;
 						OSSUtil.putObject(prePaperImg, targetName, markImgs);
-						daoImpl.updateMarkImg(mi.getPaperId(), targetName);
+						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
 						markImgs.clear();
 						markImgs.add(mi);
 					} else {
@@ -314,7 +311,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 			String targetName = "AM_" + prePaperImg;
 			OSSUtil.putObject(prePaperImg, targetName, markImgs);
-			daoImpl.updateMarkImg(mi.getPaperId(), targetName);
+			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
 			markImgs.clear();
 
 		} catch (Exception e) {
