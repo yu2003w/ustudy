@@ -65,17 +65,47 @@ public class AnswerServiceImpl implements AnswerService {
 
 		List<QuesAnswer> quesAnswers = quesAnswerDaoImpl.getQuesAnswers(egsId);
 		List<QuesAnswerDiv> quesAnswerDivs = quesAnswerDivDaoImpl.getAllQuesAnswerDivs(egsId);
-		Map<Long, List<QuesAnswerDiv>> map = new HashMap<>();
+		
+		Map<Long, List<QuesAnswerDiv>> childMap = new HashMap<>();
+		Map<String, List<QuesAnswerDiv>> stepMap = new HashMap<>();
+		
 		for (QuesAnswerDiv quesAnswerDiv : quesAnswerDivs) {
-			List<QuesAnswerDiv> divs = map.get(quesAnswerDiv.getQuesid());
-			if (null == divs) {
-				divs = new ArrayList<>();
-			}
-			divs.add(quesAnswerDiv);
-			map.put(quesAnswerDiv.getQuesid(), divs);
+		    if(quesAnswerDiv.getStep() == 0){
+		        List<QuesAnswerDiv> divs = childMap.get(quesAnswerDiv.getQuesid());
+		        if (null == divs) {
+		            divs = new ArrayList<>();
+		        }
+		        divs.add(quesAnswerDiv);
+		        childMap.put(quesAnswerDiv.getQuesid(), divs);
+		    }else {
+		        String key = "";
+		        if(quesAnswerDiv.getQuesno().equals("0")){
+		            key = "ques-" + quesAnswerDiv.getQuesid();
+		        }else{
+		            key = "child-" + quesAnswerDiv.getQuesno();
+		        }
+		        List<QuesAnswerDiv> divs = stepMap.get(key);
+                if (null == divs) {
+                    divs = new ArrayList<>();
+                }
+                divs.add(quesAnswerDiv);
+                stepMap.put(key, divs);
+            }
 		}
+		
 		for (QuesAnswer quesAnswer : quesAnswers) {
-			quesAnswer.setChild(map.get(quesAnswer.getId()));
+		    List<QuesAnswerDiv> childs = childMap.get(quesAnswer.getId());
+		    if(null != childs){
+		        for (QuesAnswerDiv child : childs) {
+		            if(null != stepMap.get("child-" + child.getQuesno())){
+		                child.setSteps(stepMap.get("child-" + child.getQuesno()));
+		            }
+                }
+		        quesAnswer.setChild(childs);
+		    }
+		    if(null != stepMap.get("ques-" + quesAnswer.getId())){
+                quesAnswer.setStep(stepMap.get("ques-" + quesAnswer.getId()));
+            }
 		}
 
 		return quesAnswers;

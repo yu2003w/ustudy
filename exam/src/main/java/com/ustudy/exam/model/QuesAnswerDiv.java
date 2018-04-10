@@ -1,6 +1,7 @@
 package com.ustudy.exam.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class QuesAnswerDiv implements Serializable {
 
@@ -13,6 +14,10 @@ public class QuesAnswerDiv implements Serializable {
 	private float score;
 	private Long quesid;
 	private Long egsId;
+	private int step;
+	private String remark;
+
+    private List<QuesAnswerDiv> steps;
 
 	public Long getEgsId() {
 		return egsId;
@@ -69,11 +74,43 @@ public class QuesAnswerDiv implements Serializable {
 	public void setQuesid(Long quesid) {
 		this.quesid = quesid;
 	}
+	
+    public int getStep() {
+        return step;
+    }
+    
+    public void setStep(int step) {
+        this.step = step;
+    }
+    
+    public String getRemark() {
+        return remark;
+    }
+    
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
-	@Override
+    public List<QuesAnswerDiv> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<QuesAnswerDiv> steps) {
+        this.steps = steps;
+    }
+
+    @Override
 	public String toString() {
-		return "QuesAnswerDiv [id=" + id + ", quesno=" + quesno + ", type=" + type + ", branch=" + branch + ", score="
-				+ score + ", quesid=" + quesid + ", egsId=" + egsId + "]";
+		return "QuesAnswerDiv [id=" + id + 
+		        ", quesno=" + quesno + 
+		        ", type=" + type + 
+		        ", branch=" + branch + 
+		        ", score=" + score + 
+		        ", quesid=" + quesid + 
+                ", egsId=" + egsId +  
+                ", step=" + step +  
+                ", remark=" + remark + 
+		        "]";
 	}
 
 }
