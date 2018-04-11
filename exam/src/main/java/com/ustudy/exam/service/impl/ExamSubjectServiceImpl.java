@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+
+import java.util.Iterator;
 
 import javax.annotation.Resource;
 
@@ -18,18 +19,23 @@ import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
-import com.ustudy.exam.dao.SubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
+import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
-import com.ustudy.exam.model.Subject;
+import com.ustudy.exam.model.score.ChildObjScore;
+import com.ustudy.exam.model.score.ChildSubScore;
+import com.ustudy.exam.model.score.SubChildScore;
+import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.OSSMetaInfo;
+import com.ustudy.exam.utility.OSSUtil;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -41,9 +47,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private SubscoreDao scoreDaoImpl;
-	
-	@Autowired
-	private SubjectDao subjectDaoImpl;
 
 	@Resource
 	private ExamDao examDao;
@@ -59,6 +62,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private QuesAnswerDao qaDao;
+
+	@Autowired
+	private ConfigMapper cgM;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.trace("getExamSubjects(), retrieving all exam subjects.");
@@ -170,6 +176,149 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
+	public boolean updateExamSubPapers(Long egsId) {
+		try {
+			// 1. merge the paper images of double marking
+			  /* 1.1 list the double marking answers
+				{paperid: xx, quesid: xx, qarea_id: xx, paper_img: xx, 
+				mark_img: xx, x: xx, y: xx}
+			  */
+			List<MarkImage> dmis = egsDaoImpl.getDblMarkImgs(egsId);
+        	  /* 1.2 upload the images to oss and insert to dmark_img table
+        	  */
+        	if (uploadMarkImgs(dmis) == false) {
+        		return false;
+        	}
+
+        	// 2. get the list of all marking images
+        	List<MarkImage> finalMarkImgs = egsDaoImpl.getFinalMarkImgs(egsId);
+
+        	// 3. merge the whole paper image, upload to oss and insert to subscore table
+        	if (mergePaperImg(finalMarkImgs) == false) {
+        		return false;
+        	}
+
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	private boolean uploadMarkImgs(List<MarkImage> mis) {
+		
+		for(int i=0; i<mis.size(); i+=2) {
+			//1. upload the mark images to oss
+			MarkImage mi1 = mis.get(i);
+			MarkImage mi2 = mis.get(i+1);
+
+			if (!mi1.getPaperId().equals(mi2.getPaperId()) ||
+				!mi1.getPageNo().equals(mi2.getPageNo()) ||
+				!mi1.getPosX().equals(mi2.getPosX()) ||
+				!mi1.getPosY().equals(mi2.getPosY())) {
+ 				logger.error("uploadMarkImgs(), unmatched double marking records-> #1: " + mi1.toString() + " #2: " + mi2.toString());
+				throw new RuntimeException("uploadMarkImgs(), unmatched double marking records found!");
+			}
+
+			String paperImg = mi1.getPaperImg();
+			String markImg1 = mi1.getMarkImg();
+			String markImg2 = mi1.getMarkImg();
+			
+			if (paperImg == null || paperImg.isEmpty() || markImg1 == null || markImg1.isEmpty() || markImg2 == null || markImg2.isEmpty()) {
+				logger.error("uploadMarkImgs(), empty image found in double marking-> #1: " + mi1.toString() + " #2: " + mi2.toString());
+				throw new RuntimeException("uploadMarkImgs(), emtpy image found in double marking!");
+			}
+
+			// mark image naming rule: M_{questionNo}_{regionNo}_{teacherId}_{paperName}.png
+			// remove the teacherId from the targetName
+			String[] strArray = markImg1.split("_");
+			String targetName = "";
+
+			for (int j=0; j<strArray.length; j++) {
+				if (j == 3) continue;
+				if (j != strArray.length-1) {
+					targetName += strArray[j] + "_";
+				} else {
+					targetName += strArray[j];
+				}
+			}
+
+			List<MarkImage> markImgs = new ArrayList<>();
+			markImgs.add(mi2);
+
+			try {
+				if (OSSUtil.getClient() == null) {
+					// need to initialize OSSMetaInfo
+					logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
+					synchronized(OSSMetaInfo.class) {
+						if (OSSUtil.getClient() == null) {
+							OSSMetaInfo omi = cgM.getOSSInfo("oss");
+							logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
+							OSSUtil.initOSS(omi);
+						}
+					}
+				}
+				OSSUtil.putObject(markImg1, targetName, markImgs);
+			} catch (Exception e) {
+				logger.error("uploadMarkImgs(), failed to upload image to oss -> " + e.getMessage());
+				return false;
+			}
+
+			// 2. insert into dmark_img table
+			egsDaoImpl.updateDblMarkImgs(mi1.getQuesId(), mi1.getPaperId(), mi1.getQareaId(), targetName);
+
+			// MarkImage dblMarkImg = new MarkImage(mi1.getPaperId(), mi1.getQuesId(), mi1.getQareaId(), mi1.getPageNo(), mi1.getPaperImg(), 
+			// 	targetName, mi1.getPosX(), mi1.getPosY());
+
+			// dblMarkImgs.add(dblMarkImg);
+		}
+		return true;
+		// return dblMarkImgs;
+	}
+
+	private boolean mergePaperImg(List<MarkImage> mis) {
+		
+		Iterator<MarkImage> it = mis.iterator();
+		String prePaperImg = "";
+		String curPaperImg = "";
+		List<MarkImage> markImgs = new ArrayList<>();
+
+		MarkImage mi = null;
+
+		try{
+			while(it.hasNext()) {
+				mi = (MarkImage)it.next();
+				curPaperImg = mi.getPaperImg();
+				if (!curPaperImg.equals(prePaperImg)) {
+					if(!prePaperImg.isEmpty()) {
+						String targetName = "AM_" + prePaperImg;
+						OSSUtil.putObject(prePaperImg, targetName, markImgs);
+						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
+						markImgs.clear();
+						markImgs.add(mi);
+					} else {
+						markImgs.add(mi);					
+					}
+				} else {
+					markImgs.add(mi);
+				}
+				prePaperImg = curPaperImg;
+			}
+
+			String targetName = "AM_" + prePaperImg;
+			OSSUtil.putObject(prePaperImg, targetName, markImgs);
+			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
+			markImgs.clear();
+
+		} catch (Exception e) {
+			logger.error("mergePaperImg(), failed to upload image to oss -> " + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public boolean updateEgsScoreStatus(Long egsId, Boolean release) {
 		
@@ -210,28 +359,43 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	private void SummaryEgsScore(Long egsId) {
-		Map<Long, Float> objScores = getObjScores(egsId);
-		Map<Long, Float> subjScores = getSubjScores(egsId);
+		logger.debug("SummaryEgsScore(), to retrieve object question scores for " + egsId);
+		List<SubScore> scores = retrieveObjScores(egsId);
+		logger.debug("SummaryEgsScore(), to retrieve subject question scores for " + egsId);
+		Map<Long, SubScore> subjScores = retrieveSubScores(egsId);
 		
-		List<SubScore> scores = new ArrayList<>();
-		for (Entry<Long, Float> objs : objScores.entrySet()) {
-			SubScore subscore = new SubScore();
-			subscore.setEgsId(egsId);
-			long studentId = objs.getKey();
-			subscore.setStuId(studentId);
-			float objScore = objs.getValue();
-			float subjScore = 0;
-			if(null != subjScores.get(studentId)){
-			    subjScore = subjScores.get(studentId);
+		// calculate total score for each exmainee in this egs
+		for (SubScore ss : scores) {
+			SubScore subjS = subjScores.get(ss.getStuId());
+			if(null != subjS){
+				// combine object and subject score here
+			    ss.setSubScore(subjS.getSubScore());
+			    List<SubChildScore> scsOL = ss.getSubCSL();
+			    List<SubChildScore> scsSL = subjS.getSubCSL();
+			    for (SubChildScore scss : scsSL) {
+			    	boolean found = false;
+			    	for (SubChildScore scs: scsOL) {
+				    	if (scs.getSubName().compareTo(scss.getSubName()) == 0) {
+				    		scs.setScore(scss.getScore() + scs.getScore());
+				    		found = true;
+				    		break;
+				    	}
+				    }
+			    	if (!found) {
+			    		// branch only existed in subject question scores
+			    		scsOL.add(scss);
+			    	}
+		    	}
+			    
 			}
-			float score = objScore + subjScore;
-			subscore.setSubScore(subjScore);
-			subscore.setObjScore(objScore);
-			subscore.setScore(score);
-			
-			scores.add(subscore);
+			else {
+				logger.warn("SummaryEgsScore(), failed to find subject scores for eid=" + ss.getStuId() + 
+						", egs=" + egsId);
+			}
+			ss.setScore(ss.getObjScore() + ss.getSubScore());
 		}
 		
+		logger.debug("SummaryEgsScore(), score combined, to calculate rank now.");
 		if(scores.size() > 0){
 			Collections.sort(scores);
 			// updated by jared, need to accumulate rank when score equals
@@ -250,36 +414,113 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				}
 				rank++;
 			}
-			scoreDaoImpl.deleteSubscores(egsId);
-			scoreDaoImpl.insertSubscores(scores);
-			//TODO: need to add logic for calculating sub child scores
-			Subject sub = subjectDaoImpl.getSubjectByEgsId(egsId);
-			if (sub.getChildSubIds().size() > 0) {
-				logger.info("summaryEgsScore(), need to calculate child subject scores together for "
-						+ "subject->" + sub.toString());
+			// save subscores, insert on duplicate key udpate
+			scoreDaoImpl.saveSubscores(scores);
+			// populate sub child scores
+			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
+			for (SubScore ss: scores) {
+				List<SubChildScore> scsL = ss.getSubCSL();
+				scsL.forEach(item->{
+				    // TODO: populate subid here
+					item.setParentId(ss.getId());
+					childScores.add(item);
+				});
 			}
-			
+			// save sub child scores
+			scoreDaoImpl.saveSubChildScores(childScores);
+			logger.debug("SummaryEgsScore(), sub child scores saved for " + egsId);
 		}
 	}
 
-	private Map<Long, Float> getObjScores(Long egsId) {
+	/**
+	 * @param egsId
+	 * @return List of SubScore only contains object question scores
+	 */
+	private List<SubScore> retrieveObjScores(Long egsId) {
+		Map<Long, SubScore> scoreM = new HashMap<Long, SubScore>();
+		/*
+		 * returned data with format as below,
+		 * score, eid, branch
+		 * data is grouped by eid and branch
+		 */
+		List<ChildObjScore> scoL = egsDaoImpl.retrieveEgsObjScores(egsId);
+		if (scoL != null && !scoL.isEmpty()) {
+			logger.debug("retrieveObjScores(), retrieved " + scoL.size() + " items for " + egsId);
+			for (ChildObjScore sco: scoL) {
+				SubScore ss = scoreM.get(sco.getEid());
+				if (ss == null) {
+					ss = new SubScore(sco.getEid(), egsId);
+					scoreM.put(sco.getEid(), ss);
+				}
+				
+				// accumulate object score here
+				ss.setObjScore(ss.getObjScore() + sco.getScore());
+				if (sco.getBranch().compareTo("不分科") != 0)
+					ss.getSubCSL().add(new SubChildScore(sco.getBranch(), sco.getScore()));
+			}
+		}
+		logger.trace("retrieveObjScores(), obj scores retrieved for " + egsId + "->" + scoreM.values());
+		return new ArrayList<SubScore>(scoreM.values());
+	}
+	
+  /*private Map<Long, Float> getObjScores(Long egsId) {
 
 		Map<Long, Float> result = new HashMap<>();
-
+		
 		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectObjScores(egsId);
 		for (Map<String, Object> map : scores) {
-			if (null != map.get("id") && null != map.get("objScore")) {
-				long studentId = (int) map.get("id");
-				Object score = map.get("objScore");
+			if (null != map.get("eid") && null != map.get("score")) {
+				long studentId = (int) map.get("eid");
+				Object score = map.get("score");
 				result.put(studentId, Float.parseFloat(score.toString()));
 			}
 		}
 
 		return result;
 
-	}
+	}*/
 
-	private Map<Long, Float> getSubjScores(Long egsId) {
+	/**
+	 * @param egsId
+	 * @return subject scores for specified egs
+	 */
+	private Map<Long, SubScore> retrieveSubScores(Long egsId) {
+		Map<Long, SubScore> scoreM = new HashMap<Long, SubScore>();
+		
+		List<ChildSubScore> cssL = egsDaoImpl.retrieveEgsSubScores(egsId);
+		logger.trace("retrieveSubScores(), retrieved " + cssL.size() + " items of subject scores for " + egsId);
+		if (cssL != null && !cssL.isEmpty()) {
+			for (ChildSubScore css: cssL) {
+				SubScore ss = scoreM.get(css.getEid());
+				if (ss == null) {
+					ss = new SubScore(css.getEid(), egsId);
+					scoreM.put(css.getEid(), ss);
+				}
+				// accumulate subject question score for examinee
+				ss.setSubScore(ss.getSubScore() + css.getRealScore());
+				if (css.getBranch().compareTo("不分科") != 0) {
+					List<SubChildScore> subCS = ss.getSubCSL();
+					boolean found = false;
+					for (SubChildScore subc : subCS) {
+						if (subc.getSubName().compareTo(css.getBranch()) == 0) {
+							subc.setScore(subc.getScore() + css.getRealScore());
+							found = true;
+							break;
+						}
+					}
+					if (found == false) {
+						SubChildScore subc = new SubChildScore(css.getBranch(), css.getRealScore());
+						subCS.add(subc);
+					}
+				}
+			}
+		}
+		
+		logger.debug("retrieveSubScores(), detailed subject scores for " + egsId + "->" + scoreM.values());
+		return scoreM;
+	}
+	
+/*	private Map<Long, Float> getSubjScores(Long egsId) {
 
 		Map<Long, Float> result = new HashMap<>();
 
@@ -345,9 +586,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		return result;
 
-	}
+	}*/
 
-	private Map<Long, String> getMarkMode(Long egsId) {
+/*	private Map<Long, String> getMarkMode(Long egsId) {
 
 		Map<Long, String> result = new HashMap<>();
 
@@ -361,7 +602,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 
 		return result;
-	}
+	}*/
 
 	/* (non-Javadoc)
 	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
