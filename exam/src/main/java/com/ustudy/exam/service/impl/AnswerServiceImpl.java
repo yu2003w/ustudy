@@ -255,6 +255,8 @@ public class AnswerServiceImpl implements AnswerService {
 				quesAnswer.setChoiceNum(subjective.getInt("choiceNum"));
 			if (null != subjective.get("score"))
 				quesAnswer.setScore(subjective.getInt("score"));
+			if (null != subjective.get("remark"))
+                quesAnswer.setRemark(subjective.getString("remark"));
 			quesAnswer.setExamGradeSubId(egsId);
 
 			if (null != subjective.get("id") && subjective.getLong("id") > 0) {
@@ -378,31 +380,16 @@ public class AnswerServiceImpl implements AnswerService {
 				        }
                     }
 				} else {
+				    long quesid = 0;
+				    if (null != subjective.get("startno") && null != quesids.get(subjective.getInt("startno"))) {
+				        quesid = quesids.get(subjective.getInt("startno"));
+		            }
 				    if (null != subjective.get("child") && !subjective.get("child").equals(null)) {
-				        JSONArray childs = subjective.getJSONArray("child");
-				        for (int j = 0; j < childs.size(); j++) {
-				            JSONObject child = childs.getJSONObject(j);
-				            QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
-				            
-				            if (null != child.get("quesno"))
-				                quesAnswerDiv.setQuesno(child.getString("quesno"));
-				            if (null != child.get("type")){
-                                quesAnswerDiv.setType(child.getString("type"));
-				            } else {
-				                quesAnswerDiv.setType("解答题");
-                            }
-				            if (null != child.get("branch"))
-				                quesAnswerDiv.setBranch(child.getString("branch"));
-				            if (null != child.get("score"))
-				                quesAnswerDiv.setScore(child.getInt("score"));
-				            if (null != subjective.get("startno") && null != quesids.get(subjective.getInt("startno"))) {
-				                quesAnswerDiv.setQuesid(quesids.get(subjective.getInt("startno")));
-				            }
-				            quesAnswerDiv.setEgsId(egsId);
-				            
-				            quesAnswerDivs.add(quesAnswerDiv);
-				        }
+				        quesAnswerDivs = addChildsDiv(egsId, quesid, subjective.getJSONArray("child"), quesAnswerDivs);
 				    }
+				    if (null != subjective.get("step") && !subjective.get("step").equals(null)) {
+                        quesAnswerDivs = addStepsDiv(egsId, quesid, subjective.getJSONArray("step"), quesAnswerDivs);
+                    }
 				}
 			}
 		}
@@ -412,6 +399,79 @@ public class AnswerServiceImpl implements AnswerService {
 		}
 
 	}
+	
+	private List<QuesAnswerDiv> addChildsDiv(Long egsId, long quesid, JSONArray childs,List<QuesAnswerDiv> quesAnswerDivs) {
+	    for (int i = 0; i < childs.size(); i++) {
+            JSONObject child = childs.getJSONObject(i);
+            QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+            
+            if (null != child.get("quesno")){
+                quesAnswerDiv.setQuesno(child.getString("quesno"));
+            }else{
+                quesAnswerDiv.setQuesno("0");
+            }
+            if (null != child.get("type")){
+                quesAnswerDiv.setType(child.getString("type"));
+            } else {
+                quesAnswerDiv.setType("解答题");
+            }
+            if (null != child.get("branch")){
+                quesAnswerDiv.setBranch(child.getString("branch"));
+            }
+            if (null != child.get("score")){
+                quesAnswerDiv.setScore(child.getInt("score"));
+            }
+            quesAnswerDiv.setQuesid(quesid);
+            if (null != child.get("remark")){
+                quesAnswerDiv.setRemark(child.getString("remark"));
+            }
+            quesAnswerDiv.setStep(0);
+            quesAnswerDiv.setEgsId(egsId);
+            
+            quesAnswerDivs.add(quesAnswerDiv);
+            
+            if (null != child.get("steps") && !child.get("steps").equals(null)) {
+                quesAnswerDivs = addStepsDiv(egsId, quesid, child.getJSONArray("steps"), quesAnswerDivs);
+            }
+        }
+	    
+	    return quesAnswerDivs;
+	}
+	
+	private List<QuesAnswerDiv> addStepsDiv(Long egsId, Long quesid, JSONArray steps,List<QuesAnswerDiv> quesAnswerDivs) {
+	    for (int j = 0; j < steps.size(); j++) {
+	        JSONObject step = steps.getJSONObject(j);
+	        QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
+	        if (null != step.get("quesno")){
+	            quesAnswerDiv.setQuesno(step.getString("quesno"));
+	        }else{
+	            quesAnswerDiv.setQuesno("0");
+	        }
+	        if (null != step.get("type")){
+	            quesAnswerDiv.setType(step.getString("type"));
+	        } else {
+	            quesAnswerDiv.setType("解答题");
+	        }
+	        if (null != step.get("branch")){
+	            quesAnswerDiv.setBranch(step.getString("branch"));
+	        }
+	        if (null != step.get("score")){
+	            quesAnswerDiv.setScore(step.getInt("score"));
+	        }
+	        quesAnswerDiv.setQuesid(quesid);
+	        if (null != step.get("step")){
+	            quesAnswerDiv.setStep(step.getInt("step"));
+	        }
+	        if (null != step.get("remark")){
+	            quesAnswerDiv.setRemark(step.getString("remark"));
+	        }
+	        quesAnswerDiv.setEgsId(egsId);
+	        
+	        quesAnswerDivs.add(quesAnswerDiv);
+	    }
+     
+	    return quesAnswerDivs;
+    }
 
 	private void getCheckBoxScores(Long egsId, JSONObject ques) throws Exception {
 		List<MultipleScoreSet> multipleScoreSets = new ArrayList<>();
