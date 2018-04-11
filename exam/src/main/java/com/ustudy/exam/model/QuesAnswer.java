@@ -29,8 +29,10 @@ public class QuesAnswer implements Serializable {
 	
 	private String teacOwner;
 	private Long examGradeSubId;
+    private String remark;
 	
 	private List<QuesAnswerDiv> child;
+	private List<QuesAnswerDiv> step;
 	
 	/**
 	 * Added by Jared
@@ -148,19 +150,35 @@ public class QuesAnswer implements Serializable {
 		this.examGradeSubId = examGradeSubId;
 	}
 
-	public List<QuesAnswerDiv> getChild() {
-		return child;
-	}
+    public List<QuesAnswerDiv> getChild() {
+        return child;
+    }
 
-	public void setChild(List<QuesAnswerDiv> child) {
-		this.child = child;
-	}
+    public void setChild(List<QuesAnswerDiv> child) {
+        this.child = child;
+    }
+
+    public List<QuesAnswerDiv> getStep() {
+        return step;
+    }
+
+    public void setStep(List<QuesAnswerDiv> step) {
+        this.step = step;
+    }
 
 	public String getSteps() {
 		return steps;
 	}
+	
+    public String getRemark() {
+        return remark;
+    }
+    
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
-	/**
+    /**
 	 * Steps is composed with the format 'quesno'-'score'
 	 * @param steps
 	 */

@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
+import com.ustudy.exam.model.MarkImage;
 
 @Mapper
 public interface ExamSubjectDao {
@@ -39,6 +40,14 @@ public interface ExamSubjectDao {
 
 	void updateMarkSwitch(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("release")Boolean release);
 	
+	List<MarkImage> getDblMarkImgs(@Param("egsId")Long egsId);
+
+	void updateDblMarkImgs(@Param("quesId")Long quesId, @Param("paperId")Long paperId, @Param("qareaId")Long qareaId, @Param("markImg")String markImg);
+
+	List<MarkImage> getFinalMarkImgs(@Param("egsId")Long egsId);
+
+	void updateMarkImg(@Param("paperId")Long paperId, @Param("markImg")String markImg);
+
 	void isTaskDispatch(Long id);
     
 	void updateExamSubjectStatusById(@Param("egsId")Long egsId, @Param("release")Boolean release);

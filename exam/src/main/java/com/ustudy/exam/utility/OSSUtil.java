@@ -3,6 +3,7 @@ package com.ustudy.exam.utility;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.util.Base64Utils;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
+
+import com.ustudy.exam.model.MarkImage;
 
 
 public class OSSUtil {
@@ -75,9 +78,47 @@ public class OSSUtil {
     		throw new Exception("can not put object due to client exception", ce);
     	}
     }
-    
+
+    /** 
+     * watermark a set of images on one base image, and then put object
+     * @param baseKey, targetKey
+     * @return 
+     */
+    public static void putObject(String baseKey, String targetKey, List<MarkImage> markImgs) throws Exception {
+        try {
+
+            String url = bucketURL + "/" + baseKey;
+            url += "?x-oss-process=image";
+
+            for(int i=0; i<markImgs.size(); i++) {
+                String base64MarkKey = Base64Utils.encodeToUrlSafeString(markImgs.get(i).getMarkImg().getBytes());
+                url += "/watermark,";
+                url += "image_" + base64MarkKey;
+                url += ",x_" + markImgs.get(i).getPosX() + ",y_" + markImgs.get(i).getPosY() + ",g_nw";
+            }
+
+            logger.debug("URL of the combined file: " + url);
+            InputStream in = new URL(url).openStream();
+            ossClient.putObject(bucketName, targetKey, in);
+        } catch (OSSException oe) {
+            logger.error("Caught an OSSException");
+            logger.error("Error Message: " + oe.getErrorMessage());
+            logger.error("Error Code: " + oe.getErrorCode());
+            throw new Exception("can not put object due to oss exception", oe);
+        } catch (ClientException ce) {
+            logger.error("Caught an ClientException");
+            logger.error("Error Message: " + ce.getErrorMessage());
+            logger.error("Error Code: " + ce.getErrorCode());
+            ce.getStackTrace();
+            throw new Exception("can not put object due to client exception", ce);
+        } catch (Exception e) {
+            logger.error("Error Message: " + e.getMessage());
+            throw new Exception("can not put object due to exception", e);
+        }
+    } 
+
 	/** 
-	 * combine two images into one and then put object
+	 * crop base image, merge with mark image, and then put object
      * @param baseKey, markKey, targetKey, x, y, w, h
      * @return 
      */

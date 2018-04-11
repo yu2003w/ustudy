@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Iterator;
+
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +21,7 @@ import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
+import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
@@ -26,10 +29,13 @@ import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.score.SubChildScore;
+import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
+import com.ustudy.exam.utility.OSSMetaInfo;
+import com.ustudy.exam.utility.OSSUtil;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -56,6 +62,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	
 	@Autowired
 	private QuesAnswerDao qaDao;
+
+	@Autowired
+	private ConfigMapper cgM;
 
 	public List<ExamSubject> getExamSubjects(Long subjectId, Long gradeId, String start, String end, String examName) {
 		logger.trace("getExamSubjects(), retrieving all exam subjects.");
@@ -165,6 +174,149 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 
 		return false;
+	}
+
+	public boolean updateExamSubPapers(Long egsId) {
+		try {
+			// 1. merge the paper images of double marking
+			  /* 1.1 list the double marking answers
+				{paperid: xx, quesid: xx, qarea_id: xx, paper_img: xx, 
+				mark_img: xx, x: xx, y: xx}
+			  */
+			List<MarkImage> dmis = egsDaoImpl.getDblMarkImgs(egsId);
+        	  /* 1.2 upload the images to oss and insert to dmark_img table
+        	  */
+        	if (uploadMarkImgs(dmis) == false) {
+        		return false;
+        	}
+
+        	// 2. get the list of all marking images
+        	List<MarkImage> finalMarkImgs = egsDaoImpl.getFinalMarkImgs(egsId);
+
+        	// 3. merge the whole paper image, upload to oss and insert to subscore table
+        	if (mergePaperImg(finalMarkImgs) == false) {
+        		return false;
+        	}
+
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	private boolean uploadMarkImgs(List<MarkImage> mis) {
+		
+		for(int i=0; i<mis.size(); i+=2) {
+			//1. upload the mark images to oss
+			MarkImage mi1 = mis.get(i);
+			MarkImage mi2 = mis.get(i+1);
+
+			if (!mi1.getPaperId().equals(mi2.getPaperId()) ||
+				!mi1.getPageNo().equals(mi2.getPageNo()) ||
+				!mi1.getPosX().equals(mi2.getPosX()) ||
+				!mi1.getPosY().equals(mi2.getPosY())) {
+ 				logger.error("uploadMarkImgs(), unmatched double marking records-> #1: " + mi1.toString() + " #2: " + mi2.toString());
+				throw new RuntimeException("uploadMarkImgs(), unmatched double marking records found!");
+			}
+
+			String paperImg = mi1.getPaperImg();
+			String markImg1 = mi1.getMarkImg();
+			String markImg2 = mi1.getMarkImg();
+			
+			if (paperImg == null || paperImg.isEmpty() || markImg1 == null || markImg1.isEmpty() || markImg2 == null || markImg2.isEmpty()) {
+				logger.error("uploadMarkImgs(), empty image found in double marking-> #1: " + mi1.toString() + " #2: " + mi2.toString());
+				throw new RuntimeException("uploadMarkImgs(), emtpy image found in double marking!");
+			}
+
+			// mark image naming rule: M_{questionNo}_{regionNo}_{teacherId}_{paperName}.png
+			// remove the teacherId from the targetName
+			String[] strArray = markImg1.split("_");
+			String targetName = "";
+
+			for (int j=0; j<strArray.length; j++) {
+				if (j == 3) continue;
+				if (j != strArray.length-1) {
+					targetName += strArray[j] + "_";
+				} else {
+					targetName += strArray[j];
+				}
+			}
+
+			List<MarkImage> markImgs = new ArrayList<>();
+			markImgs.add(mi2);
+
+			try {
+				if (OSSUtil.getClient() == null) {
+					// need to initialize OSSMetaInfo
+					logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
+					synchronized(OSSMetaInfo.class) {
+						if (OSSUtil.getClient() == null) {
+							OSSMetaInfo omi = cgM.getOSSInfo("oss");
+							logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
+							OSSUtil.initOSS(omi);
+						}
+					}
+				}
+				OSSUtil.putObject(markImg1, targetName, markImgs);
+			} catch (Exception e) {
+				logger.error("uploadMarkImgs(), failed to upload image to oss -> " + e.getMessage());
+				return false;
+			}
+
+			// 2. insert into dmark_img table
+			egsDaoImpl.updateDblMarkImgs(mi1.getQuesId(), mi1.getPaperId(), mi1.getQareaId(), targetName);
+
+			// MarkImage dblMarkImg = new MarkImage(mi1.getPaperId(), mi1.getQuesId(), mi1.getQareaId(), mi1.getPageNo(), mi1.getPaperImg(), 
+			// 	targetName, mi1.getPosX(), mi1.getPosY());
+
+			// dblMarkImgs.add(dblMarkImg);
+		}
+		return true;
+		// return dblMarkImgs;
+	}
+
+	private boolean mergePaperImg(List<MarkImage> mis) {
+		
+		Iterator<MarkImage> it = mis.iterator();
+		String prePaperImg = "";
+		String curPaperImg = "";
+		List<MarkImage> markImgs = new ArrayList<>();
+
+		MarkImage mi = null;
+
+		try{
+			while(it.hasNext()) {
+				mi = (MarkImage)it.next();
+				curPaperImg = mi.getPaperImg();
+				if (!curPaperImg.equals(prePaperImg)) {
+					if(!prePaperImg.isEmpty()) {
+						String targetName = "AM_" + prePaperImg;
+						OSSUtil.putObject(prePaperImg, targetName, markImgs);
+						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
+						markImgs.clear();
+						markImgs.add(mi);
+					} else {
+						markImgs.add(mi);					
+					}
+				} else {
+					markImgs.add(mi);
+				}
+				prePaperImg = curPaperImg;
+			}
+
+			String targetName = "AM_" + prePaperImg;
+			OSSUtil.putObject(prePaperImg, targetName, markImgs);
+			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
+			markImgs.clear();
+
+		} catch (Exception e) {
+			logger.error("mergePaperImg(), failed to upload image to oss -> " + e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	@Override

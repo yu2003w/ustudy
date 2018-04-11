@@ -27,6 +27,8 @@ public interface ExamSubjectService {
 	
 	boolean updateMarkSwitch(Long examId, Long gradeId, Long subjectId, Boolean release);
 
+	boolean updateExamSubPapers(Long egsId);
+
 	boolean saveBlankAnswerPaper(Long id, String fileName);
 	
 	boolean saveBlankQuestionsPaper(Long id, String fileName);

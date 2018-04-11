@@ -322,4 +322,32 @@ public class ExamSubjectController {
 
         return result;
     }
+
+    /**
+     * 
+     * updateExamSubPapers
+     * 创建人:  liqi
+     * 创建时间: 2018.4.7
+     *
+     * @Title: updateExamSubPapers
+     * @param egsId 考试科目ID
+     * @return 更新答题卡结果
+     */
+    @RequestMapping(value = "/examsubject/papers/{egsId}", method = RequestMethod.POST)
+    public Map updateExamSubPapers(@PathVariable Long egsId) {
+        
+        logger.debug("updateExamSubPapers().");
+        
+        Map result = new HashMap<>();
+
+        if(exSubS.updateExamSubPapers(egsId)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
 }

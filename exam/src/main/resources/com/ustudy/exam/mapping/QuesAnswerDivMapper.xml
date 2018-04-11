@@ -4,17 +4,21 @@
 
 	<resultMap type="com.ustudy.exam.model.QuesAnswerDiv" id="QuesAnswerDivResult">
         <id property="id" column="id"/>
+        <result property="quesid" column="quesid"/>
         <result property="quesno" column="quesno"/>
+        <result property="step" column="step"/>
         <result property="type" column="type"/>
         <result property="branch" column="branch"/>
         <result property="score" column="score"/>
-        <result property="quesid" column="quesid"/>
+        <result property="remark" column="remark"/>
         <result property="egsId" column="exam_grade_sub_id"/>
     </resultMap>
 
 	<select id="getAllQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
-		SELECT qs.*, q.exam_grade_sub_id FROM question_step qs LEFT JOIN question q ON qs.quesid = q.id 
-		WHERE q.exam_grade_sub_id=#{egsId} ORDER BY quesid
+		SELECT qs.*, q.exam_grade_sub_id FROM question_step qs 
+		LEFT JOIN question q ON qs.quesid = q.id 
+		WHERE q.exam_grade_sub_id=#{egsId} 
+		ORDER BY qs.quesid,qs.quesno,qs.step
 	</select>
 	
 	<select id="getQuesAnswerDivs" parameterType="Long" resultMap="QuesAnswerDivResult">
