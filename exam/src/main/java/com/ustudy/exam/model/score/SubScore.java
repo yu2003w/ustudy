@@ -1,6 +1,7 @@
 package com.ustudy.exam.model.score;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +11,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
     private static final long serialVersionUID = -1704696113960776084L;
 
     private long id;
+    // examinee id not examinee code
     private long stuId;
     private long egsId;
     private String subName = null;
@@ -26,6 +28,13 @@ public class SubScore implements Serializable, Comparable<SubScore> {
 		// TODO Auto-generated constructor stub
 	}
     
+	public SubScore(long stuId, long egsId) {
+		super();
+		this.stuId = stuId;
+		this.egsId = egsId;
+		subCSL = new ArrayList<SubChildScore>();
+	}
+
 	public SubScore(String subName, Float score, int rank) {
 		super();
 		this.subName = subName;

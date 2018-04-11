@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.ustudy.exam.model.score.ExameeSubScore;
 import com.ustudy.exam.model.score.ObjQuesScore;
+import com.ustudy.exam.model.score.SubChildScore;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.model.score.SubjectQuesScore;
 
@@ -16,7 +17,9 @@ public interface SubscoreDao {
 
 	void deleteSubscores(Long egsId);
 	
-	void insertSubscores(List<SubScore> subscores);
+	void saveSubscores(List<SubScore> subscores);
+	
+	void saveSubChildScores(List<SubChildScore> scores);
 	
 	List<Map<String, Object>> getExamScores(Long examId);
 	
