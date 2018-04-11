@@ -168,7 +168,7 @@
 		WHERE examid=#{examId} AND grade_id=#{gradeId} AND sub_id=#{subjectId}
 	</update>
 	
-	<select id="retrieveEgsSubScores" parameterType="Long" resultType="ChildSubScore">
+	<select id="retrieveEgsSubScores" parameterType="Long" resultMap="ChildSubScore">
 		select ee.id as eid, group_concat(ans.isfinal, '-', ans.score) as score, question.branch, 
 		question.mark_mode as markmode from answer as ans 
 		join paper on paper.id = ans.paperid 
@@ -178,12 +178,12 @@
 		group by ans.quesid, ans.paperid, ee.id order by eid
 	</select>
 	
-	<select id="retrieveEgsObjScores" parameterType="Long" resultType="ChildObjScore">
+	<select id="retrieveEgsObjScores" parameterType="Long" resultMap="ChildObjScore">
 		select ifnull(sum(oa.score), 0) as score, examinee.id as eid, question.branch 
 		from obj_answer as oa join paper on paper.id = oa.paperid 
 		join examinee on examinee.exam_code = paper.exam_code 
 		join question on (question.exam_grade_sub_id = paper.exam_grade_sub_id and 
-		oa.quesno >= question.startno and oa.quesno <= question.endno) 
+		oa.quesno >= question.startno and question.endno >= oa.quesno) 
 		where paper.exam_grade_sub_id = #{egsId} group by eid, question.branch order by eid
 	</select>
 	
