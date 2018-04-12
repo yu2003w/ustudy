@@ -223,7 +223,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 
 			String paperImg = mi1.getPaperImg();
-			String markImg1 = mi1.getMarkImg();
+			String markImg1 = "A" + mi1.getMarkImg(); // mark image is not suitable for watermark, add answer image. 
 			String markImg2 = mi1.getMarkImg();
 			
 			if (paperImg == null || paperImg.isEmpty() || markImg1 == null || markImg1.isEmpty() || markImg2 == null || markImg2.isEmpty()) {
@@ -260,7 +260,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 				}
-				OSSUtil.putObject(markImg1, targetName, markImgs);
+				OSSUtil.putObject(markImg1, targetName, markImgs, true);
 			} catch (Exception e) {
 				logger.error("uploadMarkImgs(), failed to upload image to oss -> " + e.getMessage());
 				return false;
@@ -308,7 +308,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 
 			String targetName = "AM_" + prePaperImg;
-			OSSUtil.putObject(prePaperImg, targetName, markImgs);
+			OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
 			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
 			markImgs.clear();
 

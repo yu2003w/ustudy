@@ -81,10 +81,11 @@ public class OSSUtil {
 
     /** 
      * watermark a set of images on one base image, and then put object
-     * @param baseKey, targetKey
+     * @param baseKey,targetKey,marImgs,overlapped
+	 * overlapped: does the basekey have the same size as the markImg?
      * @return 
      */
-    public static void putObject(String baseKey, String targetKey, List<MarkImage> markImgs) throws Exception {
+    public static void putObject(String baseKey, String targetKey, List<MarkImage> markImgs, boolean overlapped) throws Exception {
         try {
 
             String url = bucketURL + "/" + baseKey;
@@ -94,7 +95,7 @@ public class OSSUtil {
                 String base64MarkKey = Base64Utils.encodeToUrlSafeString(markImgs.get(i).getMarkImg().getBytes());
                 url += "/watermark,";
                 url += "image_" + base64MarkKey;
-                url += ",x_" + markImgs.get(i).getPosX() + ",y_" + markImgs.get(i).getPosY() + ",g_nw";
+                url += ",x_" + overlapped? 0 : markImgs.get(i).getPosX() + ",y_" + overlapped? 0: markImgs.get(i).getPosY() + ",g_nw";
             }
 
             logger.debug("URL of the combined file: " + url);
