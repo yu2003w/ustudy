@@ -95,7 +95,7 @@ public class OSSUtil {
                 String base64MarkKey = Base64Utils.encodeToUrlSafeString(markImgs.get(i).getMarkImg().getBytes());
                 url += "/watermark,";
                 url += "image_" + base64MarkKey;
-                url += ",x_" + overlapped? 0 : markImgs.get(i).getPosX() + ",y_" + overlapped? 0: markImgs.get(i).getPosY() + ",g_nw";
+                url += ",x_" + (overlapped? 0 : markImgs.get(i).getPosX()) + ",y_" + (overlapped? 0 : markImgs.get(i).getPosY()) + ",g_nw";
             }
 
             logger.debug("URL of the combined file: " + url);
