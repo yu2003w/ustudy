@@ -294,7 +294,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				if (!curPaperImg.equals(prePaperImg)) {
 					if(!prePaperImg.isEmpty()) {
 						String targetName = "AM_" + prePaperImg;
-						OSSUtil.putObject(prePaperImg, targetName, markImgs);
+						OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
 						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
 						markImgs.clear();
 						markImgs.add(mi);
