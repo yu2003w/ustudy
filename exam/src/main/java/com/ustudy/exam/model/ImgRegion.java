@@ -25,7 +25,7 @@ public class ImgRegion implements Serializable {
 	// origin images corresponding to the question block
 	private String quesImg = null;
 	
-	// answer images corresponding to the pageno in the quesion block
+	// answer images corresponding to the region id in the quesion block
 	private String ansImg = null;
 	
 	private int pageno = 0;

@@ -177,8 +177,8 @@ public class PaperCache {
 			PaperScoreCache ps = viewedPM.get(mt.getPaperid());
 			if (ps != null) {
 				// already marked
-				MarkTaskCache fm = new MarkTaskCache(mt.getPaperid(), mt.getImg(), ps.getTeacid(), 2, ps.getScore(),
-						mt.getSeq());
+				MarkTaskCache fm = new MarkTaskCache(mt.getPaperid(), mt.getImg(), ps.getTeacid(), 2, 
+						ps.getScore(), mt.getSeq());
 				mfL.add(fm);
 			} else {
 				// make sure that related papers are marked
@@ -372,13 +372,10 @@ public class PaperCache {
 				" , current batch is " + batch);
 
 		// allocated tasks
-		int count = 0, mid = 0;
+		int count = 0;
 		List<MarkTaskCache> firstMarkL = null;
 		if (isFinalMark) {
 			firstMarkL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
-			if (firstMarkL != null && !firstMarkL.isEmpty()) {
-				mid = firstMarkL.size() / 2;
-			}
 		}
 
 		if (role.equals("初评")) {
@@ -420,7 +417,7 @@ public class PaperCache {
 							// 1, final mark element 2, first mark element 3, first mark element
 							MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 							paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-							fm = firstMarkL.get(mt.getSeq() + mid);
+							fm = firstMarkL.get(mt.getSeq() + 1);
 							paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 						}
 
@@ -540,16 +537,14 @@ public class PaperCache {
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
 		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + "\nkeys->" + task.keySet().toString()
 						+ ", startSeq->" + seq + ", wanted->" + wanted + "\nPaperList->" + pList.toString());
-		int i = 0, mid = -1;
+		int i = 0;
 		if (wanted > MAX_THRES)
 			wanted = MAX_THRES;
 
 		List<MarkTaskCache> firstMarkL = null;
 		if (isfinal) {
 			firstMarkL = paperC.opsForValue().get(QUES_PAPER_PREFIX + quesid);
-			if (firstMarkL != null && !firstMarkL.isEmpty()) {
-				mid = firstMarkL.size() / 2;
-			} else {
+			if (firstMarkL == null || firstMarkL.isEmpty()) {
 				logger.error("getPapersFromTeaCache(), failed to retrieve tasks from cache for " + quesid);
 				return null;
 			}
@@ -565,7 +560,7 @@ public class PaperCache {
 					// 1, final mark element 2, first mark element 3, first mark element
 					MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-					fm = firstMarkL.get(mt.getSeq() + mid);
+					fm = firstMarkL.get(mt.getSeq() + 1);
 					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 				}
 			}
@@ -584,7 +579,7 @@ public class PaperCache {
 						// 1, final mark element 2, first mark element 3, first mark element
 						MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-						fm = firstMarkL.get(mt.getSeq() + mid);
+						fm = firstMarkL.get(mt.getSeq() + 1);
 						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 					}
 					count++;
