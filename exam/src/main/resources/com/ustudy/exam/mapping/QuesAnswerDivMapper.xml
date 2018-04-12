@@ -30,14 +30,15 @@
 	</delete>
 
 	<insert id="insertQuesAnswerDivs" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into question_step (quesno,branch,score,quesid,type) values  
+		insert into question_step (quesno,branch,score,quesid,type,step,remark) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.type, jdbcType=VARCHAR})  
+	        (#{item.quesno},#{item.branch},#{item.score},#{item.quesid},#{item.type, jdbcType=VARCHAR},#{item.step},#{item.remark, jdbcType=VARCHAR})  
 	    </foreach>  
 	</insert>
 	
 	<update id="updateQuesAnswerDiv" parameterType="com.ustudy.exam.model.QuesAnswerDiv">  
-        UPDATE question_step set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid}, type=#{type, jdbcType=VARCHAR} WHERE id=#{id}
+        UPDATE question_step set quesno=#{quesno}, branch=#{branch}, score=#{score}, quesid=#{quesid}, 
+        type=#{type, jdbcType=VARCHAR}, step=#{step}, remark=#{remark, jdbcType=VARCHAR} WHERE id=#{id}
 	</update>
 
 </mapper>

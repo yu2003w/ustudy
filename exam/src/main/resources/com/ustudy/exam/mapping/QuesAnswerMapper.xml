@@ -15,6 +15,7 @@
         <result property="scoreMode" column="mark_mode"/>
         <result property="teacOwner" column="teac_owner"/>
         <result property="examGradeSubId" column="exam_grade_sub_id"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
 	<select id="getQuesAnswers" parameterType="Long" resultMap="QuesAnswerResult">
@@ -35,7 +36,8 @@
 	    question.branch, question.choice_num, question.score, 
 	    group_concat(question_step.quesno, "-", question_step.score) as steps from question 
 	    left join question_step on question.id = question_step.quesid 
-	    where exam_grade_sub_id = #{egsId} group by question.id order by quesno
+	    where exam_grade_sub_id = #{egsId} AND step=0 
+	    group by question.id order by quesno
 	</select>
 	
 	<select id="getQuestions" parameterType="java.util.List" resultMap="QuesAnswerResult">
@@ -57,21 +59,22 @@
 	</delete>
 
 	<insert id="insertQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score,branch) values  
+		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score,branch,remark) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score},#{item.branch})  
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score},#{item.branch},#{item.remark})  
 	    </foreach>  
 	</insert>
 
 	<insert id="initQuesAnswers" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
-		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score) values  
+		insert into question (quesno,startno,endno,type,exam_grade_sub_id,choice_num,score,remark) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score})
+	        (#{item.quesno},#{item.startno},#{item.endno},#{item.type},#{item.examGradeSubId},#{item.choiceNum},#{item.score},#{item.remark})
 	    </foreach>  
 	</insert>
 	
 	<update id="updateQuesAnswer" parameterType="com.ustudy.exam.model.QuesAnswer">  
-        UPDATE question set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, score=#{score}, exam_grade_sub_id=#{examGradeSubId} WHERE id=#{id}
+        UPDATE question set quesno=#{quesno}, startno=#{startno}, endno=#{endno}, type=#{type}, branch=#{branch}, choice_num=#{choiceNum}, 
+        score=#{score}, exam_grade_sub_id=#{examGradeSubId}, remark=#{remark} WHERE id=#{id}
 	</update>
 	
 	<select id="getObjectQuestions" parameterType="Long" resultType="java.util.Map">
