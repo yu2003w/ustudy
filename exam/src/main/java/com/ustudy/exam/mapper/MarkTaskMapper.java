@@ -91,9 +91,9 @@ public interface MarkTaskMapper {
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 
-	@Select("select teacid, pageno, mark_img as img from ustudy.answer join ustudy.answer_img on "
+	@Select("select teacid, qarea_id as qareaId, mark_img as img from ustudy.answer join ustudy.answer_img on "
 			+ "ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and paperid=#{pid} and "
-			+ "ustudy.answer.isfinal = false order by pageno")
+			+ "ustudy.answer.isfinal = false order by qarea_id")
 	public List<FirstMarkImgRecord> getFirstMarkImgs(@Param("qid") String quesid, @Param("pid") String paperid);
 
 	@Select("select qarea_id as regionId, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer "
@@ -102,9 +102,10 @@ public interface MarkTaskMapper {
 	public List<MarkAnsImg> getMarkAnsImgs(@Param("qid") String quesid, @Param("pid") String paperid, 
 			@Param("tid") String tid);
 	
-	@Select("select mflag, problem_paper as isProblemPaper, isviewed as marked, score, "
-			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
-			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
+	@Select("select mflag, problem_paper as isProblemPaper, isviewed as marked, score, paper.id as paperId, "
+			+ "quesid, paper.paper_img as paperImg from ustudy.answer "
+			+ "left join paper on paper.id = answer.paperid "
+			+ "where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
 	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid, @Param("tid") String teacid);
 
 	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, isfinal, "

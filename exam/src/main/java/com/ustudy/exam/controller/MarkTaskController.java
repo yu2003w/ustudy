@@ -78,8 +78,9 @@ public class MarkTaskController {
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("Failed to set error status in response," + re.getMessage());
+				logger.error("Failed to set error status in response," + re.getMessage());
 			}
+			e.printStackTrace();
 		}
 
 		return st;
