@@ -17,9 +17,9 @@ public interface SubscoreDao {
 
 	void deleteSubscores(Long egsId);
 	
-	void saveSubscores(List<SubScore> subscores);
+	int saveSubscores(List<SubScore> subscores);
 	
-	void saveSubChildScores(List<SubChildScore> scores);
+	int saveSubChildScores(List<SubChildScore> scores);
 	
 	List<Map<String, Object>> getExamScores(Long examId);
 	

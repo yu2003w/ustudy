@@ -2,6 +2,7 @@ package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
+import com.ustudy.exam.dao.SubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.mapper.ConfigMapper;
@@ -26,6 +29,7 @@ import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
+import com.ustudy.exam.model.Subject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.score.SubChildScore;
@@ -63,6 +67,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	@Autowired
 	private QuesAnswerDao qaDao;
 
+	@Autowired
+	private SubjectDao subjectD;
+	
 	@Autowired
 	private ConfigMapper cgM;
 
@@ -358,6 +365,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return false;
 	}
 
+	@Transactional
 	private void SummaryEgsScore(Long egsId) {
 		logger.debug("SummaryEgsScore(), to retrieve object question scores for " + egsId);
 		List<SubScore> scores = retrieveObjScores(egsId);
@@ -415,20 +423,66 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				rank++;
 			}
 			// save subscores, insert on duplicate key udpate
-			scoreDaoImpl.saveSubscores(scores);
+			int ret = scoreDaoImpl.saveSubscores(scores);
+			logger.debug("SummaryEgsScore(), number of items saved for sub score is " + ret);
 			// populate sub child scores
 			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
+			
+			// load subject into hashmap
+			List<Subject> subs = subjectD.getAllSubject();
+			Map<String, Long> subMap = new HashMap<String, Long>();
+			for (Subject sub: subs) {
+				subMap.put(sub.getName(), sub.getId());
+			}
 			for (SubScore ss: scores) {
 				List<SubChildScore> scsL = ss.getSubCSL();
 				scsL.forEach(item->{
-				    // TODO: populate subid here
 					item.setParentId(ss.getId());
+					item.setSubId(subMap.get(item.getSubName()));
 					childScores.add(item);
 				});
 			}
 			// save sub child scores
-			scoreDaoImpl.saveSubChildScores(childScores);
-			logger.debug("SummaryEgsScore(), sub child scores saved for " + egsId);
+			if (!childScores.isEmpty()) {
+				// need to sort child subject scores, then calculate rank
+				childScores.sort(new Comparator<SubChildScore>() {
+					@Override
+					public int compare(SubChildScore a, SubChildScore b) {
+						if (a.getSubName().compareTo(b.getSubName()) == 0) {
+							if (a.getScore() == b.getScore())
+								return 0;
+							else if (a.getScore() > b.getScore())
+								return -1;
+							else if (a.getScore() < b.getScore())
+								return 1;
+						} 
+						return a.getSubName().compareTo(b.getSubName());
+					}
+					
+				});
+				
+				rank = 1;
+				for (int i = 0; i < childScores.size(); i++) {
+					if (i == 0) {
+						childScores.get(i).setRank(rank);
+					}
+					else {
+						// child subject changed, need to reset rank
+						if (childScores.get(i - 1).getSubName().compareTo(childScores.get(i).getSubName()) != 0) {
+							rank = 1;
+							childScores.get(i).setRank(rank);
+						} else {
+							if (childScores.get(i).getScore() == childScores.get(i - 1).getScore()) {
+								childScores.get(i).setRank(childScores.get(i - 1).getRank());
+							} else
+								childScores.get(i).setRank(rank);
+						}
+					}
+					rank++;
+				}
+				ret = scoreDaoImpl.saveSubChildScores(childScores);
+			}
+			logger.debug("SummaryEgsScore(), number of items saved for sub child scores " + ret);
 		}
 	}
 
