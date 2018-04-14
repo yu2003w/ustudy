@@ -32,27 +32,25 @@ public class ScoreController {
 	private ScoreService scoreS;
 	
 	@RequestMapping(value = "/recalculate/{egsId}/{quesno}/{answer}", method = RequestMethod.POST)
-    public Map recalculateQuestionScore(@PathVariable Long egsId, @PathVariable Integer quesno, @PathVariable String answer, HttpServletRequest request,
+    public UResp calQuestionScore(@PathVariable Long egsId, @PathVariable Integer quesno, @PathVariable String answer, HttpServletRequest request,
             HttpServletResponse response) {
+        logger.debug("calQuestionScore(), egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
 
-        logger.debug("recalculateQuestionScore().");
-        logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
-
-        Map result = new HashMap<>();
+        UResp res = new UResp();
 
         try {
-            if (scoreS.recalculateQuestionScore(egsId, quesno, answer)) {
-                result.put("success", true);
+            if (scoreS.calQuestionScore(egsId, quesno, answer)) {
+                res.setRet(true);
             } else {
-                result.put("success", false);
+                logger.warn("calQuestionScore(), calculate failed");
             }
         } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.getMessage());
+            res.setMessage(e.getMessage());
+            logger.error("calQuestionScore(), failed with exception->" + e.getMessage());
             e.printStackTrace();
         }
 
-        return result;
+        return res;
     }
 
     @RequestMapping(value = "/recalculate/{egsId}", method = RequestMethod.POST)

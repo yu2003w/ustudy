@@ -81,8 +81,8 @@ public class ScoreServiceImpl implements ScoreService {
     @Autowired
     private ScoreCache scoC;
 
-    public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
-        logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
+    public boolean calQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
+        logger.debug("calQuestionScore(), egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
         
         if (egsId > 0 && quesno > 0 && answer.trim().length() >0) {
             answer = answer.trim().toUpperCase();
@@ -209,6 +209,7 @@ public class ScoreServiceImpl implements ScoreService {
         return map;
     }
     
+    @Transactional
     public boolean publishExamScore(Long examId, Boolean release) throws Exception {
     	
     	if (release) {
@@ -253,8 +254,9 @@ public class ScoreServiceImpl implements ScoreService {
     					rank++;
     				}
     				
-    				exameeScoreDao.deleteExameeScores(examId);
-    				exameeScoreDao.insertExameeScores(exameeScores);
+    				// exameeScoreDao.deleteExameeScores(examId);
+    				int ret = exameeScoreDao.insertExameeScores(exameeScores);
+    				logger.debug("publishExamScore(), number of examee scores saved is " + ret);
     			}
     		}else {
     		    return false;

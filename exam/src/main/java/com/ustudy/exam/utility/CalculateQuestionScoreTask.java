@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.model.MultipleScoreSet;
@@ -31,6 +32,7 @@ public class CalculateQuestionScoreTask implements Callable<String> {
 	}
 
 	@Override
+	@Transactional
     public String call() throws Exception {
         
         logger.debug("CalculateQuestionScoreTask:call(), egsId: " + egsId + ",quesno=" + sr.getQuesno() + 

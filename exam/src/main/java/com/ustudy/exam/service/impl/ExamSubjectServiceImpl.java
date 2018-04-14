@@ -123,18 +123,20 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			egsDaoImpl.saveBlankAnswerPaper(id, fileName);
 			return true;
 		} catch (Exception e) {
+			logger.error("saveBlankAnswerPaper(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 		return false;
 	}
 
+	@Transactional
 	public boolean saveBlankQuestionsPaper(Long id, String fileName) {
 		logger.debug("saveBlankQuestionsPaper -> id:" + id + ",fileName:" + fileName);
 		try {
 			egsDaoImpl.saveBlankQuestionsPaper(id, fileName);
 			return true;
 		} catch (Exception e) {
-			logger.debug("saveBlankQuestionsPaper(), failed with exception->" + e.getMessage());
+			logger.error("saveBlankQuestionsPaper(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 		return false;
@@ -327,6 +329,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	@Override
+	@Transactional
 	public boolean updateEgsScoreStatus(Long egsId, Boolean release) {
 		
 		logger.debug("updateEgsScoreStatus(), egsid=" + egsId + ", release=" + release);
