@@ -59,6 +59,7 @@ public class ChildSubScore implements Serializable {
 							this.realScore += Float.valueOf(paras[1]);
 					}
 					this.realScore /= 2;
+					this.realScore = (int)this.realScore;
 				}
 				else if (sL.length == 3) {
 					// score for double mark with final mark

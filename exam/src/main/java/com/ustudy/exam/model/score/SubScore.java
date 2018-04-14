@@ -10,15 +10,15 @@ public class SubScore implements Serializable, Comparable<SubScore> {
 
     private static final long serialVersionUID = -1704696113960776084L;
 
-    private long id;
+    private long id = 0;
     // examinee id not examinee code
-    private long stuId;
-    private long egsId;
+    private long stuId = 0;
+    private long egsId = 0;
     private String subName = null;
-	private Float score;
-    private Float subScore;
-    private Float objScore;
-    private int rank;
+	private float score = 0;
+    private float subScore = 0;
+    private float objScore = 0;
+    private int rank = 0;
     
     @JsonProperty("childScores")
     private List<SubChildScore> subCSL = null;
@@ -42,7 +42,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
 		this.rank = rank;
 	}
 
-	public Long getId() {
+	public long getId() {
         return id;
     }
 
@@ -50,7 +50,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
         this.id = id;
     }
 
-    public Long getStuId() {
+    public long getStuId() {
         return stuId;
     }
 
@@ -58,7 +58,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
         this.stuId = stuid;
     }
 
-    public Long getEgsId() {
+    public long getEgsId() {
         return egsId;
     }
 
@@ -74,7 +74,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
         this.score = score;
     }
 
-    public Float getSubScore() {
+    public float getSubScore() {
         return subScore;
     }
 
@@ -82,7 +82,7 @@ public class SubScore implements Serializable, Comparable<SubScore> {
         this.subScore = subScore;
     }
 
-    public Float getObjScore() {
+    public float getObjScore() {
         return objScore;
     }
 

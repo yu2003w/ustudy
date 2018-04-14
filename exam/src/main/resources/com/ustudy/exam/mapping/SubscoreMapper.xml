@@ -31,16 +31,15 @@
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.stuId},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
 	    </foreach>
-	    on duplicate key update score=#{item.score}, sub_score=#{item.subScore}, 
-	    obj_score=#{item.objScore}, rank=#{item.rank}
+	    on duplicate key update score=score, sub_score=sub_score, obj_score=obj_score, rank=rank
 	</insert>
 	
-	<insert id="saveChildSubscores" parameterType="java.util.List">
-		insert into subchildscore (parenet_id, sub_id, score, rank) values  
+	<insert id="saveSubChildScores" parameterType="java.util.List">
+		insert into subchildscore (parent_id, sub_id, score, rank) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.parentId},#{item.subId},#{item.score},#{item.rank})  
 	    </foreach>
-	    on duplicate key update score=#{item.score}, rank=#{item.rank}
+	    on duplicate key update score=score, rank=rank
 	</insert>
 	
 	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
