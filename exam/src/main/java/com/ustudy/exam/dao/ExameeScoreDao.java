@@ -12,9 +12,9 @@ import com.ustudy.exam.model.score.StudentScore;
 @Mapper
 public interface ExameeScoreDao {
 
-	void deleteExameeScores(Long examId);
+	//int deleteExameeScores(Long examId);
 	
-	void insertExameeScores(List<ExameeScore> exameeScores);
+	int insertExameeScores(List<ExameeScore> exameeScores);
 	
 	List<StudentScore> getExameeScores(@Param("examId")Long examId, @Param("schId")Long schId, @Param("gradeId")Long gradeId, 
 	        @Param("classId")Long classId, @Param("branch")String branch, @Param("text")String text);

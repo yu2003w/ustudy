@@ -13,15 +13,18 @@
 	    <result property="rank" column="rank"/>
 	</resultMap>
 	
+	<!-- 
 	<delete id="deleteExameeScores" parameterType="Long">
 		DELETE from exameescore where exam_id=#{examId}
 	</delete>
+	-->
 
 	<insert id="insertExameeScores" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into exameescore (examee_id,exam_id,score,rank) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.stuid},#{item.examId},#{item.score},#{item.rank})  
-	    </foreach>  
+	    </foreach>
+	    on duplicate key update score = score, rank = rank
 	</insert>
 	
 	<select id="getExameeScores" parameterType="java.util.Map" resultMap="StudentScore">
