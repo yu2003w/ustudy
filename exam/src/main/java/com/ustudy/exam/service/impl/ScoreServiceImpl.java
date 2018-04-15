@@ -44,7 +44,7 @@ import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
 import com.ustudy.exam.utility.ExamUtil;
-import com.ustudy.exam.utility.CalculateQuestionScoreTask;
+import com.ustudy.exam.utility.CalQuesScoreTask;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -160,7 +160,7 @@ public class ScoreServiceImpl implements ScoreService {
                 List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
                 
                 for (ScoreRule sr : scoreRules) {
-                    CalculateQuestionScoreTask task = new CalculateQuestionScoreTask(egsId, sr, 
+                    CalQuesScoreTask task = new CalQuesScoreTask(egsId, sr, 
                     		answerDaoImpl);
                     Future<String> result = tpe.submit(task);
                     results.add(result);
