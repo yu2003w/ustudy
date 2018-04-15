@@ -119,7 +119,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		// initialize paper cache here to get number of allocated numbers
 		List<PaperRequest> prS = new ArrayList<PaperRequest>();
 		for (QuesMarkSum que : sumL) {
-			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), -1, -1));
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), 
+					que.getScorediff(), -1, -1));
 		}
 		paperC.retrievePapers(prS);
 		mt.setSummary(sumL);
@@ -192,7 +193,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 		List<PaperRequest> prS = new ArrayList<PaperRequest>();
 		for (QuesMarkSum que : queS) {
-			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), startSeq, endSeq));
+			prS.add(new PaperRequest(que.getQuesid(), que.getAssignMode(), que.getMarkMode(), que.getScorediff(), startSeq, endSeq));
 		}
 
 		// need to initialize cache for each question ids
@@ -592,7 +593,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		} else
 			mt.setMarkMode("单评");
 
-		// update time limit, assign mode, mark mode, teac_owner for specified question id
+		// update time limit, scorediff, assign mode, mark mode, teac_owner for specified question id
 		num = markTaskM.updateQuestionMeta(mt);
 		if (num != 1) {
 			logger.error("createMarkTask(), failed to update corresponding question information. " + mt.toString());

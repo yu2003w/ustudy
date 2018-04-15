@@ -42,6 +42,9 @@ public class QuesMarkSum implements Serializable {
 	private String assignMode = null;
 	@JsonIgnore
 	private String markMode = null;
+	// this value should be greater than 0 for double mark
+	@JsonIgnore
+	private float scorediff = 0;
 	@JsonIgnore
 	private int fullscore = 0;
 	
@@ -152,6 +155,14 @@ public class QuesMarkSum implements Serializable {
 		this.markMode = markMode;
 	}
 
+	public float getScorediff() {
+		return scorediff;
+	}
+
+	public void setScorediff(float scorediff) {
+		this.scorediff = scorediff;
+	}
+
 	public int getFullscore() {
 		return fullscore;
 	}
@@ -181,7 +192,7 @@ public class QuesMarkSum implements Serializable {
 		return "QuesMarkSum [questionName=" + questionName + ", questionType=" + questionType + ", avgScore=" + avgScore
 				+ ", markedNum=" + markedNum + ", quesid=" + quesid + ", progress=" + progress + ", composable="
 				+ composable + ", quesno=" + quesno + ", startno=" + startno + ", endno=" + endno + ", assignMode="
-				+ assignMode + ", markMode=" + markMode + ", fullscore=" + fullscore + "]";
+				+ assignMode + ", markMode=" + markMode + ", scorediff=" + scorediff + ", fullscore=" + fullscore + "]";
 	}
 	
 }

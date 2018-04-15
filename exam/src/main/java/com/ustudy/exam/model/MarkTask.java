@@ -27,6 +27,9 @@ public class MarkTask implements Serializable {
 	// duration for specific question
 	private int timeLimit = 0;
 	
+	// this value is meaningful for double mark
+	private float scorediff = 0;
+	
 	// teachers includes both first/second round mark with format 'markType'-'teacid'
 	// need to parse contents when setting this field
 	@JsonIgnore
@@ -150,6 +153,14 @@ public class MarkTask implements Serializable {
 		this.timeLimit = timeLimit;
 	}
 
+	public float getScorediff() {
+		return scorediff;
+	}
+
+	public void setScorediff(float scorediff) {
+		this.scorediff = scorediff;
+	}
+
 	public String getQuestionId() {
 		return questionId;
 	}
@@ -178,20 +189,19 @@ public class MarkTask implements Serializable {
 			return false;
 		}
 		if (this.markMode.compareTo("双评") == 0 && (this.finalMarkTeachersIds == null ||
-				this.finalMarkTeachersIds.isEmpty())) {
+				this.finalMarkTeachersIds.isEmpty()) && this.scorediff <= 0) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	
 	@Override
 	public String toString() {
 		return "MarkTask [examId=" + examId + ", gradeId=" + gradeId + ", subjectId=" + subjectId + ", questionId="
 				+ questionId + ", ownerId=" + ownerId + ", teachersIds=" + teachersIds + ", finalMarkTeachersIds="
-				+ finalMarkTeachersIds + ", type=" + type + ", timeLimit=" + timeLimit + ", teachers=" + teachers
-				+ ", markMode=" + markMode + "]";
+				+ finalMarkTeachersIds + ", type=" + type + ", timeLimit=" + timeLimit + ", scorediff=" + scorediff
+				+ ", teachers=" + teachers + ", markMode=" + markMode + "]";
 	}
 	
 }
