@@ -56,7 +56,7 @@ public interface MarkTaskMapper {
 	public MarkTaskBrife getMetaTaskInfo(@Param("qid") String queid);
 
 	@Select("select id as quesid, quesno, startno, endno, type as questionType, assign_mode as assignMode,"
-			+ "mark_mode as markMode, score as fullscore from ustudy.question where id = #{qid}")
+			+ "mark_mode as markMode, scorediff, score as fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 
 	@Select("select ustudy.paper.id as paperid, ustudy.paper.paper_img as img from ustudy.question "
@@ -149,7 +149,7 @@ public interface MarkTaskMapper {
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 
 	@Update("update ustudy.question set assign_mode=#{type}, mark_mode=#{markMode}, duration=#{timeLimit}, "
-			+ "teac_owner=#{ownerId} where id=#{questionId}")
+			+ "teac_owner=#{ownerId}, scorediff=#{scorediff} where id=#{questionId}")
 	public int updateQuestionMeta(MarkTask mt);
 
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "

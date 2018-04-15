@@ -154,7 +154,13 @@ public class PaperCache {
 		return true;
 	}
 
-	private boolean popFinalMarkIds(String quesid) {
+	private boolean popFinalMarkIds(String quesid, float scorediff) {
+		if (scorediff <= 0) {
+			logger.error("popFinalMarkIds(), failed to calculate final mark papers due to scorediff=" + scorediff + 
+					" for quesid=" + quesid);
+			return false;
+		}
+		
 		String cacheK = this.QUES_PAPER_PREFIX + quesid;
 		List<MarkTaskCache> mtcL = paperC.opsForValue().get(cacheK);
 		if (mtcL == null || mtcL.isEmpty()) {
@@ -183,7 +189,7 @@ public class PaperCache {
 			} else {
 				// make sure that related papers are marked
 				if ((mtcL.get(i).getScore() != -1 && mtcL.get(i + 1).getScore() != -1)
-						&& (Math.abs(mtcL.get(i).getScore() - mtcL.get(i + 1).getScore()) >= 5)) {
+						&& (Math.abs(mtcL.get(i).getScore() - mtcL.get(i + 1).getScore()) > scorediff)) {
 					// logger.debug("popFinalMarkIds(), mtcL[" + i +"] -> " + mtcL.get(i).toString()
 					// +
 					// ", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
@@ -319,7 +325,7 @@ public class PaperCache {
 			}
 
 			// for final mark, paper ids should be calculated from first round mark
-			if (isFinalMark && !popFinalMarkIds(pr.getQid())) {
+			if (isFinalMark && !popFinalMarkIds(pr.getQid(), pr.getScorediff())) {
 				logger.warn("getPapersForSingleQues(), papers for final mark is not ready");
 				return null;
 			}
