@@ -16,15 +16,15 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.score.ScoreRule;
 
-public class CalculateQuestionScoreTask implements Callable<String> {
+public class CalQuesScoreTask implements Callable<String> {
     
-    private static final Logger logger = LogManager.getLogger(CalculateQuestionScoreTask.class);
+    private static final Logger logger = LogManager.getLogger(CalQuesScoreTask.class);
     
     private Long egsId; 
     private ScoreRule sr;    
     private StudentObjectAnswerDao answerDaoImpl;
 
-	public CalculateQuestionScoreTask(Long egsId, ScoreRule sr, StudentObjectAnswerDao answerDaoImpl) {
+	public CalQuesScoreTask(Long egsId, ScoreRule sr, StudentObjectAnswerDao answerDaoImpl) {
 		super();
 		this.egsId = egsId;
 		this.sr = sr;
@@ -35,7 +35,7 @@ public class CalculateQuestionScoreTask implements Callable<String> {
 	@Transactional
     public String call() throws Exception {
         
-        logger.debug("CalculateQuestionScoreTask:call(), egsId: " + egsId + ",quesno=" + sr.getQuesno() + 
+        logger.debug("CalQuesScoreTask:call(), egsId: " + egsId + ",quesno=" + sr.getQuesno() + 
         		",answer=" + sr.getAnswer());
         
         if (egsId > 0 && sr.getQuesno() > 0 && null != sr.getAnswer()) {
