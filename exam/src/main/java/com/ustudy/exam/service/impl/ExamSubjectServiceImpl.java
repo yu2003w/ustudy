@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
@@ -83,7 +82,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId) {
-		logger.debug("getExamSubjects -> examId:" + examId);
+		logger.debug("getExamSubjects(), examId:" + examId);
 		List<ExamSubject> esL = egsDaoImpl.getAllExamSubjectByExamId(examId);
 		// set answerSet and taskDispatch based on calculation
 		populateExamSubStatus(esL);
@@ -91,7 +90,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId) {
-		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId);
+		logger.debug("getExamSubjects(), examId:" + examId + ",gradeId:" + gradeId);
 		
 		List<ExamSubject> esL = egsDaoImpl.getAllExamSubjectByExamIdAndGradeId(examId, gradeId);
 		// set answerSet and taskDispatch based on calculation
@@ -100,7 +99,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	public List<ExamSubject> getExamSubjects(Long examId, Long gradeId, Long subjectId) {
-		logger.debug("getExamSubjects -> examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
+		logger.debug("getExamSubjects(), examId:" + examId + ",gradeId:" + gradeId + ",subjectId:" + subjectId);
 		
 		List<ExamSubject> esL = egsDaoImpl.getExamSubjectByExamIdAndGradeIdAndSubjectId(examId, gradeId, subjectId);
 		// set answerSet and taskDispatch based on calculation
@@ -112,8 +111,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		logger.debug("getExamSubject -> id:" + id);
 		ExamSubject es = egsDaoImpl.getExamSubjectById(id);
 		// set status for exam subject
-		es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
-		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
+		es.setAnswerSet(this.isAnswerSet(es.getId()));
+		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		return es;
 	}
 
@@ -667,48 +666,52 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	 * Check whether all questions' answer are set at runtime rather than determine that via
 	 * fields in table of database. As settings are allowed to be changed before examination completed.
 	 */
-	@Override
-	public UResp isAnswerSet(Long id) {
-		
-		UResp res = new UResp();
+	private boolean isAnswerSet(Long id) {
 		// retrieve answer settings for egs firstly
 		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(id);
+		
+		if (quesAns == null || quesAns.isEmpty()) {
+			logger.warn("isAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
+					+ "for egs " + id);
+			return false;
+		}
+		
 		for (QuesAnswer qa: quesAns) {
 			if (!qa.isValid()) {
 				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
-				res.setMessage("answer setting for question is not completed->" + qa.toString());
-				return res;
+				return false;
 			}
 		}
-		res.setRet(true);
-		return res;
+		
+		return true;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.ustudy.exam.service.ExamSubjectService#isMarkTaskDispatched(java.lang.Long)
 	 * Check whether all questions' mark task are already dispatched
 	 */
-	@Override
-	public UResp isMarkTaskDispatched(Long id) {
-		UResp res = new UResp();
+	private boolean isMarkTaskDispatched(Long id) {
+		
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		if (mtL == null || mtL.isEmpty()) {
+			logger.warn("isMarkTaskDispatched(), no mark task records retrieved, maybe templates not uploaded.");
+			return false;
+		}
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
-				res.setMessage("mark task assignment is not completed for " + mt.getQuestionId());
-				return res;
+				return false;
 			}
 		}
 		
-		res.setRet(true);
-		return res;
+		return true;
 	}
 
 	private void populateExamSubStatus(List<ExamSubject> esL) {
 		logger.trace("populateExamSubStatus(), populate answer set and task dispatch status for examsubjects");
 		for (ExamSubject es: esL) {
-			es.setAnswerSet(this.isAnswerSet(es.getId()).isRet());
-			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()).isRet());
+			es.setAnswerSet(this.isAnswerSet(es.getId()));
+			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		}
 	}
 }

@@ -185,7 +185,8 @@ public class MarkTask implements Serializable {
 	 */
 	public boolean isValid() {
 		if (this.questionId == null || this.questionId.isEmpty() || 
-				(this.teachersIds == null || this.teachersIds.isEmpty())) {
+				(this.teachersIds == null || this.teachersIds.isEmpty()) ||
+				(this.markMode == null || this.markMode.isEmpty())) {
 			return false;
 		}
 		if (this.markMode.compareTo("双评") == 0 && (this.finalMarkTeachersIds == null ||
