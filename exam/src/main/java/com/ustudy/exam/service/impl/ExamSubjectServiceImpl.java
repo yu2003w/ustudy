@@ -694,7 +694,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
 		if (mtL == null || mtL.isEmpty()) {
-			logger.warn("isMarkTaskDispatched(), no mark task records retrieved, maybe templates not uploaded.");
+			logger.warn("isMarkTaskDispatched(), no mark task records retrieved, maybe templates not "
+					+ "uploaded for egs " + id);
 			return false;
 		}
 		for (MarkTask mt: mtL) {
