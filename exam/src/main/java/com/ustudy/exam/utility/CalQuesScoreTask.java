@@ -70,9 +70,9 @@ public class CalQuesScoreTask implements Callable<String> {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = ExamUtil.getStudentCorrectCount(studentAnswer.getAnswer(), answer);
+                            Integer correctCount = StudentObjectAnswer.getCorrectCount(studentAnswer.getAnswer(), answer);
                             if(correctCount > 0){
-                                if(correctCount == answer.split(",").length){
+                                if(correctCount == answer.length()){
                                     studentScore = score;
                                 }else if(multipleScoreSets.containsKey(correctCount)){
                                     studentScore = multipleScoreSets.get(correctCount);

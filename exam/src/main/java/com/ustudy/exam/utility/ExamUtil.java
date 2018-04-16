@@ -1,7 +1,5 @@
 package com.ustudy.exam.utility;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -75,7 +73,7 @@ public class ExamUtil {
 		rolemapping.put("cleaner", "清道夫");
 	}
 	
-	public static int getStudentCorrectCount(String stuAnswer, String correctAnswer){
+	/*public static int getStudentCorrectCount(String stuAnswer, String correctAnswer){
         
         int studentCorrectCount = 0;
         
@@ -108,6 +106,6 @@ public class ExamUtil {
         
         return studentCorrectCount;
         
-    }
+    }*/
 	
 }

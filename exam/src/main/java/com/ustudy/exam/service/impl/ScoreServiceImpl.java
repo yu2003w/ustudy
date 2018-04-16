@@ -43,7 +43,6 @@ import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
-import com.ustudy.exam.utility.ExamUtil;
 import com.ustudy.exam.utility.CalQuesScoreTask;
 
 @Service
@@ -116,8 +115,8 @@ public class ScoreServiceImpl implements ScoreService {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = ExamUtil.getStudentCorrectCount(studentAnswer.getAnswer(), answer);
-                            if(correctCount == answer.split(",").length){
+                            Integer correctCount = StudentObjectAnswer.getCorrectCount(studentAnswer.getAnswer(), answer);
+                            if(correctCount == answer.length()){
                                 studentScore = score;
                             }else if(null != multipleScoreSets.get(correctCount)){
                                 studentScore = multipleScoreSets.get(correctCount);
