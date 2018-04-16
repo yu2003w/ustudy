@@ -61,6 +61,19 @@ public class StudentObjectAnswer implements Serializable {
 		this.answerHas = answerHas;
 	}
 
+	/**
+     * @param stuans  answer selected by student
+     * @param refans  reference answer set
+     * @return
+     */
+    public static int getCorrectCount(String stuans, String refans) {
+    	if (stuans != null && stuans.length() > 0 && refans.contains(stuans)) {
+    		return stuans.length();
+    	}
+    	else
+    		return 0;
+    }
+    
 	@Override
 	public String toString() {
 		return "StudentObjectAnswer [id=" + id + ", paperid=" + paperid + ", quesno=" + quesno + ", score=" + score

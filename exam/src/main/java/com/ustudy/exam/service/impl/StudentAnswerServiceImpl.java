@@ -23,7 +23,6 @@ import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.StudentPaper;
 import com.ustudy.exam.service.StudentAnswerService;
-import com.ustudy.exam.utility.ExamUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -218,7 +217,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
                         QuesAnswer quesAnswer = quesAnswers.get(refAnswer.getQuesid());
                         answer.setScore(quesAnswer.getScore());
                     } else if (stuAnswer.length() > 0 && correctAnswer.length() >= stuAnswer.length()) {
-                        int studentCorrectCount = ExamUtil.getStudentCorrectCount(stuAnswer.toUpperCase(), correctAnswer.toUpperCase());
+                        int studentCorrectCount = StudentObjectAnswer.getCorrectCount(stuAnswer.toUpperCase(), correctAnswer.toUpperCase());
                         if (studentCorrectCount > 0) {
                             answer.setScore(multipleScoreSets.get(studentCorrectCount).getScore());
                         }
