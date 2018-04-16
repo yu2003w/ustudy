@@ -96,6 +96,7 @@ public class LoginController {
 							ses.getAttribute("uname").toString(), 
 							DashboardUtil.getAcctRoleMap().get(ses.getAttribute("role").toString())));
 					res.setRet(true);
+					logger.debug("login(), " + user.getLoginname() + " logged.");
 				}
 				else {
 					logger.error("login(), failed to retrieve user information for " + currentUser.getPrincipal().toString());
