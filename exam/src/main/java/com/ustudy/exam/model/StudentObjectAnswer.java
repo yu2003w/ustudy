@@ -67,7 +67,12 @@ public class StudentObjectAnswer implements Serializable {
      * @return
      */
     public static int getCorrectCount(String stuans, String refans) {
-    	if (stuans != null && stuans.length() > 0 && refans.contains(stuans)) {
+    	if (stuans != null && stuans.length() > 0) {
+    		for (int i = 0; i < stuans.length(); i++) {
+    			if (refans.indexOf(stuans.charAt(i)) == -1) {
+    				return 0;
+    			}
+    		}
     		return stuans.length();
     	}
     	else

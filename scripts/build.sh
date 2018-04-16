@@ -3,9 +3,9 @@
 
 #set -x
 
-if [ $# != 3 ]; then
+if [ $# != 4 ]; then
   echo "Please specify proper parameters"
-  echo "Usage: build.sh [src dir] [internal host ip] [tracelevel]"
+  echo "Usage: build.sh [src dir] [internal host ip] [tracelevel] [prod/dev]"
   exit 1
 fi
 
@@ -62,6 +62,14 @@ if [ -d ${SRC_DIR}/dockerfile/nginx/ ]; then
     sed -i "s/prodhost/${InternalIP}/g" nginx.conf
   fi
   
+  if [ "$4"x = "prod"x ]; then
+    sed -i "s/certname/cert\/214560108060077/g" Dockerfile
+    sed -i "s/certname/214560108060077/g" nginx.conf
+  elif [ "$4"x = "dev"x ]; then
+    sed -i "s/certname/cert\/214555228090077/g" Dockerfile
+    sed -i "s/certname/214555228090077/g" nginx.conf
+  fi 
+
   docker build --rm -t nginx-ustudy:1.12 .
   if [ $? = 0 ];then
     echo "build nginx image nginx-ustudy:1.12 successfully"
