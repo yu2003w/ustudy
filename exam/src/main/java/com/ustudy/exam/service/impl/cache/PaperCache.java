@@ -123,21 +123,29 @@ public class PaperCache {
 				String teacid = null;
 				if (dMark) {
 					teacid = firstTeaL.get(i % teaN);
-				}
-				// assign teacher to proper paper
-				if (ps[0] != null && (dMark && ps[0].getTeacid().compareTo(teacid) == 0)) {
-					logger.trace("cachePapers(), ps[0]" + ps[0].toString());
-					mtc.setStatus(2);
-					mtc.setTeacid(ps[0].getTeacid());
-					mtc.setScore(ps[0].getScore());
-					ps[0] = null;
-				} else if (ps[1] != null && (dMark && ps[1].getTeacid().compareTo(teacid) == 0)) {
-					logger.trace("cachePapers(), ps[1]" + ps[1].toString());
-					mtc.setStatus(2);
-					mtc.setTeacid(ps[1].getTeacid());
-					mtc.setScore(ps[1].getScore());
-					// need to clean once set
-					vIds.remove(mtc.getPaperid());
+					if (ps[0] != null && ps[0].getTeacid().compareTo(teacid) == 0) {
+						logger.trace("cachePapers(), double marked papers, ps[0]" + ps[0].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[0].getTeacid());
+						mtc.setScore(ps[0].getScore());
+						ps[0] = null;
+					} else if (ps[1] != null && ps[1].getTeacid().compareTo(teacid) == 0) {
+						logger.trace("cachePapers(), double marked papers, ps[1]" + ps[1].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[1].getTeacid());
+						mtc.setScore(ps[1].getScore());
+						// need to clean once set
+						vIds.remove(mtc.getPaperid());
+					}
+				} else {
+					if (ps[0] != null) {
+						logger.trace("cachePapers(), marked papers, " + ps[0].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[0].getTeacid());
+						mtc.setScore(ps[0].getScore());
+						ps[0] = null;
+						vIds.remove(mtc.getPaperid());
+					}
 				}
 			}
 			mtc.setSeq(i++);
@@ -369,14 +377,19 @@ public class PaperCache {
 		}
 
 		// Noted: here, maybe there is unmarked papers in cache, however, user request more papers
-		int batch = 0, wanted = amount - msc.getpList().size();
+		int batch = 0, wanted = 0; 
+		if (msc.getpList().size() > 0) {
+			wanted = amount - msc.getpList().size();
+		} else
+			wanted = amount - msc.getCompleted();
+		
 		if (wanted > MAX_THRES) {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
 		
 		logger.info("getPapersForSingleQues(), papers for " + teacid + " is as below:\nassigned=" + amount + 
-				" , completed=" + msc.getCompleted() + ", incache=" + msc.getpList().size() + ",batch=" + batch);
+				" , completed=" + msc.getCompleted() + ", incache=" + msc.getpList().size() + ", batch=" + batch);
 
 		// allocated tasks
 		int count = 0;
