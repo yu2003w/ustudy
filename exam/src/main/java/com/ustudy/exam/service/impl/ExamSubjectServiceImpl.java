@@ -678,7 +678,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		
 		for (QuesAnswer qa: quesAns) {
 			if (!qa.isValid()) {
-				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
+				logger.warn("isAnswerSet(), answer setting is not completed for question->" + qa.toString());
 				return false;
 			}
 		}
@@ -700,7 +700,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
-				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for "
+						+ "quesid=" + mt.getQuestionId());
 				return false;
 			}
 		}

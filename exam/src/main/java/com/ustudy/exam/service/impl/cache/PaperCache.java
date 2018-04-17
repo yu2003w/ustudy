@@ -368,14 +368,15 @@ public class PaperCache {
 			msc.setTotal(amount);
 		}
 
-		int batch = 0, wanted = amount - msc.getCompleted();
+		// Noted: here, maybe there is unmarked papers in cache, however, user request more papers
+		int batch = 0, wanted = amount - msc.getpList().size();
 		if (wanted > MAX_THRES) {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
 		
-		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
-				" , current batch is " + batch);
+		logger.info("getPapersForSingleQues(), papers for " + teacid + " is as below:\nassigned=" + amount + 
+				" , completed=" + msc.getCompleted() + ", incache=" + msc.getpList().size() + ",batch=" + batch);
 
 		// allocated tasks
 		int count = 0;
@@ -541,8 +542,9 @@ public class PaperCache {
 		Map<String, MarkTaskCache> task = msc.getCurAssign();
 		List<String> pList = msc.getpList();
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
-		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + "\nkeys->" + task.keySet().toString()
-						+ ", startSeq->" + seq + ", wanted->" + wanted + "\nPaperList->" + pList.toString());
+		logger.debug("getPapersFromTeaCache(), current assigned size ->" + task.size() + ",\nkeys->" + 
+				task.keySet().toString() + ", \nstartSeq->" + seq + ", wanted->" + wanted + 
+				"\nPaperList->" + pList.toString());
 		int i = 0;
 		if (wanted > MAX_THRES)
 			wanted = MAX_THRES;
@@ -571,7 +573,7 @@ public class PaperCache {
 				}
 			}
 
-			logger.info("getPapersFromTeaCache(), retrieved " + (i + 1) + 
+			logger.info("getPapersFromTeaCache(), retrieved " + i + 
 					" papers from the beginning of " + seq + " for quesid->" + quesid);
 		} else {
 			// maybe user refreshed browser, get unmarked papers from cache
