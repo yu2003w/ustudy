@@ -36,7 +36,7 @@
 	    question.branch, question.choice_num, question.score, 
 	    group_concat(question_step.quesno, "-", question_step.score) as steps from question 
 	    left join question_step on question.id = question_step.quesid 
-	    where exam_grade_sub_id = #{egsId} AND step=0 
+	    where exam_grade_sub_id = #{egsId}
 	    group by question.id order by quesno
 	</select>
 	

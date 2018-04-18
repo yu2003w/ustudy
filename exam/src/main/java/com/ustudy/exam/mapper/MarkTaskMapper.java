@@ -168,7 +168,7 @@ public interface MarkTaskMapper {
 	@Select("select question.id as questionId, question.mark_mode as markMode, "
 			+ "group_concat(marktask.marktype, '-', marktask.teacid) as teachers "
 			+ "from question left join marktask on marktask.quesid = question.id "
-			+ "where question.exam_grade_sub_id = 1 and question.type not in ('单选题', '多选题', '判断题') "
+			+ "where question.exam_grade_sub_id = #{egs} and question.type not in ('单选题', '多选题', '判断题') "
 			+ "group by question.id")
 	public List<MarkTask> getMarkTasksByEgs(@Param("egs") Long egs);
 	

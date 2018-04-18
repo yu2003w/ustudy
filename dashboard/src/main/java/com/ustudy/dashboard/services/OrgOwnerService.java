@@ -6,17 +6,17 @@ import com.ustudy.dashboard.model.OrgOwner;
 
 public interface OrgOwnerService {
 
-	public List<OrgOwner> getList(int id);
+	public List<OrgOwner> getOwnerList(long id);
 	
-	public OrgOwner displayItem(int id);
+	public OrgOwner getOwner(long id);
 	
-	public int createItem(OrgOwner item);
+	public long createItem(OrgOwner item);
 	
-	public int updateItem(OrgOwner item, int id);
+	public int updateOwner(OrgOwner item, long id);
 	
 	// Input parameter "ids" is JSON string
 	public int delItemSet(String ids);
 	
-	public int deleteItem(int id);
+	public int deleteItem(long id);
 	
 }

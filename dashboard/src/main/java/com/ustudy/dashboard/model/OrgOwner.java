@@ -14,7 +14,7 @@ public class OrgOwner implements Serializable {
 	 */
 	private static final long serialVersionUID = 6779993496312183819L;
 
-	private String id = null;
+	private long id = 0;
 	
 	@JsonProperty("userName")
 	private String name = null;
@@ -42,7 +42,7 @@ public class OrgOwner implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public OrgOwner(String id, String name, String loginname, String passwd, String orgType, String orgId, String role,
+	public OrgOwner(long id, String name, String loginname, String passwd, String orgType, String orgId, String role,
 			String createTime) {
 		super();
 		this.id = id;
@@ -56,7 +56,7 @@ public class OrgOwner implements Serializable {
 	}
 
 	// construct without the field of password
-	public OrgOwner(String id, String name, String loginname, String orgType, String orgId, String role,
+	public OrgOwner(long id, String name, String loginname, String orgType, String orgId, String role,
 			String createTime) {
 		super();
 		this.id = id;
@@ -68,11 +68,11 @@ public class OrgOwner implements Serializable {
 		this.createTime = createTime;
 	}
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 	
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

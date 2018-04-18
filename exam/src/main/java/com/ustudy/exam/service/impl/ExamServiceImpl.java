@@ -610,9 +610,14 @@ public class ExamServiceImpl implements ExamService {
 
 	private boolean isMarkTaskDispatched(Long id) {
 		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		if (mtL == null || mtL.isEmpty()) {
+			logger.warn("isMarkTaskDispatched(), no mark task records retrieved for egs->" + id);
+			return false;
+		}
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
-				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for " + mt.getQuestionId());
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed "
+						+ "for quesid=" + mt.getQuestionId());
 				return false;
 			}
 		}
@@ -623,9 +628,15 @@ public class ExamServiceImpl implements ExamService {
 		
 		// retrieve answer settings for egs firstly
 		List<QuesAnswer> quesAns = questionDaoImpl.getQuesAnswerForValidation(id);
+		if (quesAns == null || quesAns.isEmpty()) {
+			logger.warn("isAnswerSet(), no records retrieved for answer set, maybe templates not "
+					+ "uploaded for egs " + id);
+			return false;
+		}
+		
 		for (QuesAnswer qa: quesAns) {
 			if (!qa.isValid()) {
-				logger.warn("isAnswerSet(), answer setting for question is not completed->" + qa.toString());
+				logger.warn("isAnswerSet(), answer setting is not completed for question " + qa.toString());
 				return false;
 			}
 		}

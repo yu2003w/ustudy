@@ -2,7 +2,6 @@ package com.ustudy.exam.service;
 
 import java.util.List;
 
-import com.ustudy.UResp;
 import com.ustudy.exam.model.ExamSubject;
 
 public interface ExamSubjectService {
@@ -34,25 +33,5 @@ public interface ExamSubjectService {
 	boolean saveBlankQuestionsPaper(Long id, String fileName);
 	
 	boolean getMarkSwitchById(Long id);
-
-	/**
-	 * 
-	 * check related records to find out whether answer is set or not
-	 * Not a good design to determine that depends on field in table of database
-	 * 
-	 * @param id
-	 * @return
-	 */
-	UResp isAnswerSet(Long id);
-	
-	/**
-	 * check related records to find out whether mark task is dispatched or not
-	 * Not a good design to determine that depends on field in table of database as 
-	 * settings could be changed at runtime.
-	 * 
-	 * @param id
-	 * @return
-	 */
-	UResp isMarkTaskDispatched(Long id);
 	
 }

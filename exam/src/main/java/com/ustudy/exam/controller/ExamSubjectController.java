@@ -45,7 +45,7 @@ public class ExamSubjectController {
 			@RequestParam(required=false) String end, 
 			@RequestParam(required=false) String examName) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), ");
 		
 		Map result = new HashMap<>();
 

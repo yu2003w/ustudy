@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.UResp;
 import com.ustudy.exam.service.AnswerService;
 
@@ -26,9 +25,6 @@ public class SetAnswersController {
 
 	@Autowired
 	private AnswerService ansSer;
-	
-	@Autowired
-	private ExamSubjectService exSubSer;
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
 	public UResp getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, 
@@ -59,7 +55,7 @@ public class SetAnswersController {
 
 		try {
 			JSONObject data = JSONObject.fromObject(paras);
-			if (ansSer.saveQuesAnswers(egsId, data) && exSubSer.isAnswerSet(egsId).isRet()) {
+			if (ansSer.saveQuesAnswers(egsId, data)) {
 				res.setRet(true);
 			}
 			

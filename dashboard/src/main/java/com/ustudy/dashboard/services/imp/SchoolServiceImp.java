@@ -58,9 +58,9 @@ public class SchoolServiceImp implements SchoolService {
 	 */
 	@Transactional
 	@Override
-	public int createSchool(School data) {
+	public long createSchool(School data) {
 
-		int ret = schM.createSchool(data);
+		long ret = schM.createSchool(data);
 		if (ret < 0 || ret > 2) {
 			logger.error("createSchool(), create school failed with ret " + ret);
 			throw new RuntimeException("createSchool(), failed with ret " + ret);
@@ -75,7 +75,7 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	
-	private int createCleaner(String orgType, String orgId) {
+	private long createCleaner(String orgType, String orgId) {
 		// usually school id is composed of 10 digits number
 		String tname = orgId;
 		String msg = null;
@@ -128,14 +128,12 @@ public class SchoolServiceImp implements SchoolService {
 		}
 		
 		logger.debug("createCleaner(), created ret->" + ret + ", generated id->" + item.getId());
-
-		// populate role as "cleaner"
-		ret = ooM.getRoleId("cleaner");
+	
+		ret = ooM.saveRoles("cleaner", item.getTeacId());
 		if (ret <= 0) {
-			logger.error("createCleaner(), invalid role id->" + ret);
-			throw new RuntimeException("createCleaner(), invalid role id->" + ret);
+			logger.error("createCleaner(), failed to populate roles for cleaner->" + ret);
+			throw new RuntimeException("failed to populate roles for cleaner");
 		}
-		ret = ooM.saveRoles(ret, item.getTeacId());
 
 		logger.debug("createCleaner(), role populated for " + item.getTeacId());
 	
