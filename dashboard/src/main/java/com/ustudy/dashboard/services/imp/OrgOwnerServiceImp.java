@@ -64,11 +64,11 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 
 	@Transactional
 	@Override
-	public int updateOwner(OrgOwner item, long id) {
+	public int updateOwner(OrgOwner item) {
 		// firstly retrieve teacher related information for the item to be updated
 		Teacher tea = ooM.getTeaByLoginName(item.getLoginname());
 		
-		int ret = ooM.createOrgOwner(item);
+		int ret = ooM.updateOrgOwner(item);
 		if (ret < 0 || ret > 2) {
 			logger.error("updateOwner(), failed with ret " + ret + " for " + item.getId());
 			throw new RuntimeException("failed update item " + item.getId());
@@ -90,10 +90,10 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 		String idL = null;
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
-				idL = "'" + idsList.get(0) + "'";
+				idL = idsList.get(0);
 			}
 			else
-				idL += ",'" + idsList.get(i) + "'";
+				idL += "," + idsList.get(i);
 		}
 		logger.debug("delItemSet(), ids->" + idL);
 		

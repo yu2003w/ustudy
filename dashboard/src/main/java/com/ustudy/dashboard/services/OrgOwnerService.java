@@ -12,7 +12,7 @@ public interface OrgOwnerService {
 	
 	public long createItem(OrgOwner item);
 	
-	public int updateOwner(OrgOwner item, long id);
+	public int updateOwner(OrgOwner item);
 	
 	// Input parameter "ids" is JSON string
 	public int delItemSet(String ids);

@@ -25,14 +25,21 @@ public interface OrgOwnerMapper {
 	public int cleanRoleValues(String teacid);
 	
 	@Insert("insert into ustudy.orgowner (name, loginname, passwd, orgtype, orgid, role, ctime) "
-			+ "values (#{name}, #{loginname}, #{passwd}, #{orgType}, #{orgId}, #{role}, #{createTime)) "
+			+ "values (#{name}, #{loginname}, #{passwd}, #{orgType}, #{orgId}, #{role}, #{createTime}) "
 			+ "on duplicate key update name = #{name}, loginname = #{loginname}, passwd = #{passwd}, "
 			+ "orgtype = #{orgType}, orgid = #{orgId}, role = #{role}")
 	@Options(useGeneratedKeys = true)
 	public int createOrgOwner(OrgOwner owner);
 	
+	@Insert("insert into ustudy.orgowner (id, name, loginname, passwd, orgtype, orgid, role, ctime) "
+			+ "values (#{id}, #{name}, #{loginname}, #{passwd}, #{orgType}, #{orgId}, #{role}, #{createTime}) "
+			+ "on duplicate key update name = #{name}, loginname = #{loginname}, passwd = #{passwd}, "
+			+ "orgtype = #{orgType}, orgid = #{orgId}, role = #{role}")
+	@Options(useGeneratedKeys = true)
+	public int updateOrgOwner(OrgOwner owner);
+	
 	@Select("select id, name, loginname, passwd, orgtype as orgType, orgId as orgId, role, "
-			+ "ctime as createTime from ustudy.orgowner where id > #{id} and limit 10000")
+			+ "ctime as createTime from ustudy.orgowner where id > #{id} limit 10000")
 	public List<OrgOwner> getOwnerList(long id);
 	
 	@Select("select id, name, loginname, passwd, orgtype as orgType, orgId as orgId, role, "
@@ -44,10 +51,10 @@ public interface OrgOwnerMapper {
 	public int deleteOwner(long id);
 	
 	@Delete("delete orgowner, teacher from orgowner left join teacher on "
-			+ "teacher.teacid = orgowner.loginname where orgowner.id in (#{id})")
+			+ "teacher.teacid = orgowner.loginname where FIND_IN_SET (orgowner.id, #{ids})")
 	public int deleteOwnerList(String ids);
 	
-	@Insert("insert into ustudy.teacher (teacid, teacname, passwd, orgtype, orgid, ctime, lltime) "
+	@Insert("insert into ustudy.teacher (teacid, teacname, passwd, orgtype, orgid, ctime, ll_time) "
 			+ "values (#{teacId}, #{teacName}, #{passwd}, #{orgType}, #{orgId}, #{createTime}, #{llTime})")
 	public int createTeacher(Teacher tea);
 	
@@ -55,8 +62,8 @@ public interface OrgOwnerMapper {
 			+ "#{teacId}, #{teacName}, #{passwd}, #{orgType}, #{orgId})")
 	public int updateTeacher(Teacher tea);
 	
-	@Select("select id, teacid, teacname, passwd, orgtype, orgid, ctime, lltime from ustudy.teacher "
-			+ "where teacid =  #{login} ")
+	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype as orgType, orgid as orgId, "
+			+ "ctime as createTime, ll_time as llTime from ustudy.teacher where teacid =  #{login}")
 	public Teacher getTeaByLoginName(String login);
 	
 }

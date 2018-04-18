@@ -71,17 +71,9 @@ public class OrgOwner implements Serializable {
 	public long getId() {
 		return id;
 	}
-	
+
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getLoginname() {
-		return loginname;
-	}
-
-	public void setLoginname(String loginname) {
-		this.loginname = loginname;
 	}
 
 	public String getName() {
@@ -90,6 +82,14 @@ public class OrgOwner implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getLoginname() {
+		return loginname;
+	}
+
+	public void setLoginname(String loginname) {
+		this.loginname = loginname;
 	}
 
 	public String getPasswd() {
@@ -115,7 +115,7 @@ public class OrgOwner implements Serializable {
 	public void setOrgId(String orgId) {
 		this.orgId = orgId;
 	}
-	
+
 	public String getRole() {
 		return role;
 	}
