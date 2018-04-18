@@ -71,7 +71,7 @@ public class SchoolController {
 		logger.debug(item.toString());
 		String result = null;
 		try {
-		    int index = ss.createSchool(item);
+		    long index = ss.createSchool(item);
 		    logger.debug("createSchool(), school created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 

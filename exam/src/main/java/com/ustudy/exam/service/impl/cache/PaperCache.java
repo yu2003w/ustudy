@@ -378,7 +378,7 @@ public class PaperCache {
 
 		// Noted: here, maybe there is unmarked papers in cache, however, user request more papers
 		int batch = 0, wanted = 0; 
-		if (msc.getpList().size() > 0) {
+		if (msc.getpList().size() > msc.getCompleted()) {
 			wanted = amount - msc.getpList().size();
 		} else
 			wanted = amount - msc.getCompleted();

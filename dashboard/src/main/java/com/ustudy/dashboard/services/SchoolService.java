@@ -23,7 +23,7 @@ public interface SchoolService {
 	 * @param data --- to be stored into database
 	 * @return  --- index in the datababse
 	 */
-	public int createSchool(School data);
+	public long createSchool(School data);
 	
 	public void deleteSchool(int id);
 	

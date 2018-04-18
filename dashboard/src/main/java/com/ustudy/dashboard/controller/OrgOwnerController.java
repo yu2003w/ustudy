@@ -29,35 +29,42 @@ public class OrgOwnerController {
 	private OrgOwnerService ooS;
 	
 	@RequestMapping(value = "/list/{id}", method = RequestMethod.GET)
-	public List<OrgOwner> getList(@PathVariable int id, HttpServletResponse resp) {
-		logger.debug("endpoint /owner/list/" + id + " is visited");
+	public List<OrgOwner> getOwnerList(@PathVariable int id, HttpServletResponse resp) {
+		
+		logger.debug("getOwnerList(), endpoint /owner/list/" + id + " is visited");
 		List<OrgOwner> res = null;
 		try {
-			res = ooS.getList(id);
+			res = ooS.getOwnerList(id);
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error("getOwnerList(),", e.getMessage());
 			String msg = "Failed to retrieve item list from " + id;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("Failed to set error status in response");
+				logger.error("getOwnerList(), failed to set error status in response");
 			}
 		}
 		return res;
 	}
 	
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
-	public OrgOwner displayItem(@PathVariable int id, HttpServletResponse resp) {
+	public OrgOwner displayItem(@PathVariable @Valid long id, HttpServletResponse resp) {
+		
 		logger.debug("endpoint /owner/view/" + id + " is visited.");
 		OrgOwner item = null;
 		String msg = null;
+		if (id <= 0) {
+			logger.error("displayItem(), invalid id");
+			return item;
+		}
+		
 		try {
-			item = ooS.displayItem(id);
+			item = ooS.getOwner(id);
 		} catch (IncorrectResultSizeDataAccessException ie) {
-			logger.warn("displayItem(), " + ie.getLocalizedMessage());
+			logger.error("displayItem(), " + ie.getLocalizedMessage());
 			msg = "No item found for specified id " + id;
 		} catch (Exception e) {
-			logger.warn("displayItem(), " + e.getMessage());
+			logger.error("displayItem(), " + e.getMessage());
 			msg = "Failed to retrieve item " + id;
 		}
 		
@@ -71,9 +78,13 @@ public class OrgOwnerController {
 	}
 	
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-	public String delete(@PathVariable int id, HttpServletResponse resp) {
-		logger.debug("endpoint /owner/delete/" + id + " is visited.");
-		String result = null;
+	public String deleteItem(@PathVariable @Valid long id, HttpServletResponse resp) {
+		logger.debug("deleteItem(), endpoint /owner/delete/" + id + " is visited.");
+		String result = "delete item failed";
+		if (id <= 0) {
+			logger.error("deleteItem(), invalid id");
+			return result;
+		}
 		try {
 			int numOfRows = ooS.deleteItem(id);
 			if (numOfRows != 1)
@@ -81,7 +92,7 @@ public class OrgOwnerController {
 			else
 				result = "item deleted";
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error("deleteItem()," + e.getMessage());
 			result = "delete item failed";
 			resp.setStatus(500);
 		}
@@ -110,6 +121,7 @@ public class OrgOwnerController {
 			result = "delete items failed";
 			logger.warn("delSet()," + result + " --> " + e.getMessage());
 			resp.setStatus(500);
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -121,7 +133,7 @@ public class OrgOwnerController {
 		String result = null;
 		try {
 			// Before create item, need to check whether corresponding orgId is valid.
-		    int index = ooS.createItem(item);
+		    long index = ooS.createItem(item);
 		    logger.debug("createItem(), item created successfully with id " + index);
 		    //set header location
 		    resp.setHeader("Location", 
@@ -142,17 +154,11 @@ public class OrgOwnerController {
 		String result = null;
 		try {
 			// TODO: if orgid is changed, whether or not need to validate it.
-			int numOfRows = ooS.updateItem(data, Integer.parseInt(data.getId()));
-			if (numOfRows == 1)
-				logger.debug("updateItem(), update item successfully");
-			else {
-				String msg = numOfRows + " items are updated, maybe something goes wrong";
-				logger.warn(msg);
-				throw new RuntimeException(msg);
-			}
+			ooS.updateOwner(data, data.getId());
+			
 			result = "update item successfully";
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			logger.error(e.getMessage());
 			result = "update item failed";
 			resp.setStatus(500);
 		}
