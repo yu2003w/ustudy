@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.ustudy.dashboard.model.OrgOwner;
 import com.ustudy.dashboard.model.Teacher;
@@ -58,13 +59,13 @@ public interface OrgOwnerMapper {
 			+ "values (#{teacId}, #{teacName}, #{passwd}, #{orgType}, #{orgId}, #{createTime}, #{llTime})")
 	public int createTeacher(Teacher tea);
 	
-	@Insert("insert into ustudy.teacher (id, teacid, teacname, passwd, orgtype, orgid) values (#{id}, "
-			+ "#{teacId}, #{teacName}, #{passwd}, #{orgType}, #{orgId})")
+	@Update("update ustudy.teacher set teacid = #{teacId}, teacname = #{teacName}, passwd = #{passwd}, "
+			+ "orgtype = #{orgType}, orgid = #{orgId} where id = #{id}")
 	public int updateTeacher(Teacher tea);
 	
-	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype as orgType, orgid as orgId, "
-			+ "ctime as createTime, ll_time as llTime from ustudy.teacher left join orgowner on "
-			+ "orgowner.loginname = teacher.teacid where orgowner.id = #{id}")
+	@Select("select teacher.id, teacid as teacId, teacname as teacName, teacher.passwd, teacher.orgtype as orgType, "
+			+ "teacher.orgid as orgId, teacher.ctime as createTime, teacher.ll_time as llTime from ustudy.teacher "
+			+ "left join orgowner on orgowner.loginname = teacher.teacid where orgowner.id = #{id}")
 	public Teacher getTeaByOwnerId(long id);
 	
 }
