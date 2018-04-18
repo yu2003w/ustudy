@@ -63,7 +63,8 @@ public interface OrgOwnerMapper {
 	public int updateTeacher(Teacher tea);
 	
 	@Select("select id, teacid as teacId, teacname as teacName, passwd, orgtype as orgType, orgid as orgId, "
-			+ "ctime as createTime, ll_time as llTime from ustudy.teacher where teacid =  #{login}")
-	public Teacher getTeaByLoginName(String login);
+			+ "ctime as createTime, ll_time as llTime from ustudy.teacher left join orgowner on "
+			+ "orgowner.loginname = teacher.teacid where orgowner.id = #{id}")
+	public Teacher getTeaByOwnerId(long id);
 	
 }

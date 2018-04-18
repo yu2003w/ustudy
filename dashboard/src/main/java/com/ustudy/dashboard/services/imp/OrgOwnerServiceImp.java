@@ -66,14 +66,14 @@ public class OrgOwnerServiceImp implements OrgOwnerService {
 	@Override
 	public int updateOwner(OrgOwner item) {
 		// firstly retrieve teacher related information for the item to be updated
-		Teacher tea = ooM.getTeaByLoginName(item.getLoginname());
-		
+		Teacher tea = ooM.getTeaByOwnerId(item.getId());
+		logger.debug("updateOwner(), corresponding teacher info->" + tea.toString());
 		int ret = ooM.updateOrgOwner(item);
 		if (ret < 0 || ret > 2) {
 			logger.error("updateOwner(), failed with ret " + ret + " for " + item.getId());
 			throw new RuntimeException("failed update item " + item.getId());
 		}
-		long teaid = tea == null ? 0: tea.getId();
+		long teaid = (tea == null ? 0: tea.getId());
 		populateTeacher(item, teaid);
 		
 		logger.debug("updateOwner(), update orgowner " + item.getLoginname() + " with ret " + ret);
