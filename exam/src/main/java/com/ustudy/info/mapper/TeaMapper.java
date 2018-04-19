@@ -34,9 +34,9 @@ public interface TeaMapper {
 			+ "ll_time as llTime from ustudy.teacher where id=#{id}")
 	public Teacher findTeaById(int id);
 	
-	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, ll_time as llTime "
-			+ "from ustudy.teacher where orgid=#{oid} and orgtype=#{otype} and id > #{id} and teacid NOT LIKE "
-			+ "'admin%' order by ctime desc limit 1000")
+	@Select("select id, teacid as teacId, teacname as teacName, orgtype, orgid, ctime as cTime, "
+			+ "ll_time as llTime from ustudy.teacher where orgid = #{oid} and orgtype=#{otype} and "
+			+ "id > #{id} and teacid != #{oid} order by ctime desc limit 1000")
 	public List<Teacher> getTeaList(@Param("id") int id, @Param("otype") String orgType, @Param("oid") String orgId);
 	
 	@Insert("insert into ustudy.teachersub(sub_id, teac_id) values(#{sid}, #{tid})")

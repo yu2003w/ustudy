@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Iterator;
-
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
@@ -454,6 +452,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				rank++;
 			}
 			// save subscores, insert on duplicate key udpate
+			logger.debug("SummaryEgsScore(), subscore before save:" + scores.toString());
 			int ret = scoreDaoImpl.saveSubscores(scores);
 			logger.debug("SummaryEgsScore(), number of items saved for sub score is " + ret);
 			// populate sub child scores
