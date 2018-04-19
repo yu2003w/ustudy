@@ -35,7 +35,6 @@ public class MarkTask implements Serializable {
 	@JsonIgnore
 	private String teachers = null;
 	
-	@JsonIgnore
 	private String markMode = null;
 	
 	public MarkTask() {
