@@ -114,7 +114,7 @@
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join question on question.id = answer.quesid 
 		where egs.id = #{egsId} and paper.exam_code = #{exameeNO} 
-		group by question.quesno order by question.quesno
+		group by question.id order by question.quesno
 	</select>
 	
 </mapper>
