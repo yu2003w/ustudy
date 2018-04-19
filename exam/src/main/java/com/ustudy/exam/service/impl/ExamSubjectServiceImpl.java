@@ -259,11 +259,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			try {
 				if (OSSUtil.getClient() == null) {
 					// need to initialize OSSMetaInfo
-					logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
+					logger.info("uploadMarkImgs(), initialize OSSClient before use");
 					synchronized(OSSMetaInfo.class) {
 						if (OSSUtil.getClient() == null) {
 							OSSMetaInfo omi = cgM.getOSSInfo("oss");
-							logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
+							logger.debug("uploadMarkImgs(), OSS Client init with->" + omi.toString());
 							OSSUtil.initOSS(omi);
 						}
 					}
@@ -298,6 +298,17 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		List<MarkImage> markImgs = new ArrayList<>();
 
 		try {
+			if (OSSUtil.getClient() == null) {
+				// need to initialize OSSMetaInfo
+				logger.info("mergePaperImg(), initialize OSSClient before use");
+				synchronized(OSSMetaInfo.class) {
+					if (OSSUtil.getClient() == null) {
+						OSSMetaInfo omi = cgM.getOSSInfo("oss");
+						logger.debug("mergePaperImg(), OSS Client init with->" + omi.toString());
+						OSSUtil.initOSS(omi);
+					}
+				}
+			}
 			for(MarkImage mi : mis) {
 				curPaperImg = mi.getPaperImg();
 				curPaperId = mi.getPaperId();
@@ -315,7 +326,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						} else {
 							String targetName = "AM_" + prePaperImg;
 							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
-							egsDaoImpl.updateMarkImg(mi.getPaperId(), preMarkImg + targetName);
+							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
 							markImgs.clear();
 							markImgs.add(mi);
 							prePaperImg = curPaperImg;
@@ -340,7 +351,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				String targetName = "AM_" + prePaperImg;
 				OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
 				if (!preMarkImg.isEmpty()) {
-					if (preMarkImg.contains(prePaperImg)) {
+					if (preMarkImg.contains(targetName)) {
 						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
 					} else {
 						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);						
