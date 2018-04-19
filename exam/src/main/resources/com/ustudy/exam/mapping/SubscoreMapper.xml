@@ -107,7 +107,9 @@
 	</select>
 	
 	<select id="getSubQuesScore" resultMap="SubjectQuesScore" resultType="java.util.List">
-		select question.quesno, group_concat(answer.score, '-', answer.isfinal) as aggrscore from answer 
+		select (select if(strcmp(question.quesno, '0'), question.quesno, 
+		concat(question.startno, '-', question.endno))) as quesno, 
+		group_concat(answer.score, '-', answer.isfinal) as aggrscore from answer   
 		join paper on paper.id = answer.paperid 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join question on question.id = answer.quesid 
