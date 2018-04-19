@@ -286,42 +286,71 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		// return dblMarkImgs;
 	}
 
-	private boolean mergePaperImg(List<MarkImage> mis) {
-		
-		Iterator<MarkImage> it = mis.iterator();
+
+	private boolean mergePaperImg(List<MarkImage> mis) {		
 		String prePaperImg = "";
+		Long prePaperId = 0L;
+		String preMarkImg = "";
+
 		String curPaperImg = "";
+		Long curPaperId = 0L;
+
 		List<MarkImage> markImgs = new ArrayList<>();
 
-		MarkImage mi = null;
-
-		try{
-			while(it.hasNext()) {
-				mi = (MarkImage)it.next();
+		try {
+			for(MarkImage mi : mis) {
 				curPaperImg = mi.getPaperImg();
+				curPaperId = mi.getPaperId();
 				if (!curPaperImg.equals(prePaperImg)) {
 					if(!prePaperImg.isEmpty()) {
-						String targetName = "AM_" + prePaperImg;
-						OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
-						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
-						markImgs.clear();
-						markImgs.add(mi);
+						if (prePaperId.equals(curPaperId)) {
+							String targetName = "AM_" + prePaperImg;
+							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+							markImgs.clear();
+							markImgs.add(mi);
+							prePaperImg = curPaperImg;
+							prePaperId = curPaperId;
+							preMarkImg += targetName + ",";
+							continue;
+						} else {
+							String targetName = "AM_" + prePaperImg;
+							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+							egsDaoImpl.updateMarkImg(mi.getPaperId(), preMarkImg + targetName);
+							markImgs.clear();
+							markImgs.add(mi);
+							prePaperImg = curPaperImg;
+							prePaperId = curPaperId;
+							preMarkImg = "";
+							continue;
+						}
 					} else {
-						markImgs.add(mi);					
+						markImgs.add(mi);
+						prePaperImg = curPaperImg;
+						prePaperId = curPaperId;
+						continue;
 					}
 				} else {
 					markImgs.add(mi);
+					prePaperImg = curPaperImg;
+					prePaperId = curPaperId;
+					continue;
 				}
-				prePaperImg = curPaperImg;
 			}
-
-			String targetName = "AM_" + prePaperImg;
-			OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
-			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
-			markImgs.clear();
-
+			if (markImgs.size() > 0) {
+				String targetName = "AM_" + prePaperImg;
+				OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+				if (!preMarkImg.isEmpty()) {
+					if (preMarkImg.contains(prePaperImg)) {
+						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
+					} else {
+						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);						
+					}
+				} else {
+					egsDaoImpl.updateMarkImg(prePaperId, targetName);
+				}
+			}
 		} catch (Exception e) {
-			logger.error("mergePaperImg(), failed to upload image to oss -> " + e.getMessage());
+			logger.error("mergePaperImg(), failed to merge images -> " + e.getMessage());
 			return false;
 		}
 		return true;
