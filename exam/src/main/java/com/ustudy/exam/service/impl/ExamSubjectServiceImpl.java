@@ -319,7 +319,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							markImgs.add(mi);
 							prePaperImg = curPaperImg;
 							prePaperId = curPaperId;
-							preMarkImg += targetName + ",";
+							preMarkImg += targetName + ";";
 							continue;
 						} else {
 							String targetName = "AM_" + prePaperImg;
