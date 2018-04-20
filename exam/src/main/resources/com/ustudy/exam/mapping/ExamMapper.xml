@@ -153,7 +153,7 @@
 		LEFT JOIN grade g ON egs.grade_id=g.id
 		LEFT JOIN subject s ON egs.sub_id=s.id
 		LEFT JOIN examschool es ON e.id=es.examid
-		where e.id=#{orgId,jdbcType=VARCHAR} AND egs.examid in(SELECT examid from examgradesub GROUP BY examid HAVING COUNT(examid)=SUM(status)/3)
+		where es.schid=#{orgId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
