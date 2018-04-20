@@ -32,7 +32,7 @@
 		school.schname as schName, class.cls_name as className, escore.score, escore.rank, 
         group_concat(subject.name, "-", subscore.score, "-", subscore.rank, ";", 
         coalesce((select group_concat(subject.name, "-", scs.score, "-", scs.rank separator ':') from subchildscore as scs 
-        join subject on subject.id = scs.sub_id where scs.parent_id = subscore.id order by scs.sub_id), 'NULL')) 
+        join subject on subject.id = scs.sub_id where scs.parent_id = subscore.id order by scs.sub_id), 'NULL') ORDER BY subject.name) 
         as aggrscore from examinee as ee 
         left join exameescore as escore on (ee.id = escore.examee_id and ee.examid = escore.exam_id) 
         left join school on school.schid = ee.schid 
