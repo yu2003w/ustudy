@@ -157,12 +157,13 @@
 	</select>
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT p.exam_code examCode,p.paper_img paperImg,IFNULL(cl.id,'') classId,IFNULL(cl.cls_name,'') clsName,
+		SELECT p.exam_code examCode,p.paper_img paperImg, ss.mark_img paperMarkImg, IFNULL(cl.id,'') classId, IFNULL(cl.cls_name,'') clsName,
 		p.exam_grade_sub_id egsId,q.id quesId from paper p
 		LEFT JOIN question q ON p.exam_grade_sub_id=q.exam_grade_sub_id
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		LEFT JOIN class cl ON ee.class_id=cl.id
 		LEFT JOIN examgradesub egs ON egs.examid=ee.examid
+		LEFT JOIN subscore ss ON p.exam_grade_sub_id = ss.exam_grade_sub_id AND ee.id = ss.stuid
 		where egs.id=p.exam_grade_sub_id AND p.exam_grade_sub_id=#{egsId} AND q.id=#{quesId}
 	</select>
 	
