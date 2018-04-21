@@ -17,7 +17,7 @@ public interface AnalysisMapper {
 			+ "(select id, examName, schname, "
 			+ "group_concat(grade_name, '-', classes_num, ':', subs separator '#') as grs from"
 			+ "(select exam.id, exam.exam_name as examName, school.schid, school.schname, grade.grade_name, "
-			+ "grade.classes_num, group_concat(egs.id, '-', subject.name separator '$') as subs from exam "
+			+ "grade.classes_num, group_concat(egs.id, '-', subject.name separator '@') as subs from exam "
 			+ "left join examgradesub as egs on egs.examid = exam.id "
 			+ "left join grade on grade.id = egs.grade_id "
 			+ "left join subject on egs.sub_id = subject.id "

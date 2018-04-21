@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ExamSchoolAnaly implements Serializable {
 
 	/**
@@ -16,6 +19,9 @@ public class ExamSchoolAnaly implements Serializable {
 	class GradeSub {
 		
 		private String gradeName = null;
+		
+		private int clsNum = 0;
+		
 		// egsid -> subject name pairs
 		private Map<Long, String> subs = null;
 		
@@ -23,9 +29,13 @@ public class ExamSchoolAnaly implements Serializable {
 			super();
 		}
 		
-		public GradeSub(String gradeName, String ssL) {
+		public GradeSub(String gn, String ssL) {
 			super();
-			this.gradeName = gradeName;
+			String [] paras = gn.split("-");
+			if (paras != null && paras.length == 2) {
+				this.gradeName = paras[0];
+				this.clsNum = Integer.valueOf(paras[1]);
+			}
 			assembleSub(ssL);
 		}
 
@@ -33,6 +43,14 @@ public class ExamSchoolAnaly implements Serializable {
 			return gradeName;
 		}
 		
+		public int getClsNum() {
+			return clsNum;
+		}
+
+		public void setClsNum(int clsNum) {
+			this.clsNum = clsNum;
+		}
+
 		public void setGradeName(String gradeName) {
 			this.gradeName = gradeName;
 		}
@@ -52,7 +70,7 @@ public class ExamSchoolAnaly implements Serializable {
 		 */
 		private void assembleSub(String ssl) {
 			if (ssl != null && !ssl.isEmpty()) {
-				String []datas = ssl.split("$");
+				String []datas = ssl.split("@");
 				if (datas != null && datas.length > 0) {
 					for (String sub : datas) {
 						String [] paras = sub.split("-");
@@ -71,6 +89,7 @@ public class ExamSchoolAnaly implements Serializable {
 	
 	private String schoolName = null;
 	
+	@JsonProperty("GradeSubs")
 	private List<GradeSub> grSubs = null;
 
 	public ExamSchoolAnaly() {
@@ -109,9 +128,10 @@ public class ExamSchoolAnaly implements Serializable {
 		String [] grSubL = gsL.split("#");
 		for (String grsub : grSubL) {
 			String [] datas = grsub.split(":");
-			if (datas != null && datas.length == 2) {
+			if (datas != null && datas.length == 2 && datas[0] != null && !datas[0].isEmpty() && 
+					datas[1] != null && !datas[1].isEmpty()) {
 				GradeSub gs = new GradeSub(datas[0], datas[1]);
-				if (this.grSubs != null) {
+				if (this.grSubs == null) {
 					this.grSubs = new ArrayList<GradeSub>();
 				}
 				this.grSubs.add(gs);
@@ -119,8 +139,9 @@ public class ExamSchoolAnaly implements Serializable {
 		}
 	}
 	
+	@JsonIgnore
 	public boolean isValid() {
-		if ((this.schoolName == null || !this.schoolName.isEmpty()) || 
+		if ((this.schoolName == null || this.schoolName.isEmpty()) || 
 				(this.grSubs == null || this.grSubs.isEmpty())) {
 			return false;
 		}
