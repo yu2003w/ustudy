@@ -33,7 +33,7 @@ public interface AnalysisMapper {
 			+ "left join examgradesub as egs on paper.exam_grade_sub_id = egs.id "
 			+ "left join question on (question.exam_grade_sub_id = egs.id and "
 			+ "question.startno <= obj_answer.quesno and question.endno >= obj_answer.quesno) "
-			+ "where egs.id = #{egsid} group by quesno, question.id, obj_answer.answer) tb1 group by quesno, score")
+			+ "where egs.id = #{egsId} group by quesno, question.id, obj_answer.answer) tb1 group by quesno, score")
 	public List<QuesObjScoreAnaly> calQuesObjReport(@Param("egsId")long egsId, @Param("clsId") long clsId);
 	
 	@Select("")

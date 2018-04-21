@@ -15,7 +15,7 @@ import com.ustudy.UResp;
 import com.ustudy.exam.service.AnalysisService;
 
 @RestController
-@RequestMapping(value = "analysis/")
+@RequestMapping(value = "/exam/analysis/")
 public class AnalysisController {
 
 	private static final Logger logger = LogManager.getLogger(AnalysisController.class);
@@ -45,6 +45,7 @@ public class AnalysisController {
 		} catch (Exception e) {
 			logger.error("getObjQuesReport(), " + e.getMessage());
 			e.printStackTrace();
+			res.setMessage(e.getMessage());
 			resp.setStatus(500);
 		}
 		
