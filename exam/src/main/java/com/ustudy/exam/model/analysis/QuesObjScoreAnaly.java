@@ -91,7 +91,7 @@ public class QuesObjScoreAnaly implements Serializable {
 		if (opts != null && !opts.isEmpty()) {
 			String []data = opts.split(",");
 			if (data != null && data.length > 0) {
-				DecimalFormat df = new DecimalFormat("##.0%");
+				DecimalFormat df = new DecimalFormat("##0.0%");
 				for (String para : data) {
 					String [] paL = para.split("-");
 					if (paL != null && paL.length == 2) {

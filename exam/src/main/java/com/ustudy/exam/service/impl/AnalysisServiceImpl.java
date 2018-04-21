@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.mapper.AnalysisMapper;
 import com.ustudy.exam.model.analysis.EgsScoreAnaly;
+import com.ustudy.exam.model.analysis.ExamBrifeAnaly;
 import com.ustudy.exam.model.analysis.QuesObjScoreAnaly;
 import com.ustudy.exam.model.analysis.QuesSubScoreAnaly;
 import com.ustudy.exam.service.AnalysisService;
@@ -22,23 +23,39 @@ public class AnalysisServiceImpl implements AnalysisService {
 	private AnalysisMapper anaM;
 	
 	@Override
-	public List<QuesObjScoreAnaly> getObjQuesReport(long egsId, long clsId) {
+	public List<QuesObjScoreAnaly> getObjQuesReport(long egsId, long clsId) {		
 		
-		logger.debug("getObjQuesReport(), retrieve info for egsid=" + egsId + ", clsid=" + clsId);
+		List<QuesObjScoreAnaly> osL = anaM.calQuesObjReport(egsId, clsId);
 		
-		return anaM.calQuesObjReport(egsId, clsId);
+		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
+				", number of items retrived " + osL.size());
+		return osL;
 	}
 
 	@Override
 	public List<QuesSubScoreAnaly> getSubQuesReport(long egsId, long clsId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<QuesSubScoreAnaly> ssL = anaM.calQuesSubReport(egsId, clsId);
+		
+		logger.debug("getSubQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
+				", number of items retrieved " + ssL.size());
+		return ssL;
 	}
 
 	@Override
 	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<ExamBrifeAnaly> getExamsForAnaly() {
+		
+		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for analysis");
+		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList();
+		
+		logger.trace("getExamsForAnaly(), exams->" + examL.toString());
+		return examL;
 	}
 
 }

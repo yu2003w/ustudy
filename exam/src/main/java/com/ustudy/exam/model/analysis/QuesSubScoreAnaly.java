@@ -10,8 +10,8 @@ public class QuesSubScoreAnaly implements Serializable {
 	 */
 	private static final long serialVersionUID = 938939937800010344L;
 	
-	private String quesno = null;
-	private float fullScore = 0;
+	private String quesname = null;
+	private float score = 0;
 	private float aveScore = 0;
 	private float levelOfDiff = 0;
 	
@@ -22,20 +22,20 @@ public class QuesSubScoreAnaly implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getQuesno() {
-		return quesno;
+	public String getQuesname() {
+		return quesname;
 	}
 
-	public void setQuesno(String quesno) {
-		this.quesno = quesno;
+	public void setQuesname(String quesno) {
+		this.quesname = quesno;
 	}
 
-	public float getFullScore() {
-		return fullScore;
+	public float getScore() {
+		return score;
 	}
 
-	public void setFullScore(float fullScore) {
-		this.fullScore = fullScore;
+	public void setScore(float fullScore) {
+		this.score = fullScore;
 	}
 
 	public float getAveScore() {
@@ -64,7 +64,7 @@ public class QuesSubScoreAnaly implements Serializable {
 
 	@Override
 	public String toString() {
-		return "QuesSubScoreAnaly [quesno=" + quesno + ", fullScore=" + fullScore + ", aveScore=" + aveScore
+		return "QuesSubScoreAnaly [quesno=" + quesname + ", fullScore=" + score + ", aveScore=" + aveScore
 				+ ", levelOfDiff=" + levelOfDiff + ", details=" + details + "]";
 	}
 

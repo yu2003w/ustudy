@@ -28,6 +28,17 @@ public class AnalysisController {
 		
 		logger.debug("getExamBrifeList(), retrieve exam brife list for analysis");
 		UResp res = new UResp();
+		
+		try {
+			res.setData(anaS.getExamsForAnaly());
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getExamBrifeList(), failed with exception->" + e.getMessage());
+			res.setMessage(e.getMessage());
+			response.setStatus(500);
+			e.printStackTrace();
+		}
+		
 		return res;
 	}
 	
@@ -56,7 +67,20 @@ public class AnalysisController {
 	@RequestMapping(value = "questions/subject/{egsid}/{clsid}", method = RequestMethod.GET)
 	public UResp getSubQuesReport(@PathVariable("egsid") @Valid long egsid, 
 			@PathVariable("clsid") @Valid long clsid,HttpServletResponse resp) {
+		
+		logger.debug("getSubQuesReport(), egsid=" + egsid + ", clsid=" + clsid);
 		UResp res = new UResp();
+		
+		try {
+			res.setData(anaS.getSubQuesReport(egsid, clsid));
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.debug("getSubQuesReport(), " + e.getMessage());
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
+			e.printStackTrace();
+		}
+		
 		return res;
 	}
 }
