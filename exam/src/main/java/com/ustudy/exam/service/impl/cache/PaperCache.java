@@ -175,7 +175,7 @@ public class PaperCache {
 			logger.error("popFinalMarkIds(), no cached papers for question " + quesid);
 			return false;
 		}
-		int num = mtcL.size() / 2;
+		int num = mtcL.size();
 
 		List<MarkTaskCache> mfL = new ArrayList<MarkTaskCache>();
 		List<PaperScoreCache> viewedP = mtM.getFinalViewedPapersByQuesId(quesid);

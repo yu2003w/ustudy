@@ -740,7 +740,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for "
-						+ "quesid=" + mt.getQuestionId());
+						+ "quesid=" + mt.getQuestionId() + ", task->" + mt.toString());
 				return false;
 			}
 		}

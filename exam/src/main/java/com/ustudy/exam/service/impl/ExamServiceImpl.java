@@ -617,7 +617,7 @@ public class ExamServiceImpl implements ExamService {
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed "
-						+ "for quesid=" + mt.getQuestionId());
+						+ "for quesid=" + mt.getQuestionId() + ", task->" + mt.toString());
 				return false;
 			}
 		}
