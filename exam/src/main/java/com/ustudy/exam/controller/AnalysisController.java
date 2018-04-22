@@ -66,7 +66,7 @@ public class AnalysisController {
 	
 	@RequestMapping(value = "questions/subject/{egsid}/{clsid}", method = RequestMethod.GET)
 	public UResp getSubQuesReport(@PathVariable("egsid") @Valid long egsid, 
-			@PathVariable("clsid") @Valid long clsid,HttpServletResponse resp) {
+			@PathVariable("clsid") @Valid long clsid, HttpServletResponse resp) {
 		
 		logger.debug("getSubQuesReport(), egsid=" + egsid + ", clsid=" + clsid);
 		UResp res = new UResp();
@@ -83,4 +83,23 @@ public class AnalysisController {
 		
 		return res;
 	}
+	
+	@RequestMapping(value = "questions/{egsid}/{clsid}", method = RequestMethod.GET)
+	public UResp getEgsScoreReport(@PathVariable("egsid") @Valid long egsid, 
+			@PathVariable("clsid") @Valid long clsid, HttpServletResponse resp) {
+		logger.debug("getEgsScoreReport(), assemble egs score report for egsid=" + egsid + ", clsid=" + clsid);
+		UResp res = new UResp();
+		
+		try {
+			res.setData(anaS.getEgsScoreAnaly(egsid, clsid));
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getEgsScoreReport(), failed with exception->" + e.getMessage());
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
+			e.printStackTrace();
+		}
+		return res;
+	}
+	
 }

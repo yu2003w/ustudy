@@ -19,9 +19,9 @@ import net.sf.json.JSONObject;
 
 @RestController
 @RequestMapping(value = "/setanswers")
-public class SetAnswersController {
+public class AnswerSetController {
 
-	private static final Logger logger = LogManager.getLogger(SetAnswersController.class);
+	private static final Logger logger = LogManager.getLogger(AnswerSetController.class);
 
 	@Autowired
 	private AnswerService ansSer;
@@ -49,6 +49,7 @@ public class SetAnswersController {
 	public UResp saveQuesAnswers(@PathVariable Long egsId, @RequestBody String paras, 
 			HttpServletRequest request,	HttpServletResponse response) {
 
+		// TODO: refactor code, paras should be model rather than row json object
 		logger.debug("saveQuesAnswers(), save answers for " + egsId + " with parameters->" + paras);
 		
 		UResp res = new UResp();

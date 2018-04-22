@@ -44,8 +44,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
 	@Override
 	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
-		// TODO Auto-generated method stub
-		return null;
+		List<EgsScoreAnaly> esL = anaM.calEgsScoreRepport(egsId, clsId);
+		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId + 
+				",details->" + esL.toString());
+		return esL;
 	}
 
 	@Override

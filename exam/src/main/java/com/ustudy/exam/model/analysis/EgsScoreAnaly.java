@@ -1,6 +1,11 @@
 package com.ustudy.exam.model.analysis;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EgsScoreAnaly implements Serializable {
 
@@ -20,6 +25,13 @@ public class EgsScoreAnaly implements Serializable {
 	private float dis7tion = 0;
 	// standard deviation
 	private float stdDevia = 0;
+	
+	@JsonIgnore
+	private String aggrscore = null;
+	
+	// score placement
+	@JsonProperty("scoreplacement")
+	private Map<Float, Integer> splace = null;
 	
 	public EgsScoreAnaly() {
 		super();
@@ -112,11 +124,42 @@ public class EgsScoreAnaly implements Serializable {
 		this.stdDevia = stdDevia;
 	}
 
+	public String getAggrscore() {
+		return aggrscore;
+	}
+
+	public void setAggrscore(String aggrscore) {
+		this.aggrscore = aggrscore;
+		if (aggrscore != null && aggrscore.length() > 0) {
+			String []places = this.aggrscore.split(",");
+			if (places != null && places.length > 0) {
+				for (String pl : places) {
+					String []datas = pl.split("-");
+					if (datas != null && datas.length == 2) {
+						if (this.splace == null) {
+							this.splace = new HashMap<Float, Integer>();
+						}
+						this.splace.put(Float.valueOf(datas[1]), Integer.valueOf(datas[0]));
+					}
+				}
+			}
+		}
+	}
+
+	public Map<Float, Integer> getSplace() {
+		return splace;
+	}
+
+	public void setSplace(Map<Float, Integer> splace) {
+		this.splace = splace;
+	}
+
 	@Override
 	public String toString() {
 		return "EgsScoreAnaly [exCount=" + exCount + ", maxScore=" + maxScore + ", minScore=" + minScore + ", aveScore="
 				+ aveScore + ", midScore=" + midScore + ", passCount=" + passCount + ", levelOfDiff=" + levelOfDiff
-				+ ", dis7tion=" + dis7tion + ", stdDevia=" + stdDevia + "]";
+				+ ", dis7tion=" + dis7tion + ", stdDevia=" + stdDevia + ", aggrscore=" + aggrscore + ", splace="
+				+ splace + "]";
 	}
 	
 }

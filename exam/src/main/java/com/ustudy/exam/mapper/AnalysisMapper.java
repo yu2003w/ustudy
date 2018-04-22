@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import com.ustudy.exam.model.analysis.EgsScoreAnaly;
 import com.ustudy.exam.model.analysis.ExamBrifeAnaly;
 import com.ustudy.exam.model.analysis.QuesObjScoreAnaly;
 import com.ustudy.exam.model.analysis.QuesSubScoreAnaly;
@@ -46,5 +47,11 @@ public interface AnalysisMapper {
 			+ "where egs.id = #{egsId} group by question.quesno, question.score, quesname "
 			+ "order by question.quesno ")
 	public List<QuesSubScoreAnaly> calQuesSubReport(@Param("egsId") long egsid, @Param("clsId") long clsId);
+	
+	@Select("select count(*) as exCount, truncate(avg(score), 2) as aveScore, max(score) as maxScore, "
+			+ "min(score) as minScore, (select group_concat(num, '-', score) from "
+			+ "(select count(*) as num, score from subscore where exam_grade_sub_id = #{egsId} group by score) "
+			+ "scores) as aggrscore from subscore where exam_grade_sub_id = #{egsId}")
+	public List<EgsScoreAnaly> calEgsScoreRepport(@Param("egsId") long egsid, @Param("clsId") long clsId);
 	
 }
