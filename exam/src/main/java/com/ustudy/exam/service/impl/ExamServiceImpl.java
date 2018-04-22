@@ -56,8 +56,16 @@ public class ExamServiceImpl implements ExamService {
 	@Autowired
 	private MarkTaskMapper mtM;
 
-	public List<Exam> getAllExams(String orgid) {
-		return examDaoImpl.getAllExams(orgid);
+	public List<Exam> getAllExams() {
+		String orgType = ExamUtil.retrieveSessAttr("orgType");
+		String orgId = ExamUtil.retrieveSessAttr("orgId");
+		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty()) {
+			logger.error("getAllExams(), failed to retrieve org info");
+			throw new RuntimeException("failed to retrieve org info");
+		}
+		
+		logger.debug("getAllExams(), retrieve exams for " + orgType + " with id " + orgId);
+		return examDaoImpl.getAllExams(orgId);
 	}
 
 	public List<Exam> getExamsByStatus(String status) {

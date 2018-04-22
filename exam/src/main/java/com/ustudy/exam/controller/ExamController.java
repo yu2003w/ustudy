@@ -39,20 +39,13 @@ public class ExamController {
 	 */
 	@RequestMapping(value = "/allexams", method = RequestMethod.GET)
 	public Map getAllExams(HttpServletRequest request, HttpServletResponse resp) {
-		
-		String orgType = ExamUtil.retrieveSessAttr("orgType");
-		String orgId = ExamUtil.retrieveSessAttr("orgId");
-		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty()) {
-			logger.error("getAllExams(), failed to retrieve org info");
-			throw new RuntimeException("failed to retrieve org info");
-		}
-		
-		logger.debug("getAllExams(), retrieve all exams for " + orgType + " with id " + orgId);
+				
+		logger.debug("getAllExams(), /allexams visited");
 		Map result = new HashMap<>();
 
 		try {
 			result.put("success", true);
-			result.put("data", service.getAllExams(orgId));
+			result.put("data", service.getAllExams());
 		} catch (Exception e) {
 			logger.error("getAllExams(), failed with exception->" + e.getMessage());
 			resp.setStatus(500);
