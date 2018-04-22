@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Iterator;
-
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
@@ -259,11 +257,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			try {
 				if (OSSUtil.getClient() == null) {
 					// need to initialize OSSMetaInfo
-					logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
+					logger.info("uploadMarkImgs(), initialize OSSClient before use");
 					synchronized(OSSMetaInfo.class) {
 						if (OSSUtil.getClient() == null) {
 							OSSMetaInfo omi = cgM.getOSSInfo("oss");
-							logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
+							logger.debug("uploadMarkImgs(), OSS Client init with->" + omi.toString());
 							OSSUtil.initOSS(omi);
 						}
 					}
@@ -286,42 +284,82 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		// return dblMarkImgs;
 	}
 
-	private boolean mergePaperImg(List<MarkImage> mis) {
-		
-		Iterator<MarkImage> it = mis.iterator();
+
+	private boolean mergePaperImg(List<MarkImage> mis) {		
 		String prePaperImg = "";
+		Long prePaperId = 0L;
+		String preMarkImg = "";
+
 		String curPaperImg = "";
+		Long curPaperId = 0L;
+
 		List<MarkImage> markImgs = new ArrayList<>();
 
-		MarkImage mi = null;
-
-		try{
-			while(it.hasNext()) {
-				mi = (MarkImage)it.next();
+		try {
+			if (OSSUtil.getClient() == null) {
+				// need to initialize OSSMetaInfo
+				logger.info("mergePaperImg(), initialize OSSClient before use");
+				synchronized(OSSMetaInfo.class) {
+					if (OSSUtil.getClient() == null) {
+						OSSMetaInfo omi = cgM.getOSSInfo("oss");
+						logger.debug("mergePaperImg(), OSS Client init with->" + omi.toString());
+						OSSUtil.initOSS(omi);
+					}
+				}
+			}
+			for(MarkImage mi : mis) {
 				curPaperImg = mi.getPaperImg();
+				curPaperId = mi.getPaperId();
 				if (!curPaperImg.equals(prePaperImg)) {
 					if(!prePaperImg.isEmpty()) {
-						String targetName = "AM_" + prePaperImg;
-						OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
-						egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
-						markImgs.clear();
-						markImgs.add(mi);
+						if (prePaperId.equals(curPaperId)) {
+							String targetName = "AM_" + prePaperImg;
+							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+							markImgs.clear();
+							markImgs.add(mi);
+							prePaperImg = curPaperImg;
+							prePaperId = curPaperId;
+							preMarkImg += targetName + ";";
+							continue;
+						} else {
+							String targetName = "AM_" + prePaperImg;
+							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
+							markImgs.clear();
+							markImgs.add(mi);
+							prePaperImg = curPaperImg;
+							prePaperId = curPaperId;
+							preMarkImg = "";
+							continue;
+						}
 					} else {
-						markImgs.add(mi);					
+						markImgs.add(mi);
+						prePaperImg = curPaperImg;
+						prePaperId = curPaperId;
+						continue;
 					}
 				} else {
 					markImgs.add(mi);
+					prePaperImg = curPaperImg;
+					prePaperId = curPaperId;
+					continue;
 				}
-				prePaperImg = curPaperImg;
 			}
-
-			String targetName = "AM_" + prePaperImg;
-			OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
-			egsDaoImpl.updateMarkImg(mi.getPaperId(), targetName);
-			markImgs.clear();
-
+			if (markImgs.size() > 0) {
+				String targetName = "AM_" + prePaperImg;
+				OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+				if (!preMarkImg.isEmpty()) {
+					if (preMarkImg.contains(targetName)) {
+						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
+					} else {
+						egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);						
+					}
+				} else {
+					egsDaoImpl.updateMarkImg(prePaperId, targetName);
+				}
+			}
 		} catch (Exception e) {
-			logger.error("mergePaperImg(), failed to upload image to oss -> " + e.getMessage());
+			logger.error("mergePaperImg(), failed to merge images -> " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -425,6 +463,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				rank++;
 			}
 			// save subscores, insert on duplicate key udpate
+			logger.debug("SummaryEgsScore(), subscore before save:" + scores.toString());
 			int ret = scoreDaoImpl.saveSubscores(scores);
 			logger.debug("SummaryEgsScore(), number of items saved for sub score is " + ret);
 			// populate sub child scores
@@ -701,7 +740,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed for "
-						+ "quesid=" + mt.getQuestionId());
+						+ "quesid=" + mt.getQuestionId() + ", task->" + mt.toString());
 				return false;
 			}
 		}

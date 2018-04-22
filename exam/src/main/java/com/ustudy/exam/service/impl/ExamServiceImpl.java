@@ -439,7 +439,7 @@ public class ExamServiceImpl implements ExamService {
 		JSONArray result = new JSONArray();
 
 		String orgId = InfoUtil.retrieveSessAttr("orgId");
-		orgId = "001";
+		// orgId = "001";
 		if (orgId == null || orgId.isEmpty()) {
 			logger.error("getExams(), no school id found, maybe user not login");
 			throw new RuntimeException("getExams(), no school id found, maybe user not login");
@@ -617,7 +617,7 @@ public class ExamServiceImpl implements ExamService {
 		for (MarkTask mt: mtL) {
 			if (!mt.isValid()) {
 				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed "
-						+ "for quesid=" + mt.getQuestionId());
+						+ "for quesid=" + mt.getQuestionId() + ", task->" + mt.toString());
 				return false;
 			}
 		}

@@ -31,7 +31,8 @@
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.stuId},#{item.egsId},#{item.score},#{item.subScore},#{item.objScore},#{item.rank})  
 	    </foreach>
-	    on duplicate key update score=score, sub_score=sub_score, obj_score=obj_score, rank=rank
+	    on duplicate key update score=values(score), sub_score=values(sub_score), 
+	    obj_score=values(obj_score), rank=values(rank)
 	</insert>
 	
 	<insert id="saveSubChildScores" parameterType="java.util.List">
@@ -39,7 +40,7 @@
 	    <foreach collection="list" item="item" index="index" separator="," >  
 	        (#{item.parentId},#{item.subId},#{item.score},#{item.rank})  
 	    </foreach>
-	    on duplicate key update score=score, rank=rank
+	    on duplicate key update score=value(score), rank=values(rank)
 	</insert>
 	
 	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
@@ -106,12 +107,14 @@
 	</select>
 	
 	<select id="getSubQuesScore" resultMap="SubjectQuesScore" resultType="java.util.List">
-		select question.quesno, group_concat(answer.score, '-', answer.isfinal) as aggrscore from answer 
+		select (select if(strcmp(question.quesno, '0'), question.quesno, 
+		concat(question.startno, '-', question.endno))) as quesno, 
+		group_concat(answer.score, '-', answer.isfinal) as aggrscore from answer   
 		join paper on paper.id = answer.paperid 
 		join examgradesub as egs on egs.id = paper.exam_grade_sub_id 
 		join question on question.id = answer.quesid 
 		where egs.id = #{egsId} and paper.exam_code = #{exameeNO} 
-		group by question.quesno order by question.quesno
+		group by question.id order by question.quesno
 	</select>
 	
 </mapper>

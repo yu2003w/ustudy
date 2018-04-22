@@ -35,7 +35,6 @@ public class MarkTask implements Serializable {
 	@JsonIgnore
 	private String teachers = null;
 	
-	@JsonIgnore
 	private String markMode = null;
 	
 	public MarkTask() {
@@ -189,8 +188,8 @@ public class MarkTask implements Serializable {
 				(this.markMode == null || this.markMode.isEmpty())) {
 			return false;
 		}
-		if (this.markMode.compareTo("双评") == 0 && (this.finalMarkTeachersIds == null ||
-				this.finalMarkTeachersIds.isEmpty()) && this.scorediff <= 0) {
+		if (this.markMode.compareTo("双评") == 0 && ((this.finalMarkTeachersIds == null ||
+				this.finalMarkTeachersIds.isEmpty()) || this.scorediff <= 0)) {
 			return false;
 		}
 		

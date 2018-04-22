@@ -164,8 +164,14 @@ public class AnswerServiceImpl implements AnswerService {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ustudy.exam.service.AnswerService#saveQuesAnswers(java.lang.Long, net.sf.json.JSONObject)
+	 */
+	@Override
 	public boolean saveQuesAnswers(Long egsId, JSONObject ques) throws Exception {
-
+		// TODO: refactor code for answer saving, questions with sub questions should be saved correctly
+		// question score should be equals sum score of sub questions.
+		// score type should be float
 		try {
 			deleteQuesAnswers(egsId);
 

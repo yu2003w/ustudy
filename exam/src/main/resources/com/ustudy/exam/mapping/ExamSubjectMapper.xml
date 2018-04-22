@@ -209,7 +209,7 @@
 
 	<select id="getDblMarkImgs" parameterType="Long" resultMap="MarkImageResult">
 		SELECT qp.quesid, qp.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
-		FROM (SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 2) qp 
+		FROM (SELECT quesid, paperid FROM answer WHERE quesid in (SELECT id FROM question WHERE exam_grade_sub_id = ${egsId}) GROUP BY quesid, paperid HAVING COUNT(*) = 2) qp 
 		JOIN paper p ON qp.paperid = p.id 
 		JOIN answer ans ON qp.quesid = ans.quesid AND qp.paperid = ans.paperid 
 		JOIN answer_img ansi ON ans.id = ansi.ans_id 
@@ -226,7 +226,7 @@
 
 	<select id="getFinalMarkImgs" parameterType="Long" resultMap="MarkImageResult">
 		SELECT ans.quesid, ans.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
-		FROM (SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 1) qp 
+		FROM (SELECT quesid, paperid FROM answer WHERE quesid in (SELECT id FROM question WHERE exam_grade_sub_id = ${egsId}) GROUP BY quesid, paperid HAVING COUNT(*) = 1 ) qp 
 		JOIN paper p ON qp.paperid = p.id 
 		JOIN answer ans ON qp.quesid = ans.quesid AND qp.paperid = ans.paperid 
 		JOIN answer_img ansi ON ans.id = ansi.ans_id
