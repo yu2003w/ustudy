@@ -12,7 +12,7 @@ import com.ustudy.exam.model.Exam;
 @MapperScan
 public interface ExamDao {
 
-	List<Exam> getAllExams();
+	List<Exam> getAllExams(String orgid);
 	
 	List<Exam> getExams(@Param("finished")Boolean finished, @Param("orgId")String orgId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("name")String name);
 	

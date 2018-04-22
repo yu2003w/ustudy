@@ -56,8 +56,8 @@ public class ExamServiceImpl implements ExamService {
 	@Autowired
 	private MarkTaskMapper mtM;
 
-	public List<Exam> getAllExams() {
-		return examDaoImpl.getAllExams();
+	public List<Exam> getAllExams(String orgid) {
+		return examDaoImpl.getAllExams(orgid);
 	}
 
 	public List<Exam> getExamsByStatus(String status) {

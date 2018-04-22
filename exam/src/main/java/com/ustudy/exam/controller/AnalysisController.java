@@ -84,7 +84,7 @@ public class AnalysisController {
 		return res;
 	}
 	
-	@RequestMapping(value = "questions/{egsid}/{clsid}", method = RequestMethod.GET)
+	@RequestMapping(value = "{egsid}/{clsid}", method = RequestMethod.GET)
 	public UResp getEgsScoreReport(@PathVariable("egsid") @Valid long egsid, 
 			@PathVariable("clsid") @Valid long clsid, HttpServletResponse resp) {
 		logger.debug("getEgsScoreReport(), assemble egs score report for egsid=" + egsid + ", clsid=" + clsid);

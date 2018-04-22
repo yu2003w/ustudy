@@ -11,7 +11,7 @@ import net.sf.json.JSONArray;
 
 public interface ExamService {
 	
-	List<Exam> getAllExams();
+	List<Exam> getAllExams(String orgid);
 	
 	JSONArray getExams(Boolean finished, Long gradeId, Long subjectId, String startDate, String endDate, String name);
 	
