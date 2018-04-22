@@ -230,7 +230,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public boolean saveTemplates(Long id, String data) throws Exception {
 
-        logger.debug("originalData: " + data);
+        logger.debug("saveTemplates(), egsid=" + id + ", originalData->" + data);
 
         JSONObject originalData = saveOriginalData(id, data);
 

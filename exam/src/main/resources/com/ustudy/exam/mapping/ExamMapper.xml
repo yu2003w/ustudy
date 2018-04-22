@@ -12,7 +12,9 @@
 
 	<!-- 查询得到全部Exam对象 -->
 	<select id="getAllExams" parameterType="string" resultMap="ExamResult">
-		SELECT * FROM exam
+		select exam.id, exam.exam_name, exam.exam_date, exam.type, exam.status from exam 
+		left join examschool on examschool.examid = exam.id 
+		where examschool.schid = #{orgid}
 	</select>
 	
 	<select id="getExams" parameterType="java.util.Map" resultMap="ExamResult">

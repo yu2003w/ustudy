@@ -26,8 +26,8 @@ public class AnswerPapersController {
 			@RequestParam(value="text", defaultValue="") String text,
 			@RequestParam(value="viewAnswerPaper", defaultValue="false") Boolean viewAnswerPaper) {
 
-		logger.debug("getAnswerPapers().");
-		logger.debug("egsId: " + egsId + ",questionId: " + questionId + ",classId: " + classId + ",type: " + type + ",text: " + text + ",viewAnswerPaper: " + viewAnswerPaper);
+		logger.debug("getAnswerPapers(), egsId=" + egsId + ",quesid=" + questionId + ",classId=" + classId + 
+				",type: " + type + ",text: " + text + ",viewAnswerPaper: " + viewAnswerPaper);
 
 		UResp result = new UResp();
 		try {
@@ -36,6 +36,7 @@ public class AnswerPapersController {
 		} catch (Exception e) {
 			result.setRet(false);
 			result.setMessage(e.getMessage());
+			logger.error("getAnswerPapers(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 		}
 

@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
@@ -168,6 +169,7 @@ public class AnswerServiceImpl implements AnswerService {
 	 * @see com.ustudy.exam.service.AnswerService#saveQuesAnswers(java.lang.Long, net.sf.json.JSONObject)
 	 */
 	@Override
+	@Transactional
 	public boolean saveQuesAnswers(Long egsId, JSONObject ques) throws Exception {
 		// TODO: refactor code for answer saving, questions with sub questions should be saved correctly
 		// question score should be equals sum score of sub questions.
@@ -185,7 +187,7 @@ public class AnswerServiceImpl implements AnswerService {
 
 			return true;
 		} catch (Exception e) {
-			logger.error("saveQuesAnswers save error. -> msg = " + e.getMessage());
+			logger.error("saveQuesAnswers(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}
@@ -229,7 +231,7 @@ public class AnswerServiceImpl implements AnswerService {
 			if (null != objective.get("choiceNum"))
 				quesAnswer.setChoiceNum(objective.getInt("choiceNum"));
 			if (null != objective.get("score"))
-				quesAnswer.setScore(objective.getInt("score"));
+				quesAnswer.setScore(objective.getLong("score"));
 			quesAnswer.setExamGradeSubId(egsId);
 
 			if (null != objective.get("id") && objective.getLong("id") > 0) {
@@ -260,7 +262,7 @@ public class AnswerServiceImpl implements AnswerService {
 			if (null != subjective.get("choiceNum"))
 				quesAnswer.setChoiceNum(subjective.getInt("choiceNum"));
 			if (null != subjective.get("score"))
-				quesAnswer.setScore(subjective.getInt("score"));
+				quesAnswer.setScore(subjective.getLong("score"));
 			if (null != subjective.get("remark"))
                 quesAnswer.setRemark(subjective.getString("remark"));
 			quesAnswer.setExamGradeSubId(egsId);
@@ -342,7 +344,7 @@ public class AnswerServiceImpl implements AnswerService {
                             if (null != child.get("branch"))
                                 quesAnswerDiv.setBranch(child.getString("branch"));
                             if (null != child.get("score"))
-                                quesAnswerDiv.setScore(child.getInt("score"));
+                                quesAnswerDiv.setScore(child.getLong("score"));
                             if (null != child.get("quesid")) {
                                 quesAnswerDiv.setQuesid(Long.valueOf(child.getInt("quesid")));
                             }else {
@@ -363,12 +365,12 @@ public class AnswerServiceImpl implements AnswerService {
 				        }
 				        if(startno > 0 && endno > 0 && startno <= endno){
 				            String branch = "不分科";
-				            int score = 1;
+				            float score = 1;
 				            if (null != subjective.get("branch")){
 				                branch = subjective.getString("branch");
 				            }
 				            if (null != subjective.get("score")){
-				                score = subjective.getInt("score");
+				                score = subjective.getLong("score");
 				            }
 				            for (int j = startno; j <= endno; j++) {
 				                QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
@@ -425,7 +427,7 @@ public class AnswerServiceImpl implements AnswerService {
                 quesAnswerDiv.setBranch(child.getString("branch"));
             }
             if (null != child.get("score")){
-                quesAnswerDiv.setScore(child.getInt("score"));
+                quesAnswerDiv.setScore(child.getLong("score"));
             }
             quesAnswerDiv.setQuesid(quesid);
             if (null != child.get("remark")){
@@ -462,7 +464,7 @@ public class AnswerServiceImpl implements AnswerService {
 	            quesAnswerDiv.setBranch(step.getString("branch"));
 	        }
 	        if (null != step.get("score")){
-	            quesAnswerDiv.setScore(step.getInt("score"));
+	            quesAnswerDiv.setScore(step.getLong("score"));
 	        }
 	        quesAnswerDiv.setQuesid(quesid);
 	        if (null != step.get("step")){
