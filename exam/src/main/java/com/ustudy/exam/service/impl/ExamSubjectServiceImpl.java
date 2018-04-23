@@ -314,7 +314,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				if (!curPaperImg.equals(prePaperImg)) {
 					if(!prePaperImg.isEmpty()) {
 						String targetName = "AM_" + prePaperImg;
-						OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+						// first region
+						if (regionCount == 1) {
+							OSSUtil.putObject(prePaperImg, targetName, markImgs, false);
+						// later region
+						} else {
+							OSSUtil.putObject(targetName, targetName, markImgs, false);						
+						}
 						markImgs.clear();
 						markImgs.add(mi);
 						prePaperImg = curPaperImg;
