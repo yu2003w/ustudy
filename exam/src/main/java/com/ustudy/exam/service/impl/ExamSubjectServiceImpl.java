@@ -485,9 +485,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
 			
 			Subject mainSub = subjectD.getSubjectByEgsId(egsId);
+			logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
 			if (mainSub != null && mainSub.getChildSubIds() != null && mainSub.getChildSubIds().size() > 0) {
 				// current subject contains child subjects, need to retrieve ids of SubScores
-				logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
 				List<Long> ssIDs = scoreDaoImpl.getSSIDsByEgsId(egsId);
 				if (ssIDs == null || ssIDs.size() != scores.size()) {
 					logger.error("SummaryEgsScore(), number of ids not matched with that of scores for egs " + egsId);
@@ -497,6 +497,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					scores.get(i).setId(ssIDs.get(i));
 				}
 			}
+		
 			// load subject into hashmap
 			List<Subject> subs = subjectD.getAllSubject();
 			Map<String, Long> subMap = new HashMap<String, Long>();
@@ -553,8 +554,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				}
 				logger.debug("SummaryEgsScore(), sub child score before saved->" + childScores.toString());
 				ret = scoreDaoImpl.saveSubChildScores(childScores);
+				logger.debug("SummaryEgsScore(), number of saved sub child scores is " + ret);
 			}
-			logger.debug("SummaryEgsScore(), number of items saved for sub child scores " + ret);
+				
 		}
 	}
 
