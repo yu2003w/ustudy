@@ -476,19 +476,37 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				rank++;
 			}
 			// save subscores, insert on duplicate key udpate
+			// Noted: mybatis batch insert failed to write back ids at this time, need to retrieve id of
+			// subscores for child subscore save
 			logger.debug("SummaryEgsScore(), subscore before save:" + scores.toString());
 			int ret = scoreDaoImpl.saveSubscores(scores);
 			logger.debug("SummaryEgsScore(), number of items saved for sub score is " + ret);
 			// populate sub child scores
 			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
 			
+			Subject mainSub = subjectD.getSubjectByEgsId(egsId);
+			logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
+			if (mainSub != null && mainSub.getChildSubIds() != null && mainSub.getChildSubIds().size() > 0) {
+				// current subject contains child subjects, need to retrieve ids of SubScores
+				List<Long> ssIDs = scoreDaoImpl.getSSIDsByEgsId(egsId);
+				if (ssIDs == null || ssIDs.size() != scores.size()) {
+					logger.error("SummaryEgsScore(), number of ids not matched with that of scores for egs " + egsId);
+					throw new RuntimeException("number of subscore ids not matched with that of scores");
+				}
+				for (int i = 0; i < scores.size(); i++) {
+					scores.get(i).setId(ssIDs.get(i));
+				}
+			}
+		
 			// load subject into hashmap
 			List<Subject> subs = subjectD.getAllSubject();
 			Map<String, Long> subMap = new HashMap<String, Long>();
 			for (Subject sub: subs) {
 				subMap.put(sub.getName(), sub.getId());
 			}
+			
 			for (SubScore ss: scores) {
+				logger.trace("SummaryEgsScore(), subscore saved->" + ss.getId() + "," + ss.toString());
 				List<SubChildScore> scsL = ss.getSubCSL();
 				scsL.forEach(item->{
 					item.setParentId(ss.getId());
@@ -534,9 +552,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					}
 					rank++;
 				}
+				logger.debug("SummaryEgsScore(), sub child score before saved->" + childScores.toString());
 				ret = scoreDaoImpl.saveSubChildScores(childScores);
+				logger.debug("SummaryEgsScore(), number of saved sub child scores is " + ret);
 			}
-			logger.debug("SummaryEgsScore(), number of items saved for sub child scores " + ret);
+				
 		}
 	}
 

@@ -41,16 +41,36 @@ public class SubScore implements Serializable, Comparable<SubScore> {
 		this.score = score;
 		this.rank = rank;
 	}
+	
+    public long getId() {
+		return id;
+	}
 
-	public long getId() {
-        return id;
-    }
+	public void setId(long id) {
+		this.id = id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setStuId(long stuId) {
+		this.stuId = stuId;
+	}
 
-    public long getStuId() {
+	public void setEgsId(long egsId) {
+		this.egsId = egsId;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+
+	public void setSubScore(float subScore) {
+		this.subScore = subScore;
+	}
+
+	public void setObjScore(float objScore) {
+		this.objScore = objScore;
+	}
+
+	public long getStuId() {
         return stuId;
     }
 
