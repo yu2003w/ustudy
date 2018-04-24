@@ -323,8 +323,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 						markImgs.clear();
 						markImgs.add(mi);
-						prePaperImg = curPaperImg;
-						prePaperId = curPaperId;
 						regionCount = 1;
 						if (prePaperId.equals(curPaperId)) {
 							preMarkImg += targetName + ";";
@@ -332,6 +330,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
 							preMarkImg = "";
 						}
+						prePaperImg = curPaperImg;
+						prePaperId = curPaperId;
 					} else {
 						markImgs.add(mi);
 						prePaperImg = curPaperImg;
