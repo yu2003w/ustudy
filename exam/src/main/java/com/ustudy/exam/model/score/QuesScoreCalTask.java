@@ -1,5 +1,5 @@
 
-package com.ustudy.exam.utility;
+package com.ustudy.exam.model.score;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,17 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.StudentObjectAnswer;
-import com.ustudy.exam.model.score.ScoreRule;
 
-public class CalQuesScoreTask implements Callable<String> {
+public class QuesScoreCalTask implements Callable<String> {
     
-    private static final Logger logger = LogManager.getLogger(CalQuesScoreTask.class);
+    private static final Logger logger = LogManager.getLogger(QuesScoreCalTask.class);
     
     private Long egsId; 
     private ScoreRule sr;    
     private StudentObjectAnswerDao answerDaoImpl;
 
-	public CalQuesScoreTask(Long egsId, ScoreRule sr, StudentObjectAnswerDao answerDaoImpl) {
+	public QuesScoreCalTask(Long egsId, ScoreRule sr, StudentObjectAnswerDao answerDaoImpl) {
 		super();
 		this.egsId = egsId;
 		this.sr = sr;
