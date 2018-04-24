@@ -19,8 +19,8 @@ public class DetailedSubScore implements Serializable {
 	private String subName = null;
 	private float score = 0;
 	private int rank = 0;
-	private float subscore = 0;
 	private float objscore = 0;
+	private float subscore = 0;
 	// mark image for whole subject
 	private String markImg = null;
 	
@@ -34,8 +34,8 @@ public class DetailedSubScore implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DetailedSubScore(int egsId, String subName, float score, int rank, float subscore, 
-			float objscore, String markImg) {
+	public DetailedSubScore(int egsId, String subName, float score, int rank, float objscore, 
+			float subscore, String markImg) {
 		super();
 		this.egsId = egsId;
 		this.subName = subName;
@@ -120,9 +120,9 @@ public class DetailedSubScore implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DetailedSubScore [subName=" + subName + ", score=" + score + ", rank=" + rank + ", subscore=" + subscore
-				+ ", objscore=" + objscore + ", markImg=" + markImg + ", subQuesL=" + subQuesL + ", objQuesL="
-				+ objQuesL + "]";
+		return "DetailedSubScore [egsId=" + egsId + ", subName=" + subName + ", score=" + score + ", rank=" + rank
+				+ ", objscore=" + objscore + ", subscore=" + subscore + ", markImg=" + markImg + ", subQuesL="
+				+ subQuesL + ", objQuesL=" + objQuesL + "]";
 	}
 	
 }

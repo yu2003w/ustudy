@@ -323,8 +323,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 						markImgs.clear();
 						markImgs.add(mi);
-						prePaperImg = curPaperImg;
-						prePaperId = curPaperId;
 						regionCount = 1;
 						if (prePaperId.equals(curPaperId)) {
 							preMarkImg += targetName + ";";
@@ -332,6 +330,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
 							preMarkImg = "";
 						}
+						prePaperImg = curPaperImg;
+						prePaperId = curPaperId;
 					} else {
 						markImgs.add(mi);
 						prePaperImg = curPaperImg;
@@ -426,37 +426,46 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		Map<Long, SubScore> subjScores = retrieveSubScores(egsId);
 		
 		// calculate total score for each exmainee in this egs
-		for (SubScore ss : scores) {
-			SubScore subjS = subjScores.get(ss.getStuId());
-			if(null != subjS){
-				// combine object and subject score here
-			    ss.setSubScore(subjS.getSubScore());
-			    List<SubChildScore> scsOL = ss.getSubCSL();
-			    List<SubChildScore> scsSL = subjS.getSubCSL();
-			    for (SubChildScore scss : scsSL) {
-			    	boolean found = false;
-			    	for (SubChildScore scs: scsOL) {
-				    	if (scs.getSubName().compareTo(scss.getSubName()) == 0) {
-				    		scs.setScore(scss.getScore() + scs.getScore());
-				    		found = true;
-				    		break;
+		if (scores.size() > 0) {
+			for (SubScore ss : scores) {
+				SubScore subjS = subjScores.get(ss.getStuId());
+				if(null != subjS){
+					// combine object and subject score here
+				    ss.setSubScore(subjS.getSubScore());
+				    List<SubChildScore> scsOL = ss.getSubCSL();
+				    List<SubChildScore> scsSL = subjS.getSubCSL();
+				    for (SubChildScore scss : scsSL) {
+				    	boolean found = false;
+				    	for (SubChildScore scs: scsOL) {
+					    	if (scs.getSubName().compareTo(scss.getSubName()) == 0) {
+					    		scs.setScore(scss.getScore() + scs.getScore());
+					    		found = true;
+					    		break;
+					    	}
+					    }
+				    	if (!found) {
+				    		// branch only existed in subject question scores
+				    		scsOL.add(scss);
 				    	}
-				    }
-			    	if (!found) {
-			    		// branch only existed in subject question scores
-			    		scsOL.add(scss);
 			    	}
-		    	}
-			    
+				    
+				}
+				else {
+					logger.warn("SummaryEgsScore(), failed to find subject scores for eid=" + ss.getStuId() + 
+							", egs=" + egsId);
+				}
+				ss.setScore(ss.getObjScore() + ss.getSubScore());
 			}
-			else {
-				logger.warn("SummaryEgsScore(), failed to find subject scores for eid=" + ss.getStuId() + 
-						", egs=" + egsId);
+		} else {
+			logger.info("SummaryEgsScore(), no object scores for " + egsId + ", only subject scores be calculated");
+			scores = new ArrayList<SubScore>(subjScores.values());
+			for (SubScore ss: scores) {
+				ss.setScore(ss.getSubScore());
 			}
-			ss.setScore(ss.getObjScore() + ss.getSubScore());
 		}
 		
 		logger.debug("SummaryEgsScore(), score combined, to calculate rank now.");
+		logger.trace("SummaryEgsScore(), before ranking->" + scores.toString());
 		if(scores.size() > 0){
 			Collections.sort(scores);
 			// updated by jared, need to accumulate rank when score equals
