@@ -37,13 +37,13 @@ import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.score.DetailedSubScore;
 import com.ustudy.exam.model.score.ExameeSubScore;
+import com.ustudy.exam.model.score.QuesScoreCalTask;
 import com.ustudy.exam.model.score.ScoreRule;
 import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
-import com.ustudy.exam.utility.CalQuesScoreTask;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -159,8 +159,7 @@ public class ScoreServiceImpl implements ScoreService {
                 List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
                 
                 for (ScoreRule sr : scoreRules) {
-                    CalQuesScoreTask task = new CalQuesScoreTask(egsId, sr, 
-                    		answerDaoImpl);
+                    QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
                     Future<String> result = tpe.submit(task);
                     results.add(result);
                 }

@@ -265,7 +265,7 @@ public class ClientController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public UResp login(HttpServletRequest request, HttpServletResponse response) {
 		
-		logger.info("login().");
+		logger.info("login(), /client/login");
 		String token = request.getHeader("token");
 		
 		return cs.login(token);

@@ -177,10 +177,6 @@ public class ClientServiceImpl implements ClientService {
                 try {
                     Session ses = currentUser.getSession(true);
                     teacher = teacherService.findUserById(currentUser.getPrincipal().toString());
-//                    School schoole = schoolDaoImpl.getSchoolById(teacher.getOrgid());
-//                    if (null != schoole) {
-//                        teacher.setOrgname(schoole.getSchname());
-//                    }
                     
                     if (teacher != null) {
                         teacher.setRoles(teacherService.getRolesById(teacher.getUid()));
@@ -199,7 +195,7 @@ public class ClientServiceImpl implements ClientService {
                     }
                     
                 } catch (Exception e) {
-                    logger.warn("login(), session failed -> " + e.getMessage());
+                    logger.error("login(), session failed -> " + e.getMessage());
                     result.setRet(status);
                     result.setMessage("用户信息有误");
                 }
@@ -235,7 +231,7 @@ public class ClientServiceImpl implements ClientService {
         JSONObject originalData = saveOriginalData(id, data);
 
         cleanQuestion(id);
-        Map<String, Long> quesAnswersId = getQuesAnswer(id, originalData);
+        Map<String, Long> quesAnswersId = parseQuesAnswer(id, originalData);
         if (null != quesAnswersId && quesAnswersId.size() > 0) {
             saveQuesareas(quesAnswersId, originalData);
             return true;
@@ -256,7 +252,7 @@ public class ClientServiceImpl implements ClientService {
             
             examSubjectDaoImpl.saveOriginalData(id, getFileNames(originalData), xmlServerPath, data);
         } catch (Exception e) {
-            logger.error("examgradesub 表更新失败， " + e.getMessage());
+            logger.error("saveOriginalData(), save data failed with exception->" + e.getMessage());
             e.printStackTrace();
         }
         
@@ -295,7 +291,7 @@ public class ClientServiceImpl implements ClientService {
      * @return
      * @throws Exception
      */
-    private Map<String, Long> getQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception {
+    private Map<String, Long> parseQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception {
 
 //        List<QuesAnswer> quesAnswers = new ArrayList<>();
         Map<String,QuesAnswer> quesAnswers = new HashMap<>();
@@ -377,6 +373,7 @@ public class ClientServiceImpl implements ClientService {
         
         if (null != quesAnswers && quesAnswers.size() > 0) {
             quesAnswerList = new ArrayList<QuesAnswer>(quesAnswers.values());
+            logger.trace("parseQuesAnswer(), QuesAnswer before save->" + quesAnswerList.toString());
             quesAnswerDaoImpl.initQuesAnswers(quesAnswerList);
         }
 
