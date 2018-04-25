@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import com.ustudy.exam.dao.MultipleScoreSetDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesAnswerDivDao;
 import com.ustudy.exam.dao.RefAnswerDao;
+import com.ustudy.exam.model.AnswerSet;
+import com.ustudy.exam.model.MulScoreBox;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.QuesAnswerDiv;
@@ -39,26 +42,27 @@ public class AnswerServiceImpl implements AnswerService {
 	@Resource
 	private RefAnswerDao refAnswerDaoImpl;
 
-	@Resource
-	private MultipleScoreSetDao multipleScoreSetDaoImpl;
+	@Autowired
+	private MultipleScoreSetDao mulScoreSetDaoImpl;
 
-	public Map<String, Object> getQuesAnswer(Long egsId) throws Exception {
+	public AnswerSet getQuesAnswer(Long egsId) throws Exception {
 
-		logger.info("getQuesAnswer(), egsId=" + egsId);
+		logger.debug("getQuesAnswer(), egsId=" + egsId);
+		
+		AnswerSet ansS = new AnswerSet();
 
 		try {
-			Map<String, Object> result = new HashMap<>();
-
-			result.put("refAnswers", refAnswerDaoImpl.getRefAnswers(egsId));
-			result.put("quesAnswers", getQuesAnswers(egsId));
-			result.put("checkBoxScores", getCheckBoxScores(egsId));
-
-			return result;
+			ansS.setRefAnswers(refAnswerDaoImpl.getRefAnswers(egsId));
+			ansS.setQuesAnswers(getQuesAnswers(egsId));
+			ansS.setCheckBoxScores(getCheckBoxScores(egsId));
+			
 		} catch (Exception e) {
-			logger.error("getQuesAnswer select error. -> msg = " + e.getMessage());
+			logger.error("getQuesAnswer(), failed with exception->" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}
+		
+		return ansS;
 
 	}
 
@@ -112,20 +116,32 @@ public class AnswerServiceImpl implements AnswerService {
 		return quesAnswers;
 	}
 
-	private JSONArray getCheckBoxScores(Long egsId) {
-		JSONArray checkBoxScores = new JSONArray();
+	private List<MulScoreBox> getCheckBoxScores(Long egsId) {
+		/*JSONArray checkBoxScores = new JSONArray();
 		List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
 		Map<Integer, List<MultipleScoreSet>> scores = new HashMap<>();
 		for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-			List<MultipleScoreSet> list = scores.get(multipleScoreSet.getCorrectAnswerCount());
+			List<MultipleScoreSet> list = scores.get(multipleScoreSet.getTotal());
 			if (null == list) {
 				list = new ArrayList<>();
 			}
 			list.add(multipleScoreSet);
-			scores.put(multipleScoreSet.getCorrectAnswerCount(), list);
-		}
+			scores.put(multipleScoreSet.getTotal(), list);
+		}*/
+		
+		List<MultipleScoreSet> mulScoreSets = mulScoreSetDaoImpl.getAggrMulScoreSet(egsId);
 
-		for (Integer size : scores.keySet()) {
+		List<MulScoreBox> mulScoreBoxL = null;
+		for (MultipleScoreSet mss: mulScoreSets) {
+			if (mulScoreBoxL == null)
+				mulScoreBoxL = new ArrayList<MulScoreBox>();
+			MulScoreBox msb = new MulScoreBox(mss.getTotal(), mss.getAggScore());
+			mulScoreBoxL.add(msb);
+		}
+		
+		return mulScoreBoxL;
+		
+	/*	for (Integer size : scores.keySet()) {
 			JSONObject object = new JSONObject();
 			object.put("size", size);
 			object.put("seted", false);
@@ -133,7 +149,7 @@ public class AnswerServiceImpl implements AnswerService {
 			List<MultipleScoreSet> list = scores.get(size);
 			for (MultipleScoreSet multipleScoreSet : list) {
 				JSONObject object_ = new JSONObject();
-				object_.put("count", multipleScoreSet.getStudentCorrectCount());
+				object_.put("count", multipleScoreSet.getSelected());
 				object_.put("score", multipleScoreSet.getScore());
 
 				scores_.add(object_);
@@ -143,22 +159,22 @@ public class AnswerServiceImpl implements AnswerService {
 			checkBoxScores.add(object);
 		}
 
-		return checkBoxScores;
+		return checkBoxScores;*/
 	}
 
 	public boolean deleteQuesAnswers(Long egsId) throws Exception {
 
-		logger.info("deleteQuesAnswers -> egsId=" + egsId);
+		logger.info("deleteQuesAnswers(), clear answer set for egsId=" + egsId);
 
 		try {
 			quesAnswerDivDaoImpl.deleteQuesAnswerDivs(egsId);
 			// quesAnswerDaoImpl.deleteQuesAnswers(egsId);
 			refAnswerDaoImpl.deleteRefAnswers(egsId);
-			multipleScoreSetDaoImpl.deleteMultipleScoreSets(egsId);
+			mulScoreSetDaoImpl.deleteMultipleScoreSets(egsId);
 
 			return true;
 		} catch (Exception e) {
-			logger.error("deleteQuesAnswers delete error. -> msg = " + e.getMessage());
+			logger.error("deleteQuesAnswers(),  failed with exception->" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}
@@ -496,9 +512,9 @@ public class AnswerServiceImpl implements AnswerService {
 						int studentCorrectCount = score.getInt("count");
 						float score_ = Float.valueOf(score.getString("score"));
 						MultipleScoreSet multipleScoreSet = new MultipleScoreSet();
-						multipleScoreSet.setExamGradeSubId(egsId);
-						multipleScoreSet.setCorrectAnswerCount(correctAnswerCount);
-						multipleScoreSet.setStudentCorrectCount(studentCorrectCount);
+						multipleScoreSet.setEgsId(egsId);
+						multipleScoreSet.setTotal(correctAnswerCount);
+						multipleScoreSet.setSelected(studentCorrectCount);
 						multipleScoreSet.setScore(score_);
 
 						multipleScoreSets.add(multipleScoreSet);
@@ -508,7 +524,7 @@ public class AnswerServiceImpl implements AnswerService {
 		}
 
 		if (!multipleScoreSets.isEmpty()) {
-			multipleScoreSetDaoImpl.insertMultipleScoreSets(multipleScoreSets);
+			mulScoreSetDaoImpl.insertMultipleScoreSets(multipleScoreSets);
 		}
 
 	}

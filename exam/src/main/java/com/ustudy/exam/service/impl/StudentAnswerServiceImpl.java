@@ -184,7 +184,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
         List<MultipleScoreSet> list = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
         if (null != list && list.size() > 0) {
             for (MultipleScoreSet multipleScoreSet : list) {
-                multipleScoreSets.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet);
+                multipleScoreSets.put(multipleScoreSet.getSelected(), multipleScoreSet);
             }
         }
 
