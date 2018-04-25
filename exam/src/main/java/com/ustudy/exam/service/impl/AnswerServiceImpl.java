@@ -135,7 +135,7 @@ public class AnswerServiceImpl implements AnswerService {
 		for (MultipleScoreSet mss: mulScoreSets) {
 			if (mulScoreBoxL == null)
 				mulScoreBoxL = new ArrayList<MulScoreBox>();
-			MulScoreBox msb = new MulScoreBox(mss.getTotal(), mss.getAggScore());
+			MulScoreBox msb = new MulScoreBox(mss.getTotal(), mss.getAggrScore());
 			mulScoreBoxL.add(msb);
 		}
 		
