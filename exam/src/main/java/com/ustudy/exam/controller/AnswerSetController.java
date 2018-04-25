@@ -27,8 +27,7 @@ public class AnswerSetController {
 	private AnswerService ansSer;
 
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
-	public UResp getQuesAnswers(@PathVariable Long egsId, HttpServletRequest request, 
-			HttpServletResponse response) {
+	public UResp getQuesAnswers(@PathVariable Long egsId, HttpServletRequest req, HttpServletResponse resp) {
 
 		logger.debug("getQuesAnswers(), retrieving answers for " + egsId);
 
@@ -38,6 +37,7 @@ public class AnswerSetController {
 			res.setData(ansSer.getQuesAnswer(egsId));
 			res.setRet(true);
 		} catch (Exception e) {
+			resp.setStatus(500);
 			res.setMessage("retrieve answers failed with exception->" + e.getMessage());
 			logger.error("getQuesAnswers(), retrieved answers failed for " + egsId + ", " + e.getMessage());
 		}
@@ -56,7 +56,7 @@ public class AnswerSetController {
 	 */
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
 	public UResp saveQuesAnswers(@PathVariable Long egsId, @RequestBody String paras, 
-			HttpServletRequest request,	HttpServletResponse response) {
+			HttpServletRequest request,	HttpServletResponse resp) {
 
 		// TODO: refactor code, paras should be model rather than raw json object
 		logger.debug("saveQuesAnswers(), save answers for " + egsId + " with parameters->" + paras);
@@ -73,6 +73,7 @@ public class AnswerSetController {
 			res.setMessage("save answers failed with exception->" + e.getMessage());
 			logger.error("saveQuesAnswers(), save answers for " + egsId + 
 					" failed with exception->" + e.getMessage());
+			resp.setStatus(500);
 			e.printStackTrace();
 		}
 
