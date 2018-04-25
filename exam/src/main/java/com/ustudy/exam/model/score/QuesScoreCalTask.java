@@ -105,8 +105,8 @@ public class QuesScoreCalTask implements Callable<String> {
         Map<Integer, Float> map = new HashMap<>();
         if(null != mssL && mssL.size() > 0){
             for (MultipleScoreSet mss : mssL) {
-                if(mss.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
-                    map.put(mss.getStudentCorrectCount(), mss.getScore());
+                if(mss.getTotal() == answer.trim().replaceAll(",", "").length()){
+                    map.put(mss.getSelected(), mss.getScore());
                 }
             }
         }

@@ -45,11 +45,20 @@ public class AnswerSetController {
 		return res;
 	}
 
+	/**
+	 * setting answers for questions of egs
+	 * 
+	 * @param egsId
+	 * @param paras
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
 	public UResp saveQuesAnswers(@PathVariable Long egsId, @RequestBody String paras, 
 			HttpServletRequest request,	HttpServletResponse response) {
 
-		// TODO: refactor code, paras should be model rather than row json object
+		// TODO: refactor code, paras should be model rather than raw json object
 		logger.debug("saveQuesAnswers(), save answers for " + egsId + " with parameters->" + paras);
 		
 		UResp res = new UResp();

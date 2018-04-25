@@ -2,14 +2,15 @@ package com.ustudy.exam.dao;
 
 import java.util.List;
 
-import org.mybatis.spring.annotation.MapperScan;
-
+import org.apache.ibatis.annotations.Mapper;
 import com.ustudy.exam.model.MultipleScoreSet;
 
-@MapperScan
+@Mapper
 public interface MultipleScoreSetDao {
 
 	List<MultipleScoreSet> getAllMultipleScoreSets(Long egsId);
+	
+	List<MultipleScoreSet> getAggrMulScoreSet(Long egsId);
 	
 	boolean deleteMultipleScoreSets(Long egsId);
 	

@@ -198,8 +198,8 @@ public class ScoreServiceImpl implements ScoreService {
         
         if(null != multipleScoreSets && multipleScoreSets.size() > 0){
             for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-                if(multipleScoreSet.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
-                    map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                if(multipleScoreSet.getTotal() == answer.trim().replaceAll(",", "").length()){
+                    map.put(multipleScoreSet.getSelected(), multipleScoreSet.getScore());
                 }
             }
         }

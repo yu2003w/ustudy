@@ -4,14 +4,26 @@
 
 	<resultMap type="com.ustudy.exam.model.MultipleScoreSet" id="MultipleScoreSetResult">
         <id property="id" column="id"/>
-        <result property="examGradeSubId" column="exam_grade_sub_id"/>
-        <result property="correctAnswerCount" column="correct_answer_count"/>
-        <result property="studentCorrectCount" column="student_correct_count"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="total" column="correct_answer_count"/>
+        <result property="selected" column="student_correct_count"/>
         <result property="score" column="score"/>
+    </resultMap>
+    
+    <resultMap type="com.ustudy.exam.model.MultipleScoreSet" id="AggrMulScoreSetResult">
+        <id property="id" column="id"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="total" column="correct_answer_count"/>
+        <result property="aggrScores" column="scores"/>
     </resultMap>
 
 	<select id="getAllMultipleScoreSets" parameterType="Long" resultMap="MultipleScoreSetResult">
 		SELECT * FROM multiple_score_set where exam_grade_sub_id=#{egsId}
+	</select>
+	
+	<select id="getAggrMulScoreSet" parameterType="Long" resultMap="AggrMulScoreSetResult">
+		SELECT exam_grade_sub_id, correct_answer_count, group_concat(student_correct_count, '-', score) as 
+		scores from ustudy.multiple_score_set where exam_grade_sub_id = #{egsId} group by correct_answer_count
 	</select>
 
 	<delete id="deleteMultipleScoreSets" parameterType="Long">
@@ -21,7 +33,7 @@
 	<insert id="insertMultipleScoreSets" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into multiple_score_set (exam_grade_sub_id, correct_answer_count, student_correct_count, score) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
-	        (#{item.examGradeSubId},#{item.correctAnswerCount},#{item.studentCorrectCount},#{item.score})  
+	        (#{item.egsId},#{item.total},#{item.selected},#{item.score})  
 	    </foreach>  
 	</insert>
 
