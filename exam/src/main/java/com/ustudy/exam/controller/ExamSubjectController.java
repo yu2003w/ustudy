@@ -45,7 +45,7 @@ public class ExamSubjectController {
 			@RequestParam(required=false) String end, 
 			@RequestParam(required=false) String examName) {
 		
-		logger.debug("getExamSubjects(), ");
+		logger.debug("getExamSubjects(), /examsubjects/ visited");
 		
 		Map result = new HashMap<>();
 
@@ -63,7 +63,7 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubjects/{examId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId);
 		
 		Map result = new HashMap<>();
 
@@ -108,7 +108,7 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubjects/{examId}/{gradeId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId + "/" + gradeId);
 		
 		Map result = new HashMap<>();
 
@@ -128,7 +128,7 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId + "/" + gradeId + "/" + subjectId);
 		
 		Map result = new HashMap<>();
 
@@ -144,9 +144,9 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubject/{id}", method = RequestMethod.GET)
-	public Map getExamSubject(@PathVariable Long id) {
+	public Map getExamSubjectById(@PathVariable Long id) {
 		
-		logger.debug("getExamSubject().");
+		logger.debug("getExamSubjectById(), id->" + id);
 		
 		Map result = new HashMap<>();
 

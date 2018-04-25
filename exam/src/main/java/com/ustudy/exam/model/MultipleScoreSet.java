@@ -16,7 +16,7 @@ public class MultipleScoreSet implements Serializable {
 	
 	// format is as "1-0.0,2-0.0,3-0.0"
 	@JsonIgnore
-	private String aggrScore = null;
+	private String aggrScores = null;
 
 	public MultipleScoreSet() {
 		super();
@@ -80,25 +80,33 @@ public class MultipleScoreSet implements Serializable {
 	}
 
 	public String getAggScore() {
-		return getAggrScore();
+		return getAggrScores();
 	}
 
 	public String getAggrScore() {
-		return aggrScore;
+		return getAggrScores();
+	}
+
+	public String getAggrScores() {
+		return aggrScores;
 	}
 
 	public void setAggScore(String aggScore) {
-		setAggrScore(aggScore);
+		setAggrScores(aggScore);
 	}
 
 	public void setAggrScore(String aggScore) {
-		this.aggrScore = aggScore;
+		setAggrScores(aggScore);
+	}
+
+	public void setAggrScores(String aggScore) {
+		this.aggrScores = aggScore;
 	}
 
 	@Override
 	public String toString() {
 		return "MultipleScoreSet [id=" + id + ", egsId=" + egsId + ", total=" + total + ", selected=" + selected
-				+ ", score=" + score + ", aggScore=" + aggrScore + "]";
+				+ ", score=" + score + ", aggScore=" + aggrScores + "]";
 	}
 
 }
