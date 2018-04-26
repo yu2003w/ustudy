@@ -117,17 +117,6 @@ public class AnswerServiceImpl implements AnswerService {
 	}
 
 	private List<MulScoreBox> getCheckBoxScores(Long egsId) {
-		/*JSONArray checkBoxScores = new JSONArray();
-		List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
-		Map<Integer, List<MultipleScoreSet>> scores = new HashMap<>();
-		for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-			List<MultipleScoreSet> list = scores.get(multipleScoreSet.getTotal());
-			if (null == list) {
-				list = new ArrayList<>();
-			}
-			list.add(multipleScoreSet);
-			scores.put(multipleScoreSet.getTotal(), list);
-		}*/
 		
 		List<MultipleScoreSet> mulScoreSets = mulScoreSetDaoImpl.getAggrMulScoreSet(egsId);
 
@@ -139,26 +128,6 @@ public class AnswerServiceImpl implements AnswerService {
 		}
 		
 		return mulScoreBoxL;
-		
-	/*	for (Integer size : scores.keySet()) {
-			JSONObject object = new JSONObject();
-			object.put("size", size);
-			object.put("seted", false);
-			JSONArray scores_ = new JSONArray();
-			List<MultipleScoreSet> list = scores.get(size);
-			for (MultipleScoreSet multipleScoreSet : list) {
-				JSONObject object_ = new JSONObject();
-				object_.put("count", multipleScoreSet.getSelected());
-				object_.put("score", multipleScoreSet.getScore());
-
-				scores_.add(object_);
-			}
-			object.put("scores", scores_);
-
-			checkBoxScores.add(object);
-		}
-
-		return checkBoxScores;*/
 	}
 
 	public boolean deleteQuesAnswers(Long egsId) throws Exception {

@@ -599,23 +599,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		logger.trace("retrieveObjScores(), obj scores retrieved for " + egsId + "->" + scoreM.values());
 		return new ArrayList<SubScore>(scoreM.values());
 	}
-	
-  /*private Map<Long, Float> getObjScores(Long egsId) {
-
-		Map<Long, Float> result = new HashMap<>();
-		
-		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectObjScores(egsId);
-		for (Map<String, Object> map : scores) {
-			if (null != map.get("eid") && null != map.get("score")) {
-				long studentId = (int) map.get("eid");
-				Object score = map.get("score");
-				result.put(studentId, Float.parseFloat(score.toString()));
-			}
-		}
-
-		return result;
-
-	}*/
 
 	/**
 	 * @param egsId
@@ -656,90 +639,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		logger.debug("retrieveSubScores(), detailed subject scores for " + egsId + "->" + scoreM.values());
 		return scoreM;
 	}
-	
-/*	private Map<Long, Float> getSubjScores(Long egsId) {
-
-		Map<Long, Float> result = new HashMap<>();
-
-		Map<Long, Map<Long, List<Map<String, Object>>>> questScores = new HashMap<>();
-
-		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectSubjScores(egsId);
-		for (Map<String, Object> map : scores) {
-			if (null != map.get("id") && null != map.get("quesid")) {
-				long studentId = (int) map.get("id");
-				long quesid = (int) map.get("quesid");
-				Map<Long, List<Map<String, Object>>> questions = questScores.get(studentId);
-				if (null == questions) {
-					questions = new HashMap<>();
-				}
-				List<Map<String, Object>> qes_scores = questions.get(quesid);
-				if (null == qes_scores) {
-					qes_scores = new ArrayList<>();
-				}
-				qes_scores.add(map);
-
-				questions.put(quesid, qes_scores);
-				questScores.put(studentId, questions);
-			}
-		}
-
-		Map<Long, String> markModes = getMarkMode(egsId);
-
-		for (Entry<Long, Map<Long, List<Map<String, Object>>>> stu : questScores.entrySet()) {
-			long studentId = stu.getKey();
-			float score = 0;
-			for (Entry<Long, List<Map<String, Object>>> qes : stu.getValue().entrySet()) {
-				long quesid = qes.getKey();
-				List<Map<String, Object>> qes_scores = qes.getValue();
-				String markMode = markModes.get(quesid);
-				if (markMode.equals("双评")) {
-					if (qes_scores.size() >= 2 && qes_scores.size() <= 3) {
-						float sc = 0;
-						int count = 0;
-						for (Map<String, Object> map : qes_scores) {
-							boolean isfinal = (boolean) map.get("isfinal");
-							if(isfinal){
-								count = 1;
-								sc = (float) map.get("score");
-								break;
-							} else {
-								count = count + 1;
-								sc = sc + (float) map.get("score");
-							}
-						}
-						if(sc>0){
-							score += (float) sc/count;
-						}
-					}
-				} else {
-					if (qes_scores.size() > 0) {
-						score += (float) qes_scores.get(0).get("score");
-					}
-				}
-			}
-
-			result.put(studentId, score);
-		}
-
-		return result;
-
-	}*/
-
-/*	private Map<Long, String> getMarkMode(Long egsId) {
-
-		Map<Long, String> result = new HashMap<>();
-
-		List<Map<String, Object>> scores = egsDaoImpl.getExamSubjectMarkMode(egsId);
-		for (Map<String, Object> map : scores) {
-			if (null != map.get("id") && null != map.get("markMode")) {
-				long questionId = (int) map.get("id");
-				String markMode = map.get("markMode").toString();
-				result.put(questionId, markMode);
-			}
-		}
-
-		return result;
-	}*/
 
 	/* (non-Javadoc)
 	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
