@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ustudy.dashboard.model.OrgBrife;
 import com.ustudy.dashboard.model.School;
+import com.ustudy.dashboard.model.UResp;
 import com.ustudy.dashboard.services.SchoolService;
 
 @RestController
@@ -170,5 +171,22 @@ public class SchoolController {
 		return item;
 	}
 
+	@RequestMapping(value="/subjects/", method = RequestMethod.GET) 
+	public UResp getSubDict(HttpServletResponse resp) {
+		logger.debug("getSubDict(), retrieving all subjects");
+		
+		UResp res = new UResp();
+		try {
+			res.setData(ss.retrieveSubjects());
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getSubDict(), failed with exception->" + e.getMessage());
+			resp.setStatus(500);
+			res.setMessage(e.getMessage());
+		}
+		
+		return res;
+		
+	}
 }
 
