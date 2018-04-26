@@ -194,7 +194,7 @@ public class QuesAnswer implements Serializable {
 	public boolean isValid() {
 		boolean ret = true;
 		if ((this.type == null || this.type.isEmpty()) || (this.branch == null || this.branch.isEmpty()) 
-				|| this.score == 0 || 
+				|| (this.score == 0 || this.type.compareTo("填空题") != 0) || 
 				((this.type.compareTo("单选题") == 0 || this.type.compareTo("多选题") == 0) && this.choiceNum <= 0)) {
 			ret = false;
 		}
