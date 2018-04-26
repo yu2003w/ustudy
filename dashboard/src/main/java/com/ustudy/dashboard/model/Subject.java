@@ -1,7 +1,9 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Subject implements Serializable {
@@ -17,7 +19,12 @@ public class Subject implements Serializable {
     @JsonProperty("id")
 	private String subId = null;
 
-	
+    // contains child subject information with format {"ids":[7,8,9]}
+    @JsonIgnore
+    private String child = null;
+    
+    private Map<String, String> childSubs = null;
+    
 	public Subject() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -46,9 +53,25 @@ public class Subject implements Serializable {
 		this.subId = subId;
 	}
 
+	public Map<String, String> getChildSubs() {
+		return childSubs;
+	}
+
+	public void setChildSubs(Map<String, String> childSubs) {
+		this.childSubs = childSubs;
+	}
+
+	public String getChild() {
+		return child;
+	}
+
+	public void setChild(String child) {
+		this.child = child;
+	}
+
 	@Override
 	public String toString() {
-		return "Subject [subName=" + subName + ", subId=" + subId + "]";
+		return "Subject [subName=" + subName + ", subId=" + subId + ", childSubs=" + childSubs + "]";
 	}
 
 	
