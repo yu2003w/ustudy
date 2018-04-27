@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.UResp;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
-import com.ustudy.exam.service.ExamineeService;
+import com.ustudy.exam.service.ExamStuService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
 import com.ustudy.exam.service.StudentPaperService;
@@ -46,7 +46,7 @@ public class ClientController {
 	private StudentAnswerService sas;
 	
 	@Autowired
-	private ExamineeService eeS;
+	private ExamStuService eeS;
 	
 	@Autowired
 	private StudentPaperService sps;
