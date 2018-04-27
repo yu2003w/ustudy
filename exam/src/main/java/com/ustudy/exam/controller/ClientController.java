@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.UResp;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
-import com.ustudy.exam.service.ExamStudentService;
+import com.ustudy.exam.service.ExamineeService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
 import com.ustudy.exam.service.StudentPaperService;
@@ -46,7 +46,7 @@ public class ClientController {
 	private StudentAnswerService sas;
 	
 	@Autowired
-	private ExamStudentService ests;
+	private ExamineeService eeS;
 	
 	@Autowired
 	private StudentPaperService sps;
@@ -428,7 +428,7 @@ public class ClientController {
 		
 		result = new UResp();
 		result.setRet(true);
-		result.setData(ests.getStudentInfoByExamGrade(examId, gradeId));
+		result.setData(eeS.getStudentInfoByExamGrade(examId, gradeId));
 		
 		return result;
 		

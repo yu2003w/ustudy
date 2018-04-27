@@ -200,7 +200,7 @@ public class ExamController {
 
 	@RequestMapping(value = "/exam/summary/{examId}", method = RequestMethod.GET)
 	public Map getExamSummary(@PathVariable Long examId, HttpServletResponse response) {
-		logger.debug("getExamSummary(" + examId + ").");
+		logger.debug("getExamSummary(), assemble exam summary for " + examId);
 
 		Map result = new HashMap<>();
 

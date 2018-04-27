@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ustudy.exam.service.ExamStudentService;
+import com.ustudy.exam.service.ExamineeService;
 
 @RestController
 @RequestMapping(value = "/")
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class ExamStudentController {
+public class ExamineeController {
 	
-	private static final Logger logger = LogManager.getLogger(ExamStudentController.class);
+	private static final Logger logger = LogManager.getLogger(ExamineeController.class);
 	
 	@Autowired
-	private ExamStudentService service;
+	private ExamineeService service;
 	
 	/**
 	 * 

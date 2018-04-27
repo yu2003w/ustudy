@@ -130,8 +130,6 @@ public class ExamServiceImpl implements ExamService {
 
 	public JSONArray getExamSummary(Long examId) {
 
-		logger.info("getExamSummary -> examId:" + examId);
-
 		List<Map<String, Object>> examSubjects = examDaoImpl.getExamSummary(examId);
 
 		if (null != examSubjects && examSubjects.size() > 0) {

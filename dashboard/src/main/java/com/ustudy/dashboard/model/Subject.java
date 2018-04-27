@@ -71,7 +71,8 @@ public class Subject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Subject [subName=" + subName + ", subId=" + subId + ", childSubs=" + childSubs + "]";
+		return "Subject [subName=" + subName + ", subId=" + subId + ", child=" + child + ", childSubs=" + childSubs
+				+ "]";
 	}
 
 	
