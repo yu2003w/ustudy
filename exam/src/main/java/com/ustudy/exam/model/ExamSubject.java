@@ -21,8 +21,9 @@ public class ExamSubject implements Serializable {
 	private int template;
 	private int objItemNum;
 	private int subItemNum;
-	private int taskDispatch;
-	private String answerSeted ;
+	private boolean markSwitch;
+	private boolean taskDispatch;
+	private boolean answerSet ;
 	private int uploadBathCount ;
 	private String blankAnswerPaper ;
 	private String blankQuestionsPaper ;
@@ -153,20 +154,28 @@ public class ExamSubject implements Serializable {
 		this.subItemNum = subItemNum;
 	}
 
-	public int getTaskDispatch() {
+	public boolean getMarkSwitch() {
+		return markSwitch;
+	}
+
+	public void setMarkSwitch(boolean markSwitch) {
+		this.markSwitch = markSwitch;
+	}
+
+	public boolean getTaskDispatch() {
 		return taskDispatch;
 	}
 
-	public void setTaskDispatch(int taskDispatch) {
+	public void setTaskDispatch(boolean taskDispatch) {
 		this.taskDispatch = taskDispatch;
 	}
 
-	public String getAnswerSeted() {
-		return answerSeted;
+	public boolean getAnswerSet() {
+		return answerSet;
 	}
 
-	public void setAnswerSeted(String answerSeted) {
-		this.answerSeted = answerSeted;
+	public void setAnswerSet(boolean answerSet) {
+		this.answerSet = answerSet;
 	}
 
 	public int getUploadBathCount() {
@@ -216,4 +225,18 @@ public class ExamSubject implements Serializable {
 	public String getExamName() { return examName; }
 
 	public void setExamName(String examName) { this.examName = examName; }
+
+	@Override
+	public String toString() {
+		return "ExamSubject [id=" + id + ", examid=" + examid + ", gradeId=" + gradeId + ", gradeName=" + gradeName
+				+ ", subId=" + subId + ", subName=" + subName + ", stuNum=" + stuNum + ", teacNum=" + teacNum
+				+ ", examPaper=" + examPaper + ", examAnswer=" + examAnswer + ", examPaperNum=" + examPaperNum
+				+ ", template=" + template + ", objItemNum=" + objItemNum + ", subItemNum=" + subItemNum
+				+ ", markSwitch=" + markSwitch + ", taskDispatch=" + taskDispatch + ", answerSeted=" + answerSet
+				+ ", uploadBathCount=" + uploadBathCount + ", blankAnswerPaper=" + blankAnswerPaper
+				+ ", blankQuestionsPaper=" + blankQuestionsPaper + ", xmlServerPath=" + xmlServerPath
+				+ ", originalData=" + originalData + ", examName=" + examName + ", questions=" + questions + "]";
+	}
+	
+	
 }

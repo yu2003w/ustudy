@@ -13,8 +13,30 @@
         <result property="choiceNum" column="choice_num"/>
     </resultMap>
 
+    <resultMap type="com.ustudy.exam.model.score.ScoreRule" id="ScoreRule">
+        <id property="id" column="id"/>
+        <result property="egsId" column="exam_grade_sub_id"/>
+        <result property="quesid" column="quesid"/>
+        <result property="quesno" column="quesno"/>
+        <result property="branch" column="branch"/>
+        <result property="answer" column="answer"/>
+        <result property="type" column="type"/>
+        <result property="choiceNum" column="choice_num"/>
+        <result property="score" column="score"/>
+        <result property="mulscoreset" column="mulscoreset"/>
+    </resultMap>
+    
 	<select id="getRefAnswers" parameterType="Long" resultMap="RefAnswerResult">
 		SELECT r.*, q.type, q.choice_num FROM refanswer r LEFT JOIN question q ON r.quesid = q.id WHERE r.exam_grade_sub_id = #{egsId} ORDER BY r.quesno
+	</select>
+	
+	<select id="getEgsScoreRules" parameterType="Long" resultMap="ScoreRule">
+		select ref.exam_grade_sub_id as egsId, ref.quesid, ref.quesno, ref.branch, ref.answer, question.score, 
+		question.choice_num as choiceNum, question.type, (select group_concat(mss.correct_answer_count, '-', 
+		mss.student_correct_count, '-', mss.score) from multiple_score_set as mss 
+		where ref.exam_grade_sub_id = mss.exam_grade_sub_id ) as mulscoreset from refanswer as ref 
+		join question on (question.exam_grade_sub_id = ref.exam_grade_sub_id and ref.quesid = question.id) 
+		where ref.exam_grade_sub_id = #{egsId}
 	</select>
 	
 	<select id="getRefAnswer" parameterType="java.util.Map" resultMap="RefAnswerResult">

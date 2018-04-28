@@ -20,7 +20,7 @@ public interface MarkTaskService {
 	 * each time, only one student's paper need to be updated afer mark completed
 	 * 
 	 */
-	public List<MarkUpdateResult> updateMarkResult(QuestionPaper qp);
+	public List<MarkUpdateResult> updateMarkResult(QuestionPaper qp, Long egsId);
 	
 	/*
 	 * only certain roles could retrieve all mark tasks for certain subject

@@ -12,6 +12,7 @@ public class PaperRequest implements Serializable {
 	private String qid = null;
 	private String assmode = null;
 	private String markmode = null;
+	private float scorediff = 0;
 	
 	// parameters to retrieve already marked papers
 	private int startSeq = -1;
@@ -22,14 +23,16 @@ public class PaperRequest implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public PaperRequest(String qid, String assmode, String markmode, int startSeq, int endSeq) {
+	public PaperRequest(String qid, String assmode, String markmode, float scorediff, int startSeq, int endSeq) {
 		super();
 		this.qid = qid;
 		this.assmode = assmode;
 		this.markmode = markmode;
+		this.scorediff = scorediff;
 		this.startSeq = startSeq;
 		this.endSeq = endSeq;
 	}
+
 
 	public String getQid() {
 		return qid;
@@ -71,10 +74,18 @@ public class PaperRequest implements Serializable {
 		this.endSeq = endSeq;
 	}
 
+	public float getScorediff() {
+		return scorediff;
+	}
+
+	public void setScorediff(float scorediff) {
+		this.scorediff = scorediff;
+	}
+
 	@Override
 	public String toString() {
-		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + ", markmode=" + markmode + ", startSeq=" + startSeq
-				+ ", endSeq=" + endSeq + "]";
+		return "PaperRequest [qid=" + qid + ", assmode=" + assmode + ", markmode=" + markmode + ", scorediff="
+				+ scorediff + ", startSeq=" + startSeq + ", endSeq=" + endSeq + "]";
 	}
 
 }

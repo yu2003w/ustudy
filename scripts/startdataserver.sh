@@ -11,6 +11,8 @@ if [ $# != 2 ]; then
 fi
 WORK_DIR=$1
 SCHEMA_DIR=$2
+OS_NAME=`uname -s`
+
 echo "Using ${WORK_DIR} as working directory"
 if [ ! -d ${WORK_DIR}/mysql/schema/ ]; then
   mkdir -p ${WORK_DIR}/mysql/schema/ 
@@ -39,7 +41,12 @@ else
   echo "Copy schema files into " ${WORK_DIR}/mysql/schema/ " successfully"
 fi
 
-chown -R 999:999 ${WORK_DIR}/mysql/
+# permission needed for MacOS
+if [ $OS_NAME = "Darwin" ]; then
+  chmod -R 777 ${WORK_DIR}/mysql
+else
+  chown -R 999:999 ${WORK_DIR}/mysql/
+fi
 
 MYSQL_LOG_DIR=${WORK_DIR}/logs/mysql/
 if [ ! -d ${MYSQL_LOG_DIR} ]; then
@@ -55,7 +62,12 @@ fi
 # noted here, mysql image uses sbt user whose id is 999
 # after successfully created the logs directory, need to chown to sbt in order
 # to create log files successfully
-chown 999:999 ${MYSQL_LOG_DIR}
+# permission needed for MacOS
+if [ $OS_NAME = "Darwin" ]; then
+  chmod -R 777 ${MYSQL_LOG_DIR}
+else
+  chown 999:999 ${MYSQL_LOG_DIR}
+fi
 
 # before launching mysql service, clear mysql logs 
 echo "clear logs generated in ${MYSQL_LOG_DIR}"
@@ -63,8 +75,9 @@ rm -rf ${MYSQL_LOG_DIR}/*
 
 # To specify log file name, use '--general_log_file gen.log' as needed
 # add more mysql logs
-docker run --rm -it --name ustudy-dw -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
+docker run --rm -it --name ustudy-dw --hostname dw-master -v ${WORK_DIR}/mysql/data:/var/lib/mysql \
     -v ${WORK_DIR}/mysql/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
+    -v ${SCHEMA_DIR}/../scripts/master-mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf \
     -p 13306:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
     --log-error=/var/log/mysql/mysqld.log  \
     --general_log=1 --general_log_file /var/log/mysql/gen.log \
@@ -76,25 +89,21 @@ if [ $? != 0 ];then
 else
   echo "Launched ustudy-dw container successfully"
 fi
-
+if [ $OS_NAME = "Darwin" ]; then
+  mkdir -p ${WORK_DIR}/nginx/frontend
+  mkdir -p ${WORK_DIR}/logs/nginx
+  chmod -R 777 ${WORK_DIR}/nginx
+  chmod -R 777 ${WORK_DIR}/logs/nginx
+fi
 # start nginx as proxy for frontend services
-docker run --rm -it --name nginx -p 80:80 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
-    -v ${WORK_DIR}/logs/nginx/:/var/log/nginx/ -d nginx:1.12
+docker run --rm -it --name nginx -p 443:443 -v ${WORK_DIR}/nginx/frontend/:/mnt/frontend/ \
+    -v ${WORK_DIR}/logs/nginx/:/var/log/nginx/ -d nginx-ustudy:1.12
 if [ $? != 0 ]; then
   echo "Failed to launch nginx container"
   docker stop ustudy-dw
   exit 1
 else
   echo "Launched nginx container successfully"
-fi
-docker cp ${SCHEMA_DIR}/../scripts/nginx.conf nginx:/etc/nginx/nginx.conf
-docker exec -u root nginx /bin/sh -c 'nginx -s reload'
-if [ $? != 0 ]; then
-  echo "Failed update nginx configuration"
-  docker stop ustudy-dw nginx
-  exit 1
-else
-  echo "Updated nginx configuration"
 fi
 
 # set container timezone to Asia/Shanghai

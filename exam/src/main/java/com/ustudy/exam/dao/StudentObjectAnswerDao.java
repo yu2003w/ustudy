@@ -13,7 +13,7 @@ public interface StudentObjectAnswerDao {
 
 	void insertStudentObjectAnswer(StudentObjectAnswer answer);
 	
-	void updateStudentObjectAnswer(@Param("id")Long id, @Param("score")Integer score);
+	void updateStudentObjectAnswer(@Param("id")Long id, @Param("score")Float score);
 	
 	void updateBatch(List<Map<String, Object>> scores);
 	

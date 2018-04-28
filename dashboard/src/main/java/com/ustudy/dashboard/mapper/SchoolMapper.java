@@ -85,4 +85,8 @@ public interface SchoolMapper {
 	@Options(useGeneratedKeys=true)
 	public int createCleaner(Teacher tea);
 	
+	@Select("select id as subId, name as subName, child from ustudy.subject")
+	public List<Subject> getAllSubjects();
+	
+	
 }

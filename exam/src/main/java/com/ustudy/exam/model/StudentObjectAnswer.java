@@ -9,7 +9,7 @@ public class StudentObjectAnswer implements Serializable {
 	private Long id;
 	private Long paperid;
 	private int quesno;
-	private int score;
+	private float score;
 	private String answer;
 	private int answerHas;
 	
@@ -37,11 +37,11 @@ public class StudentObjectAnswer implements Serializable {
 		this.quesno = quesno;
 	}
 	
-	public int getScore() {
+	public float getScore() {
 		return score;
 	}
 	
-	public void setScore(int score) {
+	public void setScore(float score) {
 		this.score = score;
 	}
 	
@@ -59,6 +59,30 @@ public class StudentObjectAnswer implements Serializable {
 	
 	public void setAnswerHas(int answerHas) {
 		this.answerHas = answerHas;
+	}
+
+	/**
+     * @param stuans  answer selected by student
+     * @param refans  reference answer set
+     * @return
+     */
+    public static int getCorrectCount(String stuans, String refans) {
+    	if (stuans != null && stuans.length() > 0) {
+    		for (int i = 0; i < stuans.length(); i++) {
+    			if (refans.indexOf(stuans.charAt(i)) == -1) {
+    				return 0;
+    			}
+    		}
+    		return stuans.length();
+    	}
+    	else
+    		return 0;
+    }
+    
+	@Override
+	public String toString() {
+		return "StudentObjectAnswer [id=" + id + ", paperid=" + paperid + ", quesno=" + quesno + ", score=" + score
+				+ ", answer=" + answer + ", answerHas=" + answerHas + "]";
 	}
 	
 }

@@ -184,7 +184,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
         List<MultipleScoreSet> list = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
         if (null != list && list.size() > 0) {
             for (MultipleScoreSet multipleScoreSet : list) {
-                multipleScoreSets.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet);
+                multipleScoreSets.put(multipleScoreSet.getSelected(), multipleScoreSet);
             }
         }
 
@@ -217,7 +217,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
                         QuesAnswer quesAnswer = quesAnswers.get(refAnswer.getQuesid());
                         answer.setScore(quesAnswer.getScore());
                     } else if (stuAnswer.length() > 0 && correctAnswer.length() >= stuAnswer.length()) {
-                        int studentCorrectCount = getStudentCorrectCount(stuAnswer.toUpperCase(), correctAnswer.toUpperCase());
+                        int studentCorrectCount = StudentObjectAnswer.getCorrectCount(stuAnswer.toUpperCase(), correctAnswer.toUpperCase());
                         if (studentCorrectCount > 0) {
                             answer.setScore(multipleScoreSets.get(studentCorrectCount).getScore());
                         }
@@ -227,24 +227,6 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
         }
 
         return answers;
-    }
-
-    private int getStudentCorrectCount(String stuAnswer, String correctAnswer) {
-
-        int studentCorrectCount = 0;
-
-        String[] stuAnswers = stuAnswer.split(",");
-        for (String answer : stuAnswers) {
-            if (correctAnswer.contains(answer)) {
-                studentCorrectCount++;
-            } else {
-                studentCorrectCount = 0;
-                break;
-            }
-        }
-
-        return studentCorrectCount;
-
     }
 
     @Transactional

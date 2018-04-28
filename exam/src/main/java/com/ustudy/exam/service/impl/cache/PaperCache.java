@@ -33,8 +33,7 @@ public class PaperCache {
 
 	// <String, MarkStaticsCache>, key is teacher id combined with quesion id
 	// similar as t-13810001341-q-17
-	// value MartStaticsCache contains all papers assigned to the teacher including
-	// already marked
+	// MartStaticsCache contains all papers assigned to the teacher including already marked
 	@Autowired
 	private RedisTemplate<String, MarkStaticsCache> teaPaperC;
 
@@ -63,22 +62,33 @@ public class PaperCache {
 			return false;
 		}
 
-		// for double mark, to double papers ids in the cache, when dispatch the task,
-		// should avoid assign
-		// same paper to the same teacher twice
+		// for double mark, to double papers ids in the cache, when dispatch the task, 
+		// should avoid assign same paper to the same teacher twice
 		// Thanks Li Qi for the idea.
+		List<String> firstTeaL = null;
+		boolean dMark = false;
 		if (pr.getMarkmode().compareTo("双评") == 0) {
-			// noted: here, mctL.addAll(mtcL) should not be used, it's not right usage for
-			// list copy
+			// noted: here, mctL.addAll(mtcL) should not be used, it's not right usage for list copy
 			List<MarkTaskCache> dt = new ArrayList<MarkTaskCache>();
+			// place marktask as paper A, A', B, B', C, C', D, D' and so on
 			for (MarkTaskCache mt : mtcL) {
 				dt.add(new MarkTaskCache(mt));
+				dt.add(new MarkTaskCache(mt));
 			}
-			mtcL.addAll(dt);
+			mtcL = dt;
+			// retrieve teachers for first round mark
+			firstTeaL = mtM.getTeachersByQidType(pr.getQid(), "初评");
+			if (firstTeaL == null || firstTeaL.isEmpty()) {
+				logger.error("cachePapers(), no teachers retrieved for " + pr.getQid());
+				return false;
+			}
+			else
+				dMark = true;
 		}
-		logger.info("cachePapers(), total paper size -> " + mtcL.size());
+		logger.info("cachePapers(), total paper size -> " + mtcL.size() + ", qid->" + pr.getQid() + 
+				(dMark == false ? "": firstTeaL.toString()));
 
-		// get viewed papers list
+		// get already viewed papers
 		List<PaperScoreCache> viewedP = mtM.getViewedPapersByQuesId(pr.getQid());
 		Map<String, PaperScoreCache[]> vIds = new HashMap<String, PaperScoreCache[]>();
 		if (viewedP != null && !viewedP.isEmpty()) {
@@ -102,24 +112,40 @@ public class PaperCache {
 			}
 		}
 
-		// fill ids for viewed papers， also fill seq for all papers
+		// fill ids for viewed papers， also fill sequences for all papers
+		// for double marks, calculate to associate teacher and marked papers
 		int i = 0;
+		int teaN = dMark == true ? firstTeaL.size():0;
 		for (MarkTaskCache mtc : mtcL) {
 			PaperScoreCache[] ps = vIds.get(mtc.getPaperid());
 			if (ps != null) {
-				if (ps[0] != null) {
-					logger.trace("cachePapers(), ps[0]" + ps[0].toString());
-					mtc.setStatus(2);
-					mtc.setTeacid(ps[0].getTeacid());
-					mtc.setScore(ps[0].getScore());
-					ps[0] = null;
-				} else if (ps[1] != null) {
-					logger.trace("cachePapers(), ps[1]" + ps[1].toString());
-					mtc.setStatus(2);
-					mtc.setTeacid(ps[1].getTeacid());
-					mtc.setScore(ps[1].getScore());
-					// need to clean once set
-					vIds.remove(mtc.getPaperid());
+				logger.trace("cachePapers(), " + ps[0] + ps[1]);
+				String teacid = null;
+				if (dMark) {
+					teacid = firstTeaL.get(i % teaN);
+					if (ps[0] != null && ps[0].getTeacid().compareTo(teacid) == 0) {
+						logger.trace("cachePapers(), double marked papers, ps[0]" + ps[0].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[0].getTeacid());
+						mtc.setScore(ps[0].getScore());
+						ps[0] = null;
+					} else if (ps[1] != null && ps[1].getTeacid().compareTo(teacid) == 0) {
+						logger.trace("cachePapers(), double marked papers, ps[1]" + ps[1].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[1].getTeacid());
+						mtc.setScore(ps[1].getScore());
+						// need to clean once set
+						vIds.remove(mtc.getPaperid());
+					}
+				} else {
+					if (ps[0] != null) {
+						logger.trace("cachePapers(), marked papers, " + ps[0].toString());
+						mtc.setStatus(2);
+						mtc.setTeacid(ps[0].getTeacid());
+						mtc.setScore(ps[0].getScore());
+						ps[0] = null;
+						vIds.remove(mtc.getPaperid());
+					}
 				}
 			}
 			mtc.setSeq(i++);
@@ -136,14 +162,20 @@ public class PaperCache {
 		return true;
 	}
 
-	private boolean popFinalMarkIds(String quesid) {
+	private boolean popFinalMarkIds(String quesid, float scorediff) {
+		if (scorediff <= 0) {
+			logger.error("popFinalMarkIds(), failed to calculate final mark papers due to scorediff=" + scorediff + 
+					" for quesid=" + quesid);
+			return false;
+		}
+		
 		String cacheK = this.QUES_PAPER_PREFIX + quesid;
 		List<MarkTaskCache> mtcL = paperC.opsForValue().get(cacheK);
 		if (mtcL == null || mtcL.isEmpty()) {
 			logger.error("popFinalMarkIds(), no cached papers for question " + quesid);
 			return false;
 		}
-		int num = mtcL.size() / 2;
+		int num = mtcL.size();
 
 		List<MarkTaskCache> mfL = new ArrayList<MarkTaskCache>();
 		List<PaperScoreCache> viewedP = mtM.getFinalViewedPapersByQuesId(quesid);
@@ -154,18 +186,18 @@ public class PaperCache {
 			}
 		}
 
-		for (int i = 0; i < num; i++) {
+		for (int i = 0; i < num; i += 2) {
 			MarkTaskCache mt = mtcL.get(i);
 			PaperScoreCache ps = viewedPM.get(mt.getPaperid());
 			if (ps != null) {
 				// already marked
-				MarkTaskCache fm = new MarkTaskCache(mt.getPaperid(), mt.getImg(), ps.getTeacid(), 2, ps.getScore(),
-						mt.getSeq());
+				MarkTaskCache fm = new MarkTaskCache(mt.getPaperid(), mt.getImg(), ps.getTeacid(), 2, 
+						ps.getScore(), mt.getSeq());
 				mfL.add(fm);
 			} else {
 				// make sure that related papers are marked
-				if ((mtcL.get(i).getScore() != -1 && mtcL.get(i + num).getScore() != -1)
-						&& (Math.abs(mtcL.get(i).getScore() - mtcL.get(i + num).getScore()) >= 5)) {
+				if ((mtcL.get(i).getScore() != -1 && mtcL.get(i + 1).getScore() != -1)
+						&& (Math.abs(mtcL.get(i).getScore() - mtcL.get(i + 1).getScore()) > scorediff)) {
 					// logger.debug("popFinalMarkIds(), mtcL[" + i +"] -> " + mtcL.get(i).toString()
 					// +
 					// ", mtcL[" + (i+num) + "]->" + mtcL.get(i+num).toString());
@@ -300,8 +332,8 @@ public class PaperCache {
 				logger.info("getPapersForSingleQues(), paper cached finished for question " + pr.getQid());
 			}
 
-			// for final mark, paper ids should be caculated from first round mark
-			if (isFinalMark && !popFinalMarkIds(pr.getQid())) {
+			// for final mark, paper ids should be calculated from first round mark
+			if (isFinalMark && !popFinalMarkIds(pr.getQid(), pr.getScorediff())) {
 				logger.warn("getPapersForSingleQues(), papers for final mark is not ready");
 				return null;
 			}
@@ -344,38 +376,35 @@ public class PaperCache {
 			msc.setTotal(amount);
 		}
 
-		int batch = 0, wanted = amount - msc.getCompleted();
+		// Noted: here, maybe there is unmarked papers in cache, however, user request more papers
+		int batch = 0, wanted = 0; 
+		if (msc.getpList().size() > msc.getCompleted()) {
+			wanted = amount - msc.getpList().size();
+		} else
+			wanted = amount - msc.getCompleted();
+		
 		if (wanted > MAX_THRES) {
 			batch = MAX_THRES;
 		} else
 			batch = wanted;
 		
-		logger.info("getPapersForSingleQues(), papers assigned to " + teacid + " is " + amount + 
-				" , current batch is " + batch);
+		logger.info("getPapersForSingleQues(), papers for " + teacid + " is as below:\nassigned=" + amount + 
+				" , completed=" + msc.getCompleted() + ", incache=" + msc.getpList().size() + ", batch=" + batch);
 
 		// allocated tasks
-		int count = 0, mid = 0;
+		int count = 0;
 		List<MarkTaskCache> firstMarkL = null;
 		if (isFinalMark) {
 			firstMarkL = paperC.opsForValue().get(QUES_PAPER_PREFIX + pr.getQid());
-			if (firstMarkL != null && !firstMarkL.isEmpty()) {
-				mid = firstMarkL.size() / 2;
-			}
 		}
 
 		if (role.equals("初评")) {
 			// for first mark, papers for each teacher could be calculated and paper sequence for each teacher
 			// is fixed once the mark task is assigned
-			int oriNum = mtcL.size() / 2;
-			List<Integer> task = new ArrayList<Integer>();
-			for (int i = 0; i < oriNum; i++) {
-				task.add(i);
-				task.add(i + oriNum);
-			}
-			logger.info("getPapersForSingleQues(), total task for first mark ->" + task.size() + 
+			logger.info("getPapersForSingleQues(), total task for first mark ->" + mtcL.size() + 
 					", amount->" + amount);
-			for (int i = tmi.getSeq() - 1; i < task.size() && count < amount; i += tmi.getNum()) {
-				MarkTaskCache mt = mtcL.get(task.get(i));
+			for (int i = tmi.getSeq() - 1; i < mtcL.size() && count < amount; i += tmi.getNum()) {
+				MarkTaskCache mt = mtcL.get(i);
 				logger.debug("getPapersForSingleQues(), index->" + i + ", " + mt.toString());
 				if (!msc.getCurAssign().containsKey(mt.getPaperid())) {
 					if (mt.getStatus() == 0) {
@@ -408,7 +437,7 @@ public class PaperCache {
 							// 1, final mark element 2, first mark element 3, first mark element
 							MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 							paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-							fm = firstMarkL.get(mt.getSeq() + mid);
+							fm = firstMarkL.get(mt.getSeq() + 1);
 							paperM.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 						}
 
@@ -526,18 +555,17 @@ public class PaperCache {
 		Map<String, MarkTaskCache> task = msc.getCurAssign();
 		List<String> pList = msc.getpList();
 		List<PaperImgCache> piC = new ArrayList<PaperImgCache>();
-		logger.debug("getPapersFromTeaCache(), currentAssign size ->" + task.size() + "\nkeys->" + task.keySet().toString()
-						+ ", startSeq->" + seq + ", wanted->" + wanted + "\nPaperList->" + pList.toString());
-		int i = 0, mid = -1;
+		logger.debug("getPapersFromTeaCache(), current assigned size ->" + task.size() + ",\nkeys->" + 
+				task.keySet().toString() + ", \nstartSeq->" + seq + ", wanted->" + wanted + 
+				"\nPaperList->" + pList.toString());
+		int i = 0;
 		if (wanted > MAX_THRES)
 			wanted = MAX_THRES;
 
 		List<MarkTaskCache> firstMarkL = null;
 		if (isfinal) {
 			firstMarkL = paperC.opsForValue().get(QUES_PAPER_PREFIX + quesid);
-			if (firstMarkL != null && !firstMarkL.isEmpty()) {
-				mid = firstMarkL.size() / 2;
-			} else {
+			if (firstMarkL == null || firstMarkL.isEmpty()) {
 				logger.error("getPapersFromTeaCache(), failed to retrieve tasks from cache for " + quesid);
 				return null;
 			}
@@ -553,12 +581,12 @@ public class PaperCache {
 					// 1, final mark element 2, first mark element 3, first mark element
 					MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-					fm = firstMarkL.get(mt.getSeq() + mid);
+					fm = firstMarkL.get(mt.getSeq() + 1);
 					piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 				}
 			}
 
-			logger.info("getPapersFromTeaCache(), retrieved " + (i + 1) + 
+			logger.info("getPapersFromTeaCache(), retrieved " + i + 
 					" papers from the beginning of " + seq + " for quesid->" + quesid);
 		} else {
 			// maybe user refreshed browser, get unmarked papers from cache
@@ -572,7 +600,7 @@ public class PaperCache {
 						// 1, final mark element 2, first mark element 3, first mark element
 						MarkTaskCache fm = firstMarkL.get(mt.getSeq());
 						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
-						fm = firstMarkL.get(mt.getSeq() + mid);
+						fm = firstMarkL.get(mt.getSeq() + 1);
 						piC.add(new PaperImgCache(fm.getPaperid(), fm.getScore(), fm.getTeacid()));
 					}
 					count++;

@@ -12,7 +12,7 @@ import com.ustudy.exam.model.Exam;
 @MapperScan
 public interface ExamDao {
 
-	List<Exam> getAllExams();
+	List<Exam> getAllExams(String orgid);
 	
 	List<Exam> getExams(@Param("finished")Boolean finished, @Param("orgId")String orgId, @Param("gradeId")Long gradeId, @Param("subjectId")Long subjectId, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("name")String name);
 	
@@ -23,6 +23,12 @@ public interface ExamDao {
 	List<Map<String, Object>> getExamSummary(Long examid);
 	
 	List<Map<String, Object>> getGradeStudentCounts(Long examid);
+
+	List<Map<String, Object>> getEgsStudentCounts(@Param("examid")long examid, @Param("artMathCount")long artMathCount);	
+
+	Long getArtMathCount(Long examid);	
+
+	Long getBranchCount(Long examid);	
 	
 	List<Map<String, Object>> getSubjectPaperCounts(Long examid);
 	
@@ -51,5 +57,7 @@ public interface ExamDao {
 	ArrayList<Map<String, Object>> getSubjects();
 
 	void updateExamStatus(@Param("examid")Long examid, @Param("status")String status);
+
+	void updateEgsStatus(@Param("examid")Long examid, @Param("status")String status);
 
 }

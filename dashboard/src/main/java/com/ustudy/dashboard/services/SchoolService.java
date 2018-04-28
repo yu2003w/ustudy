@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ustudy.dashboard.model.OrgBrife;
 import com.ustudy.dashboard.model.School;
+import com.ustudy.dashboard.model.Subject;
 
 /**
  * @author jared
@@ -23,7 +24,7 @@ public interface SchoolService {
 	 * @param data --- to be stored into database
 	 * @return  --- index in the datababse
 	 */
-	public int createSchool(School data);
+	public long createSchool(School data);
 	
 	public void deleteSchool(int id);
 	
@@ -34,5 +35,8 @@ public interface SchoolService {
 	public int delSchools(String ids);
 	
 	public List<OrgBrife> getOrgBrifeList(int id);
+	
+	// try to retrieve all subjects
+	List<Subject> retrieveSubjects();
 	
 }

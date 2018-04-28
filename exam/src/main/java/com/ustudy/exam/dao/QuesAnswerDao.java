@@ -3,12 +3,12 @@ package com.ustudy.exam.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.mybatis.spring.annotation.MapperScan;
 
 import com.ustudy.exam.model.QuesAnswer;
 
-@MapperScan
+@Mapper
 public interface QuesAnswerDao {
 
 	List<QuesAnswer> getQuesAnswers(Long egsId);
@@ -30,5 +30,7 @@ public interface QuesAnswerDao {
 	boolean updateQuesAnswer(QuesAnswer quesAnswer);
 	
 	List<Map<String, Object>> getObjectQuestions(Long egsId);
+	
+	List<QuesAnswer> getQuesAnswerForValidation(Long egsId);
 	
 }
