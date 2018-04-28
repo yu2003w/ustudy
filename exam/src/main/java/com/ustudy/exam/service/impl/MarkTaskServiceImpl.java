@@ -241,13 +241,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 						+ ba.getPaperId() + ", ansimgs->" + ba.getPaperImg());
 
 				ba.setMetaInfo(mark.getQuestionName(), mark.getQuestionType(), mark.getMarkMode(), mark.getFullscore());
-				List<SingleAnswer> saL = new ArrayList<SingleAnswer>();
-				if (mark.getQuesno() == null || mark.getQuesno().isEmpty() || mark.getQuesno().compareTo("0") == 0) {
+				List<SingleAnswer> saL = markTaskM.getQuesDiv(mark.getQuesid());
+				if (saL != null && !saL.isEmpty() && ba.isMarked()) {
 					// need to retrieve detailed information of sub questions for this question block
-					if (ba.isMarked()) {
 						saL = markTaskM.getMarkedQuesDiv(mark.getQuesid(), ba.getPaperId());
-					} else
-						saL = markTaskM.getQuesDiv(mark.getQuesid());
 				}
 
 				ba.setSteps(saL);
