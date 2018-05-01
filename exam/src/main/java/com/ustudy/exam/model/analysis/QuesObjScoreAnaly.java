@@ -24,6 +24,10 @@ public class QuesObjScoreAnaly implements Serializable {
 	// format is answer, '-', count
 	@JsonIgnore
 	private String opts = null;
+	
+	// reference answer
+	private String refa = null;
+	
 	// scoring average
 	private String scor7age = null;
 	
@@ -107,10 +111,27 @@ public class QuesObjScoreAnaly implements Serializable {
 		
 	}
 
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
+	public String getRefa() {
+		return refa;
+	}
+
+	public void setRefa(String refa) {
+		this.refa = refa;
+	}
+
 	@Override
 	public String toString() {
-		return "QuesScoreAnaly [quesno=" + quesno + ", fullScore=" + score + ", aveScore=" + aveScore
-				+ ", levelOfDiff=" + levelOfDiff + ", scor7age=" + scor7age + ", choices=" + choices + "]";
+		return "QuesObjScoreAnaly [quesno=" + quesno + ", score=" + score + ", aveScore=" + aveScore + ", levelOfDiff="
+				+ levelOfDiff + ", total=" + total + ", opts=" + opts + ", refa=" + refa + ", scor7age=" + scor7age
+				+ ", choices=" + choices + "]";
 	}
 	
 }

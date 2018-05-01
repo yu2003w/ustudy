@@ -61,7 +61,7 @@ public interface SchoolMapper {
 	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
 			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
 			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
-			+ "where class.grade_id = #{gid}")
+			+ "where class.grade_id = #{gid} order by class.id")
 	public List<ClassInfo> getClsInfoByGrId(int gid);
 	
 	@Select("select subject.name as sub, sub_owner as teacid, teacname from classsub "

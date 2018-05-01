@@ -13,6 +13,7 @@ import com.ustudy.exam.model.analysis.ExamBrifeAnaly;
 import com.ustudy.exam.model.analysis.QuesObjScoreAnaly;
 import com.ustudy.exam.model.analysis.QuesSubScoreAnaly;
 import com.ustudy.exam.service.AnalysisService;
+import com.ustudy.exam.utility.ExamUtil;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
@@ -53,8 +54,16 @@ public class AnalysisServiceImpl implements AnalysisService {
 	@Override
 	public List<ExamBrifeAnaly> getExamsForAnaly() {
 		
-		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for analysis");
-		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList();
+		String orgType = ExamUtil.retrieveSessAttr("orgType");
+		String orgId = ExamUtil.retrieveSessAttr("orgId");
+		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty()) {
+			logger.error("getAllExamsForAnaly(), failed to retrieve org info");
+			throw new RuntimeException("failed to retrieve org info");
+		}
+		
+		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for " + orgId);
+		
+		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList(orgId);
 		
 		logger.trace("getExamsForAnaly(), exams->" + examL.toString());
 		return examL;

@@ -43,12 +43,9 @@ public class SchoolController {
 		String msg = null;
 		try {
 			item = schS.getSchool();
-		} catch (IncorrectResultSizeDataAccessException ie) {
-			msg = "getSchool()" + ie.getMessage();
-			logger.warn(msg);
 		} catch (Exception e) {
-			msg = "getSchool(),  failed to retrieve school information --> \n" + e.getMessage();
-			logger.warn(msg);
+			msg = "getSchool(), failed with exception->" + e.getMessage();
+			logger.error(e.getMessage());
 			resp.setStatus(500);
 			resp.setHeader("reason", msg);
 			return null;
@@ -72,7 +69,7 @@ public class SchoolController {
 			subL = schS.getDepSubs(dName);
 		} catch (Exception e) {
 			msg = "getDepartSubs(), failed to retrieve deppartment subject-teacher information";
-			logger.warn(msg + e.getMessage());
+			logger.error(e.getMessage());
 			resp.setStatus(500);
 			resp.setHeader("reason", msg);
 			return null;
@@ -102,7 +99,7 @@ public class SchoolController {
 		} catch (Exception e) {
 			resp.setStatus(500);
 			result = "update department subjects-teachers failed. ";
-			logger.warn("updateDepartSubs(), " + result + e.getMessage());
+			logger.error("updateDepartSubs(), " + result + e.getMessage());
 		}
 		return result;
 	}

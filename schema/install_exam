@@ -46,6 +46,7 @@ branch varchar(16) DEFAULT '不分科',
 answer VARCHAR(128),
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
+UNIQUE KEY(quesid, quesno),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE,

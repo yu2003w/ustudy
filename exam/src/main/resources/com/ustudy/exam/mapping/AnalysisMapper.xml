@@ -1,0 +1,84 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ustudy.exam.mapper.AnalysisMapper">
+
+	<resultMap type="com.ustudy.exam.model.analysis.ExamBrifeAnaly" id="ExamBrifAnaly">
+	  <result property="examName" column="examName"/>
+	  <result property="schoolDetails" column="schoolDetails"/>
+	</resultMap>
+
+	<resultMap type="com.ustudy.exam.model.analysis.EgsScoreAnaly" id="EgsScoreAnaly">
+	  <result property="exCount" column="exCount"/>
+	  <result property="maxScore" column="maxScore"/>
+	  <result property="minScore" column="minScore"/>
+	  <result property="aveScore" column="aveScore"/>
+	  <result property="midScore" column="midScore"/>
+	  <result property="aggrscore" column="aggrscore"/>
+	</resultMap>
+
+	<resultMap type="com.ustudy.exam.model.analysis.QuesObjScoreAnaly" id="QuesObjScoreAnaly">
+	  <result property="quesno" column="quesno"/>
+	  <result property="score" column="score"/>
+	  <result property="aveScore" column="aveScore"/>
+	  <result property="total" column="total"/>
+	  <result property="opts" column="opts"/>
+	  <result property="refa" column="refa"/>
+	</resultMap>
+
+	<resultMap type="com.ustudy.exam.model.analysis.QuesSubScoreAnaly" id="QuesSubScoreAnaly">
+	  <result property="quesname" column="quesname"/>
+	  <result property="score" column="score"/>
+	  <result property="aveScore" column="aveScore"/>
+	</resultMap>
+
+	<select id="getExamBrifeList" parameterType="String" resultMap="ExamBrifAnaly">
+		SELECT id, examName, GROUP_CONCAT(schname, ';', grs) AS schoolDetails FROM
+		(SELECT id, examName, schname, GROUP_CONCAT(grade_name, '-',
+		classes_num, ':', subs SEPARATOR '#') AS grs
+		FROM (SELECT exam.id, exam.exam_name AS examName, school.schid,
+		school.schname, grade.grade_name,
+		grade.classes_num, GROUP_CONCAT(egs.id, '-', subject.name SEPARATOR '@') AS subs FROM
+		exam
+		LEFT JOIN examgradesub AS egs ON egs.examid = exam.id
+		LEFT JOIN grade ON grade.id = egs.grade_id
+		LEFT JOIN subject ON egs.sub_id = subject.id
+		LEFT JOIN examschool ON examschool.examid = exam.id
+		LEFT JOIN school ON examschool.schid = school.schid where examschool.schid
+		= #{orgid}
+		GROUP BY exam.id , egs.grade_id) gsub
+		GROUP BY id, schid) ggr
+		GROUP BY id
+	</select>
+	
+	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
+	  select count(*) as exCount, truncate(avg(score), 1) as aveScore, max(score) as maxScore, 
+	  min(score) as minScore, (SELECT score FROM ustudy.subscore where exam_grade_sub_id = 1 and id = 
+	  ((select count(*) as total from subscore where exam_grade_sub_id = #{egsid}) div 2) order by rank) 
+	  as midscore, (select group_concat(num, '-', score) from (select count(*) as num, score from subscore 
+	  where exam_grade_sub_id = #{egsid} group by score) scores) as aggrscore from subscore 
+	  where exam_grade_sub_id = #{egsid}
+	</select>
+	
+	<select id="calQuesObjReport" parameterType="long" resultMap="QuesObjScoreAnaly">
+	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 1) as aveScore, sum(num) as total, 
+	  group_concat(tb1.answer, '-', num) opts, refa from 
+	  (select obj_answer.quesno, question.score, sum(obj_answer.score) as ss, obj_answer.answer, 
+	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa from obj_answer 
+	  left join paper on obj_answer.paperid = paper.id 
+	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
+	  left join question on (question.exam_grade_sub_id = egs.id and question.startno <= obj_answer.quesno and question.endno >= obj_answer.quesno) 
+	  left join refanswer on (refanswer.quesid = question.id and refanswer.quesno = obj_answer.quesno) 
+	  where egs.id = #{egsid} group by quesno, question.id, obj_answer.answer) tb1 
+	  group by tb1.quesno, tb1.quesid
+	</select>
+	
+	<select id="calQuesSubReport" parameterType="long" resultMap="QuesSubScoreAnaly">
+	  SELECT if((question.quesno > 0), question.quesno, concat(question.startno, '-',question.endno)) as quesname, 
+	  question.score, truncate(avg(ans.score), 1) as aveScore FROM ustudy.answer as ans 
+	  left join paper on ans.paperid = paper.id 
+	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
+	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
+	  where egs.id = #{egsid} group by question.quesno, question.score, quesname order by question.quesno
+	</select>
+
+</mapper>
