@@ -27,9 +27,10 @@
 
 	<resultMap type="com.ustudy.exam.model.analysis.QuesSubScoreAnaly" id="QuesSubScoreAnaly">
 	  <result property="quesname" column="quesname"/>
-	  <result property="score" column="score"/>
+	  <result property="score" column="fscore"/>
 	  <result property="aveScore" column="aveScore"/>
-	</resultMap>
+	  <result property="aggrscore" column="aggrscore"/>
+ 	</resultMap>
 
 	<select id="getExamBrifeList" parameterType="String" resultMap="ExamBrifAnaly">
 		SELECT id, examName, GROUP_CONCAT(schname, ';', grs) AS schoolDetails FROM
@@ -54,7 +55,11 @@
 	  select count(*) as exCount, truncate(avg(score), 1) as aveScore, max(score) as maxScore, 
 	  min(score) as minScore, (SELECT score FROM ustudy.subscore where exam_grade_sub_id = 1 and id = 
 	  ((select count(*) as total from subscore where exam_grade_sub_id = #{egsid}) div 2) order by rank) 
-	  as midscore, (select group_concat(num, '-', score) from (select count(*) as num, score from subscore 
+	  as midscore, (select count(*) from subscore where score >= (
+	  (select sum(if((question.type in ('单选题', '多选题', '判断题')), 
+	  question.score * (question.endno - question.startno + 1), question.score)) as fullscore from 
+	  ustudy.question where exam_grade_sub_id = #{egsid})* 0.6) and exam_grade_sub_id = #{egsid}) as passCount, 
+	  (select group_concat(num, '-', score) from (select count(*) as num, score from subscore 
 	  where exam_grade_sub_id = #{egsid} group by score) scores) as aggrscore from subscore 
 	  where exam_grade_sub_id = #{egsid}
 	</select>
@@ -66,19 +71,28 @@
 	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa from obj_answer 
 	  left join paper on obj_answer.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
-	  left join question on (question.exam_grade_sub_id = egs.id and question.startno <= obj_answer.quesno and question.endno >= obj_answer.quesno) 
+	  left join question on (question.exam_grade_sub_id = egs.id and obj_answer.quesno >= question.startno and question.endno >= obj_answer.quesno) 
 	  left join refanswer on (refanswer.quesid = question.id and refanswer.quesno = obj_answer.quesno) 
 	  where egs.id = #{egsid} group by quesno, question.id, obj_answer.answer) tb1 
 	  group by tb1.quesno, tb1.quesid
 	</select>
 	
 	<select id="calQuesSubReport" parameterType="long" resultMap="QuesSubScoreAnaly">
-	  SELECT if((question.quesno > 0), question.quesno, concat(question.startno, '-',question.endno)) as quesname, 
-	  question.score, truncate(avg(ans.score), 1) as aveScore FROM ustudy.answer as ans 
+	  select tb1.quesname, fscore, tb2.aveScore, group_concat(score, '-', num) as aggrscore from 
+	  (select if((question.quesno > 0), question.quesno, concat(question.startno, '-', question.endno)) as quesname, 
+	  question.score as fscore, count(ans.score) as num, ans.score from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
-	  where egs.id = #{egsid} group by question.quesno, question.score, quesname order by question.quesno
+	  where egs.id = #{egsid} group by quesname, question.quesno, question.score, ans.score) tb1 
+	  left join (SELECT if((question.quesno > 0), question.quesno, concat(question.startno, '-', question.endno)) as quesname, 
+	  truncate(avg(ans.score), 1) as aveScore from answer as ans 
+	  left join paper on ans.paperid = paper.id 
+	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
+	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
+	  where egs.id = #{egsid} group by quesname, question.quesno, question.score order by question.quesno) tb2 
+	  on tb2.quesname = tb1.quesname 
+	  group by quesname, fscore, aveScore
 	</select>
 
 </mapper>

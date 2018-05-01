@@ -17,7 +17,8 @@ public class QuesObjScoreAnaly implements Serializable {
 	private String quesno = null;
 	private float score = 0;
 	private float aveScore = 0;
-	private float levelOfDiff = 0;
+	//discrimination index
+	private float dist7tion = 0;
 	@JsonIgnore
 	private int total = 0;
 	
@@ -62,12 +63,12 @@ public class QuesObjScoreAnaly implements Serializable {
 		this.aveScore = aveScore;
 	}
 
-	public float getLevelOfDiff() {
-		return levelOfDiff;
+	public float getDist7tion() {
+		return dist7tion;
 	}
 
-	public void setLevelOfDiff(float levelOfDiff) {
-		this.levelOfDiff = levelOfDiff;
+	public void setDist7tion(float dist7tion) {
+		this.dist7tion = dist7tion;
 	}
 
 	public String getScor7age() {
@@ -129,8 +130,8 @@ public class QuesObjScoreAnaly implements Serializable {
 
 	@Override
 	public String toString() {
-		return "QuesObjScoreAnaly [quesno=" + quesno + ", score=" + score + ", aveScore=" + aveScore + ", levelOfDiff="
-				+ levelOfDiff + ", total=" + total + ", opts=" + opts + ", refa=" + refa + ", scor7age=" + scor7age
+		return "QuesObjScoreAnaly [quesno=" + quesno + ", score=" + score + ", aveScore=" + aveScore + ", dist7tion="
+				+ dist7tion + ", total=" + total + ", opts=" + opts + ", refa=" + refa + ", scor7age=" + scor7age
 				+ ", choices=" + choices + "]";
 	}
 	

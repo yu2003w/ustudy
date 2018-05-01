@@ -215,7 +215,7 @@ public class AnswerServiceImpl implements AnswerService {
 			if (null != objective.get("choiceNum"))
 				quesAnswer.setChoiceNum(objective.getInt("choiceNum"));
 			if (null != objective.get("score"))
-				quesAnswer.setScore(objective.getLong("score"));
+				quesAnswer.setScore(Float.valueOf(objective.getString("score")));
 			quesAnswer.setExamGradeSubId(egsId);
 
 			if (null != objective.get("id") && objective.getLong("id") > 0) {
@@ -246,7 +246,7 @@ public class AnswerServiceImpl implements AnswerService {
 			if (null != subjective.get("choiceNum"))
 				quesAnswer.setChoiceNum(subjective.getInt("choiceNum"));
 			if (null != subjective.get("score"))
-				quesAnswer.setScore(subjective.getLong("score"));
+				quesAnswer.setScore(Float.valueOf(subjective.getString("score")));
 			if (null != subjective.get("remark"))
                 quesAnswer.setRemark(subjective.getString("remark"));
 			quesAnswer.setExamGradeSubId(egsId);
@@ -328,7 +328,7 @@ public class AnswerServiceImpl implements AnswerService {
                             if (null != child.get("branch"))
                                 quesAnswerDiv.setBranch(child.getString("branch"));
                             if (null != child.get("score"))
-                                quesAnswerDiv.setScore(child.getLong("score"));
+                                quesAnswerDiv.setScore(Float.valueOf(child.getString("score")));
                             if (null != child.get("quesid")) {
                                 quesAnswerDiv.setQuesid(Long.valueOf(child.getInt("quesid")));
                             }else {
@@ -354,7 +354,7 @@ public class AnswerServiceImpl implements AnswerService {
 				                branch = subjective.getString("branch");
 				            }
 				            if (null != subjective.get("score")){
-				                score = subjective.getLong("score");
+				                score = Float.valueOf(subjective.getString("score"));
 				            }
 				            for (int j = startno; j <= endno; j++) {
 				                QuesAnswerDiv quesAnswerDiv = new QuesAnswerDiv();
@@ -411,7 +411,7 @@ public class AnswerServiceImpl implements AnswerService {
                 quesAnswerDiv.setBranch(child.getString("branch"));
             }
             if (null != child.get("score")){
-                quesAnswerDiv.setScore(child.getLong("score"));
+                quesAnswerDiv.setScore(Float.valueOf(child.getString("score")));
             }
             quesAnswerDiv.setQuesid(quesid);
             if (null != child.get("remark")){
@@ -448,7 +448,7 @@ public class AnswerServiceImpl implements AnswerService {
 	            quesAnswerDiv.setBranch(step.getString("branch"));
 	        }
 	        if (null != step.get("score")){
-	            quesAnswerDiv.setScore(step.getLong("score"));
+	            quesAnswerDiv.setScore(Float.valueOf(step.getString("score")));
 	        }
 	        quesAnswerDiv.setQuesid(quesid);
 	        if (null != step.get("step")){
