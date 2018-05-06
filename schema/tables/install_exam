@@ -162,6 +162,20 @@ FOREIGN KEY (schid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考生信息表';
 
+create table if not exists ustudy.examineesub (
+id int(11) NOT NULL AUTO_INCREMENT,
+eeid int NOT NULL,
+subid int NOT NULL,
+PRIMARY KEY(id),
+UNIQUE KEY(eeid, subid),
+FOREIGN KEY (eeid)
+    REFERENCES ustudy.examinee(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (subid)
+    REFERENCES ustudy.subject(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
 # tables for student paper
 create table if not exists ustudy.paper (
 id int(11) NOT NULL AUTO_INCREMENT,

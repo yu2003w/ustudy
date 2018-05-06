@@ -1,6 +1,7 @@
 package com.ustudy.info.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Examinee implements Serializable {
 
@@ -21,10 +22,27 @@ public class Examinee implements Serializable {
 
 	private String classId = null;
 	private String className = null;
+	
+	// if branch is presented, list of subjects should be ignored
+	private String branch = null;
+	private List<String> subs = null;
 
 	public Examinee() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public Examinee(String stuName, String stuId, String stuExamId, String examId, String gradeId, String classId,
+			String branch, List<String> subs) {
+		super();
+		this.stuName = stuName;
+		this.stuId = stuId;
+		this.stuExamId = stuExamId;
+		this.examId = examId;
+		this.gradeId = gradeId;
+		this.classId = classId;
+		this.branch = branch;
+		this.subs = subs;
 	}
 
 	public Examinee(String stuName, String stuId, String stuExamId, String examId, String schId, 
@@ -126,11 +144,27 @@ public class Examinee implements Serializable {
 		this.gradeId = gradeId;
 	}
 
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	public List<String> getSubs() {
+		return subs;
+	}
+
+	public void setSubs(List<String> subs) {
+		this.subs = subs;
+	}
+
 	@Override
 	public String toString() {
 		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
-				+ ", className=" + className + "]";
+				+ ", className=" + className + ", branch=" + branch + ", subs=" + subs + "]";
 	}
 
 }
