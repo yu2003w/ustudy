@@ -1,8 +1,8 @@
 package com.ustudy.exam.model.analysis;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,9 +29,9 @@ public class EgsScoreAnaly implements Serializable {
 	@JsonIgnore
 	private String aggrscore = null;
 	
-	// score placement
+	// score placement, need to sort by keys, so use TreeMap, although TreeMap has some performance limitations
 	@JsonProperty("scoreplacement")
-	private Map<Float, Integer> splace = null;
+	private TreeMap<Float, Integer> splace = null;
 	
 	public EgsScoreAnaly() {
 		super();
@@ -137,7 +137,7 @@ public class EgsScoreAnaly implements Serializable {
 					String []datas = pl.split("-");
 					if (datas != null && datas.length == 2) {
 						if (this.splace == null) {
-							this.splace = new HashMap<Float, Integer>();
+							this.splace = new TreeMap<Float, Integer>();
 						}
 						this.splace.put(Float.valueOf(datas[1]), Integer.valueOf(datas[0]));
 					}
@@ -150,7 +150,7 @@ public class EgsScoreAnaly implements Serializable {
 		return splace;
 	}
 
-	public void setSplace(Map<Float, Integer> splace) {
+	public void setSplace(TreeMap<Float, Integer> splace) {
 		this.splace = splace;
 	}
 

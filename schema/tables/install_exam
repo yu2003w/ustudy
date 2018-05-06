@@ -94,6 +94,7 @@ branch varchar(16) default '不分科',
 score float(3,1) NOT NULL,
 remark varchar(1000) DEFAULT NULL COMMENT '备注、注释',
 PRIMARY KEY (id),
+UNIQUE KEY (quesid, quesno, step),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE

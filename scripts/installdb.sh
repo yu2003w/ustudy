@@ -4,7 +4,7 @@
 # Instatll databases for each services
 
 # databases for dashboard
-docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_dashboard'
+docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/tables/install_dashboard'
 if [ $? = 0 ]; then
   echo "Install database for service dashboard successfully"
 else
@@ -13,7 +13,7 @@ else
 fi
 
 # databases for infocenter
-docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_infocenter'
+docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/tables/install_infocenter'
 if [ $? = 0 ]; then
   echo "Install database for service infocenter successfully"
 else
@@ -22,7 +22,7 @@ else
 fi
 
 # databases for examination center
-docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_exam'
+docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/tables/install_exam'
 if [ $? = 0 ]; then
   echo "Install database for service examination center successfully"
 else
@@ -31,7 +31,7 @@ else
 fi
 
 # databases for score analytics
-docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/install_score'
+docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/tables/install_score'
 if [ $? = 0 ]; then
   echo "Install database for score analytics successfully"
 else
@@ -39,3 +39,11 @@ else
   exit 1
 fi
 
+# views
+docker exec -u root ustudy-dw /bin/sh -c 'mysql -u root -p"mysql" < /root/mysql/schema/views/install_views'
+if [ $? = 0 ]; then
+  echo "Install views for analytics successfully"
+else
+  echo "Install views for analytics failed"
+  exit 1
+fi

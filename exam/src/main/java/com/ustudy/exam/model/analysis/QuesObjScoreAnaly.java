@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,6 +24,8 @@ public class QuesObjScoreAnaly implements Serializable {
 	private int total = 0;
 	
 	// format is answer, '-', count
+	// Noted here, answer maybe "ABC", then each option 'A', 'B','C' should be accumulated separately
+	// for example with format "A-228,CD-1,C-318,B-68,AD-1,AC-1,AB-1,D-57"
 	@JsonIgnore
 	private String opts = null;
 	
@@ -32,7 +35,7 @@ public class QuesObjScoreAnaly implements Serializable {
 	// scoring average
 	private String scor7age = null;
 	
-	private Map<String, String> choices = null;
+	private TreeMap<String, String> choices = null;
 	
 	public QuesObjScoreAnaly() {
 		super();
@@ -83,7 +86,7 @@ public class QuesObjScoreAnaly implements Serializable {
 		return choices;
 	}
 
-	public void setChoices(Map<String, String> choices) {
+	public void setChoices(TreeMap<String, String> choices) {
 		this.choices = choices;
 	}
 
@@ -96,15 +99,30 @@ public class QuesObjScoreAnaly implements Serializable {
 		if (opts != null && !opts.isEmpty()) {
 			String []data = opts.split(",");
 			if (data != null && data.length > 0) {
+				HashMap<Character, Integer> ansM = new HashMap<Character, Integer>();
 				DecimalFormat df = new DecimalFormat("##0.0%");
 				for (String para : data) {
 					String [] paL = para.split("-");
 					if (paL != null && paL.length == 2) {
 						if (this.choices == null) {
-							this.choices = new HashMap<String, String>();
+							this.choices = new TreeMap<String, String>();
 						}
-						if (paL[0] != null && paL[0].length() > 0 && this.total != 0)
-							choices.put(paL[0], df.format(Float.valueOf(paL[1])/this.total));
+						if (paL[0] != null && paL[0].length() > 0 && this.total != 0) {
+							for (int i = 0; i < paL[0].length(); i++) {
+								if (ansM.containsKey(paL[0].charAt(i))) {
+									ansM.put(paL[0].charAt(i), ansM.get(paL[0].charAt(i)) + Integer.valueOf(paL[1]));
+								} else
+									ansM.put(paL[0].charAt(i), Integer.valueOf(paL[1]));
+	
+							}
+						}
+					
+					}
+				}
+				if (ansM.size() > 0) {
+					for (Map.Entry<Character, Integer> ans: ansM.entrySet()) {
+						this.choices.put(String.valueOf(ans.getKey()), 
+								df.format(ans.getValue().floatValue()/this.total));
 					}
 				}
 			}

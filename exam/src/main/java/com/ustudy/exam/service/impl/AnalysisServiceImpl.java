@@ -30,6 +30,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrived " + osL.size());
+		logger.trace("getObjQuesReport(), details->" + osL.toString());
 		return osL;
 	}
 
@@ -46,8 +47,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 	@Override
 	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
 		List<EgsScoreAnaly> esL = anaM.calEgsScoreRepport(egsId, clsId);
-		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId + 
-				",details->" + esL.toString());
+		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId);
+		logger.trace("getEgsScoreAnaly(), details->" + esL.toString());
 		return esL;
 	}
 

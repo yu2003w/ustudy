@@ -78,21 +78,34 @@
 	</select>
 	
 	<select id="calQuesSubReport" parameterType="long" resultMap="QuesSubScoreAnaly">
-	  select tb1.quesname, fscore, tb2.aveScore, group_concat(score, '-', num) as aggrscore from 
-	  (select if((question.quesno > 0), question.quesno, concat(question.startno, '-', question.endno)) as quesname, 
-	  question.score as fscore, count(ans.score) as num, ans.score from answer as ans 
+	  (select tb1.quesname, tb1.fscore, tb2.aveScore, group_concat(tb1.score, '-', tb1.num) as aggrscore from 
+	  (select question.quesno as quesname, question.score as fscore, count(ans.score) as num, ans.score from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
-	  where egs.id = #{egsid} group by quesname, question.quesno, question.score, ans.score) tb1 
-	  left join (SELECT if((question.quesno > 0), question.quesno, concat(question.startno, '-', question.endno)) as quesname, 
-	  truncate(avg(ans.score), 1) as aveScore from answer as ans 
+	  where egs.id = #{egsid} and question.quesno > 0 group by question.quesno, question.score, ans.score order by question.quesno) tb1 
+	  left join (select question.quesno as quesname, truncate(avg(ans.score), 1) as aveScore from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
-	  where egs.id = #{egsid} group by quesname, question.quesno, question.score order by question.quesno) tb2 
-	  on tb2.quesname = tb1.quesname 
-	  group by quesname, fscore, aveScore
+	  where egs.id = #{egsid} and question.quesno > 0 group by question.quesno order by question.quesno) tb2 
+	  on tb1.quesname = tb2.quesname group by quesname, fscore, aveScore) 
+	  union (select tb1.quesname, tb1.fscore, tb2.aveScore, group_concat(tb1.num, '-', score) as aggrscore from 
+	  (select quest.quesno as quesname, quest.score as fscore, count(anst.score) as num, anst.score from answer_step as anst 
+	  left join answer as ans on anst.answer_id = ans.id 
+	  left join paper on ans.paperid = paper.id 
+	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
+	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
+	  left join question_step as quest on (quest.quesid = question.id and quest.quesno = anst.quesno) 
+	  where egs.id = #{egsid} and question.quesno = 0 group by quest.quesno,fscore, anst.score order by quest.quesno) tb1 
+	  left join (select quest.quesno as quesname, truncate(avg(anst.score),1) as aveScore from answer_step as anst 
+	  left join answer as ans on anst.answer_id = ans.id 
+	  left join paper on ans.paperid = paper.id 
+	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
+	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
+	  left join question_step as quest on (quest.quesid = question.id and quest.quesno = anst.quesno) 
+	  where egs.id = #{egsid} and question.quesno = 0 group by quest.quesno order by quest.quesno) tb2 
+	  on tb1.quesname = tb2.quesname group by quesname, fscore, aveScore) order by cast(quesname as DECIMAL)
 	</select>
 
 </mapper>
