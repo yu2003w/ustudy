@@ -6,7 +6,7 @@ left join ustudy.examschool as esh on exam.id = esh.examid
 left join ustudy.school as sch on sch.schid = esh.schid;
 
 create view ustudy.eebrife as
-SELECT ee.exam_code, ee.name, ee.paper_status, exam.exam_name, exam.exam_date, 
+SELECT ee.exam_code, ee.name, ee.status, exam.exam_name, exam.exam_date, 
 school.schid, school.schname, grade.grade_name, class.cls_name FROM ustudy.examinee as ee 
 left join ustudy.exam on exam.id = ee.examid 
 left join ustudy.school on school.schid = ee.schid 

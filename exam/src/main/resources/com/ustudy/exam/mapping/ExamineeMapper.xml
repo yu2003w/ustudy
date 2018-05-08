@@ -1,0 +1,40 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ustudy.info.mapper.ExamineeMapper">
+
+	<resultMap type="com.ustudy.info.model.Examinee" id="Examinee">
+	  <result property="id" column="id"/>
+	  <result property="stuExamId" column="exam_code"/>
+	  <result property="examId" column="examid"/>
+	  <result property="schId" column="schid"/>
+	  <result property="gradeId" column="gradeid"/>
+	  <result property="classId" column="class_id"/>
+	  <result property="className" column="class_name"/>
+	  <result property="stuName" column="name"/>
+	  <result property="stuId" column="stuno"/>
+	</resultMap>
+	
+	<insert id="createExaminee" useGeneratedKeys="true" keyProperty="id">
+	    insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) 
+	    values(#{stuExamId}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
+	    on duplicate key update schid=#{schId}, gradeid=#{gradeId}, class_id=#{classId}, class_name=#{className}, 
+	    name=#{stuName}, stuno=#{stuId} 
+	</insert>
+	
+	<insert id="createExamineeSubs" >
+	    insert into ustudy.examineesub (eeid, subid) values
+	    <foreach item="item" collection="list" separator=",">
+	        (#{item.eeid}, #{item.subid})
+	    </foreach>
+	</insert>
+	
+	<delete id="deleteExaminee" parameterType="long">
+	    delete from ustudy.examinee where id=#{id}
+	</delete>
+	
+	<select id="getExamineeById" parameterType="long" resultMap="Examinee">
+		select id, exam_code, examid, schid, gradeid, class_id, class_name, name, stuno from ustudy.examinee 
+		where id=#{id}
+	</select>
+
+</mapper>

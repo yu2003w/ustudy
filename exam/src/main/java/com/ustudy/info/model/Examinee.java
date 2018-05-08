@@ -10,7 +10,7 @@ public class Examinee implements Serializable {
 	 */
 	private static final long serialVersionUID = 1646823396136227256L;
 
-	private int id = -1;
+	private long id = 0;
 
 	private String stuName = null;
 	private String stuId = null;
@@ -23,17 +23,16 @@ public class Examinee implements Serializable {
 	private String classId = null;
 	private String className = null;
 	
-	// if branch is presented, list of subjects should be ignored
-	private String branch = null;
-	private List<String> subs = null;
+	// sub ids selected for the examinee
+	private List<Long> subs = null;
 
 	public Examinee() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Examinee(String stuName, String stuId, String stuExamId, String examId, String gradeId, String classId,
-			String branch, List<String> subs) {
+	public Examinee(String stuName, String stuId, String stuExamId, String examId, String gradeId, 
+			String classId, List<Long> subs) {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
@@ -41,7 +40,6 @@ public class Examinee implements Serializable {
 		this.examId = examId;
 		this.gradeId = gradeId;
 		this.classId = classId;
-		this.branch = branch;
 		this.subs = subs;
 	}
 
@@ -72,11 +70,11 @@ public class Examinee implements Serializable {
 		this.className = className;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -144,19 +142,11 @@ public class Examinee implements Serializable {
 		this.gradeId = gradeId;
 	}
 
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-
-	public List<String> getSubs() {
+	public List<Long> getSubs() {
 		return subs;
 	}
 
-	public void setSubs(List<String> subs) {
+	public void setSubs(List<Long> subs) {
 		this.subs = subs;
 	}
 
@@ -164,7 +154,7 @@ public class Examinee implements Serializable {
 	public String toString() {
 		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
-				+ ", className=" + className + ", branch=" + branch + ", subs=" + subs + "]";
+				+ ", className=" + className + ", subs=" + subs + "]";
 	}
 
 }
