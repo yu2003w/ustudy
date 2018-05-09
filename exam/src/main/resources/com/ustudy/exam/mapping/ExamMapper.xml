@@ -12,7 +12,9 @@
 
 	<!-- 查询得到全部Exam对象 -->
 	<select id="getAllExams" parameterType="string" resultMap="ExamResult">
-		SELECT * FROM exam
+		select exam.id, exam.exam_name, exam.exam_date, exam.type, exam.status from exam 
+		left join examschool on examschool.examid = exam.id 
+		where examschool.schid = #{orgid}
 	</select>
 	
 	<select id="getExams" parameterType="java.util.Map" resultMap="ExamResult">
@@ -53,7 +55,7 @@
 	
 	<select id="getExamSummary" parameterType="Long" resultType="java.util.Map">
 		SELECT g.grade_name AS gradeName,g.id AS gradeId,s.name AS subjectName,s.id AS subjectId,egs.status AS status,
-		egs.temp_upload AS template,egs.answer_set AS answerSet,egs.task_dispatch AS taskDispatch,egs.id AS egsId, 
+		egs.temp_upload AS template,egs.mark_switch AS markSwitch,egs.id AS egsId, 
 		egs.blank_answer_paper AS answerPaper,egs.blank_questions_paper AS questionsPaper,DATE_FORMAT(e.exam_date,'%Y-%m-%d') AS examDate from examgradesub egs 
 		LEFT JOIN grade g ON egs.grade_id=g.id LEFT JOIN subject s on egs.sub_id=s.id LEFT JOIN exam e ON egs.examid=e.id where egs.examid=#{examid}
 	</select>
@@ -89,6 +91,29 @@
 		SELECT count(id) count,gradeId from examinee where examid=#{examid} GROUP BY gradeId
 	</select>
 
+	<select id="getEgsStudentCounts" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT count(ee.id) AS count, egs.id AS egsId FROM examinee ee JOIN examgradesub egs ON (ee.examid = egs.examid AND ee.gradeid = egs.grade_id)
+		JOIN subject sub ON (egs.sub_id = sub.id) JOIN class cls ON (ee.class_id = cls.id) WHERE (egs.examid = #{examid})
+		<if test="artMathCount &gt; 0">
+			AND ((sub.type = 0 AND sub.name = '数学' AND cls.cls_type = 'sci') || (sub.type = 0 AND sub.name = '数学(文)' AND cls.cls_type = 'art') || 
+			(sub.type = 0 AND sub.name != '数学' AND sub.name != '数学(文)') || ((sub.type = 1 OR sub.type = 3) AND cls.cls_type = 'art') ||
+			((sub.type = 2 OR sub.type = 4) AND cls.cls_type = 'sci'))
+		</if>
+		<if test="artMathCount = 0">
+			AND ((sub.type = 0 AND sub.name != '数学(文)') || ((sub.type = 1 OR sub.type = 3) AND cls.cls_type = 'art') || 
+			((sub.type = 2 OR sub.type = 4) AND cls.cls_type = 'sci'))
+		</if>
+		GROUP BY egs.id
+	</select>
+
+	<select id="getArtMathCount" parameterType="Long" resultType="Long">
+		SELECT count(1) FROM subject sub JOIN examgradesub egs ON sub.id = egs.sub_id WHERE egs.examid = #{examid} AND sub.name = '数学(文)'
+	</select>
+
+	<select id="getBranchCount" parameterType="Long" resultType="Long">
+		SELECT count(1) FROM class WHERE (cls_type = 'art' OR cls_type = 'sci') AND grade_id in (SELECT grade_id FROM examgradesub WHERE examid = #{examid})
+	</select>
+
 	<select id="getSubjectPaperCounts" parameterType="Long" resultType="java.util.Map">
 		SELECT count(p.id) count,p.exam_grade_sub_id as egsId from paper p 
 		LEFT JOIN examgradesub egs ON egs.id=p.exam_grade_sub_id 
@@ -111,11 +136,15 @@
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} where id=#{examid}
 	</update>
 	
+	<update id="updateEgsStatus" parameterType="java.util.Map">
+		UPDATE examgradesub SET status=#{status,jdbcType=VARCHAR} where examid=#{examid}
+	</update>
+
 	<update id="updateExamStatusByEgsid" parameterType="java.util.Map">
 		UPDATE exam SET status=#{status,jdbcType=VARCHAR} 
 		WHERE id=(SELECT examid FROM examgradesub where id=#{egsId})
-		<if test="status == '2'">
-		AND (SELECT COUNT(examid) FROM examgradesub where id=#{egsId} AND status&lt;&gt;'2')=0
+		<if test='status == "2"'>
+		AND (SELECT COUNT(examid) FROM examgradesub where examid=(SELECT examid FROM examgradesub where id=#{egsId}) AND status&lt;&gt;'2')=0
 		</if>
 	</update>
 
@@ -126,16 +155,17 @@
 		LEFT JOIN grade g ON egs.grade_id=g.id
 		LEFT JOIN subject s ON egs.sub_id=s.id
 		LEFT JOIN examschool es ON e.id=es.examid
-		where e.id=#{orgId,jdbcType=VARCHAR} AND egs.examid in(SELECT examid from examgradesub GROUP BY examid HAVING COUNT(examid)=SUM(status)/3)
+		where es.schid=#{orgId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT p.exam_code examCode,p.paper_img paperImg,IFNULL(cl.id,'') classId,IFNULL(cl.cls_name,'') clsName,
+		SELECT p.exam_code examCode,p.paper_img paperImg, ss.mark_img paperMarkImg, IFNULL(cl.id,'') classId, IFNULL(cl.cls_name,'') clsName,
 		p.exam_grade_sub_id egsId,q.id quesId from paper p
 		LEFT JOIN question q ON p.exam_grade_sub_id=q.exam_grade_sub_id
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		LEFT JOIN class cl ON ee.class_id=cl.id
 		LEFT JOIN examgradesub egs ON egs.examid=ee.examid
+		LEFT JOIN subscore ss ON p.exam_grade_sub_id = ss.exam_grade_sub_id AND ee.id = ss.stuid
 		where egs.id=p.exam_grade_sub_id AND p.exam_grade_sub_id=#{egsId} AND q.id=#{quesId}
 	</select>
 	

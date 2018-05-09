@@ -9,7 +9,7 @@ public class Teacher implements Serializable {
 	 */
 	private static final long serialVersionUID = -8384160649426123525L;
 	
-	private int id = -1;
+	private long id = 0;
 	
 	private String teacId = null;
 	
@@ -30,7 +30,7 @@ public class Teacher implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Teacher(int id, String teacId, String teacName, String passwd, String createTime, String llTime,
+	public Teacher(long id, String teacId, String teacName, String passwd, String createTime, String llTime,
 			String orgType, String orgId) {
 		super();
 		this.id = id;
@@ -43,6 +43,16 @@ public class Teacher implements Serializable {
 		this.orgId = orgId;
 	}
 
+	public Teacher(String teacId, String teacName, String passwd, String orgType, String orgId, String createTime) {
+		super();
+		this.teacId = teacId;
+		this.teacName = teacName;
+		this.passwd = passwd;
+		this.createTime = createTime;
+		this.orgType = orgType;
+		this.orgId = orgId;
+	}
+
 	public Teacher(String teacId, String teacName, String orgType, String orgId) {
 		super();
 		this.teacId = teacId;
@@ -51,11 +61,11 @@ public class Teacher implements Serializable {
 		this.orgId = orgId;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

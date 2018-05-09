@@ -1,0 +1,63 @@
+package com.ustudy.exam.service.impl;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ustudy.exam.mapper.AnalysisMapper;
+import com.ustudy.exam.model.analysis.EgsScoreAnaly;
+import com.ustudy.exam.model.analysis.ExamBrifeAnaly;
+import com.ustudy.exam.model.analysis.QuesObjScoreAnaly;
+import com.ustudy.exam.model.analysis.QuesSubScoreAnaly;
+import com.ustudy.exam.service.AnalysisService;
+
+@Service
+public class AnalysisServiceImpl implements AnalysisService {
+	
+	private static final Logger logger = LogManager.getLogger(AnalysisServiceImpl.class);
+
+	@Autowired
+	private AnalysisMapper anaM;
+	
+	@Override
+	public List<QuesObjScoreAnaly> getObjQuesReport(long egsId, long clsId) {		
+		
+		List<QuesObjScoreAnaly> osL = anaM.calQuesObjReport(egsId, clsId);
+		
+		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
+				", number of items retrived " + osL.size());
+		return osL;
+	}
+
+	@Override
+	public List<QuesSubScoreAnaly> getSubQuesReport(long egsId, long clsId) {
+		
+		List<QuesSubScoreAnaly> ssL = anaM.calQuesSubReport(egsId, clsId);
+		
+		logger.debug("getSubQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
+				", number of items retrieved " + ssL.size());
+		return ssL;
+	}
+
+	@Override
+	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
+		List<EgsScoreAnaly> esL = anaM.calEgsScoreRepport(egsId, clsId);
+		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId + 
+				",details->" + esL.toString());
+		return esL;
+	}
+
+	@Override
+	public List<ExamBrifeAnaly> getExamsForAnaly() {
+		
+		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for analysis");
+		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList();
+		
+		logger.trace("getExamsForAnaly(), exams->" + examL.toString());
+		return examL;
+	}
+
+}

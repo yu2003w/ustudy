@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.ustudy.exam.model.Subscore;
+import com.ustudy.exam.model.score.SubScore;
 
 public class ScoreApiTest {
 
@@ -130,10 +130,10 @@ public class ScoreApiTest {
 
 	public static void sort() {
 
-		List<Subscore> subscores = new ArrayList<>();
+		List<SubScore> subscores = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
-			Subscore subscore = new Subscore();
+			SubScore subscore = new SubScore();
 			subscore.setScore(Float.valueOf(i));
 			subscores.add(subscore);
 		}

@@ -243,8 +243,8 @@ public class SchoolServiceImp implements SchoolService {
 	public List<TeacherSub> getDepTeac(String depName) {
 		// retrieve all teacher information for specified department
 		String sqlDepTea = "select teachergrade.teac_id as teacherId, teacname as teacherName, teachersub.sub_name"
-				+ " as subName from grade join (teachergrade, teacher, teachersub) on (teachergrade.grade_name "
-				+ "= grade.grade_name and teacher.teacid = teachergrade.teac_id and teachersub.teac_id = "
+				+ " as subName from grade join (teachergrade, teacher, teachersub) on (teachergrade.grade_id "
+				+ "= grade.id and teacher.teacid = teachergrade.teac_id and teachersub.teac_id = "
 				+ "teacher.teacid) where schid = ? and grade_name in (";
 		
 		if (depName.compareTo("high") == 0) {
@@ -283,8 +283,9 @@ public class SchoolServiceImp implements SchoolService {
 
 	@Override
 	public List<TeacherSub> getGradeTeac(String id) {
-		String sqlGrTea = "select teacid, teacname from teacher where teacid in (select teac_id "
-				+ "from teachergrade join grade on grade.grade_name = teachergrade.grade_name where grade.id = ?)";
+		String sqlGrTea = "select teacid as teacherId, teacname as teacherName, subject.name as subName from (teacher left join teachersub on teachersub.teac_id = teacher.teacid) "
+		+ "left join subject on teachersub.sub_id = subject.id where teacid in (select teac_id "
+				+ "from teachergrade join grade on grade.id = teachergrade.grade_id where grade.id = ?)";
 		List<TeacherSub> teaL = schS.query(sqlGrTea, new TeacherSubRowMapper(), id);
 		return teaL;
 	}
@@ -310,7 +311,7 @@ public class SchoolServiceImp implements SchoolService {
 		logger.debug("updateClassInfo(), new item->" + item.toString());
 		String sqlCls = "update class set cls_name = ?, cls_type = ?, cls_owner = ? where id =?";
 		int cnt = schS.update(sqlCls, item.getClassName(), item.getClassType(),
-				item.getClaOwner().getTeacid(), item.getId());
+				item.getClaOwner() == null ? null: item.getClaOwner().getTeacid(), item.getId());
 		return cnt;
 	}
 

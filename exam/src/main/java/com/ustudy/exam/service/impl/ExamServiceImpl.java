@@ -18,9 +18,11 @@ import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.QuesareaDao;
 import com.ustudy.exam.mapper.ExamMapper;
 import com.ustudy.exam.mapper.MarkProgMapper;
+import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
 import com.ustudy.exam.model.GrClsBrife;
+import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.statics.EgsMarkMetrics;
@@ -39,7 +41,7 @@ public class ExamServiceImpl implements ExamService {
 	@Resource
 	private ExamDao examDaoImpl;
 
-	@Resource
+	@Autowired
 	private QuesAnswerDao questionDaoImpl;
 
 	@Resource
@@ -50,9 +52,20 @@ public class ExamServiceImpl implements ExamService {
 	
 	@Autowired
 	private MarkProgMapper mpM;
+	
+	@Autowired
+	private MarkTaskMapper mtM;
 
 	public List<Exam> getAllExams() {
-		return examDaoImpl.getAllExams();
+		String orgType = ExamUtil.retrieveSessAttr("orgType");
+		String orgId = ExamUtil.retrieveSessAttr("orgId");
+		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty()) {
+			logger.error("getAllExams(), failed to retrieve org info");
+			throw new RuntimeException("failed to retrieve org info");
+		}
+		
+		logger.debug("getAllExams(), retrieve exams for " + orgType + " with id " + orgId);
+		return examDaoImpl.getAllExams(orgId);
 	}
 
 	public List<Exam> getExamsByStatus(String status) {
@@ -117,13 +130,14 @@ public class ExamServiceImpl implements ExamService {
 
 	public JSONArray getExamSummary(Long examId) {
 
-		logger.info("getExamSummary -> examId:" + examId);
-
 		List<Map<String, Object>> examSubjects = examDaoImpl.getExamSummary(examId);
 
 		if (null != examSubjects && examSubjects.size() > 0) {
 
 			Map<Long, Long> gradeStudentCounts = getGradeStudentCounts(examId);
+
+			Map<Long, Long> egsStudentCounts = getEgsStudentCounts(examId);
+
 			/* comment out by jared
 			Map<Long, Long> subjectPaperCounts = getSubjectPaperCounts(examId);
 			Map<Long, Long> subjectAnswers = getSubjectAnswers(examId);
@@ -131,7 +145,7 @@ public class ExamServiceImpl implements ExamService {
 			Map<Long, Map<String, Long>> subjectQuestions = getSubjectQuestions(examId);
 
 			// return summary(examSubjects, gradeStudentCounts, subjectPaperCounts, subjectAnswers, subjectQuestions);
-			return summary(examSubjects, gradeStudentCounts, subjectQuestions);
+			return summary(examSubjects, gradeStudentCounts, egsStudentCounts, subjectQuestions);
 		}
 
 		return null;
@@ -151,7 +165,27 @@ public class ExamServiceImpl implements ExamService {
 		return counts;
 	}
 
-	private Map<Long, Long> getSubjectPaperCounts(Long examId) {
+	private Map<Long, Long> getEgsStudentCounts(Long examId) {
+
+		Map<Long, Long> counts = new HashMap<>();
+
+		long branchCount = examDaoImpl.getBranchCount(examId);
+
+		// has branch art or sci
+		if (branchCount > 0) {
+			long artMathCount = examDaoImpl.getArtMathCount(examId);
+
+			List<Map<String, Object>> egsStudentCounts = examDaoImpl.getEgsStudentCounts(examId, artMathCount);
+			for (Map<String, Object> map : egsStudentCounts) {
+				long egsId = (int) map.get("egsId");
+				long count = (long) map.get("count");
+				counts.put(egsId, count);
+			}
+		}
+		return counts;
+	}
+
+	/*private Map<Long, Long> getSubjectPaperCounts(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -163,9 +197,9 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
-	private Map<Long, Long> getSubjectAnswers(Long examId) {
+	/*private Map<Long, Long> getSubjectAnswers(Long examId) {
 
 		Map<Long, Long> counts = new HashMap<>();
 
@@ -177,7 +211,7 @@ public class ExamServiceImpl implements ExamService {
 		}
 
 		return counts;
-	}
+	}*/
 
 	private Map<Long, Map<String, Long>> getSubjectQuestions(Long examId) {
 
@@ -190,6 +224,7 @@ public class ExamServiceImpl implements ExamService {
 			int startno = (int) map.get("startno");
 			int endno = (int) map.get("endno");
 			float score = (float)map.get("score");
+			
 			if (type.equals("单选题") || type.equals("多选题") || type.equals("判断题")) {
 				Map<String, Long> m = counts.get(egsId);
 				long objectCount = 0;
@@ -254,19 +289,22 @@ public class ExamServiceImpl implements ExamService {
 		return counts;
 	}
 
-	private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts,
+	private JSONArray summary(List<Map<String, Object>> examSubjects, Map<Long, Long> gradeStudentCounts, Map<Long, Long> egsStudentCounts, 
 			Map<Long, Map<String, Long>> subjectQuestions) {
 
 		JSONArray result = new JSONArray();
+		// exam meta data
 		JSONArray array = new JSONArray();
 
 		Map<Long, List<JSONObject>> subjects = new HashMap<>();
 
 		for (Map<String, Object> map : examSubjects) {
-			long gradeId = (int) map.get("gradeId");
+			Long gradeId = Long.parseLong(String.valueOf(map.get("gradeId")));
 			String gradeName = String.valueOf(map.get("gradeName"));
 			String examDate = String.valueOf(map.get("examDate"));
+			Long egsId = Long.parseLong(String.valueOf(map.get("egsId"))); 
 			List<JSONObject> list = subjects.get(gradeId);
+			long gradeStudentCount = 0;
 			if (null == list) {
 				list = new ArrayList<>();
 				JSONObject object = new JSONObject();
@@ -279,8 +317,17 @@ public class ExamServiceImpl implements ExamService {
 					count = gradeStudentCounts.get(gradeId);
 				}
 				object.put("studentCount", count);
+				gradeStudentCount = count;
 
 				array.add(object);
+			} else {
+				for (int i = 0; i < array.size(); i++) {
+					JSONObject object = array.getJSONObject(i);
+					if (gradeId == object.getLong("gradeId")) {
+						gradeStudentCount = object.getLong("studentCount");
+						break;
+					}
+				}
 			}
 
 			JSONObject subject = new JSONObject();
@@ -288,8 +335,15 @@ public class ExamServiceImpl implements ExamService {
 			subject.put("subjectId", map.get("subjectId"));
 			subject.put("status", map.get("status"));
 			subject.put("template", map.get("template"));
-			subject.put("answerSet", map.get("answerSet"));
-			subject.put("taskDispatch", map.get("taskDispatch"));
+			subject.put("markSwitch", map.get("markSwitch"));
+
+			long count = 0;
+			if (null != egsStudentCounts.get(egsId)) {
+				count = egsStudentCounts.get(egsId);
+			} else {
+				count = gradeStudentCount;
+			}
+			subject.put("studentCount", count);
 
 			String answerPaper = "";
 			if (null == map.get("answerPaper") || map.get("answerPaper").toString().equals("null")) {
@@ -307,19 +361,21 @@ public class ExamServiceImpl implements ExamService {
 			}
 			subject.put("questionsPaper", questionsPaper);
 
-			long egsId = 0;
-			if (null != map.get("egsId")) {
-				egsId = (int) map.get("egsId");
-			}
 			subject.put("egsId", egsId);
-
-			long paperCount = 0;
+			
+			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
+			subject.put("taskDispatch", this.isMarkTaskDispatched(egsId));
+			subject.put("answerSet", this.isAnswerSet(egsId));
+			logger.trace("summary(), taskDispatch->" + subject.get("taskDispatch") + 
+					", answerSet->" + subject.get("answerSet"));
+			
 			/* commented by Jared
+			long paperCount = 0;
 			if (null != subjectPaperCounts.get(egsId)) {
 				paperCount = subjectPaperCounts.get(egsId);
-			} 
-			*/
-			EgsMarkMetrics emm = mpM.getOverallMarkMetrics((int)egsId);
+			} */
+			
+			EgsMarkMetrics emm = mpM.getOverallMarkMetrics(egsId);
 			if (emm == null) {
 				logger.error("summary(), failed to retrieve mark metrics for egs->" + egsId);
 				throw new RuntimeException("failed to retrieve mark metrics for egs->" + egsId);
@@ -389,7 +445,7 @@ public class ExamServiceImpl implements ExamService {
 		JSONArray result = new JSONArray();
 
 		String orgId = InfoUtil.retrieveSessAttr("orgId");
-		orgId = "001";
+		// orgId = "001";
 		if (orgId == null || orgId.isEmpty()) {
 			logger.error("getExams(), no school id found, maybe user not login");
 			throw new RuntimeException("getExams(), no school id found, maybe user not login");
@@ -558,4 +614,39 @@ public class ExamServiceImpl implements ExamService {
 		return egL;
 	}
 
+	private boolean isMarkTaskDispatched(Long id) {
+		List<MarkTask> mtL = mtM.getMarkTasksByEgs(id);
+		if (mtL == null || mtL.isEmpty()) {
+			logger.warn("isMarkTaskDispatched(), no mark task records retrieved for egs->" + id);
+			return false;
+		}
+		for (MarkTask mt: mtL) {
+			if (!mt.isValid()) {
+				logger.warn("isMarkTaskDispatched(), mark task assignment is not completed "
+						+ "for quesid=" + mt.getQuestionId() + ", task->" + mt.toString());
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isAnswerSet(Long id) {
+		
+		// retrieve answer settings for egs firstly
+		List<QuesAnswer> quesAns = questionDaoImpl.getQuesAnswerForValidation(id);
+		if (quesAns == null || quesAns.isEmpty()) {
+			logger.warn("isAnswerSet(), no records retrieved for answer set, maybe templates not "
+					+ "uploaded for egs " + id);
+			return false;
+		}
+		
+		for (QuesAnswer qa: quesAns) {
+			if (!qa.isValid()) {
+				logger.warn("isAnswerSet(), answer setting is not completed for question " + qa.toString());
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,14 +35,15 @@ import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
+import com.ustudy.exam.model.score.DetailedSubScore;
+import com.ustudy.exam.model.score.ExameeSubScore;
+import com.ustudy.exam.model.score.QuesScoreCalTask;
+import com.ustudy.exam.model.score.ScoreRule;
+import com.ustudy.exam.model.score.StudentScore;
 import com.ustudy.exam.model.statics.ScoreClass;
 import com.ustudy.exam.model.statics.ScoreSubjectCls;
 import com.ustudy.exam.service.ScoreService;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
-import com.ustudy.exam.utility.RecalculateQuestionScoreTask;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -56,7 +56,7 @@ public class ScoreServiceImpl implements ScoreService {
 	@Resource
 	private MultipleScoreSetDao multipleScoreSetDaoImpl;
 	
-	@Resource
+	@Autowired
 	private RefAnswerDao refAnswerDaoImpl;
 	
 	@Resource
@@ -68,10 +68,10 @@ public class ScoreServiceImpl implements ScoreService {
 	@Resource
     private ExamDao examDao;
     
-    @Resource
+    @Autowired
     private SubscoreDao subscoreDao;
     
-    @Resource
+    @Autowired
     private ExameeScoreDao exameeScoreDao;
     
     @Autowired
@@ -80,8 +80,8 @@ public class ScoreServiceImpl implements ScoreService {
     @Autowired
     private ScoreCache scoC;
 
-    public boolean recalculateQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
-        logger.debug("egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
+    public boolean calQuestionScore(Long egsId, Integer quesno, String answer) throws Exception {
+        logger.debug("calQuestionScore(), egsId: " + egsId + ",quesno=" + quesno + ",answer=" + answer);
         
         if (egsId > 0 && quesno > 0 && answer.trim().length() >0) {
             answer = answer.trim().toUpperCase();
@@ -97,16 +97,16 @@ public class ScoreServiceImpl implements ScoreService {
                 
                 //分数
                 QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, refAnswer.getQuesid());
-                int score = quesAnswer.getScore();
+                float score = quesAnswer.getScore();
                 
                 //多选给分
-                Map<Integer, Integer> multipleScoreSets = null;
+                Map<Integer, Float> multipleScoreSets = null;
                 if(answer.length() > 1){
                     multipleScoreSets = getMultipleScoreSet(answer,egsId);
                 }
                 
                 for (StudentObjectAnswer studentAnswer : answers) {
-                    int studentScore = 0;
+                    float studentScore = 0;
                     if(answer.length() == 1){
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
@@ -115,8 +115,8 @@ public class ScoreServiceImpl implements ScoreService {
                         if(studentAnswer.getAnswer().equals(answer)){
                             studentScore = score;
                         }else{
-                            Integer correctCount = getStudentCorrectCount(studentAnswer.getAnswer(), answer);
-                            if(correctCount == answer.split(",").length){
+                            Integer correctCount = StudentObjectAnswer.getCorrectCount(studentAnswer.getAnswer(), answer);
+                            if(correctCount == answer.length()){
                                 studentScore = score;
                             }else if(null != multipleScoreSets.get(correctCount)){
                                 studentScore = multipleScoreSets.get(correctCount);
@@ -138,8 +138,9 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
 
-    public boolean recalculateQuestionScore(Long egsId) throws Exception {
-        logger.debug("egsId: " + egsId);
+    @Override
+    public boolean calObjScoreOfEgs(Long egsId) throws Exception {
+        logger.debug("calEgsScore(), calculate egs score for " + egsId);
         
         new Thread() {
             public void run() {                
@@ -147,17 +148,18 @@ public class ScoreServiceImpl implements ScoreService {
                  * 创建线程池，并发量最大为5
                  * LinkedBlockingDeque，表示执行任务或者放入队列
                  */
-                ThreadPoolExecutor tpe = new ThreadPoolExecutor(20, 100, 0,
+                ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
                         TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
                         new ThreadPoolExecutor.CallerRunsPolicy());
                 
                 //存储线程的返回值
                 List<Future<String>> results = new LinkedList<Future<String>>();
                 
-                List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+                List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
                 
-                for (RefAnswer refAnswer : refAnswers) {
-                    RecalculateQuestionScoreTask task = new RecalculateQuestionScoreTask(egsId, refAnswer, quesDaoImpl, multipleScoreSetDaoImpl, answerDaoImpl);
+                for (ScoreRule sr : scoreRules) {
+                    QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
                     Future<String> result = tpe.submit(task);
                     results.add(result);
                 }
@@ -169,7 +171,9 @@ public class ScoreServiceImpl implements ScoreService {
                 try {
                     tpe.awaitTermination(1, TimeUnit.DAYS);
                 } catch (InterruptedException e) {
-                    logger.error(e.getMessage());                    
+                    logger.error("calEgsScore() in new thread->" + e.getMessage());                    
+                } catch (Exception ex) {
+                	logger.error("calEgsScore() in new thread->" + ex.getMessage());
                 }
                 
                 ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
@@ -186,16 +190,16 @@ public class ScoreServiceImpl implements ScoreService {
         
     }
     
-    private Map<Integer, Integer> getMultipleScoreSet(String answer, Long egsId){
+    private Map<Integer, Float> getMultipleScoreSet(String answer, Long egsId){
         
-        Map<Integer, Integer> map = new HashMap<>();
+        Map<Integer, Float> map = new HashMap<>();
         
         List<MultipleScoreSet> multipleScoreSets = multipleScoreSetDaoImpl.getAllMultipleScoreSets(egsId);
         
         if(null != multipleScoreSets && multipleScoreSets.size() > 0){
             for (MultipleScoreSet multipleScoreSet : multipleScoreSets) {
-                if(multipleScoreSet.getCorrectAnswerCount() == answer.trim().replaceAll(",", "").length()){
-                    map.put(multipleScoreSet.getStudentCorrectCount(), multipleScoreSet.getScore());
+                if(multipleScoreSet.getTotal() == answer.trim().replaceAll(",", "").length()){
+                    map.put(multipleScoreSet.getSelected(), multipleScoreSet.getScore());
                 }
             }
         }
@@ -203,24 +207,7 @@ public class ScoreServiceImpl implements ScoreService {
         return map;
     }
     
-    private int getStudentCorrectCount(String stuAnswer, String correctAnswer){
-        
-        int studentCorrectCount = 0;
-        
-        String[] stuAnswers = stuAnswer.split(",");
-        for (String answer : stuAnswers) {
-            if(correctAnswer.contains(answer)){
-                studentCorrectCount++;
-            }else {
-                studentCorrectCount = 0;
-                break;
-            }
-        }
-        
-        return studentCorrectCount;
-        
-    }
-
+    @Transactional
     public boolean publishExamScore(Long examId, Boolean release) throws Exception {
     	
     	if (release) {
@@ -228,6 +215,8 @@ public class ScoreServiceImpl implements ScoreService {
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
     		if(count == 0){    			
     			examDao.updateExamStatus(examId, "2");
+                // update the status of all the sub-exams accordingly.
+                examDao.updateEgsStatus(examId, "2");
     			
     			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
     			if(scores.size() > 0){
@@ -263,23 +252,31 @@ public class ScoreServiceImpl implements ScoreService {
     					rank++;
     				}
     				
-    				exameeScoreDao.deleteExameeScores(examId);
-    				exameeScoreDao.insertExameeScores(exameeScores);
+    				// exameeScoreDao.deleteExameeScores(examId);
+    				int ret = exameeScoreDao.insertExameeScores(exameeScores);
+    				logger.debug("publishExamScore(), number of examee scores saved is " + ret);
     			}
     		}else {
     		    return false;
             }
     	} else {
     		examDao.updateExamStatus(examId, "1");
+            // update the status of all the sub-exams accordingly.
+            examDao.updateEgsStatus(examId, "1");
 		}
         
         return true;
         
     }
 
-    public JSONArray getStudentSubjects(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text) throws Exception {
-        
-        JSONArray array = new JSONArray();
+    /* 
+     * Retrieve student scores based on different filter conditions，including examinee scores 
+     * and subject scores
+     * (non-Javadoc)
+     * @see com.ustudy.exam.service.ScoreService#getStudentScores(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.String, java.lang.String)
+     */
+    public List<StudentScore> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, 
+    		Long subjectId, String branch, String text) throws Exception {
         
         if (null != branch && branch.trim().length() > 0) {
             branch = branch.trim();
@@ -291,48 +288,39 @@ public class ScoreServiceImpl implements ScoreService {
                 branch = "";
             }
         }
-        
-        List<Map<String, Object>> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, classId, branch, text);
-        if(null != exameeScores && exameeScores.size() > 0){
-            Map<Long, JSONArray> studentScores = getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
-            for (Map<String, Object> map : exameeScores) {
-                long stuid = (int)map.get("stuExamId");
-                JSONArray scores = studentScores.get(stuid);
-                if(null != scores){
-                    map.put("scores", scores);
-                    array.add(map);
-                }
-            }
-        }
 
-        return array;
-    }
-    
-    private Map<Long, JSONArray> getStudentScores(Long examId, Long schId, Long gradeId, Long classId, Long subjectId, String branch, String text){
-        
-        Map<Long, JSONArray> result = new HashMap<>();
-        
-        List<Map<String, Object>> studentScores = exameeScoreDao.getStudentScores(examId, schId, gradeId, classId, subjectId, branch, text);
-        for (Map<String, Object> map : studentScores) {
-            long stuid = (int)map.get("stuid");
-            JSONArray array = result.get(stuid);
-            if(null == array){
-                array = new JSONArray();
-            }
-            array.add(map);
-            
-            result.put(stuid, array);
-        }
-        
-        return result;
-        
+        List<StudentScore> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, 
+        		classId, branch, text);
+
+        logger.debug("getStudentScores(), number of items retrieved is " + exameeScores.size());
+        return exameeScores;
     }
 
-	public JSONObject getStudentScores(Long stuId, Long examId) throws Exception {
+	/* 
+	 * Assemble detailed scores for specified examinee
+	 * (non-Javadoc)
+	 * @see com.ustudy.exam.service.ScoreService#getDetailedExameeScore(java.lang.Long, java.lang.Long)
+	 */
+    @Override
+	public ExameeSubScore getDetailedExameeScore(Long exameeId, Long examId) throws Exception {
 		
-		JSONObject object = new JSONObject();
+		ExameeSubScore examSubS = subscoreDao.getExameeSubScores(exameeId, examId);
+		logger.debug("getDetailedExameeScore(), retrieved metainfo->" + examSubS.toString());
 		
-		List<Map<String, Object>> scores = subscoreDao.getStudentScores(stuId, examId);
+		//populate object/subject question scores for each subject
+		for (DetailedSubScore dss: examSubS.getSubScores()) {
+			if (dss.getScore() != -1) {
+				dss.setObjQuesL(subscoreDao.getObjQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+				logger.trace("getDetailedExameeScore(), obj ques score->" + dss.getObjQuesL());
+				dss.setSubQuesL(subscoreDao.getSubQuesScore(examSubS.getExameeNO(), dss.getEgsId()));
+				logger.trace("getDetailedExameeScore(), subject ques score->" + dss.getSubQuesL());
+			}
+		}
+		
+		return examSubS;
+		/*JSONObject object = new JSONObject();
+		
+		List<Map<String, Object>> scores = subscoreDao.getStudentScores(exameeId, examId);
 		if(scores.size()>0){
 			JSONArray array = new JSONArray();
 			Map<String, Map<Long, List<Map<String, Object>>>> questions = getQuestions(stuId, examId);
@@ -375,10 +363,10 @@ public class ScoreServiceImpl implements ScoreService {
 			object.put("subjects", array);
 		}
 		
-		return object;
+		return object;*/
 	}
 	
-	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
+/*	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
 		
 		Map<String, Map<Long, List<Map<String, Object>>>> result = new HashMap<>();
 		
@@ -398,7 +386,7 @@ public class ScoreServiceImpl implements ScoreService {
 		Map<Long, List<Map<String, Object>>> objectives = new HashMap<>();
 		List<Map<String, Object>> objScores = subscoreDao.getStudentObjScores(stuId, examId, null);
 		for (Map<String, Object> map : objScores) {
-		    float score = (int)map.get("score");
+		    float score = (float)map.get("score");
 		    objectives = setScores(objectives, map.get("id").toString(), score);
         }
 		
@@ -466,9 +454,9 @@ public class ScoreServiceImpl implements ScoreService {
 		result.put("objectives", objectives);
 		
 		return result;
-	}
+	}*/
 	
-	private Map<Long, List<Map<String, Object>>> setScores(Map<Long, List<Map<String, Object>>> scores,String id, float score){
+/*	private Map<Long, List<Map<String, Object>>> setScores(Map<Long, List<Map<String, Object>>> scores,String id, float score){
 	    
 	    if (null != id && id.indexOf("-")>=0) {
 	        String[] ids = id.split("-");
@@ -489,7 +477,7 @@ public class ScoreServiceImpl implements ScoreService {
 	    }
 	    
 	    return scores;
-	}
+	}*/
 
 	@Override
 	public List<ScoreClass> getClsScores(int eid, int gid) {

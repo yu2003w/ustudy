@@ -16,7 +16,7 @@ public class FirstMarkImgRecord implements Serializable {
 	private String teacid = null;
 	
 	@JsonIgnore
-	private int pageno = -1;
+	private int qareaId = -1;
 
 	@JsonProperty("markImg")
 	private String img = null;
@@ -29,7 +29,7 @@ public class FirstMarkImgRecord implements Serializable {
 	public FirstMarkImgRecord(String teacid, int pageno, String img) {
 		super();
 		this.teacid = teacid;
-		this.pageno = pageno;
+		this.qareaId = pageno;
 		this.img = img;
 	}
 
@@ -50,17 +50,17 @@ public class FirstMarkImgRecord implements Serializable {
 		this.teacid = teacid;
 	}
 
-	public int getPageno() {
-		return pageno;
+	public int getQareaId() {
+		return qareaId;
 	}
 
-	public void setPageno(int pageno) {
-		this.pageno = pageno;
+	public void setQareaId(int pageno) {
+		this.qareaId = pageno;
 	}
 
 	@Override
 	public String toString() {
-		return "FirstMarkImgRecord [teacid=" + teacid + ", pageno=" + pageno + ", img=" + img + "]";
+		return "FirstMarkImgRecord [teacid=" + teacid + ", qareaId=" + qareaId + ", img=" + img + "]";
 	}
 	
 }

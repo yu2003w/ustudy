@@ -11,16 +11,18 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.SavedRequest;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.dashboard.model.Account;
+import com.ustudy.dashboard.model.UResp;
+import com.ustudy.dashboard.model.UserBrife;
 import com.ustudy.dashboard.services.AccountService;
+import com.ustudy.dashboard.util.DashboardUtil;
 
 @RestController
 public class LoginController {
@@ -31,11 +33,13 @@ public class LoginController {
 	AccountService accS;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
-	public void login(HttpServletRequest request, HttpServletResponse response) {
+	public UResp login(HttpServletRequest request, HttpServletResponse response) {
 				
 		logger.debug("endpoint /login is visited");
 		String msg = null;
 		boolean status = true;
+		
+		UResp res = new UResp();
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		
@@ -43,14 +47,15 @@ public class LoginController {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			
-			logger.debug("login() is invoked with username->" + username + 
-					";password->" + password);
+			logger.debug("login() is invoked with username->" + username + ";password->" + password);
 			
 			try {
 				UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 				token.setRememberMe(true);
 				currentUser.login(token);
-				logger.debug("Token retrieved -> " + token.toString());
+				
+				logger.trace("Token retrieved -> " + token.toString());
+				
 			} catch (UnknownAccountException | IncorrectCredentialsException uae) {
 				msg = "Attempt to access with invalid account -> username:" + username;
 				status = false;
@@ -58,42 +63,72 @@ public class LoginController {
 				msg = "Account is locked, username:" + username;
 				status = false;
 			} catch (AuthenticationException ae) {
-				logger.warn(ae.getMessage());
+				msg = ae.getMessage();
 				status = false;
 			} catch (Exception e) {
-				logger.warn(e.getMessage());
+				msg = e.getMessage();
 				status = false;
 			}
 			
-		} 
-		
-		String redirectUrl = null;
+		}
 		
 		if (status) {
 			logger.debug("user [" + currentUser.getPrincipal() + "] loggined successfully");
-			// login successful, redirect to original request
-			msg = "Authentication successful";
+			
+			/* Don't need to redirect, front end will handle redirect stuff
 			SavedRequest sr = WebUtils.getAndClearSavedRequest(request);
-			//WebUtils.redirectToSavedRequest(request, response, null);
-			//WebUtils.issueRedirect(request, response, sr.getRequestUrl(), null, false);
 			redirectUrl = sr.getRequestUrl();
-			
-			Account user = accS.findUserByLoginName(currentUser.getPrincipal().toString());
-			if (!accS.updateLLTime(user.getId()))
-				logger.warn("login(), failed to set last login time for user " + currentUser.getPrincipal().toString());
-			
+			*/
+			try {
+				Session ses = currentUser.getSession(true);
+				
+				Account user = accS.findUserByLoginName(currentUser.getPrincipal().toString());
+				
+				if (user != null) {
+					if (!accS.updateLLTime(user.getId())) {
+						logger.error("login(), failed to set ll_time for user " + currentUser.getPrincipal().toString());
+					}
+					
+					ses.setAttribute("uid", user.getLoginname());
+					ses.setAttribute("uname", user.getFullname());
+					ses.setAttribute("role", DashboardUtil.getAcctRoleMap().get(user.getRoleName()));
+					res.setData(new UserBrife(ses.getAttribute("uid").toString(), 
+							ses.getAttribute("uname").toString(), 
+							DashboardUtil.getAcctRoleMap().get(ses.getAttribute("role").toString())));
+					res.setRet(true);
+					logger.debug("login(), " + user.getLoginname() + " logged.");
+				}
+				else {
+					logger.error("login(), failed to retrieve user information for " + currentUser.getPrincipal().toString());
+					response.setStatus(500);
+					response.setHeader("loginresult", "failed to retrieve user information");
+					res.setMessage("failed to retrieve user information");
+				} 
+				
+			} catch (Exception e) {
+				logger.error("login(), populate user information failed->" + e.getMessage());
+				response.setStatus(500);
+				response.setHeader("loginresult", "populate user information failed");
+				res.setMessage("populate user information failed");
+			}
 		} else {
-			logger.warn(msg);
-			// login failed here, need to redirect to error pages
-			redirectUrl = "/dashboard/error.jsp";
+			logger.error(msg);
+			response.setStatus(500);
+			response.setHeader("loginresult", "authentication failed");
+			res.setMessage("authentication failed");
 		}
 		
+		/*
+		 * No need to redirect, front end will control logic for login request
 		try {
 			logger.debug("redirect to " + redirectUrl);
 			response.sendRedirect(redirectUrl);
 		} catch (Exception re) {
 			logger.warn("Failed to redirect to login pages --> " + re.getMessage());
 		}
+		*/
+		
+		return res;
 		
 	}
 	
@@ -109,23 +144,36 @@ public class LoginController {
 	
 	
 	@RequestMapping(value="/loginId", method = RequestMethod.GET)
-	public String getLoginName(HttpServletResponse resp) {
+	public UResp getLoginUser(HttpServletResponse resp) {
 		logger.debug("endpoint /loginId is visited");
 		Subject cUser = null;
+		UResp res = new UResp();
+		
 		try {
 			cUser = SecurityUtils.getSubject();
 		} catch (Exception e) {
-			logger.warn("Failed to get subject --> " + e.getMessage());
+			logger.error("getLoginUser(), Failed to get subject --> " + e.getMessage());
+			res.setMessage("failed to get subject");
+			return res;
 		}
+		
 		if (cUser.getPrincipal() == null) {
-			logger.warn("/loginId, User didn't log in");
-			resp.setStatus(404);
-			return "No User logged in";
+			logger.info("getLoginUser(), User didn't log in");
+			resp.setStatus(530);
+			resp.setHeader("Failure reason:", "No User logged in");
+			res.setMessage("No user logged in");
+			return res;
 		}
 		else {
-			logger.debug(cUser.getPrincipal().toString());
-			return cUser.getPrincipal().toString();
+			//user already logged in, retrieve information from session storage
+			Session ses = cUser.getSession();
+			res.setData(new UserBrife(ses.getAttribute("uid").toString(), ses.getAttribute("uname").toString(), 
+					DashboardUtil.getAcctRoleMap().get(ses.getAttribute("role").toString())));
+			res.setRet(true);
+			logger.debug("getLoginUser(), user->" + res.getData().toString());
 		}
+		
+		return res;
 		
 	}
 	

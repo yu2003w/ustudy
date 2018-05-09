@@ -1,0 +1,83 @@
+package com.ustudy.exam.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ustudy.UResp;
+import com.ustudy.exam.service.AnswerService;
+
+import net.sf.json.JSONObject;
+
+@RestController
+@RequestMapping(value = "/setanswers")
+public class AnswerSetController {
+
+	private static final Logger logger = LogManager.getLogger(AnswerSetController.class);
+
+	@Autowired
+	private AnswerService ansSer;
+
+	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.GET)
+	public UResp getQuesAnswers(@PathVariable Long egsId, HttpServletRequest req, HttpServletResponse resp) {
+
+		logger.debug("getQuesAnswers(), retrieving answers for " + egsId);
+
+		UResp res = new UResp();
+
+		try {
+			res.setData(ansSer.getQuesAnswer(egsId));
+			res.setRet(true);
+		} catch (Exception e) {
+			resp.setStatus(500);
+			res.setMessage("retrieve answers failed with exception->" + e.getMessage());
+			logger.error("getQuesAnswers(), retrieved answers failed for " + egsId + ", " + e.getMessage());
+		}
+
+		return res;
+	}
+
+	/**
+	 * setting answers for questions of egs
+	 * 
+	 * @param egsId
+	 * @param paras
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/answers/{egsId}", method = RequestMethod.POST)
+	public UResp saveQuesAnswers(@PathVariable Long egsId, @RequestBody String paras, 
+			HttpServletRequest request,	HttpServletResponse resp) {
+
+		// TODO: refactor code, paras should be model rather than raw json object
+		logger.debug("saveQuesAnswers(), save answers for " + egsId + " with parameters->" + paras);
+		
+		UResp res = new UResp();
+
+		try {
+			JSONObject data = JSONObject.fromObject(paras);
+			if (ansSer.saveQuesAnswers(egsId, data)) {
+				res.setRet(true);
+			}
+			
+		} catch (Exception e) {
+			res.setMessage("save answers failed with exception->" + e.getMessage());
+			logger.error("saveQuesAnswers(), save answers for " + egsId + 
+					" failed with exception->" + e.getMessage());
+			resp.setStatus(500);
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+}

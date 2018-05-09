@@ -1,5 +1,6 @@
 package com.ustudy.dashboard.services.imp;
 
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -9,7 +10,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -58,9 +67,9 @@ public class SchoolServiceImp implements SchoolService {
 	 */
 	@Transactional
 	@Override
-	public int createSchool(School data) {
+	public long createSchool(School data) {
 
-		int ret = schM.createSchool(data);
+		long ret = schM.createSchool(data);
 		if (ret < 0 || ret > 2) {
 			logger.error("createSchool(), create school failed with ret " + ret);
 			throw new RuntimeException("createSchool(), failed with ret " + ret);
@@ -75,7 +84,7 @@ public class SchoolServiceImp implements SchoolService {
 	}
 	
 	
-	private int createCleaner(String orgType, String orgId) {
+	private long createCleaner(String orgType, String orgId) {
 		// usually school id is composed of 10 digits number
 		String tname = orgId;
 		String msg = null;
@@ -128,14 +137,12 @@ public class SchoolServiceImp implements SchoolService {
 		}
 		
 		logger.debug("createCleaner(), created ret->" + ret + ", generated id->" + item.getId());
-
-		// populate role as "cleaner"
-		ret = ooM.getRoleId("cleaner");
+	
+		ret = ooM.saveRoles("cleaner", item.getTeacId());
 		if (ret <= 0) {
-			logger.error("createCleaner(), invalid role id->" + ret);
-			throw new RuntimeException("createCleaner(), invalid role id->" + ret);
+			logger.error("createCleaner(), failed to populate roles for cleaner->" + ret);
+			throw new RuntimeException("failed to populate roles for cleaner");
 		}
-		ret = ooM.saveRoles(ret, item.getTeacId());
 
 		logger.debug("createCleaner(), role populated for " + item.getTeacId());
 	
@@ -393,6 +400,35 @@ public class SchoolServiceImp implements SchoolService {
 			id = 0;
 		List<OrgBrife> obL = schM.getSchBrife(id);
 		return obL;
+	}
+
+	@Override
+	public List<Subject> retrieveSubjects() {
+		List<Subject> subL = schM.getAllSubjects();
+		logger.debug("retrieveSubjects(), " + subL.toString());
+		Map<Integer, String> subD = new HashMap<Integer, String>();
+		for (Subject sub: subL) {
+			if (sub.getChild() == null || sub.getChild().length() == 0) {
+				subD.put(Integer.valueOf(sub.getSubId()), sub.getSubName());
+			}
+		}
+		
+		for (Subject sub: subL) {
+			if (sub.getChild() != null && sub.getChild().length() > 0) {
+				// need to parse child subjects
+				JsonReader reader = Json.createReader(new StringReader(sub.getChild()));
+				JsonObject jObj = reader.readObject();
+				reader.close();
+				JsonArray ids = jObj.getJsonArray("ids");
+				Map<String, String> childSubs = new HashMap<String, String>();
+				for (int i = 0; i < ids.size(); i++) {
+					JsonNumber sid = ids.getJsonNumber(i);
+					childSubs.put(sid.toString(), subD.get(sid.intValue()));
+					sub.setChildSubs(childSubs);
+				}
+			}
+		}
+		return subL;
 	}
 
 }

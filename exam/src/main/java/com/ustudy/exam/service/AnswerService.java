@@ -1,12 +1,12 @@
 package com.ustudy.exam.service;
 
-import java.util.Map;
+import com.ustudy.exam.model.AnswerSet;
 
 import net.sf.json.JSONObject;
 
-public interface SetAnswersService {
+public interface AnswerService {
 
-	Map<String, Object> getQuesAnswer(Long egsId) throws Exception;
+	AnswerSet getQuesAnswer(Long egsId) throws Exception;
 	
 	boolean deleteQuesAnswers(Long egsId) throws Exception;
 	

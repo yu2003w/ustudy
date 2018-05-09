@@ -10,6 +10,7 @@ public class TeaMarkInfo implements Serializable {
 	private static final long serialVersionUID = 1878572067059983680L;
 
 	private int seq = -1;
+	// number of teachers assigned for marking certain question
 	private int num = -1;
 	
 	public TeaMarkInfo() {

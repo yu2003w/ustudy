@@ -5,6 +5,7 @@ id INT NOT NULL AUTO_INCREMENT,
 stuid INT NOT NULL COMMENT '考生ID',
 exam_grade_sub_id INT NOT NULL COMMENT '考试科目',
 score float(4,1) DEFAULT '0.0' COMMENT '总分数',
+mark_img varchar(128),
 sub_score float(4,1) DEFAULT '0.0' COMMENT '主观题分数',
 obj_score float(4,1) DEFAULT '0.0' COMMENT '客观题分数',
 rank INT DEFAULT '0' COMMENT '排名',
@@ -16,6 +17,25 @@ FOREIGN KEY (stuid)
     ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+create table if not exists ustudy.subchildscore (
+id INT NOT NULL AUTO_INCREMENT,
+# id of subscore
+parent_id INT NOT NULL,
+# child subject id
+sub_id INT NOT NULL COMMENT '分科科目id',
+score float(4,1) DEFAULT '0.0' COMMENT '总分数',
+rank INT DEFAULT '0' COMMENT '排名',
+PRIMARY KEY(id),
+UNIQUE KEY (parent_id, sub_id),
+INDEX (rank),
+FOREIGN KEY (sub_id)
+    REFERENCES ustudy.subject(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (parent_id)
+    REFERENCES ustudy.subscore(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 

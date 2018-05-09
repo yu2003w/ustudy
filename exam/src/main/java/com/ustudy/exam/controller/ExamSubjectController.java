@@ -29,7 +29,7 @@ public class ExamSubjectController {
 	private static final Logger logger = LogManager.getLogger(ExamSubjectController.class);
 	
 	@Autowired
-	private ExamSubjectService service;
+	private ExamSubjectService exSubS;
 	
 	@Autowired
     private ScoreService scoreService;
@@ -45,12 +45,12 @@ public class ExamSubjectController {
 			@RequestParam(required=false) String end, 
 			@RequestParam(required=false) String examName) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/ visited");
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(subjectId, gradeId, start, end, examName));
+		result.put("data", exSubS.getExamSubjects(subjectId, gradeId, start, end, examName));
 
 		return result;
 	}
@@ -63,13 +63,13 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubjects/{examId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId);
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
 		
-		List<ExamSubject> examSubjects = service.getExamSubjects(examId);
+		List<ExamSubject> examSubjects = exSubS.getExamSubjects(examId);
 		Map<String, Map<String, Object>> grades = new HashMap<>();
 		for (ExamSubject examSubject : examSubjects) {
 			Map<String, Object> grade = grades.get("" + examSubject.getGradeId());
@@ -108,12 +108,12 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubjects/{examId}/{gradeId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId + "/" + gradeId);
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(examId, gradeId));
+		result.put("data", exSubS.getExamSubjects(examId, gradeId));
 
 		return result;
 	}
@@ -128,12 +128,12 @@ public class ExamSubjectController {
 	@RequestMapping(value = "/examsubject/{examId}/{gradeId}/{subjectId}", method = RequestMethod.GET)
 	public Map getExamSubjects(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId) {
 		
-		logger.debug("getExamSubjects().");
+		logger.debug("getExamSubjects(), /examsubjects/" + examId + "/" + gradeId + "/" + subjectId);
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubjects(examId, gradeId, subjectId));
+		result.put("data", exSubS.getExamSubjects(examId, gradeId, subjectId));
 
 		return result;
 	}
@@ -144,14 +144,14 @@ public class ExamSubjectController {
 	 * @return
 	 */
 	@RequestMapping(value = "/examsubject/{id}", method = RequestMethod.GET)
-	public Map getExamSubject(@PathVariable Long id) {
+	public Map getExamSubjectById(@PathVariable Long id) {
 		
-		logger.debug("getExamSubject().");
+		logger.debug("getExamSubjectById(), id->" + id);
 		
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getExamSubject(id));
+		result.put("data", exSubS.getExamSubject(id));
 
 		return result;
 	}
@@ -168,7 +168,7 @@ public class ExamSubjectController {
 		Map result = new HashMap<>();
 
 		result.put("success", true);
-		result.put("data", service.getLastExamSubjects());
+		result.put("data", exSubS.getLastExamSubjects());
 
 		return result;
 	}
@@ -187,35 +187,40 @@ public class ExamSubjectController {
     @RequestMapping(value = "/examsubject/status/{egsId}/{release}", method = RequestMethod.POST)
     public Map updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release) {
         
-        logger.debug("updateExamSubjectStatus().");
+        logger.debug("updateExamSubjectStatus(), " + (release == true? "release": "withdraw") + 
+        		" score results");
         
         Map result = new HashMap<>();
         
         if(release){
+        	// first, calculate score of object questions for specified egs
             try {
-                scoreService.recalculateQuestionScore(egsId);
+                scoreService.calObjScoreOfEgs(egsId);
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("updateExamSubjectStatus(), " + e.getMessage(), e);
                 result.put("success", false);
                 result.put("data", "更新失败");
                 return result;
             }
         }
 
-        if(service.updateExamSubjectStatus(egsId, release)){
+        // Don't automatically publish the score of the whole exam after one subject is published.
+
+        // score summation for specified exam grade subject
+        if(exSubS.updateEgsScoreStatus(egsId, release)){
             
-            new Thread() {
-                public void run() {
-                    try {
-                        ExamSubject examSubject = service.getExamSubject(egsId);
-                        if(null != examSubject && examSubject.getExamid() > 0){
-                            scoreService.publishExamScore(examSubject.getExamid(), true);
-                        }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
-                    }                    
-                }
-            }.start();
+            // new Thread() {
+            //     public void run() {
+            //         try {
+            //             ExamSubject examSubject = service.getExamSubject(egsId);
+            //             if(null != examSubject && examSubject.getExamid() > 0){
+            //                 scoreService.publishExamScore(examSubject.getExamid(), true);
+            //             }
+            //         } catch (Exception e) {
+            //             logger.error(e.getMessage());
+            //         }                    
+            //     }
+            // }.start();
             
             result.put("success", true);
             result.put("data", "更新成功");
@@ -247,7 +252,95 @@ public class ExamSubjectController {
         
         Map result = new HashMap<>();
 
-        if(service.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
+        if(exSubS.updateExamSubjectStatus(examId, gradeId, subjectId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     * updateMarkSwitch
+     * 创建人:  liqi
+     * 创建时间: 2018.3.10
+     *
+     * @Title: updateMarkSwitch
+     * @param examId 考试ID
+     * @param gradeId 年级ID
+     * @param subjectId 科目ID
+     * @param release 是否开启阅卷
+     * @return 阅卷开关结果
+     */
+    @RequestMapping(value = "/examsubject/markswitch/{examId}/{gradeId}/{subjectId}/{release}", method = RequestMethod.POST)
+    public Map updateMarkSwitch(@PathVariable Long examId, @PathVariable Long gradeId, @PathVariable Long subjectId, @PathVariable Boolean release) {
+        
+        logger.debug("updateMarkSwitch().");
+        
+        Map result = new HashMap<>();
+
+        if(exSubS.updateMarkSwitch(examId, gradeId, subjectId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     * updateMarkSwitch
+     * 创建人:  liqi
+     * 创建时间: 2018.3.10
+     *
+     * @Title: updateMarkSwitch
+     * @param egsId 考试科目ID
+     * @param release 是否开启阅卷
+     * @return 阅卷开关结果
+     */
+    @RequestMapping(value = "/examsubject/markswitch/{egsId}/{release}", method = RequestMethod.POST)
+    public Map updateMarkSwitch(@PathVariable Long egsId, @PathVariable Boolean release) {
+        
+        logger.debug("updateMarkSwitch().");
+        
+        Map result = new HashMap<>();
+
+        if(exSubS.updateMarkSwitch(egsId, release)){
+            result.put("success", true);
+            result.put("data", "更新成功");
+        }else {
+            result.put("success", false);
+            result.put("data", "更新失败");
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     * updateExamSubPapers
+     * 创建人:  liqi
+     * 创建时间: 2018.4.7
+     *
+     * @Title: updateExamSubPapers
+     * @param egsId 考试科目ID
+     * @return 更新答题卡结果
+     */
+    @RequestMapping(value = "/examsubject/papers/{egsId}", method = RequestMethod.POST)
+    public Map updateExamSubPapers(@PathVariable Long egsId) {
+        
+        logger.debug("updateExamSubPapers().");
+        
+        Map result = new HashMap<>();
+
+        if(exSubS.updateExamSubPapers(egsId)){
             result.put("success", true);
             result.put("data", "更新成功");
         }else {

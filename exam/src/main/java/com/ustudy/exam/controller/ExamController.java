@@ -38,15 +38,19 @@ public class ExamController {
 	 * @return Map
 	 */
 	@RequestMapping(value = "/allexams", method = RequestMethod.GET)
-	public Map getAllExams(HttpServletRequest request, HttpServletResponse response) {
-		
-		logger.debug("getAllExams().");
-		
+	public Map getAllExams(HttpServletRequest request, HttpServletResponse resp) {
+				
+		logger.debug("getAllExams(), /allexams visited");
 		Map result = new HashMap<>();
 
-		result.put("success", true);
-		result.put("data", service.getAllExams());
-
+		try {
+			result.put("success", true);
+			result.put("data", service.getAllExams());
+		} catch (Exception e) {
+			logger.error("getAllExams(), failed with exception->" + e.getMessage());
+			resp.setStatus(500);
+		}
+		
 		return result;
 	}
     
@@ -196,7 +200,7 @@ public class ExamController {
 
 	@RequestMapping(value = "/exam/summary/{examId}", method = RequestMethod.GET)
 	public Map getExamSummary(@PathVariable Long examId, HttpServletResponse response) {
-		logger.debug("getExamSummary(" + examId + ").");
+		logger.debug("getExamSummary(), assemble exam summary for " + examId);
 
 		Map result = new HashMap<>();
 

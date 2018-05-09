@@ -34,7 +34,8 @@ public interface MarkTaskMapper {
 	public String getMarkType(@Param("tid") String teacid, @Param("qid") String quesid);
 
 	@Select("select examid as examId, (select exam_name from ustudy.exam where ustudy.exam.id = examid) as "
-			+ "examName, (select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
+			+ "examName, (select exam_grade_sub_id from ustudy.question where id = #{qid}) as egsId, " 
+			+ "(select name from ustudy.subject where ustudy.subject.id = sub_id) as subject, "
 			+ "(select grade_name from ustudy.grade where ustudy.grade.id = grade_id) as grade, quesno, "
 			+ "startno, endno, type as quesType from ustudy.examgradesub join ustudy.question on "
 			+ "ustudy.examgradesub.id = ustudy.question.exam_grade_sub_id where ustudy.examgradesub.id = "
@@ -55,7 +56,7 @@ public interface MarkTaskMapper {
 	public MarkTaskBrife getMetaTaskInfo(@Param("qid") String queid);
 
 	@Select("select id as quesid, quesno, startno, endno, type as questionType, assign_mode as assignMode,"
-			+ "mark_mode as markMode, score as fullscore from ustudy.question where id = #{qid}")
+			+ "mark_mode as markMode, scorediff, score as fullscore from ustudy.question where id = #{qid}")
 	public QuesMarkSum getQuesSum(@Param("qid") String queid);
 
 	@Select("select ustudy.paper.id as paperid, ustudy.paper.paper_img as img from ustudy.question "
@@ -78,32 +79,36 @@ public interface MarkTaskMapper {
 	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
-	@Select("select answer_step.quesno, answer_step.score, question_step.score as fullscore "
-			+ "from answer_step join question_step on question_step.quesno = answer_step.quesno "
-			+ "where answer_id = (select id from ustudy.answer where quesid = #{qid} and paperid = #{pid})")
+	@Select("select answer_step.quesno, answer_step.score, question_step.score as fullscore from answer_step "
+			+ "left join answer on answer.id = answer_step.answer_id "
+			+ "left join question on question.id = answer.quesid "
+			+ "left join question_step on "
+			+ "(question_step.quesno = answer_step.quesno and question.id = question_step.quesid) "
+			+ "where answer.quesid = #{qid} and answer.paperid = #{pid}")
 	public List<SingleAnswer> getMarkedQuesDiv(@Param("qid") String quesid, @Param("pid") String paperid);
 
 	@Select("select mark_mode from ustudy.question where id = #{qid}")
 	public String getMarkMode(@Param("qid") String qid);
 
-	@Select("select file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
+	@Select("select id, file_name as quesImg, pageno, posx, posy, width, height from ustudy.quesarea where "
 			+ "quesid = #{qid} order by pageno")
 	public List<ImgRegion> getPaperRegion(@Param("qid") String quesid);
 
-	@Select("select teacid, pageno, mark_img as img from ustudy.answer join ustudy.answer_img on "
+	@Select("select teacid, qarea_id as qareaId, mark_img as img from ustudy.answer join ustudy.answer_img on "
 			+ "ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and paperid=#{pid} and "
-			+ "ustudy.answer.isfinal = false order by pageno")
+			+ "ustudy.answer.isfinal = false order by qarea_id")
 	public List<FirstMarkImgRecord> getFirstMarkImgs(@Param("qid") String quesid, @Param("pid") String paperid);
 
-	@Select("select pageno, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer join "
-			+ "ustudy.answer_img on ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and "
-			+ "paperid=#{pid} and answer.teacid=#{tid} order by pageno")
+	@Select("select qarea_id as regionId, mark_img as markImg, ans_mark_img as ansMarkImg from ustudy.answer "
+			+ "join ustudy.answer_img on ustudy.answer.id = ustudy.answer_img.ans_id where quesid=#{qid} and "
+			+ "paperid=#{pid} and answer.teacid=#{tid} order by qarea_id")
 	public List<MarkAnsImg> getMarkAnsImgs(@Param("qid") String quesid, @Param("pid") String paperid, 
 			@Param("tid") String tid);
 	
-	@Select("select mflag, problem_paper as isProblemPaper, isviewed as marked, score, "
-			+ "(select paper_img from ustudy.paper where paper.id = paperid) as paperImg, quesid, "
-			+ "paperid as paperId from ustudy.answer where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
+	@Select("select mflag, problem_paper as isProblemPaper, isviewed as marked, score, paper.id as paperId, "
+			+ "quesid, paper.paper_img as paperImg from ustudy.answer "
+			+ "left join paper on paper.id = answer.paperid "
+			+ "where quesid=#{qid} and paperid=#{pid} and teacid=#{tid}")
 	public BlockAnswer getAnswer(@Param("qid") String quesid, @Param("pid") String pid, @Param("tid") String teacid);
 
 	@Insert("insert into ustudy.answer (quesid, paperid, teacid, mflag, problem_paper, isviewed, isfinal, "
@@ -113,8 +118,8 @@ public interface MarkTaskMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "ba.id")
 	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 
-	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, pageno, ans_id) values (#{ir.markImg}, "
-			+ "#{ir.ansMarkImg}, #{ir.pageno}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
+	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values (#{ir.markImg}, "
+			+ "#{ir.ansMarkImg}, #{ir.id}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
 			+ "ans_mark_img=#{ir.ansMarkImg}")
 	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid);
 
@@ -147,7 +152,7 @@ public interface MarkTaskMapper {
 	public int populateMetaMarkTask(MetaMarkTask mmt);
 
 	@Update("update ustudy.question set assign_mode=#{type}, mark_mode=#{markMode}, duration=#{timeLimit}, "
-			+ "teac_owner=#{ownerId} where id=#{questionId}")
+			+ "teac_owner=#{ownerId}, scorediff=#{scorediff} where id=#{questionId}")
 	public int updateQuestionMeta(MarkTask mt);
 
 	@Delete("delete from ustudy.marktask where teacid = #{teacid} and quesid = #{quesid} and "
@@ -162,5 +167,12 @@ public interface MarkTaskMapper {
 	@Select("select count(*) as marked, sum(score) as score, quesid from answer where isviewed=true and "
 			+ "teacid=#{tid} group by quesid")
 	public List<TeaStatics> getMarkStaticsByTeaId(@Param("tid") String tid);
-
+	
+	@Select("select question.id as questionId, question.mark_mode as markMode, question.scorediff, "
+			+ "group_concat(marktask.marktype, '-', marktask.teacid) as teachers "
+			+ "from question left join marktask on marktask.quesid = question.id "
+			+ "where question.exam_grade_sub_id = #{egs} and question.type not in ('单选题', '多选题', '判断题') "
+			+ "group by question.id")
+	public List<MarkTask> getMarkTasksByEgs(@Param("egs") Long egs);
+	
 }

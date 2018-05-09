@@ -16,10 +16,10 @@ public interface AccountService {
 	
 	public int delItemSet(String ids) ;
 	
-	public int createItem(Account item);
+	public int createAccount(Account item);
 	
-	public int updateItem(Account item, int id);
+	public int updateAccount(Account item, int id);
 	
-	public boolean updateLLTime(String id);
+	public boolean updateLLTime(int id);
 	
 }
