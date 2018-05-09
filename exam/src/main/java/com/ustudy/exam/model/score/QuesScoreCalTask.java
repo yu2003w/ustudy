@@ -11,11 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.StudentObjectAnswer;
 
-public class QuesScoreCalTask implements Callable<String> {
+public class QuesScoreCalTask implements Callable<UResp> {
     
     private static final Logger logger = LogManager.getLogger(QuesScoreCalTask.class);
     
@@ -29,75 +30,80 @@ public class QuesScoreCalTask implements Callable<String> {
 		this.sr = sr;
 		this.answerDaoImpl = answerDaoImpl;
 	}
-
+	
 	@Override
 	@Transactional
-    public String call() throws Exception {
+    public UResp call() throws Exception {
         
-        logger.debug("CalQuesScoreTask:call(), egsId: " + egsId + ",quesno=" + sr.getQuesno() + 
-        		",answer=" + sr.getAnswer());
+        logger.debug("QuesScoreCalTask:call(), egsId: " + egsId + ", quesno=" + sr.getQuesno() + 
+        		", answer=" + sr.getAnswer());
         
+        UResp ret = new UResp();
+        
+        String msg = "quesid=" + String.valueOf(sr.getQuesid()) + ", quesnod=" + sr.getQuesno() + 
+        		", ans=" + sr.getAnswer();
         if (egsId > 0 && sr.getQuesno() > 0 && null != sr.getAnswer()) {
-            
-            int quesno = sr.getQuesno();
-            
-            List<StudentObjectAnswer> answers = answerDaoImpl.getQuestionAnswer(egsId, quesno);
-            List<Map<String, Object>> scores = new ArrayList<>();
-            
-            if(null != answers && answers.size() > 0){
-                //分数
-                // QuesAnswer quesAnswer = quesDaoImpl.getQuesAnswer(egsId, sr.getQuesid());
-                // float score = quesAnswer.getScore();
-            	
-            	String answer = sr.getAnswer().trim().toUpperCase();
-                float score = sr.getScore();
-                //多选给分
-                Map<Integer, Float> multipleScoreSets = null;
-                if(answer.length() > 1){
-                	multipleScoreSets = getMultipleScoreSet(answer, sr.getMulScoreSet());
-                }
+            try {
+            	int quesno = sr.getQuesno();
+                List<StudentObjectAnswer> answers = answerDaoImpl.getQuestionAnswer(egsId, quesno);
+                List<Map<String, Object>> scores = new ArrayList<>();
                 
-                for (StudentObjectAnswer studentAnswer : answers) {
-                    float studentScore = 0;
-                    //单选、判断题
-                    if(answer.length() == 1){
-                        if(studentAnswer.getAnswer().equals(answer)){
-                            studentScore = score;
-                        }
-                    //多选题
-                    }else if(answer.length() >= studentAnswer.getAnswer().length()){
-                        if(studentAnswer.getAnswer().equals(answer)){
-                            studentScore = score;
-                        }else{
-                            Integer correctCount = StudentObjectAnswer.getCorrectCount(studentAnswer.getAnswer(), answer);
-                            if(correctCount > 0){
-                                if(correctCount == answer.length()){
-                                    studentScore = score;
-                                }else if(multipleScoreSets.containsKey(correctCount)){
-                                    studentScore = multipleScoreSets.get(correctCount);
+                if(null != answers && answers.size() > 0){                	
+                	String answer = sr.getAnswer().trim().toUpperCase();
+                    float score = sr.getScore();
+                    //多选给分
+                    Map<Integer, Float> multipleScoreSets = null;
+                    if(answer.length() > 1){
+                    	multipleScoreSets = getMultipleScoreSet(answer, sr.getMulScoreSet());
+                    }
+                    
+                    for (StudentObjectAnswer studentAnswer : answers) {
+                        float studentScore = 0;
+                        //单选、判断题
+                        if(answer.length() == 1){
+                            if(studentAnswer.getAnswer().equals(answer)){
+                                studentScore = score;
+                            }
+                        //多选题
+                        }else if(answer.length() >= studentAnswer.getAnswer().length()){
+                            if(studentAnswer.getAnswer().equals(answer)){
+                                studentScore = score;
+                            }else{
+                                Integer correctCount = StudentObjectAnswer.getCorrectCount(studentAnswer.getAnswer(), answer);
+                                if(correctCount > 0){
+                                    if(correctCount == answer.length()){
+                                        studentScore = score;
+                                    }else if(multipleScoreSets.containsKey(correctCount)){
+                                        studentScore = multipleScoreSets.get(correctCount);
+                                    }
                                 }
                             }
                         }
+                        
+                        if(studentAnswer.getScore() != studentScore && studentScore >= 0){
+                            Map<String, Object> sc = new HashMap<>();
+                            sc.put("id", studentAnswer.getId());
+                            sc.put("score", studentScore);
+                            scores.add(sc);
+                        }
                     }
                     
-                    if(studentAnswer.getScore() != studentScore && studentScore >= 0){
-                        Map<String, Object> sc = new HashMap<>();
-                        sc.put("id", studentAnswer.getId());
-                        sc.put("score", studentScore);
-                        scores.add(sc);
-                    }
                 }
                 
+                if(scores.size()>0){
+                    answerDaoImpl.updateBatch(scores);
+                }
+                ret.setRet(true);
+                logger.trace("QuesScoreCalTask:call(), completed->" + msg);
+            } catch (Exception e) {
+            	ret.setMessage("failed with exception " + e.getMessage());
+            	logger.error("QuesScoreCalTask:call(), failed->" + e.getMessage());
             }
-            
-            if(scores.size()>0){
-                answerDaoImpl.updateBatch(scores);
-            }
-            
-            return "true";
         }else {
-            return "false";
+            ret.setMessage("invalid parameter->" + msg);
         }
+        
+        return ret;
     }
     
     private Map<Integer, Float> getMultipleScoreSet(String answer, List<MultipleScoreSet> mssL){

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.ExameeScoreDao;
@@ -139,55 +140,55 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public boolean calObjScoreOfEgs(Long egsId) throws Exception {
+    public boolean calObjScoreOfEgs(Long egsId) {
         logger.debug("calEgsScore(), calculate egs score for " + egsId);
         
-        new Thread() {
-            public void run() {                
-                /**
-                 * 创建线程池，并发量最大为5
-                 * LinkedBlockingDeque，表示执行任务或者放入队列
-                 */
-                ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
-                        TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
-                        new ThreadPoolExecutor.CallerRunsPolicy());
-                
-                //存储线程的返回值
-                List<Future<String>> results = new LinkedList<Future<String>>();
-                
-                //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
-                List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
-                
-                for (ScoreRule sr : scoreRules) {
-                    QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
-                    Future<String> result = tpe.submit(task);
-                    results.add(result);
-                }
-                
-                //此函数表示不再接收新任务，
-                //如果不调用，awaitTermination将一直阻塞
-                tpe.shutdown();
-                //1天，模拟永远等待
-                try {
-                    tpe.awaitTermination(1, TimeUnit.DAYS);
-                } catch (InterruptedException e) {
-                    logger.error("calEgsScore() in new thread->" + e.getMessage());                    
-                } catch (Exception ex) {
-                	logger.error("calEgsScore() in new thread->" + ex.getMessage());
-                }
-                
-                ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
-                if(null != examSubject && null != examSubject.getExamid()){
-                    calClsSubScore(examSubject.getExamid().intValue(), -1);
-                }
-                
-                scoC.setScoreColStatus(egsId.intValue(), true);
-                
+        /**
+         * 创建线程池，并发量最大为5
+         * LinkedBlockingDeque，表示执行任务或者放入队列
+         */
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
+                TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        
+        //存储线程的返回值
+        List<Future<UResp>> results = new LinkedList<Future<UResp>>();
+        
+        //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+        List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
+        
+        for (ScoreRule sr : scoreRules) {
+            QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
+            Future<UResp> result = tpe.submit(task);
+            results.add(result);
+        }
+        
+        //此函数表示不再接收新任务，
+        //如果不调用，awaitTermination将一直阻塞
+        tpe.shutdown();
+        //1天，模拟永远等待
+        try {
+            tpe.awaitTermination(1, TimeUnit.DAYS);
+            for (Future<UResp> res : results) {
+            	logger.trace("calObjScoreOfEgs(), result->" + res.get());
+            	// check Future to get status of calculation
+            	if (!res.get().isRet()) {
+            		logger.error("calObjScoreOfEgs(), " + res.get().getMessage());
+            		return false;
+            	}
             }
-        }.start();
+        } catch (Exception e) {
+        	logger.error("calObjScoreOfEgs(), exception->" + e.getMessage());
+        	return false;
+        }
         
+        ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
+        if(null != examSubject && null != examSubject.getExamid()){
+            calClsSubScore(examSubject.getExamid().intValue(), -1);
+        }
+        
+        scoC.setScoreColStatus(egsId.intValue(), true);
         return true;
-        
     }
     
     private Map<Integer, Float> getMultipleScoreSet(String answer, Long egsId){

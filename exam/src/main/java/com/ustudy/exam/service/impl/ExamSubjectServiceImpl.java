@@ -386,9 +386,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		try {
 			egsDaoImpl.updateExamSubjectStatusById(egsId, release);
 			if (release) {
-			    // calculate subscore for egs
+				// calculate subscore for egs，scores of object questions should be recalculated, 
+				// caller should ensure that obj score calculation is completed
 				SummaryEgsScore(egsId);
-				// 清除缓存
+				// clear cache
 				paperC.clearSubCache(String.valueOf(egsId));
 				// 更新考试状态
 				// TODO: possibly need to optimize logic and sql instructions here
