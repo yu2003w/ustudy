@@ -3,6 +3,7 @@ package com.ustudy.info.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ClassInfo implements Serializable {
@@ -12,11 +13,14 @@ public class ClassInfo implements Serializable {
 	 */
 	private static final long serialVersionUID = -3286058535369633296L;
 
-	private String id = null;
+	private long id = 0;
 	
 	private String className = null;
 	
 	private String classType = null;
+	
+	@JsonIgnore
+	private long gradeId = 0;
 	
 	@JsonProperty("classOwner")
 	private TeacherBrife claOwner = null;
@@ -29,7 +33,7 @@ public class ClassInfo implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ClassInfo(String id, String className, String classType, TeacherBrife claOwner, List<SubjectTeac> subs) {
+	public ClassInfo(long id, String className, String classType, TeacherBrife claOwner, List<SubjectTeac> subs) {
 		super();
 		this.id = id;
 		this.className = className;
@@ -39,7 +43,7 @@ public class ClassInfo implements Serializable {
 	}
 
 	
-	public ClassInfo(String id, String className, String classType, String teacid, String teacname) {
+	public ClassInfo(long id, String className, String classType, String teacid, String teacname) {
 		super();
 		this.id = id;
 		this.className = className;
@@ -47,12 +51,26 @@ public class ClassInfo implements Serializable {
 		this.claOwner = new TeacherBrife(teacid, teacname);
 	}
 
-	public String getId() {
+	public ClassInfo(String className, long gradeId) {
+		super();
+		this.className = className;
+		this.gradeId = gradeId;
+	}
+
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getGradeId() {
+		return gradeId;
+	}
+
+	public void setGradeId(long gradeId) {
+		this.gradeId = gradeId;
 	}
 
 	public String getClassName() {
@@ -89,8 +107,8 @@ public class ClassInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ClassInfo [id=" + id + ", className=" + className + ", classType=" + classType + ", claOwner="
-				+ claOwner + ", subs=" + subs + "]";
+		return "ClassInfo [id=" + id + ", className=" + className + ", classType=" + classType + ", gradeId=" + gradeId
+				+ ", claOwner=" + claOwner + ", subs=" + subs + "]";
 	}
 	
 }

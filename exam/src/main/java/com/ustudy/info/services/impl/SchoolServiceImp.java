@@ -140,7 +140,7 @@ public class SchoolServiceImp implements SchoolService {
 				if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
 					gr.setType(true);
 				}
-				List<SubjectTeac> cSub = schM.getClsSubs(Integer.valueOf(cls.getId()));
+				List<SubjectTeac> cSub = schM.getClsSubs(cls.getId());
 				if (cSub == null || cSub.isEmpty())
 					cSub = new ArrayList<SubjectTeac>();
 				cls.setSubs(cSub);
@@ -394,8 +394,7 @@ public class SchoolServiceImp implements SchoolService {
 			List<Item> gSubs = schM.getGradeSub(it.getId());
 			SchGradeSub tg = null;
 			if (gSubs == null || gSubs.isEmpty()) {
-				logger.warn("getGrSubs(), no subjects set for grade->" + it.getId() + 
-						", school->" + schid);
+				logger.warn("getGrSubs(), no subjects set for grade->" + it.getId() + ", school->" + schid);
 				// no subjects set for this grade, just skip it
 				tg = new SchGradeSub(it.getId(), it.getName(), new ArrayList<Item>());
 			}

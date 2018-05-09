@@ -17,8 +17,8 @@
 	<insert id="createExaminee" useGeneratedKeys="true" keyProperty="id">
 	    insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) 
 	    values(#{stuExamId}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
-	    on duplicate key update schid=#{schId}, gradeid=#{gradeId}, class_id=#{classId}, class_name=#{className}, 
-	    name=#{stuName}, stuno=#{stuId} 
+	    on duplicate key update schid=values(schid), gradeid=values(gradeid), class_id=values(class_id), 
+	    class_name=values(class_name), name=values(name), stuno=values(stuno) 
 	</insert>
 	
 	<insert id="createExamineeSubs" >
@@ -36,5 +36,10 @@
 		select id, exam_code, examid, schid, gradeid, class_id, class_name, name, stuno from ustudy.examinee 
 		where id=#{id}
 	</select>
-
+	
+	<insert id="saveClsInfo" useGeneratedKeys="true" keyProperty="id">
+	    insert into ustudy.class (grade_id, cls_name) values (#{item.gradeId}, #{item.className})
+	    on duplicate key update grade_id=values(grade_id), cls_name=values(cls_name)
+	</insert>
+	
 </mapper>

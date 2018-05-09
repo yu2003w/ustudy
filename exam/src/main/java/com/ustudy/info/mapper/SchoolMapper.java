@@ -47,31 +47,31 @@ public interface SchoolMapper {
 	
 	@Select("select sub_id as id, name from ustudy.gradesub join ustudy.subject on "
 			+ "ustudy.subject.id = ustudy.gradesub.sub_id where grade_id=#{grId}")
-	public List<Item> getGradeSub(int grId);
+	public List<Item> getGradeSub(long grId);
 	
 	@Select("select id, cls_name as name from ustudy.class where grade_id=#{gid}")
-	public List<Item> getGradeClass(@Param("gid") int grId);
+	public List<Item> getGradeClass(@Param("gid") long grId);
 	
 	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
 			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
 			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
 			+ "where class.id = #{cid}")
-	public ClassInfo getClsInfoById(int cid);
+	public ClassInfo getClsInfoById(long cid);
 	
 	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
 			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
 			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
 			+ "where class.grade_id = #{gid} order by class.id")
-	public List<ClassInfo> getClsInfoByGrId(int gid);
+	public List<ClassInfo> getClsInfoByGrId(long gid);
 	
 	@Select("select subject.name as sub, sub_owner as teacid, teacname from classsub "
 			+ "left join teacher on (classsub.sub_owner is not null and classsub.sub_owner = teacher.teacid) "
 			+ "join subject on classsub.sub_id = subject.id where classsub.cls_id = #{cid}")
-	public List<SubjectTeac> getClsSubs(int cid);
+	public List<SubjectTeac> getClsSubs(long cid);
 
 	@Select("select subject.name as sub, sub_owner as teacid, teacname from gradesub "
 			+ "left join teacher on (gradesub.sub_owner is not null and gradesub.sub_owner = teacher.teacid) "
 			+ "join ustudy.subject on gradesub.sub_id = subject.id where grade_id = #{gid}")
-	public List<SubjectTeac> getGrSubs(int gid);
+	public List<SubjectTeac> getGrSubs(long gid);
 	
 }

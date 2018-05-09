@@ -16,11 +16,11 @@ public class Examinee implements Serializable {
 	private String stuId = null;
 	private String stuExamId = null;
 
-	private String examId = null;
+	private long examId = 0;
 	private String schId = null;
-	private String gradeId = null;
+	private long gradeId = 0;
 
-	private String classId = null;
+	private long classId = 0;
 	private String className = null;
 	
 	// sub ids selected for the examinee
@@ -31,8 +31,8 @@ public class Examinee implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Examinee(String stuName, String stuId, String stuExamId, String examId, String gradeId, 
-			String classId, List<Long> subs) {
+	public Examinee(String stuName, String stuId, String stuExamId, long examId, long gradeId, 
+			long classId, List<Long> subs) {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
@@ -43,8 +43,8 @@ public class Examinee implements Serializable {
 		this.subs = subs;
 	}
 
-	public Examinee(String stuName, String stuId, String stuExamId, String examId, String schId, 
-			String gradeId,	String classId, String className) {
+	public Examinee(String stuName, String stuId, String stuExamId, long examId, String schId, 
+			long gradeId, long classId, String className) {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
@@ -56,8 +56,8 @@ public class Examinee implements Serializable {
 		this.className = className;
 	}
 
-	public Examinee(int id, String stuName, String stuId, String stuExamId, String examId, String schId,
-			String gradeId,	String classId, String className) {
+	public Examinee(int id, String stuName, String stuId, String stuExamId, long examId, String schId,
+			long gradeId, long classId, String className) {
 		super();
 		this.id = id;
 		this.stuName = stuName;
@@ -76,6 +76,14 @@ public class Examinee implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getExamId() {
+		return examId;
+	}
+
+	public long getGradeId() {
+		return gradeId;
 	}
 
 	public String getStuName() {
@@ -102,12 +110,20 @@ public class Examinee implements Serializable {
 		this.stuExamId = stuExamId;
 	}
 
-	public String getClassId() {
+	public long getClassId() {
 		return classId;
 	}
 
-	public void setClassId(String classId) {
+	public void setClassId(long classId) {
 		this.classId = classId;
+	}
+
+	public void setExamId(long examId) {
+		this.examId = examId;
+	}
+
+	public void setGradeId(long gradeId) {
+		this.gradeId = gradeId;
 	}
 
 	public String getSchId() {
@@ -124,22 +140,6 @@ public class Examinee implements Serializable {
 
 	public void setClassName(String className) {
 		this.className = className;
-	}
-
-	public String getExamId() {
-		return examId;
-	}
-
-	public void setExamId(String examId) {
-		this.examId = examId;
-	}
-
-	public String getGradeId() {
-		return gradeId;
-	}
-
-	public void setGradeId(String gradeId) {
-		this.gradeId = gradeId;
 	}
 
 	public List<Long> getSubs() {

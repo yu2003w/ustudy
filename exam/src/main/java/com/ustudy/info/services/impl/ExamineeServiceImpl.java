@@ -1,7 +1,9 @@
 package com.ustudy.info.services.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.info.mapper.ExamineeMapper;
+import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Examinee;
 import com.ustudy.info.model.ExamineeSub;
 import com.ustudy.info.services.ExamineeService;
@@ -28,6 +31,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 	public int createExaminee(List<Examinee> ex) {
 		int count = 0;
 		List<ExamineeSub> eeSubs = new ArrayList<ExamineeSub>();
+		Map<String, Long> clsDict = populateClsInfo(ex);
 		for (Examinee ee : ex) {
 			if (ee.getSchId() == null || ee.getSchId().isEmpty()) {
 				if (InfoUtil.retrieveSessAttr("orgType").compareTo("学校") == 0) {
@@ -35,10 +39,17 @@ public class ExamineeServiceImpl implements ExamineeService {
 					logger.trace("createExaminee(), populated schIds " + ee.getSchId().toString());
 				}
 				else {
-					logger.error("createExam(), schId is not specified in item->" + ee.toString());
+					logger.error("createExaminee(), schId is not specified in item->" + ee.toString());
 					throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
 				}
 			}
+			if (ee.getClassName() == null || ee.getClassName().length() == 0 || ee.getGradeId() <= 0 ||
+					!clsDict.containsKey(ee.getGradeId() + ee.getClassName())) {
+				logger.warn("createExainee(), invalid grade id or class name", ee);
+				continue;
+			}
+			
+			ee.setClassId(clsDict.get(ee.getGradeId() + ee.getClassName()));
 			int ret = exM.createExaminee(ee);
 			//TODO: need to populate examinee subjects here
 			if (ret < 0 || ret > 2) {
@@ -67,6 +78,35 @@ public class ExamineeServiceImpl implements ExamineeService {
 
 	}
 
+	private Map<String, Long> populateClsInfo(List<Examinee> exL) {
+		Map<String, Long> clsM = null;
+		List<ClassInfo> clsL = new ArrayList<ClassInfo>();
+		for (Examinee ex: exL) {
+			if (ex.getClassName() == null || ex.getClassName().length() == 0 || ex.getGradeId() <= 0) {
+				logger.warn("populateClassInfo(), invalid class info", ex);
+				continue;
+			}
+			ClassInfo ci = new ClassInfo(ex.getClassName(), ex.getGradeId());
+			if (!clsL.contains(ci)) {
+				clsL.add(ci);
+			}
+		}
+		for (ClassInfo ci: clsL) {
+			int ret = exM.saveClsInfo(ci);
+			if (ret < 0 || ret > 2) {
+				logger.error("populateClsInfo(), failed to populate class info", ci);
+				throw new RuntimeException("failed to populate class info");
+			}
+			logger.debug("populateClsInfo(), class info populated", ci);
+			if (clsM == null)
+				clsM = new HashMap<String, Long>();
+			clsM.put(ci.getGradeId() + ci.getClassName(), ci.getId());
+		}
+		logger.debug("populateClsInfo(), class info dictionary", clsM);
+		
+		return clsM;
+	}
+	
 	@Override
 	@Transactional
 	public int updateExaminee(List<Examinee> exs) {
@@ -88,7 +128,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 
 			// check whether examId or stuExamId updated, whether unique key changed or not
 			Examinee stu = exM.getExamineeById(ee.getId());
-			if ((ee.getExamId() != null && ee.getExamId().compareTo(stu.getExamId()) == 0)
+			if ((ee.getExamId() > 0 && ee.getExamId() == stu.getExamId())
 					&& (ee.getStuExamId() != null && ee.getStuExamId().compareTo(stu.getStuExamId()) == 0)) {
 				ret = exM.createExaminee(ee);
 				if (ret < 0 || ret > 2) {

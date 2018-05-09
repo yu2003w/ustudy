@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Examinee;
 import com.ustudy.info.model.ExamineeSub;
 
@@ -17,5 +18,7 @@ public interface ExamineeMapper {
 	int deleteExaminee(long id);
 	
 	Examinee getExamineeById(long id);
+	
+	int saveClsInfo(ClassInfo ci);
 	
 }
