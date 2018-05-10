@@ -52,16 +52,34 @@
 	</select>
 	
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
-	  select count(*) as exCount, truncate(avg(score), 1) as aveScore, max(score) as maxScore, 
-	  min(score) as minScore, (SELECT score FROM ustudy.subscore where exam_grade_sub_id = 1 and id = 
-	  ((select count(*) as total from subscore where exam_grade_sub_id = #{egsid}) div 2) order by rank) 
-	  as midscore, (select count(*) from subscore where score >= (
-	  (select sum(if((question.type in ('单选题', '多选题', '判断题')), 
-	  question.score * (question.endno - question.startno + 1), question.score)) as fullscore from 
-	  ustudy.question where exam_grade_sub_id = #{egsid})* 0.6) and exam_grade_sub_id = #{egsid}) as passCount, 
-	  (select group_concat(num, '-', score) from (select count(*) as num, score from subscore 
-	  where exam_grade_sub_id = #{egsid} group by score) scores) as aggrscore from subscore 
-	  where exam_grade_sub_id = #{egsid}
+	  SELECT COUNT(*) AS exCount, TRUNCATE(AVG(score), 1) AS aveScore, MAX(score) AS maxScore, MIN(score) AS minScore,
+	  (SELECT score FROM (SELECT (@row:=@row + 1) AS row, score FROM (SELECT score, rank FROM ustudy.subscore 
+	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid}
+	  <if test="clsid > 0">
+	  AND ee.class_id = #{clsid}
+	  </if>
+	  ORDER BY rank) tb1, (SELECT @row:=0) r) tb2 WHERE row = ((SELECT COUNT(*) AS total FROM subscore 
+	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid}
+	  <if test="clsid > 0">
+	  AND ee.class_id = #{clsid}
+	  </if>
+	  ) DIV 2)) AS midscore, (SELECT COUNT(*) FROM subscore LEFT JOIN examinee AS ee ON ee.id = subscore.stuid 
+	  WHERE score >= ((SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), 
+	  question.score * (question.endno - question.startno + 1), question.score)) AS fullscore FROM ustudy.question 
+	  WHERE exam_grade_sub_id = #{egsid}) * 0.6) AND exam_grade_sub_id = #{egsid} 
+	  <if test="clsid > 0">
+	  AND ee.class_id = #{clsid}
+	  </if>
+	  ) AS passCount, (SELECT GROUP_CONCAT(num, '-', score) FROM (SELECT COUNT(*) AS num, score FROM subscore 
+	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid} 
+	  <if test="clsid > 0">
+	  AND ee.class_id = #{clsid}
+	  </if>
+	  GROUP BY score) scores) AS aggrscore FROM subscore LEFT JOIN examinee AS ee ON ee.id = subscore.stuid 
+	  WHERE exam_grade_sub_id = #{egsid} 
+	  <if test="clsid > 0">
+	  AND ee.class_id = #{clsid}
+	  </if>
 	</select>
 	
 	<select id="calQuesObjReport" parameterType="long" resultMap="QuesObjScoreAnaly">
@@ -73,8 +91,12 @@
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and obj_answer.quesno >= question.startno and question.endno >= obj_answer.quesno) 
 	  left join refanswer on (refanswer.quesid = question.id and refanswer.quesno = obj_answer.quesno) 
-	  where egs.id = #{egsid} group by quesno, question.id, obj_answer.answer) tb1 
-	  group by tb1.quesno, tb1.quesid
+	  left join examinee as ee on ee.exam_code = paper.exam_code 
+	  where egs.id = #{egsid} 
+	  <if test="clsid">
+	  and ee.class_id = #{clsid}
+	  </if> 
+	  group by quesno, question.id, obj_answer.answer) tb1 group by tb1.quesno, tb1.quesid
 	</select>
 	
 	<select id="calQuesSubReport" parameterType="long" resultMap="QuesSubScoreAnaly">
@@ -83,12 +105,22 @@
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
-	  where egs.id = #{egsid} and question.quesno > 0 group by question.quesno, question.score, ans.score order by question.quesno) tb1 
+      left join examinee as ee on ee.exam_code = paper.exam_code 
+      where egs.id = #{egsid} 
+	  <if test="clsid > 0">
+	  and ee.class_id = #{clsid}
+	  </if> 
+	  and question.quesno > 0 group by question.quesno, question.score, ans.score order by question.quesno) tb1 
 	  left join (select question.quesno as quesname, truncate(avg(ans.score), 1) as aveScore from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
-	  where egs.id = #{egsid} and question.quesno > 0 group by question.quesno order by question.quesno) tb2 
+      left join examinee as ee on ee.exam_code = paper.exam_code 
+      where egs.id = #{egsid} 
+	  <if test="clsid > 0">
+	  and ee.class_id = #{clsid}
+	  </if> 
+	  and question.quesno > 0 group by question.quesno order by question.quesno) tb2 
 	  on tb1.quesname = tb2.quesname group by quesname, fscore, aveScore) 
 	  union (select tb1.quesname, tb1.fscore, tb2.aveScore, group_concat(tb1.num, '-', score) as aggrscore from 
 	  (select quest.quesno as quesname, quest.score as fscore, count(anst.score) as num, anst.score from answer_step as anst 
@@ -97,14 +129,22 @@
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
 	  left join question_step as quest on (quest.quesid = question.id and quest.quesno = anst.quesno) 
-	  where egs.id = #{egsid} and question.quesno = 0 group by quest.quesno,fscore, anst.score order by quest.quesno) tb1 
+      left join examinee as ee on ee.exam_code = paper.exam_code 
+      where egs.id = #{egsid} 
+	  <if test="clsid > 0">
+	  and ee.class_id = #{clsid}
+	  </if> and question.quesno = 0 group by quest.quesno,fscore, anst.score order by quest.quesno) tb1 
 	  left join (select quest.quesno as quesname, truncate(avg(anst.score),1) as aveScore from answer_step as anst 
 	  left join answer as ans on anst.answer_id = ans.id 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
 	  left join question_step as quest on (quest.quesid = question.id and quest.quesno = anst.quesno) 
-	  where egs.id = #{egsid} and question.quesno = 0 group by quest.quesno order by quest.quesno) tb2 
+      left join examinee as ee on ee.exam_code = paper.exam_code 
+      where egs.id = #{egsid} 
+	  <if test="clsid > 0">
+	  and ee.class_id = #{clsid}
+	  </if> and question.quesno = 0 group by quest.quesno order by quest.quesno) tb2 
 	  on tb1.quesname = tb2.quesname group by quesname, fscore, aveScore) order by cast(quesname as DECIMAL)
 	</select>
 
