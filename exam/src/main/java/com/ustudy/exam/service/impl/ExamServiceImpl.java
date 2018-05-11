@@ -496,6 +496,11 @@ public class ExamServiceImpl implements ExamService {
 			if (null != papers && papers.size() > 0) {
 				Map<String, List<Map<String, Object>>> markImgs = getSubjectQuestionMarkImgs(egsId, quesId);
 				for (Map<String, Object> map : papers) {
+					if ("2" == map.get("paperStatus") && "2" == map.get("errorStatus")) {
+						map.put("hasProblem", true);
+					} else {
+						map.put("hasProblem", false);
+					}
 					if (null != map.get("paperImg") && null != map.get("examCode")) {
 						String examCode = map.get("examCode").toString();
 						List<Map<String, Object>> markImg = markImgs.get(examCode);
