@@ -108,8 +108,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public ExamSubject getExamSubject(Long id) {
 		logger.debug("getExamSubject -> id:" + id);
 		ExamSubject es = egsDaoImpl.getExamSubjectById(id);
-		// set status for exam subject
-		es.setAnswerSet(this.isAnswerSet(es.getId()));
+		// populate sub/obj answer set status
+		this.checkAnswerSet(es);
 		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		return es;
 	}
@@ -641,30 +641,40 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return scoreM;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
-	 * 
-	 * Check whether all questions' answer are set at runtime rather than determine that via
-	 * fields in table of database. As settings are allowed to be changed before examination completed.
+	/**
+	 * Check whether all subject questions' answer are set at runtime rather than determine that via
+	 * fields in table of database. As settings are allowed to be changed before examination completed
+	 * @param es --- ExamSubject to be populated
 	 */
-	private boolean isAnswerSet(Long id) {
+	private void checkAnswerSet(ExamSubject es) {
 		// retrieve answer settings for egs firstly
-		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(id);
-		
+		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(es.getId());
+		es.setSubAnsSet(true);
+		es.setObjAnsSet(true);
 		if (quesAns == null || quesAns.isEmpty()) {
-			logger.warn("isAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
-					+ "for egs " + id);
-			return false;
+			logger.warn("checkAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
+					+ "for egs " + es.getId());
+			es.setSubAnsSet(false);
+			es.setObjAnsSet(false);
 		}
 		
 		for (QuesAnswer qa: quesAns) {
-			if (!qa.isValid()) {
-				logger.warn("isAnswerSet(), answer setting is not completed for question->" + qa.toString());
-				return false;
+			if (qa.getType() == null || qa.getType().isEmpty()) {
+				es.setSubAnsSet(false);
+				es.setObjAnsSet(false);
+				return;
+			}
+			if ((qa.getType().equals("单选题") || qa.getType().equals("多选题") || qa.getType().equals("判断题")) 
+					&& !qa.isValid() ) {
+				logger.warn("checkAnswerSet(), answer setting is not completed for question->" + qa.toString());
+				es.setObjAnsSet(false);
+			}
+			else if (!qa.isValid()) {
+				es.setSubAnsSet(false);
 			}
 		}
-		
-		return true;
+		logger.trace("checkAnswerSet(), subAnsSet=" + es.isSubAnsSet() + ", objAnsSet=" + es.isObjAnsSet() + 
+				",egsid=" + es.getId());
 	}
 
 	/* (non-Javadoc)
@@ -686,14 +696,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				return false;
 			}
 		}
-		
 		return true;
 	}
 
 	private void populateExamSubStatus(List<ExamSubject> esL) {
 		logger.trace("populateExamSubStatus(), populate answer set and task dispatch status for examsubjects");
 		for (ExamSubject es: esL) {
-			es.setAnswerSet(this.isAnswerSet(es.getId()));
+			checkAnswerSet(es);
 			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		}
 	}

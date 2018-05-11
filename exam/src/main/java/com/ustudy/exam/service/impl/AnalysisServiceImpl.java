@@ -30,7 +30,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrived " + osL.size());
-		logger.trace("getObjQuesReport(), details->", osL.toString());
+		logger.trace("getObjQuesReport(), details->" + osL.toString());
 		return osL;
 	}
 
@@ -41,7 +41,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		logger.debug("getSubQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrieved " + ssL.size());
-		logger.trace("getSubQuesReport(), details->", ssL.toString());
+		logger.trace("getSubQuesReport(), details->" + ssL.toString());
 		return ssL;
 	}
 
@@ -49,7 +49,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
 		List<EgsScoreAnaly> esL = anaM.calEgsScoreRepport(egsId, clsId);
 		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId);
-		logger.trace("getEgsScoreAnaly(), details->", esL.toString());
+		logger.trace("getEgsScoreAnaly(), details->" + esL.toString());
 		return esL;
 	}
 
@@ -67,7 +67,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList(orgId);
 		
-		logger.trace("getExamsForAnaly(), details->", examL.toString());
+		logger.trace("getExamsForAnaly(), details->" + examL.toString());
 		return examL;
 	}
 

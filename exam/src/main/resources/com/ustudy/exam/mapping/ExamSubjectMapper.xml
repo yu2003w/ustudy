@@ -187,18 +187,6 @@
 		where paper.exam_grade_sub_id = #{egsId} group by eid, question.branch order by eid
 	</select>
 	
-	<!--  commented by Jared on April 11, 2018 -->
-	<!-- 
-	<select id="getExamSubjectSubjScores" parameterType="Long" resultType="java.util.Map">
-		SELECT e.id,a.quesid,a.isviewed,a.isfinal,a.score, question.branch from answer a
-		LEFT JOIN paper p on a.paperid=p.id 
-		LEFT JOIN examinee e ON p.exam_code=e.exam_code 
-		join question on (question.id = a.quesid) 
-		WHERE p.exam_grade_sub_id=#{egsId} 
-		ORDER BY e.id,a.quesid
-	</select>
-	-->
-	
 	<select id="getExamSubjectMarkMode" parameterType="Long" resultType="java.util.Map">
 		SELECT id,mark_mode AS markMode from question where exam_grade_sub_id=#{egsId}
 	</select>
