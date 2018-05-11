@@ -33,22 +33,19 @@
  	</resultMap>
 
 	<select id="getExamBrifeList" parameterType="String" resultMap="ExamBrifAnaly">
-		SELECT id, examName, GROUP_CONCAT(schname, ';', grs) AS schoolDetails FROM
-		(SELECT id, examName, schname, GROUP_CONCAT(grade_name, '-',
-		classes_num, ':', subs SEPARATOR '#') AS grs
-		FROM (SELECT exam.id, exam.exam_name AS examName, school.schid,
-		school.schname, grade.grade_name,
-		grade.classes_num, GROUP_CONCAT(egs.id, '-', subject.name SEPARATOR '@') AS subs FROM
-		exam
-		LEFT JOIN examgradesub AS egs ON egs.examid = exam.id
-		LEFT JOIN grade ON grade.id = egs.grade_id
-		LEFT JOIN subject ON egs.sub_id = subject.id
-		LEFT JOIN examschool ON examschool.examid = exam.id
-		LEFT JOIN school ON examschool.schid = school.schid where examschool.schid
-		= #{orgid}
-		GROUP BY exam.id , egs.grade_id) gsub
-		GROUP BY id, schid) ggr
-		GROUP BY id
+		SELECT id, examName, GROUP_CONCAT(schname, ';', grs) AS schoolDetails FROM 
+		(SELECT id, examName, schname, GROUP_CONCAT(grade_name, '-', classes_num, ':', clsinfo, ':', subs 
+		SEPARATOR '#') AS grs FROM (SELECT exam.id, exam.exam_name AS examName, school.schid, school.schname, 
+		grade.grade_name, GROUP_CONCAT(DISTINCT class.id, '-', class.cls_name SEPARATOR '@') AS clsinfo, 
+		grade.classes_num, GROUP_CONCAT(DISTINCT egs.id, '-', subject.name SEPARATOR '@') AS subs FROM exam 
+		LEFT JOIN examgradesub AS egs ON egs.examid = exam.id 
+		LEFT JOIN grade ON grade.id = egs.grade_id 
+		LEFT JOIN class ON class.grade_id = grade.id 
+		LEFT JOIN subject ON egs.sub_id = subject.id 
+		LEFT JOIN examschool ON examschool.examid = exam.id 
+		LEFT JOIN school ON examschool.schid = school.schid 
+		WHERE examschool.schid = #{orgid} GROUP BY exam.id , egs.grade_id) gsub 
+		GROUP BY id , schid) ggr GROUP BY id
 	</select>
 	
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">

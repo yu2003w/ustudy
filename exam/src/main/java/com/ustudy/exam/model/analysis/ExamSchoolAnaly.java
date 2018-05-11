@@ -16,7 +16,7 @@ public class ExamSchoolAnaly implements Serializable {
 	 */
 	private static final long serialVersionUID = 4036132654234616877L;
 
-	class GradeSub {
+	class GradeDetail {
 		
 		private String gradeName = null;
 		
@@ -25,18 +25,26 @@ public class ExamSchoolAnaly implements Serializable {
 		// egsid -> subject name pairs
 		private Map<Long, String> subs = null;
 		
-		public GradeSub() {
+		// clsid -> class name pairs
+		private Map<Long, String> clsinfo = null;
+		
+		public GradeDetail() {
 			super();
 		}
 		
-		public GradeSub(String gn, String ssL) {
+		public GradeDetail(String gn, String ssL, String clsL) {
 			super();
 			String [] paras = gn.split("-");
 			if (paras != null && paras.length == 2) {
 				this.gradeName = paras[0];
 				this.clsNum = Integer.valueOf(paras[1]);
 			}
-			assembleSub(ssL);
+			this.subs = new HashMap<Long, String>();
+			this.clsinfo = new HashMap<Long, String>();
+			//assemble egs, sub information
+			assemble(ssL, this.subs);
+			//assemble class information
+			assemble(clsL, this.clsinfo);
 		}
 
 		public String getGradeName() {
@@ -59,6 +67,14 @@ public class ExamSchoolAnaly implements Serializable {
 			return subs;
 		}
 		
+		public Map<Long, String> getClsinfo() {
+			return clsinfo;
+		}
+
+		public void setClsinfo(Map<Long, String> clsinfo) {
+			this.clsinfo = clsinfo;
+		}
+
 		public void setSubs(Map<Long, String> subs) {
 			this.subs = subs;
 		}
@@ -66,20 +82,15 @@ public class ExamSchoolAnaly implements Serializable {
 		/**
 		 * @param ssl
 		 * format as below,
-		 * 5-数学$6-英语$7-文综$8-理综$4-语文
+		 * 1-语文@2-数学@3-英语@4-物理@5-生物@6-化学@7-政治@8-历史@9-地理@10-数学(文)
 		 */
-		private void assembleSub(String ssl) {
-			if (ssl != null && !ssl.isEmpty()) {
-				String []datas = ssl.split("@");
-				if (datas != null && datas.length > 0) {
-					for (String sub : datas) {
-						String [] paras = sub.split("-");
-						if (paras != null && paras.length == 2) {
-							if (this.subs == null) {
-								this.subs = new HashMap<Long, String>();
-							}
-							this.subs.put(Long.valueOf(paras[0]), paras[1]);
-						}
+		private void assemble(String ssl, Map<Long, String> dm) {
+			String []datas = ssl.split("@");
+			if (datas != null && datas.length > 0) {
+				for (String sub : datas) {
+					String [] paras = sub.split("-");
+					if (paras != null && paras.length == 2) {
+						dm.put(Long.valueOf(paras[0]), paras[1]);
 					}
 				}
 			}
@@ -89,17 +100,22 @@ public class ExamSchoolAnaly implements Serializable {
 	
 	private String schoolName = null;
 	
-	@JsonProperty("GradeSubs")
-	private List<GradeSub> grSubs = null;
+	@JsonProperty("GradeDetails")
+	private List<GradeDetail> grDetails = null;
 
 	public ExamSchoolAnaly() {
 		super();
 	}
 
-	public ExamSchoolAnaly(String schoolName, String gsL) {
+	
+	/**
+	 * @param schoolName
+	 * @param grDetails -- include information about egs and class information
+	 */
+	public ExamSchoolAnaly(String schoolName, String grDetails) {
 		super();
 		this.schoolName = schoolName;
-		assembleGrSub(gsL);
+		assembleGrSub(grDetails);
 	}
 
 	public String getSchoolName() {
@@ -110,31 +126,42 @@ public class ExamSchoolAnaly implements Serializable {
 		this.schoolName = schoolName;
 	}
 
-	public List<GradeSub> getGrSubs() {
-		return grSubs;
+	public List<GradeDetail> getGrSubs() {
+		return getGrDetails();
 	}
 
-	public void setGrSubs(List<GradeSub> grSubs) {
-		this.grSubs = grSubs;
+
+	public List<GradeDetail> getGrDetails() {
+		return grDetails;
+	}
+
+	public void setGrSubs(List<GradeDetail> grSubs) {
+		setGrDetails(grSubs);
+	}
+
+
+	public void setGrDetails(List<GradeDetail> grSubs) {
+		this.grDetails = grSubs;
 	}
 
 	/**
 	 * @param gsL
-	 * format as below:
-	 * 九年级-5:5-数学$6-英语$7-文综$8-理综$4-语文
+	 * format similar as below:
+	 * 高二-7:7-高二（1）班@8-高二（2）班@9-高二（3）班@10-高二（4）班@11-高二（5）班@12-高二（6）班@13-高二（7）班:
+	 * 1-语文@2-数学@3-英语@4-物理@5-生物@6-化学@7-政治@8-历史@9-地理@10-数学(文)
 	 * @return
 	 */
 	private void assembleGrSub(String gsL) {
 		String [] grSubL = gsL.split("#");
 		for (String grsub : grSubL) {
 			String [] datas = grsub.split(":");
-			if (datas != null && datas.length == 2 && datas[0] != null && !datas[0].isEmpty() && 
-					datas[1] != null && !datas[1].isEmpty()) {
-				GradeSub gs = new GradeSub(datas[0], datas[1]);
-				if (this.grSubs == null) {
-					this.grSubs = new ArrayList<GradeSub>();
+			if (datas != null && datas.length == 3 && datas[0] != null && !datas[0].isEmpty() && 
+					datas[1] != null && !datas[1].isEmpty() && datas[2] != null && !datas[2].isEmpty()) {
+				GradeDetail gs = new GradeDetail(datas[0], datas[1], datas[2]);
+				if (this.grDetails == null) {
+					this.grDetails = new ArrayList<GradeDetail>();
 				}
-				this.grSubs.add(gs);
+				this.grDetails.add(gs);
 			}
 		}
 	}
@@ -142,7 +169,7 @@ public class ExamSchoolAnaly implements Serializable {
 	@JsonIgnore
 	public boolean isValid() {
 		if ((this.schoolName == null || this.schoolName.isEmpty()) || 
-				(this.grSubs == null || this.grSubs.isEmpty())) {
+				(this.grDetails == null || this.grDetails.isEmpty())) {
 			return false;
 		}
 		return true;
@@ -150,7 +177,7 @@ public class ExamSchoolAnaly implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "ExamSchoolAnaly [schoolName=" + schoolName + ", grSubs=" + grSubs + "]";
+		return "ExamSchoolAnaly [schoolName=" + schoolName + ", grDetails=" + grDetails + "]";
 	}
 	
 }

@@ -64,8 +64,9 @@ public class ExamBrifeAnaly implements Serializable {
 	
 	/**
 	 * @param sch
-	 * format is as below,
-	 * 潼关四知学校;九年级-5:5-数学$6-英语$7-文综$8-理综$4-语文
+	 * format is similar as below,
+	 * 江南中学;高二-7:7-高二（1）班@8-高二（2）班@9-高二（3）班@10-高二（4）班@11-高二（5）班@12-高二（6）班@13-高二（7）班:
+	 * 1-语文@2-数学@3-英语@4-物理@5-生物@6-化学@7-政治@8-历史@9-地理@10-数学(文)
 	 * @return
 	 */
 	private ExamSchoolAnaly assembleExamSch(String sch) {

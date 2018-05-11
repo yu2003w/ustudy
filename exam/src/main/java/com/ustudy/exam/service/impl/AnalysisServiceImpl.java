@@ -30,7 +30,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrived " + osL.size());
-		logger.trace("getObjQuesReport(), details->" + osL.toString());
+		logger.trace("getObjQuesReport(),", osL);
 		return osL;
 	}
 
@@ -41,6 +41,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		logger.debug("getSubQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrieved " + ssL.size());
+		logger.trace("getSubQuesReport(),", ssL);
 		return ssL;
 	}
 
@@ -48,7 +49,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 	public List<EgsScoreAnaly> getEgsScoreAnaly(long egsId, long clsId) {
 		List<EgsScoreAnaly> esL = anaM.calEgsScoreRepport(egsId, clsId);
 		logger.debug("getEgsScoreAnaly(), egs score report for egsid=" + egsId + ", clsId=" + clsId);
-		logger.trace("getEgsScoreAnaly(), details->" + esL.toString());
+		logger.trace("getEgsScoreAnaly(),", esL);
 		return esL;
 	}
 
@@ -66,7 +67,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList(orgId);
 		
-		logger.trace("getExamsForAnaly(), exams->" + examL.toString());
+		logger.trace("getExamsForAnaly(),", examL);
 		return examL;
 	}
 
