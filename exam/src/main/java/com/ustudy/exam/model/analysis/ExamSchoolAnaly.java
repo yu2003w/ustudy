@@ -42,9 +42,9 @@ public class ExamSchoolAnaly implements Serializable {
 			this.subs = new HashMap<Long, String>();
 			this.clsinfo = new HashMap<Long, String>();
 			//assemble egs, sub information
-			assemble(ssL, this.subs);
+			assemble(ssL, this.clsinfo);
 			//assemble class information
-			assemble(clsL, this.clsinfo);
+			assemble(clsL, this.subs);
 		}
 
 		public String getGradeName() {
@@ -126,22 +126,12 @@ public class ExamSchoolAnaly implements Serializable {
 		this.schoolName = schoolName;
 	}
 
-	public List<GradeDetail> getGrSubs() {
-		return getGrDetails();
-	}
-
-
 	public List<GradeDetail> getGrDetails() {
 		return grDetails;
 	}
 
-	public void setGrSubs(List<GradeDetail> grSubs) {
-		setGrDetails(grSubs);
-	}
-
-
-	public void setGrDetails(List<GradeDetail> grSubs) {
-		this.grDetails = grSubs;
+	public void setGrDetails(List<GradeDetail> grDetails) {
+		this.grDetails = grDetails;
 	}
 
 	/**
