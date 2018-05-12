@@ -677,9 +677,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				",egsid=" + es.getId());
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ustudy.exam.service.ExamSubjectService#isMarkTaskDispatched(java.lang.Long)
-	 * Check whether all questions' mark task are already dispatched
+	/**
+	 * Check whether all questions' mark task for specified egs are already dispatched
+	 * @param id --- egsid
+	 * @return
 	 */
 	private boolean isMarkTaskDispatched(Long id) {
 		

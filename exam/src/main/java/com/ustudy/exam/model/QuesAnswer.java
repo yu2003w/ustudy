@@ -208,7 +208,8 @@ public class QuesAnswer implements Serializable {
 					String[] data = st.split("-");
 					if (data.length == 2) {
 						float tmp = Float.valueOf(data[1]);
-						if (tmp <= 0) {
+						if (tmp <= 0 && ((this.type.equals("填空题") && this.score == 0) || 
+								!this.type.equals("填空题"))) {
 							ret = false;
 							break;
 						}

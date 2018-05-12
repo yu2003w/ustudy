@@ -40,7 +40,7 @@ public interface MarkProgMapper {
 			+ "as marked from question join marktask on marktask.quesid = question.id "
 			+ "join teacher on marktask.teacid = teacher.teacid "
 			+ "where exam_grade_sub_id = #{egsid} and question.type not in ('单选题', '多选题', '判断题') "
-			+ "group by question.id")
+			+ "group by question.id order by startno")
 	public List<QuesMarkMetrics> getQuesMarkMetricsByEgsId(@Param("eid") int eid, @Param("egsid") int egsid);
 	
 	@Select("select (select count(*) from paper where exam_grade_sub_id = #{egsid}) as num, "
