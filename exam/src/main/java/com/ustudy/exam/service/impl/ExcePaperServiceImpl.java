@@ -1,6 +1,7 @@
 package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -212,5 +213,35 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 		
 		return false;
 	}
+
+	@Override
+	@Transactional
+	public boolean updatePaperStatus(String paperIds, String paperStatus) {
+	    
+	    logger.info("paper IDs:" + paperIds);
+	    
+	    JSONObject papers = JSONObject.fromObject(paperIds);
+	    String ids = papers.getString("ids");
+
+	    try {
+	        Map<String, Object> map = new HashMap<String, Object>();
+	        if (paperStatus.equals("1")) {
+	        	map.put("paperStatus", 2);
+	        	map.put("errorStatus", 2);	        	
+	        } else {
+	        	map.put("paperStatus", 0);
+	        	map.put("errorStatus", 2);	        		        	
+	        }
+	        List<String> list = Arrays.asList(ids.split(","));
+	        map.put("list", list);
+	        spDao.updatePapersStatus(map);            
+            return true;
+        } catch (Exception e) {
+            logger.error("updatePaperStatus(), failed ->" + e.getMessage());
+        }
+		
+		return false;
+	}
+
 
 }
