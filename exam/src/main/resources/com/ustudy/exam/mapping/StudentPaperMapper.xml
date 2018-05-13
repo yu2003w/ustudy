@@ -79,7 +79,7 @@
 	<update id="updatePapersStatus" parameterType="java.util.Map">
 		UPDATE paper SET paper_status=#{paperStatus,jdbcType=VARCHAR}, error_status=#{errorStatus,jdbcType=VARCHAR} 
 		WHERE id in
-	    <foreach collection="list" item="item" separator=",">
+	    <foreach collection="list" item="item" separator="," open="(" close=")">
 	        #{item}
 	    </foreach>
 

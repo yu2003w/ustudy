@@ -232,7 +232,12 @@ public class ExcePaperServiceImpl implements ExcePaperService {
 	        	map.put("paperStatus", 0);
 	        	map.put("errorStatus", 2);	        		        	
 	        }
-	        List<String> list = Arrays.asList(ids.split(","));
+	        List<Integer> list = new ArrayList<Integer>();
+	        String strs[] = ids.split(",");
+	        for (String s: strs) {
+	        	list.add(Integer.parseInt(s));
+	        }
+
 	        map.put("list", list);
 	        spDao.updatePapersStatus(map);            
             return true;
