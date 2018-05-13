@@ -26,11 +26,12 @@ public class ExamineeAnsDetail implements Serializable {
 	private List<ReItem> objL = null;
 	private List<ReItem> subL = null;
 	
+	private float score = 0;
+	
 	@JsonIgnore
 	private String objans = null;
 	@JsonIgnore
 	private String subans = null;
-	
 	
 	public ExamineeAnsDetail() {
 		super();
@@ -134,10 +135,18 @@ public class ExamineeAnsDetail implements Serializable {
 		}
 	}
 
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+
 	@Override
 	public String toString() {
 		return "ExamineeAnsDetail [eeCode=" + eeCode + ", eeName=" + eeName + ", clsName=" + clsName + ", objL=" + objL
-				+ ", subL=" + subL + ", objans=" + objans + ", subans=" + subans + "]";
+				+ ", subL=" + subL + ", score=" + score + ", objans=" + objans + ", subans=" + subans + "]";
 	}
 	
 }

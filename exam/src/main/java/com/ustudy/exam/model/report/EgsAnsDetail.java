@@ -25,6 +25,8 @@ public class EgsAnsDetail implements Serializable {
 	private List<ReItem> objRef = null;
 	private List<ReItem> subRef = null;
 	
+	private float score = 0;
+	
 	@JsonIgnore
 	private String oref = null;
 	@JsonIgnore
@@ -120,10 +122,18 @@ public class EgsAnsDetail implements Serializable {
 		
 	}
 
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+
 	@Override
 	public String toString() {
 		return "EgsAnsDetail [egsid=" + egsid + ", subName=" + subName + ", objRef=" + objRef + ", subRef=" + subRef
-				+ ", oref=" + oref + ", sref=" + sref + ", details=" + details + "]";
+				+ ", score=" + score + ", oref=" + oref + ", sref=" + sref + ", details=" + details + "]";
 	}
 
 }
