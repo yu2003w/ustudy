@@ -15,7 +15,7 @@ import com.ustudy.UResp;
 import com.ustudy.exam.service.report.EgsAnsReport;
 
 @RestController
-@RequestMapping(value="/report/")
+@RequestMapping(value="/exam/report/")
 public class EgsReportController {
 
 	private static final Logger logger = LogManager.getLogger(EgsReportController.class);

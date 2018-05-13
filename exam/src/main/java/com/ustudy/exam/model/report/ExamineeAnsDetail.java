@@ -100,8 +100,12 @@ public class ExamineeAnsDetail implements Serializable {
 			String [] datas = this.objans.split(",");
 			for (String item: datas) {
 				String [] paras = item.split("-");
-				if (paras != null && paras.length >= 1) {
-					this.objL.add(new ReItem(paras[0], paras[1]));
+				if (paras != null) {
+					if (paras.length == 2) {
+						this.objL.add(new ReItem(paras[0], paras[1]));
+					}
+					else if (paras.length == 1)
+						this.objL.add(new ReItem(paras[0], paras[1]));
 				}
 			}
 		}
@@ -118,8 +122,13 @@ public class ExamineeAnsDetail implements Serializable {
 			String [] datas = this.subans.split(",");
 			for (String item: datas) {
 				String [] paras = item.split("-");
-				if (paras != null && paras.length >= 1) {
-					this.subL.add(new ReItem(paras[0], paras[1]));
+				if (paras != null) {
+					if (paras.length == 2) {
+						this.subL.add(new ReItem(paras[0], paras[1]));
+					} else if (paras.length == 1) {
+						this.subL.add(new ReItem(paras[0], null));
+					}
+					
 				}
 			}
 		}

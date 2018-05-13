@@ -1,6 +1,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ustudy.exam.mapper.EgsAnsReport">
+<mapper namespace="com.ustudy.exam.mapper.EgsAnsReportMapper">
 
 	<resultMap type="com.ustudy.exam.model.report.ExamineeAnsDetail" id="ExamineeAnsDetail">
 	  <result property="eeCode" column="exam_code"/>
