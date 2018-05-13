@@ -5,6 +5,7 @@
 	<resultMap type="com.ustudy.exam.model.report.ExamineeAnsDetail" id="ExamineeAnsDetail">
 	  <result property="eeCode" column="exam_code"/>
 	  <result property="eeName" column="name"/>
+	  <result property="clsName" column="cls_name"/>
 	  <result property="objans" column="objans"/>
 	  <result property="subans" column="subans"/>
 	</resultMap>
@@ -15,14 +16,16 @@
 	</resultMap>
 	
 	<select id="getEEAnsDetails" parameterType="long" resultMap="ExamineeAnsDetail">
-	    SELECT otb.exam_code, otb.name, otb.objans, stb.subans FROM 
-	    (SELECT paper.exam_code, ee.name, GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans 
+	    SELECT otb.exam_code, otb.name, otb.cls_name, otb.objans, stb.subans FROM 
+	    (SELECT paper.exam_code, ee.name, class.cls_name, 
+	    GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans 
 	    FROM ustudy.paper LEFT JOIN obj_answer AS oans ON oans.paperid = paper.id 
 	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    left join class on class.id = ee.class_id 
 	    LEFT JOIN question ON (question.exam_grade_sub_id = paper.exam_grade_sub_id AND oans.quesno >= question.startno 
 	    AND question.endno >= oans.quesno) 
 	    WHERE paper.exam_grade_sub_id = #{egsid} AND question.type IN ('单选题' , '多选题', '判断题') 
-	    GROUP BY paper.exam_code , ee.name ORDER BY paper.exam_code) otb 
+	    GROUP BY paper.exam_code, ee.name, class.id ORDER BY class.id, paper.exam_code) otb 
 	    LEFT JOIN (SELECT exam_code, name, GROUP_CONCAT(quesno, '-', score ORDER BY quesno) AS subans FROM 
 	    ((SELECT ee.exam_code, ee.name, question.quesno, answer.score FROM ustudy.answer 
 	    LEFT JOIN paper ON paper.id = paperid 
@@ -38,7 +41,7 @@
 	    WHERE question.exam_grade_sub_id = #{egsid} AND question.type NOT IN ('单选题' , '多选题', '判断题') 
 	    AND question.quesno = 0 ORDER BY ee.exam_code , question.startno , anst.quesno) 
 	    ORDER BY exam_code , quesno) tb1 
-	    GROUP BY exam_code , name) stb ON otb.exam_code = stb.exam_code
+	    GROUP BY exam_code , name) stb ON otb.exam_code = stb.exam_code order by cls_name, exam_code
 	</select>
 	
 	<select id="getEgsAnsMeta" parameterType="long" resultMap="EgsAnsMeta">

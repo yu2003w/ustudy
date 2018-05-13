@@ -98,7 +98,7 @@ public class EgsAnsDetail implements Serializable {
 			String []datas = this.oref.split(",");
 			for (String item: datas) {
 				String [] paras = item.split("-");
-				this.objRef.add(new ReItem(paras[1], paras[1]));
+				this.objRef.add(new ReItem(paras[0], paras[1]));
 			}
 		}
 	}
@@ -114,7 +114,7 @@ public class EgsAnsDetail implements Serializable {
 			String []datas = this.sref.split(",");
 			for (String item: datas) {
 				String [] paras = item.split("-");
-				this.subRef.add(new ReItem(paras[1], paras[1]));
+				this.subRef.add(new ReItem(paras[0], paras[1]));
 			}
 		}
 		

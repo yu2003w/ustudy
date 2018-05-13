@@ -105,7 +105,7 @@ public class ExamineeAnsDetail implements Serializable {
 						this.objL.add(new ReItem(paras[0], paras[1]));
 					}
 					else if (paras.length == 1)
-						this.objL.add(new ReItem(paras[0], paras[1]));
+						this.objL.add(new ReItem(paras[0], null));
 				}
 			}
 		}
