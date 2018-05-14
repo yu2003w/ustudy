@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.UResp;
@@ -93,6 +94,41 @@ public class ExamineeController {
 			resp.setStatus(500);
 		}
 		
+		return res;
+	}
+	
+	/**
+	 * @param examid
+	 * @param gradeid
+	 * @param clsid
+	 * @param key     --- key word to search exmainee by name
+	 * @param resp
+	 * @return
+	 */
+	@RequestMapping(value = "{examid}/{gradeid}", method = RequestMethod.GET)
+	public UResp getExamineeByFilter(@PathVariable("examid") @Valid long examid, 
+			@PathVariable("gradeid") @Valid long gradeid, 
+			@RequestParam(value = "clsid", required = false) long clsid, 
+			@RequestParam(value = "key", required = false) String key, 
+			HttpServletResponse resp) {
+		UResp res = new UResp();
+		if (examid <= 0 || gradeid <= 0) {
+			logger.error("getExamineeByFilter(), invalid parameters");
+			res.setMessage("invalid parameters");
+			resp.setStatus(400);
+			return res;
+		}
+		
+		logger.debug("getExamineeByFilter(), retrieving examinees with filter examid=" + examid + 
+				", gradeid=" + gradeid + ", clsid=" + clsid + ", key=" + key);
+		try {
+			res.setData(examS.getExamineeByFilter(examid, gradeid, clsid, key));
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getExamineeByFilter(), exception->" + e.getMessage());
+			resp.setStatus(500);
+			res.setMessage(e.getMessage());
+		}
 		return res;
 	}
 	

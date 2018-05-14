@@ -27,7 +27,7 @@
 	
 	<select id="getEEAnsDetails" parameterType="long" resultMap="ExamineeAnsDetail">
 	    SELECT otb.exam_code, otb.name, otb.cls_name, otb.score, otb.objans, stb.subans FROM 
-	    (SELECT paper.exam_code, ee.name, class.cls_name, 
+	    (SELECT paper.exam_code, ee.name, class.cls_name, subscore.score, 
 	    GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans 
 	    FROM ustudy.paper LEFT JOIN obj_answer AS oans ON oans.paperid = paper.id 
 	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
@@ -57,9 +57,10 @@
 	
 	<select id="getEgsAnsMeta" parameterType="long" resultMap="EgsAnsMeta">
 	    select otbl.rans, stbl.qscore, (otbl.fscore + stbl.fscore) as score from 
-	    (SELECT group_concat(refanswer.quesno, '-', answer order by refanswer.quesno) as rans FROM ustudy.refanswer 
-	    left join question on (question.exam_grade_sub_id = refanswer.exam_grade_sub_id and refanswer.quesid = question.id) 
-	    where exam_grade_sub_id = #{egsid} order by quesid) otbl join 
+	    (SELECT group_concat(refanswer.quesno, '-', answer order by refanswer.quesno) as rans, 
+	    sum(score) as fscore FROM ustudy.refanswer left join question on 
+	    (question.exam_grade_sub_id = refanswer.exam_grade_sub_id and refanswer.quesid = question.id) 
+	    where refanswer.exam_grade_sub_id = #{egsid} order by quesid) otbl join 
 	    (select group_concat(quesno, '-', score order by quesno) as qscore, sum(score) as fscore from ( 
 	    SELECT question.quesno, question.score FROM ustudy.question 
 	    where exam_grade_sub_id = #{egsid} and question.quesno > 0 and 

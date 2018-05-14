@@ -2,6 +2,9 @@ package com.ustudy.info.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.TreeMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Examinee implements Serializable {
 
@@ -25,6 +28,11 @@ public class Examinee implements Serializable {
 	
 	// sub ids selected for the examinee
 	private List<Long> subs = null;
+	
+	@JsonIgnore
+	private String subD = null;
+	
+	private TreeMap<Long, String> subDetails = null;
 
 	public Examinee() {
 		super();
@@ -150,11 +158,37 @@ public class Examinee implements Serializable {
 		this.subs = subs;
 	}
 
+	public TreeMap<Long, String> getSubDetails() {
+		return subDetails;
+	}
+
+	public void setSubDetails(TreeMap<Long, String> subDetails) {
+		this.subDetails = subDetails;
+	}
+
+	public String getSubD() {
+		return subD;
+	}
+
+	public void setSubD(String subD) {
+		this.subD = subD;
+		if (this.subD != null && !this.subD.isEmpty()) {
+			this.subDetails = new TreeMap<Long, String>();
+			String [] datas = this.subD.split(",");
+			for (String item: datas) {
+				String [] paras = item.split("-");
+				if (paras != null && paras.length == 2) {
+					this.subDetails.put(Long.valueOf(paras[0]), paras[1]);
+				}
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
-				+ ", className=" + className + ", subs=" + subs + "]";
+				+ ", className=" + className + ", subs=" + subs + ", subDetails=" + subDetails + "]";
 	}
 
 }

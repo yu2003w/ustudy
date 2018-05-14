@@ -6,10 +6,12 @@ import com.ustudy.info.model.Examinee;
 
 public interface ExamineeService {
 
-	public int createExaminee(List<Examinee> ex);
+	int createExaminee(List<Examinee> ex);
 
-	public int updateExaminee(List<Examinee> exs);
+	int updateExaminee(List<Examinee> exs);
 
-	public int deleteExaminee(int id);
+	int deleteExaminee(int id);
+	
+	List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key);
 	
 }

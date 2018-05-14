@@ -167,4 +167,11 @@ public class ExamineeServiceImpl implements ExamineeService {
 		return ret;
 	}
 
+	@Override
+	public List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key) {
+		List<Examinee> eeL = exM.getExamineeByFilter(examid, gradeid, clsid, key);
+		logger.debug("getExamineeByFilter(), " + eeL.size() + " examinees retrieved.");
+		return eeL;
+	}
+
 }

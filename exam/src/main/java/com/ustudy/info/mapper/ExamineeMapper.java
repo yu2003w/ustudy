@@ -21,4 +21,6 @@ public interface ExamineeMapper {
 	
 	int saveClsInfo(ClassInfo ci);
 	
+	List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key);
+	
 }
