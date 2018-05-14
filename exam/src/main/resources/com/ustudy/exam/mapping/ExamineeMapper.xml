@@ -19,7 +19,7 @@
 	    insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) 
 	    values(#{stuExamId}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
 	    on duplicate key update schid=values(schid), gradeid=values(gradeid), class_id=values(class_id), 
-	    class_name=values(class_name), name=values(name), stuno=values(stuno) 
+	    class_name=values(class_name), name=values(name), stuno=values(stuno), id=LAST_INSERT_ID(id)
 	</insert>
 	
 	<insert id="createExamineeSubs" >
@@ -27,6 +27,7 @@
 	    <foreach item="item" collection="list" separator=",">
 	        (#{item.eeid}, #{item.subid})
 	    </foreach>
+	    on duplicate key update eeid=values(eeid), subid=values(subid)
 	</insert>
 	
 	<delete id="deleteExaminee" parameterType="long">
@@ -39,8 +40,9 @@
 	</select>
 	
 	<insert id="saveClsInfo" useGeneratedKeys="true" keyProperty="id">
-	    insert into ustudy.class (grade_id, cls_name) values (#{item.gradeId}, #{item.className})
-	    on duplicate key update grade_id=values(grade_id), cls_name=values(cls_name)
+	    insert into ustudy.class (grade_id, cls_name) values (#{gradeId}, #{className})
+	    on duplicate key update grade_id=values(grade_id), cls_name=values(cls_name), 
+	    id=LAST_INSERT_ID(id)
 	</insert>
 	
 	<select id="getExamineeByFilter" resultMap="Examinee">

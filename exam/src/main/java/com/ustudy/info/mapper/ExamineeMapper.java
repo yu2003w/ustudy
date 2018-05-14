@@ -3,6 +3,7 @@ package com.ustudy.info.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Examinee;
@@ -21,6 +22,7 @@ public interface ExamineeMapper {
 	
 	int saveClsInfo(ClassInfo ci);
 	
-	List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key);
+	List<Examinee> getExamineeByFilter(@Param("examid") long examid, @Param("gradeid") long gradeid, 
+			@Param("clsid") long clsid, @Param("key") String key);
 	
 }

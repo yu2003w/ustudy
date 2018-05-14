@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 public class Examinee implements Serializable {
 
@@ -26,7 +28,8 @@ public class Examinee implements Serializable {
 	private long classId = 0;
 	private String className = null;
 	
-	// sub ids selected for the examinee
+	// sub ids selected for the examinee,  field only meaningful for creation
+	@JsonProperty(access = Access.READ_ONLY)
 	private List<Long> subs = null;
 	
 	@JsonIgnore

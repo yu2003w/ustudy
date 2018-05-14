@@ -108,7 +108,7 @@ public class ExamineeController {
 	@RequestMapping(value = "{examid}/{gradeid}", method = RequestMethod.GET)
 	public UResp getExamineeByFilter(@PathVariable("examid") @Valid long examid, 
 			@PathVariable("gradeid") @Valid long gradeid, 
-			@RequestParam(value = "clsid", required = false) long clsid, 
+			@RequestParam(value = "clsid", required = false) Long clsid, 
 			@RequestParam(value = "key", required = false) String key, 
 			HttpServletResponse resp) {
 		UResp res = new UResp();
@@ -122,7 +122,7 @@ public class ExamineeController {
 		logger.debug("getExamineeByFilter(), retrieving examinees with filter examid=" + examid + 
 				", gradeid=" + gradeid + ", clsid=" + clsid + ", key=" + key);
 		try {
-			res.setData(examS.getExamineeByFilter(examid, gradeid, clsid, key));
+			res.setData(examS.getExamineeByFilter(examid, gradeid, clsid == null ? 0:clsid, key));
 			res.setRet(true);
 		} catch (Exception e) {
 			logger.error("getExamineeByFilter(), exception->" + e.getMessage());

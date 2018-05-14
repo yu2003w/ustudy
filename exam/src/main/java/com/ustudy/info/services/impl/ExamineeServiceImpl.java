@@ -97,12 +97,12 @@ public class ExamineeServiceImpl implements ExamineeService {
 				logger.error("populateClsInfo(), failed to populate class info", ci);
 				throw new RuntimeException("failed to populate class info");
 			}
-			logger.debug("populateClsInfo(), class info populated", ci);
+			logger.debug("populateClsInfo(), class info populated" + ci.toString());
 			if (clsM == null)
 				clsM = new HashMap<String, Long>();
 			clsM.put(ci.getGradeId() + ci.getClassName(), ci.getId());
 		}
-		logger.debug("populateClsInfo(), class info dictionary", clsM);
+		logger.debug("populateClsInfo(), class info dictionary" + clsM.toString());
 		
 		return clsM;
 	}
