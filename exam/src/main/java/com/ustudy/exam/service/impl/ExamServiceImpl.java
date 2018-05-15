@@ -504,10 +504,22 @@ public class ExamServiceImpl implements ExamService {
 					if (null != map.get("paperImg") && null != map.get("examCode")) {
 						String examCode = map.get("examCode").toString();
 						List<Map<String, Object>> markImg = markImgs.get(examCode);
+						boolean isBest = false;
+						boolean isFAQ = false;
 						if (null == markImg) {
 							markImg = new ArrayList<>();
+						} else {
+							for(Map<String, Object> mi : markImg) {
+								if (mi.mflag.equals("BEST")) {
+									isBest = true;
+								} else if (mi.mflag.equals("FAQ")) {
+									isFAQ = true;
+								}
+							}
 						}
 						map.put("markImgs", markImg);
+						map.put("isBest", isBest);
+						map.put("isFAQ", isFAQ);
 
 						String[] paperImgs = map.get("paperImg").toString().split(",");
 						String quesImgs = "";
