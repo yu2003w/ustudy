@@ -2,6 +2,7 @@ package com.ustudy.info.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -103,6 +104,32 @@ public class ClassInfo implements Serializable {
 
 	public void setSubs(List<SubjectTeac> subs) {
 		this.subs = subs;
+	}	
+
+	private boolean equals(ClassInfo ci) {
+		if (this == ci)
+			return true;
+		if (this.getClassName() != null && ci.getClassName() != null && 
+				this.getClassName().equals(ci.getClassName()) && 
+				this.getGradeId() > 0 && ci.getGradeId() > 0 && this.getGradeId() == ci.getGradeId()) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ClassInfo) {
+			return this.equals((ClassInfo)obj);
+		}else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		// class info could be determined by class name and grade id
+		return Objects.hash(this.className, this.gradeId);
+
 	}
 
 	@Override

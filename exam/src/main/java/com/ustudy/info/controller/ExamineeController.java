@@ -55,6 +55,7 @@ public class ExamineeController {
 	
 	@RequestMapping(value="delete/{id}/", method = RequestMethod.DELETE)
 	public UResp deleteExaminee(@PathVariable @Valid int id, HttpServletResponse resp) {
+		
 		UResp res = new UResp();
 		try {
 			int ret = examS.deleteExaminee(id);
@@ -77,6 +78,7 @@ public class ExamineeController {
 	
 	@RequestMapping(value="update/", method = RequestMethod.POST)
 	public UResp updateExaminee(@RequestBody @Valid List<Examinee> exs, HttpServletResponse resp) {
+		
 		UResp res = new UResp();
 		if (exs == null || exs.isEmpty()) {
 			logger.warn("updateExaminee(), input parameter is empty");
@@ -111,6 +113,7 @@ public class ExamineeController {
 			@RequestParam(value = "clsid", required = false) Long clsid, 
 			@RequestParam(value = "key", required = false) String key, 
 			HttpServletResponse resp) {
+		
 		UResp res = new UResp();
 		if (examid <= 0 || gradeid <= 0) {
 			logger.error("getExamineeByFilter(), invalid parameters");
@@ -128,6 +131,27 @@ public class ExamineeController {
 			logger.error("getExamineeByFilter(), exception->" + e.getMessage());
 			resp.setStatus(500);
 			res.setMessage(e.getMessage());
+		}
+		return res;
+	}
+	
+	@RequestMapping(value = "absent/{egsid}", method = RequestMethod.GET)
+	public UResp getAbsentListPerEgs(@PathVariable("egsid") long egsid, HttpServletResponse resp) {
+		UResp res = new UResp();
+		if (egsid < 0) {
+			logger.warn("getAbsentListPerEgs(), invalid parameter, egsid=" + egsid);
+			resp.setStatus(400);
+			res.setMessage("invalid parameter");
+			return res;
+		}
+		
+		try {
+			res.setData(examS.getAbsentListPerEgs(egsid));
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getAbsentListPerEgs(), exception->" + e.getMessage());
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
 		}
 		return res;
 	}

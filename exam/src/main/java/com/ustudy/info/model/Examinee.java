@@ -29,12 +29,13 @@ public class Examinee implements Serializable {
 	private String className = null;
 	
 	// sub ids selected for the examinee,  field only meaningful for creation
-	@JsonProperty(access = Access.READ_ONLY)
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private List<Long> subs = null;
 	
 	@JsonIgnore
 	private String subD = null;
 	
+	@JsonProperty(access = Access.READ_ONLY)
 	private TreeMap<Long, String> subDetails = null;
 
 	public Examinee() {

@@ -25,4 +25,6 @@ public interface ExamineeMapper {
 	List<Examinee> getExamineeByFilter(@Param("examid") long examid, @Param("gradeid") long gradeid, 
 			@Param("clsid") long clsid, @Param("key") String key);
 	
+	List<Examinee> getAbsentListPerEgs(long egsid);
+	
 }

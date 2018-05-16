@@ -30,6 +30,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 	@Transactional
 	public int createExaminee(List<Examinee> ex) {
 		int count = 0;
+		logger.trace("createExaminee(), " + ex.size() + " examinees submitted");
 		List<ExamineeSub> eeSubs = new ArrayList<ExamineeSub>();
 		Map<String, Long> clsDict = populateClsInfo(ex);
 		for (Examinee ee : ex) {
@@ -171,6 +172,13 @@ public class ExamineeServiceImpl implements ExamineeService {
 	public List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key) {
 		List<Examinee> eeL = exM.getExamineeByFilter(examid, gradeid, clsid, key);
 		logger.debug("getExamineeByFilter(), " + eeL.size() + " examinees retrieved.");
+		return eeL;
+	}
+
+	@Override
+	public List<Examinee> getAbsentListPerEgs(long egsid) {
+		List<Examinee> eeL = exM.getAbsentListPerEgs(egsid);
+		logger.debug("getAbsentListPerEgs(), " + eeL.size() + " examinees absent for egsid " + egsid);
 		return eeL;
 	}
 

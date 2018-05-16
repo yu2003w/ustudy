@@ -14,4 +14,11 @@ public interface ExamineeService {
 	
 	List<Examinee> getExamineeByFilter(long examid, long gradeid, long clsid, String key);
 	
+	/**
+	 * calculate absent examinee list for egs
+	 * @param egsid
+	 * @return
+	 */
+	List<Examinee> getAbsentListPerEgs(long egsid);
+	
 }
