@@ -4,7 +4,7 @@
 
 	<resultMap type="com.ustudy.info.model.Examinee" id="Examinee">
 	  <result property="id" column="id"/>
-	  <result property="stuExamId" column="exam_code"/>
+	  <result property="examCode" column="exam_code"/>
 	  <result property="examId" column="examid"/>
 	  <result property="schId" column="schid"/>
 	  <result property="gradeId" column="gradeid"/>

@@ -55,13 +55,13 @@ public class ExamineeServiceImpl implements ExamineeService {
 			//TODO: need to populate examinee subjects here
 			if (ret < 0 || ret > 2) {
 				logger.error("createExaminee(), create examinee failed with " + ret + 
-						", exam_code " + ee.getStuExamId());
+						", exam_code " + ee.getExamCode());
 				throw new RuntimeException("insert into ustudy.examinee failed with " + ret);
 			}
 			
 			if (ee.getId() <= 0) {
 				logger.error("createExaminee(), invalid id after creation " + ee.getId() + 
-						", exam_code " + ee.getStuExamId());
+						", exam_code " + ee.getExamCode());
 				throw new RuntimeException("invalid id after creation " + ee.getId());
 			}
 			
@@ -130,7 +130,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 			// check whether examId or stuExamId updated, whether unique key changed or not
 			Examinee stu = exM.getExamineeById(ee.getId());
 			if ((ee.getExamId() > 0 && ee.getExamId() == stu.getExamId())
-					&& (ee.getStuExamId() != null && ee.getStuExamId().compareTo(stu.getStuExamId()) == 0)) {
+					&& (ee.getExamCode() != null && ee.getExamCode().compareTo(stu.getExamCode()) == 0)) {
 				ret = exM.createExaminee(ee);
 				if (ret < 0 || ret > 2) {
 					logger.error("updateExaminee(), failed to create examinee with ret->" + ret);

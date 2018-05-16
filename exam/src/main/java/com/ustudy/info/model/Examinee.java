@@ -19,7 +19,7 @@ public class Examinee implements Serializable {
 
 	private String stuName = null;
 	private String stuId = null;
-	private String stuExamId = null;
+	private String examCode = null;
 
 	private long examId = 0;
 	private String schId = null;
@@ -51,7 +51,7 @@ public class Examinee implements Serializable {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
-		this.stuExamId = stuExamId;
+		this.examCode = stuExamId;
 		this.examId = examId;
 		this.gradeId = gradeId;
 		this.classId = classId;
@@ -63,7 +63,7 @@ public class Examinee implements Serializable {
 		super();
 		this.stuName = stuName;
 		this.stuId = stuId;
-		this.stuExamId = stuExamId;
+		this.examCode = stuExamId;
 		this.examId = examId;
 		this.schId = schId;
 		this.gradeId = gradeId;
@@ -77,7 +77,7 @@ public class Examinee implements Serializable {
 		this.id = id;
 		this.stuName = stuName;
 		this.stuId = stuId;
-		this.stuExamId = stuExamId;
+		this.examCode = stuExamId;
 		this.examId = examId;
 		this.schId = schId;
 		this.gradeId = gradeId;
@@ -117,12 +117,12 @@ public class Examinee implements Serializable {
 		this.stuId = stuId;
 	}
 
-	public String getStuExamId() {
-		return stuExamId;
+	public String getExamCode() {
+		return examCode;
 	}
 
-	public void setStuExamId(String stuExamId) {
-		this.stuExamId = stuExamId;
+	public void setExamCode(String examCode) {
+		this.examCode = examCode;
 	}
 
 	public long getClassId() {
@@ -205,7 +205,7 @@ public class Examinee implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
+		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + examCode
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
 				+ ", className=" + className + ", subs=" + subs + ", subN=" + subN + ", subI=" + subI + ", subDetails="
 				+ subDetails + "]";
