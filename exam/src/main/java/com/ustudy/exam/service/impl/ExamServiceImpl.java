@@ -510,9 +510,9 @@ public class ExamServiceImpl implements ExamService {
 							markImg = new ArrayList<>();
 						} else {
 							for(Map<String, Object> mi : markImg) {
-								if (mi.mflag.equals("BEST")) {
+								if (mi.get("mflag").equals("BEST")) {
 									isBest = true;
-								} else if (mi.mflag.equals("FAQ")) {
+								} else if (mi.get("mflag").equals("FAQ")) {
 									isFAQ = true;
 								}
 							}

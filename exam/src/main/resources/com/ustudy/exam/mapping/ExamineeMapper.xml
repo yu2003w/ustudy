@@ -61,4 +61,14 @@
 	    GROUP BY ee.id
 	</select>
 	
+	<select id="getAbsentListPerEgs" resultMap="Examinee">
+	    SELECT ee.id, ee.exam_code, ee.name, ee.examid, ee.gradeid, ee.schid, ee.stuno, class.id as class_id, 
+	    class.cls_name as class_name FROM ustudy.examinee as ee 
+	    left join examineesub as esub on ee.id = esub.eeid 
+	    left join class on class.id = ee.class_id 
+	    left join examgradesub as egs on egs.sub_id = esub.subid 
+	    left join paper on (paper.exam_code = ee.exam_code and paper.exam_grade_sub_id = egs.id) 
+	    where egs.id = #{egsid} and paper.id is null order by exam_code
+	</select>
+	
 </mapper>
