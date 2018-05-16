@@ -21,4 +21,12 @@ public interface ExamineeService {
 	 */
 	List<Examinee> getAbsentListPerEgs(long egsid);
 	
+	/**
+	 * retrieve examinee list by client with examid and gradeid
+	 * @param examid
+	 * @param gradeid
+	 * @return
+	 */
+	List<Examinee> getExamineeListByClient(long examid, long gradeid);
+	
 }

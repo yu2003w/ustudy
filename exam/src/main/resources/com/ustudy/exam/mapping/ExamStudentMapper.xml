@@ -19,7 +19,7 @@
 		SELECT * FROM examinee where examid=#{examId} and gradeid=#{gradeId}
 	</select>
 	
-	<select id="getExamStudents" parameterType="java.util.Map" resultType="java.util.Map">
+<!-- 	<select id="getExamStudents" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT ee.id as studentId,ee.name AS studentName,ee.exam_code AS examCode,cl.cls_name AS className,cl.id AS classId 
 		from examinee ee LEFT JOIN class cl ON ee.class_id=cl.id 
 		where ee.examid=#{examId} and ee.gradeid=#{gradeId}
@@ -44,6 +44,6 @@
 		AND (ee.`name` LIKE CONCAT('%',#{studentName, jdbcType=VARCHAR},'%') or ee.exam_code LIKE CONCAT('%',#{studentName, jdbcType=VARCHAR},'%'))
 		</if>
 		ORDER BY ee.id
-	</select>
+	</select> -->
 
 </mapper>

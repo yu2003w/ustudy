@@ -182,4 +182,11 @@ public class ExamineeServiceImpl implements ExamineeService {
 		return eeL;
 	}
 
+	@Override
+	public List<Examinee> getExamineeListByClient(long examid, long gradeid) {
+		List<Examinee> eeL = exM.getExamineeByClient(examid, gradeid);
+		logger.debug("getExamineeListByClient(), " + eeL.size() + " examinees retrieved by client for examid=" + examid + ", gradeid=" + gradeid);
+		return eeL;
+	}
+
 }

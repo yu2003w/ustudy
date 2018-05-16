@@ -1,10 +1,6 @@
 package com.ustudy.exam.service.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -47,7 +43,7 @@ public class ExamStuServiceImpl implements ExamStuService {
 		return array;
 	}
 
-    public Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName) {
+/*    public Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -81,7 +77,7 @@ public class ExamStuServiceImpl implements ExamStuService {
         return classes;
     }
 
-    public Map<String, Object> getMissExamStudents(Long egsId, Long gradeId, Long classId, String studentName) {
+   public Map<String, Object> getMissExamStudents(Long egsId, Long gradeId, Long classId, String studentName) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -96,6 +92,6 @@ public class ExamStuServiceImpl implements ExamStuService {
         }
         
         return result;
-    }
+    }*/
 
 }

@@ -27,4 +27,6 @@ public interface ExamineeMapper {
 	
 	List<Examinee> getAbsentListPerEgs(long egsid);
 	
+	List<Examinee> getExamineeByClient(@Param("examid") long examid, @Param("gradeid") long gradeid);
+	
 }

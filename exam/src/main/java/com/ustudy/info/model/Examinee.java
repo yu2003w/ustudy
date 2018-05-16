@@ -1,8 +1,8 @@
 package com.ustudy.info.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,15 +28,18 @@ public class Examinee implements Serializable {
 	private long classId = 0;
 	private String className = null;
 	
-	// sub ids selected for the examinee,  field only meaningful for creation
-	@JsonProperty(access = Access.WRITE_ONLY)
+	// sub ids selected for the examinee
 	private List<Long> subs = null;
 	
+	// subjects names separated by ','
 	@JsonIgnore
-	private String subD = null;
+	private String subN = null;
+	// subject ids separated by ','
+	@JsonIgnore
+	private String subI = null;
 	
-	@JsonProperty(access = Access.READ_ONLY)
-	private TreeMap<Long, String> subDetails = null;
+	@JsonProperty(value = "subNames", access = Access.READ_ONLY)
+	private List<String> subDetails = null;
 
 	public Examinee() {
 		super();
@@ -162,28 +165,40 @@ public class Examinee implements Serializable {
 		this.subs = subs;
 	}
 
-	public TreeMap<Long, String> getSubDetails() {
+	public List<String> getSubDetails() {
 		return subDetails;
 	}
 
-	public void setSubDetails(TreeMap<Long, String> subDetails) {
+	public void setSubDetails(List<String> subDetails) {
 		this.subDetails = subDetails;
 	}
 
-	public String getSubD() {
-		return subD;
+	public String getSubN() {
+		return subN;
 	}
 
-	public void setSubD(String subD) {
-		this.subD = subD;
-		if (this.subD != null && !this.subD.isEmpty()) {
-			this.subDetails = new TreeMap<Long, String>();
-			String [] datas = this.subD.split(",");
-			for (String item: datas) {
-				String [] paras = item.split("-");
-				if (paras != null && paras.length == 2) {
-					this.subDetails.put(Long.valueOf(paras[0]), paras[1]);
-				}
+	public void setSubN(String subN) {
+		this.subN = subN;
+		if (this.subN != null && this.subN.length() > 0) {
+			this.subDetails = new ArrayList<String>();
+			String [] datas = this.subN.split(",");
+			for (String da: datas) {
+				this.subDetails.add(da);
+			}
+		}
+	}
+
+	public String getSubI() {
+		return subI;
+	}
+
+	public void setSubI(String subI) {
+		this.subI = subI;
+		if (this.subI != null && this.subI.length() > 0) {
+			this.subs = new ArrayList<Long>();
+			String [] datas = this.subI.split(",");
+			for (String da: datas) {
+				this.subs.add(Long.valueOf(da));
 			}
 		}
 	}
@@ -192,7 +207,8 @@ public class Examinee implements Serializable {
 	public String toString() {
 		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + stuExamId
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
-				+ ", className=" + className + ", subs=" + subs + ", subDetails=" + subDetails + "]";
+				+ ", className=" + className + ", subs=" + subs + ", subN=" + subN + ", subI=" + subI + ", subDetails="
+				+ subDetails + "]";
 	}
 
 }
