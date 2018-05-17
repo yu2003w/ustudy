@@ -110,7 +110,11 @@ public class MarkTaskController {
 		} catch (Exception e) {
 			logger.warn("updateMarkResult()," + e.getMessage());
 			try {
-				resp.sendError(500, "updateMarkResult(), failed to update mark result.");
+				if(e.getMessage().equals("suspended")) {
+					resp.sendError(403, "suspended");
+				} else {
+					resp.sendError(500, "updateMarkResult(), failed to update mark result.");
+				}
 			} catch (Exception re) {
 				logger.warn("updateMarkResult(), failed to set error status. " + re.getMessage());
 			}

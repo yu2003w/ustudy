@@ -378,8 +378,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 		ExamSubject es = examSubjectDao.getMarkSwitchById(egsId);
 		if (es.getMarkSwitch() == false) {
-			logger.error("updateMarkResult(), the marking is already paused.");
-			throw new RuntimeException("updateMarkResult(), the marking is paused");
+			logger.error("updateMarkResult(), the marking is already suspended.");
+			throw new RuntimeException("suspended");
 		}
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
