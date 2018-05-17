@@ -10,7 +10,7 @@ import com.ustudy.exam.model.ExamStudent;
 @MapperScan
 public interface ExamStudentDao {
 
-	List<ExamStudent> getStudentInfoByExamIDAndGradeId(@Param("examId")Long examId, @Param("gradeId")Long gradeId);
+	/*List<ExamStudent> getStudentInfoByExamIDAndGradeId(@Param("examId")Long examId, @Param("gradeId")Long gradeId);*/
 	
 	/*List<Map<String, Object>> getExamStudents(@Param("examId")Long examId, @Param("gradeId")Long gradeId, @Param("classId")Long classId, @Param("studentName")String studentName);
 	

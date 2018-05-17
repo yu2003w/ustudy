@@ -19,7 +19,7 @@ import net.sf.json.JSONObject;
 @Service
 public class ExamStuServiceImpl implements ExamStuService {
     
-    private static final Logger logger = LogManager.getLogger(ExamStuController.class);
+/*    private static final Logger logger = LogManager.getLogger(ExamStuController.class);
 
 	@Resource
 	private ExamStudentDao examStudentDaompl;
@@ -41,7 +41,7 @@ public class ExamStuServiceImpl implements ExamStuService {
 		}
 		
 		return array;
-	}
+	}*/
 
 /*    public Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName) {
         

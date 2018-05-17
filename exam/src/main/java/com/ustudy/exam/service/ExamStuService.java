@@ -4,7 +4,7 @@ import net.sf.json.JSONArray;
 
 public interface ExamStuService {
 
-	JSONArray getStudentInfoByExamGrade(Long examId, Long gradeId);
+/*	JSONArray getStudentInfoByExamGrade(Long examId, Long gradeId);*/
 	
 /*	Map<String, Object> getExamStudents(Long examId, Long gradeId, Long classId, String studentName);
 	

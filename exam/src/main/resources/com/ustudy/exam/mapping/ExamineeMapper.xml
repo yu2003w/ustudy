@@ -17,7 +17,7 @@
 	
 	<insert id="createExaminee" useGeneratedKeys="true" keyProperty="id">
 	    insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) 
-	    values(#{stuExamId}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
+	    values(#{examCode}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
 	    on duplicate key update schid=values(schid), gradeid=values(gradeid), class_id=values(class_id), 
 	    class_name=values(class_name), name=values(name), stuno=values(stuno), id=LAST_INSERT_ID(id)
 	</insert>

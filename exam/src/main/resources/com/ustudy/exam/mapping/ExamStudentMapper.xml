@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ustudy.exam.dao.ExamStudentDao">
 
-	<resultMap type="com.ustudy.exam.model.ExamStudent" id="ExamStudentResult">
+<!-- 	<resultMap type="com.ustudy.exam.model.ExamStudent" id="ExamStudentResult">
         <id property="id" column="id"/>
         <result property="examCode" column="exam_code"/>
         <result property="examid" column="examid"/>
@@ -17,7 +17,7 @@
 
 	<select id="getStudentInfoByExamIDAndGradeId" parameterType="java.util.Map" resultMap="ExamStudentResult">
 		SELECT * FROM examinee where examid=#{examId} and gradeid=#{gradeId}
-	</select>
+	</select> -->
 	
 <!-- 	<select id="getExamStudents" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT ee.id as studentId,ee.name AS studentName,ee.exam_code AS examCode,cl.cls_name AS className,cl.id AS classId 
