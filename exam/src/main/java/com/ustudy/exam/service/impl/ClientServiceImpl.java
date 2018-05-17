@@ -351,7 +351,15 @@ public class ClientServiceImpl implements ClientService {
                                         if (startno > number) {
                                             startno = number;
                                         }
-                                        if (endno < number) {
+                                        if ((endno + 1) == number) {
+                                            endno = number;
+                                        } else if ((endno + 1) < number) {
+                                            if (startno == endno) {
+                                                quesno = startno;
+                                            }
+                                            quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                                            quesno = 0;
+                                            startno = number;
                                             endno = number;
                                         }
                                     }
@@ -445,6 +453,13 @@ public class ClientServiceImpl implements ClientService {
                             quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, egsId, page, subjective));
                         }
                     }
+                    if (null != page.get("OmrObjectives")) {
+                        JSONArray objectives = page.getJSONArray("OmrObjectives");
+                        for (int j = 0; j < objectives.size(); j++) {
+                            JSONObject objective = objectives.getJSONObject(j);
+                            quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, egsId, page, objective));
+                        }
+                    }
                 }
             }
         }
@@ -492,7 +507,44 @@ public class ClientServiceImpl implements ClientService {
         if (null != subjective.get("EndQid")) {
             endQuestionNo = subjective.getInt("EndQid");
         }
-        long quesid = quesAnswersId.get(startQuestionNo + "-" + endQuestionNo);
+
+        long quesid =0L;
+        if (null == subjective.get("StartQid") && null == subjective.get("EndQid")) {
+            for (String key : quesAnswersId.keySet()) {
+                // set the area to the first objective question
+                if (key.startsWith("1-")) {
+                    quesid = quesAnswersId.get(key);
+                    startQuestionNo = 1;
+                    endQuestionNo = Integer.parseInt(key.substring(2, key.length()-2));
+                    break;
+                }
+            }
+        } else {
+            quesid = quesAnswersId.get(startQuestionNo + "-" + endQuestionNo);
+        }
+
+        if (null != subjective.get("region")) {
+            JSONObject region = subjective.getJSONObject("region");
+                int posx = 0;
+                int posy = 0;
+                int width = 0;
+                int height = 0;
+                int bottom = 0;
+                int right = 0;
+               if (null != region.get("x")) {
+                    posx = region.getInt("x");
+                }
+                if (null != region.get("y")) {
+                    posy = region.getInt("y");
+                }
+                if (null != region.get("width")) {
+                    width = region.getInt("width");
+                }
+                if (null != region.get("height")) {
+                    height = region.getInt("height");
+                }
+                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, type, startQuestionNo, endQuestionNo, egsId, quesid));
+        }
 
         if (null != subjective.get("regionList")) {
             JSONArray regions = subjective.getJSONArray("regionList");
