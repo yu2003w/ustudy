@@ -23,12 +23,12 @@ public class EgsDetail implements Serializable {
 	 */
 	class QuesMeta {
 		private long quesid = 0;
-		private String quesname = null;
+		private String quesno = null;
 		
-		public QuesMeta(long quesid, String quesname) {
+		public QuesMeta(long quesid, String quesno) {
 			super();
 			this.quesid = quesid;
-			this.quesname = quesname;
+			this.quesno = quesno;
 		}
 
 		public long getQuesid() {
@@ -39,12 +39,12 @@ public class EgsDetail implements Serializable {
 			this.quesid = quesid;
 		}
 
-		public String getQuesname() {
-			return quesname;
+		public String getQuesno() {
+			return quesno;
 		}
 
-		public void setQuesname(String quesname) {
-			this.quesname = quesname;
+		public void setQuesno(String quesno) {
+			this.quesno = quesno;
 		}
 
 	}
@@ -129,9 +129,7 @@ public class EgsDetail implements Serializable {
 		String [] items = para.split("-");
 		if (items != null && items.length > 0 && (items.length %2  == 0)) {
 			for (int i = 0; i < items.length; i += 2) {
-				// assemble question name here 
-				items[i+1].replaceAll(":", "-");
-				pList.add(new QuesMeta(Long.valueOf(items[i]), items[i+1]));
+				pList.add(new QuesMeta(Long.valueOf(items[i]), items[i+1].replaceAll(":", "-")));
 			}
 		}
 	}
