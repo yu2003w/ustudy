@@ -24,7 +24,7 @@ duration INT,
 teac_owner CHAR(11),
 exam_grade_sub_id INT NOT NULL,
 remark varchar(1000) DEFAULT NULL COMMENT '备注、注释',
-INDEX(exam_grade_sub_id, quesno),
+INDEX(exam_grade_sub_id, quesno, startno),
 UNIQUE KEY(exam_grade_sub_id, quesno, startno, endno),
 PRIMARY KEY (id),
 FOREIGN KEY (exam_grade_sub_id)
@@ -231,7 +231,7 @@ isfinal boolean default false,
 score float(3,1) default 0,
 teacid CHAR(11),
 PRIMARY KEY(id),
-INDEX (quesid, paperid, isviewed, isfinal),
+INDEX (quesid, paperid, isviewed, isfinal, mflag),
 UNIQUE KEY (quesid, paperid, teacid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)

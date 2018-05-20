@@ -13,7 +13,7 @@ import com.ustudy.UResp;
 import com.ustudy.exam.service.AnswerSheetService;
 
 @RestController
-@RequestMapping(value = "/answersheet/")
+@RequestMapping(value = "/exam/answersheet/")
 public class AnswerSheetController {
 
 	private static final Logger logger = LogManager.getLogger(AnswerSheetController.class);

@@ -8,7 +8,7 @@
 	  <result property="details" column="details"/>
 	</resultMap>
 
-	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamBrifAnaly">
+	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamGrSub">
 		SELECT exam.exam_name, grade.grade_name, GROUP_CONCAT(subject.name, '-', egs.id, '@', 
 		(SELECT GROUP_CONCAT((SELECT IF(question.quesno > 0, question.quesno, 
 		CONCAT(question.startno, ':', question.endno))) SEPARATOR '-') FROM question 

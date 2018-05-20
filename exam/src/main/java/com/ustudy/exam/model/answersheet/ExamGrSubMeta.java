@@ -1,6 +1,7 @@
 package com.ustudy.exam.model.answersheet;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,6 +56,15 @@ public class ExamGrSubMeta implements Serializable {
 
 	public void setDetails(String details) {
 		this.details = details;
+		if (this.details != null && this.details.length() > 0) {
+			String [] items = this.details.split(",");
+			this.egsSubL = new ArrayList<EgsDetail>();
+			for (String it: items) {
+				if (it != null && it.length() > 0) 
+					this.egsSubL.add(new EgsDetail(it));
+			}
+		}
+		
 	}
 
 	public String getExamName() {
