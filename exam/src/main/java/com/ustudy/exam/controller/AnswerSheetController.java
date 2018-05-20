@@ -48,14 +48,14 @@ public class AnswerSheetController {
 	
 	@RequestMapping(value = "papers/{qid}/{type}", method = RequestMethod.GET)
 	public UResp getAnsPapers(@PathVariable("qid") @Valid long quesid, @PathVariable("type") @Valid String type, 
-			@RequestParam(value = "clsid", required = false) long clsid, 
+			@RequestParam(value = "clsid", required = false) Long clsid, 
 			@RequestParam(value = "key", required = false) String key, HttpServletResponse resp) {
 		UResp res = new UResp();
 		
-		logger.debug("getAnsPapers(), qid=" + quesid + "type=" + type);
+		logger.debug("getAnsPapers(), qid=" + quesid + ", type=" + type);
 		
 		try {
-			res.setData(ansS.getAnsPapers(quesid, type, clsid, key));
+			res.setData(ansS.getAnsPapers(quesid, type, clsid == null? 0 : clsid, key));
 			res.setRet(true);
 		} catch (Exception e) {
 			logger.error("getAnsPapers(), exception->" + e.getMessage());

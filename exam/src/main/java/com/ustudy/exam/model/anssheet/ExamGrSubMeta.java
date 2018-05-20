@@ -24,6 +24,8 @@ public class ExamGrSubMeta implements Serializable {
 	
 	private String gradeName = null;
 	
+	private long gradeId = 0;
+	
 	@JsonProperty("GrSubDetails")
 	private List<EgsQuesDetail> egsSubL = null;
 	
@@ -83,10 +85,18 @@ public class ExamGrSubMeta implements Serializable {
 		this.egsSubL = egsSubL;
 	}
 
+	public long getGradeId() {
+		return gradeId;
+	}
+
+	public void setGradeId(long gradeId) {
+		this.gradeId = gradeId;
+	}
+
 	@Override
 	public String toString() {
-		return "ExamGrSubMeta [examName=" + examName + ", gradeName=" + gradeName + ", egsSubL=" + egsSubL
-				+ ", details=" + details + "]";
+		return "ExamGrSubMeta [examName=" + examName + ", gradeName=" + gradeName + ", gradeId=" + gradeId
+				+ ", egsSubL=" + egsSubL + ", details=" + details + "]";
 	}
 
 }

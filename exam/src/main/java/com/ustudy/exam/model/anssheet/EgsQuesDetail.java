@@ -48,6 +48,8 @@ public class EgsQuesDetail implements Serializable {
 		}
 
 	}
+	
+	private long subId = 0;
 	private String subName = null;
 	private long egsid = 0;
 	List<QuesMeta> quesL = null;
@@ -61,16 +63,17 @@ public class EgsQuesDetail implements Serializable {
 
 	/**
 	 * @param detail with format as below
-	 * 语文-28@254-5-255-6-252-8-257-9-258-13-250-14-261-15-260-16-259-20-251-21-253-22@-@-
-	 * 物理-31@295-14-299-15-297-16-294-17-298-18@294-17-298-18@-
+	 * 1-语文-28@254-5-255-6-252-8-257-9-258-13-250-14-261-15-260-16-259-20-251-21-253-22@-@-
+	 * 4-物理-31@295-14-299-15-297-16-294-17-298-18@294-17-298-18@-
 	 */
 	public EgsQuesDetail(String detail) {
 		String [] paras = detail.split("@");
 		if (paras != null && paras.length == 4) {
 			String []datas = paras[0].split("-");
 			if (datas != null && datas.length == 2) {
-				this.subName = datas[0];
-				this.egsid = Long.valueOf(datas[1]);
+				this.subId = Long.valueOf(datas[0]);
+				this.subName = datas[1];
+				this.egsid = Long.valueOf(datas[2]);
 				this.quesL = new ArrayList<QuesMeta>();
 				assembleList(paras[1], this.quesL);
 				this.bestL = new ArrayList<QuesMeta>();
@@ -87,6 +90,14 @@ public class EgsQuesDetail implements Serializable {
 
 	public void setEgsid(long egsid) {
 		this.egsid = egsid;
+	}
+
+	public long getSubId() {
+		return subId;
+	}
+
+	public void setSubId(long subId) {
+		this.subId = subId;
 	}
 
 	public String getSubName() {
@@ -136,8 +147,8 @@ public class EgsQuesDetail implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "EgsDetail [subName=" + subName + ", egsid=" + egsid + ", quesL=" + quesL + ", bestL=" + bestL
-				+ ", faqL=" + faqL + "]";
+		return "EgsQuesDetail [subId=" + subId + ", subName=" + subName + ", egsid=" + egsid + ", quesL=" + quesL
+				+ ", bestL=" + bestL + ", faqL=" + faqL + "]";
 	}
 
 }
