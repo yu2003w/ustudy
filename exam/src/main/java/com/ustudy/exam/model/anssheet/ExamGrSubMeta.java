@@ -1,4 +1,4 @@
-package com.ustudy.exam.model.answersheet;
+package com.ustudy.exam.model.anssheet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class ExamGrSubMeta implements Serializable {
 	private String gradeName = null;
 	
 	@JsonProperty("GrSubDetails")
-	private List<EgsDetail> egsSubL = null;
+	private List<EgsQuesDetail> egsSubL = null;
 	
 	@JsonIgnore
 	private String details = null;
@@ -58,10 +58,10 @@ public class ExamGrSubMeta implements Serializable {
 		this.details = details;
 		if (this.details != null && this.details.length() > 0) {
 			String [] items = this.details.split(",");
-			this.egsSubL = new ArrayList<EgsDetail>();
+			this.egsSubL = new ArrayList<EgsQuesDetail>();
 			for (String it: items) {
 				if (it != null && it.length() > 0) 
-					this.egsSubL.add(new EgsDetail(it));
+					this.egsSubL.add(new EgsQuesDetail(it));
 			}
 		}
 		
@@ -75,11 +75,11 @@ public class ExamGrSubMeta implements Serializable {
 		this.examName = examName;
 	}
 
-	public List<EgsDetail> getEgsSubL() {
+	public List<EgsQuesDetail> getEgsSubL() {
 		return egsSubL;
 	}
 
-	public void setEgsSubL(List<EgsDetail> egsSubL) {
+	public void setEgsSubL(List<EgsQuesDetail> egsSubL) {
 		this.egsSubL = egsSubL;
 	}
 

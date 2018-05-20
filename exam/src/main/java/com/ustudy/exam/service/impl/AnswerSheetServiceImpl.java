@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ustudy.exam.mapper.AnswerSheetMapper;
-import com.ustudy.exam.model.answersheet.ExamGrSubMeta;
+import com.ustudy.exam.model.anssheet.AnsPaper;
+import com.ustudy.exam.model.anssheet.ExamGrSubMeta;
 import com.ustudy.exam.service.AnswerSheetService;
 import com.ustudy.exam.utility.ExamUtil;
 
@@ -37,6 +38,14 @@ public class AnswerSheetServiceImpl implements AnswerSheetService {
 		logger.debug("getAnswerSheetMeta(), " + meta.size() + " items retrieved for " + orgId);
 		
 		return meta;
+	}
+
+	@Override
+	public List<AnsPaper> getAnsPapers(long quesid, String type, long clsid, String key) {
+		List<AnsPaper> apL = ansM.getAnsPapers(quesid, type, clsid, key);
+		logger.debug("getAnsPapers(), quesid=" + quesid + ", type=" + type + ", " + apL.size() + 
+				" items retrieved");
+		return apL;
 	}
 
 }

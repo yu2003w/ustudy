@@ -1,4 +1,4 @@
-package com.ustudy.exam.model.answersheet;
+package com.ustudy.exam.model.anssheet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
  * contains information about question list, faq list, best list per egs
  *
  */
-public class EgsDetail implements Serializable {
+public class EgsQuesDetail implements Serializable {
 
 	/**
 	 * 
@@ -54,7 +54,7 @@ public class EgsDetail implements Serializable {
 	List<QuesMeta> bestL = null;
 	List<QuesMeta> faqL = null;
 	
-	public EgsDetail() {
+	public EgsQuesDetail() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -64,7 +64,7 @@ public class EgsDetail implements Serializable {
 	 * 语文-28@254-5-255-6-252-8-257-9-258-13-250-14-261-15-260-16-259-20-251-21-253-22@-@-
 	 * 物理-31@295-14-299-15-297-16-294-17-298-18@294-17-298-18@-
 	 */
-	public EgsDetail(String detail) {
+	public EgsQuesDetail(String detail) {
 		String [] paras = detail.split("@");
 		if (paras != null && paras.length == 4) {
 			String []datas = paras[0].split("-");

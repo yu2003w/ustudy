@@ -7,7 +7,15 @@
 	  <result property="gradeName" column="grade_name"/>
 	  <result property="details" column="details"/>
 	</resultMap>
-
+	
+	<resultMap type="com.ustudy.exam.model.answersheet.AnsPaper" id="AnsPaper">
+	  <result property="eeCode" column="exam_code"/>
+	  <result property="eeName" column="exam_name"/>
+	  <result property="fullPaper" column="mark_img"/>
+	  <result property="markAnsPaper" column="mapaper"/>
+	  <result property="paperid" column="paperid"/>
+	</resultMap>
+	
 	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamGrSub">
 		SELECT exam.exam_name, grade.grade_name, GROUP_CONCAT(subject.name, '-', egs.id, '@', 
 		(SELECT GROUP_CONCAT(question.id, '-', (SELECT IF(question.quesno > 0, question.quesno, 
@@ -31,6 +39,26 @@
 		LEFT JOIN subject ON egs.sub_id = subject.id 
 		LEFT JOIN examschool ON exam.id = examschool.examid 
 		WHERE examschool.schid = #{orgid} GROUP BY egs.examid, egs.grade_id
+	</select>
+	
+	<select id="getAnsPapers" resultMap="AnsPaper">
+	    SELECT ee.exam_code, ee.name, answer.paperid, subscore.mark_img, class.cls_name, 
+	    group_concat(ansimg.ans_mark_img order by ansimg.qarea_id) as mapaper 
+	    FROM ustudy.answer 
+	    left join answer_img as ansimg on ansimg.ans_id = answer.id 
+	    left join question on question.id = answer.quesid 
+	    left join paper on (paper.exam_grade_sub_id = question.exam_grade_sub_id and answer.paperid = paper.id) 
+	    left join examinee as ee on ee.exam_code = paper.exam_code 
+	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
+	    left join class on class.id = ee.class_id
+	    where quesid = #{qid} 
+	    <if test="clsid > 0">
+	    and ee.class_id =  #{clsid}
+	    </if>
+	    <if test="type != null and type.length > 0">
+	    and answer.mflag = #{mflag}
+	    </if>
+	    group by ee.id, answer.paperid, subscore.id
 	</select>
 
 </mapper>
