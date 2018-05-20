@@ -11,7 +11,8 @@
 	
 	<resultMap type="com.ustudy.exam.model.anssheet.AnsPaper" id="AnsPaper">
 	  <result property="eeCode" column="exam_code"/>
-	  <result property="eeName" column="exam_name"/>
+	  <result property="eeName" column="name"/>
+	  <result property="clsName" column="cls_name"/>
 	  <result property="fullPaper" column="mark_img"/>
 	  <result property="markAnsPaper" column="mapaper"/>
 	  <result property="paperid" column="paperid"/>

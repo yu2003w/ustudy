@@ -17,6 +17,7 @@ public class AnsPaper implements Serializable {
 	
 	private String eeCode = null;
 	private String eeName = null;
+	private String clsName = null;
 	
 	// full paper contains both answer and mark images
 	private String fullPaper = null;
@@ -47,6 +48,14 @@ public class AnsPaper implements Serializable {
 		this.eeName = eeName;
 	}
 
+	public String getClsName() {
+		return clsName;
+	}
+
+	public void setClsName(String clsName) {
+		this.clsName = clsName;
+	}
+
 	public String getFullPaper() {
 		return fullPaper;
 	}
@@ -73,8 +82,8 @@ public class AnsPaper implements Serializable {
 
 	@Override
 	public String toString() {
-		return "AnsPaper [eeCode=" + eeCode + ", eeName=" + eeName + ", fullPaper=" + fullPaper + ", markAnsPaper="
-				+ markAnsPaper + ", paperid=" + paperid + "]";
+		return "AnsPaper [eeCode=" + eeCode + ", eeName=" + eeName + ", clsName=" + clsName + ", fullPaper=" + fullPaper
+				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + "]";
 	}
 
 }

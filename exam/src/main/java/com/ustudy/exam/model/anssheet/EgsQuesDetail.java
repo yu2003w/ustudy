@@ -70,7 +70,7 @@ public class EgsQuesDetail implements Serializable {
 		String [] paras = detail.split("@");
 		if (paras != null && paras.length == 4) {
 			String []datas = paras[0].split("-");
-			if (datas != null && datas.length == 2) {
+			if (datas != null && datas.length == 3) {
 				this.subId = Long.valueOf(datas[0]);
 				this.subName = datas[1];
 				this.egsid = Long.valueOf(datas[2]);
