@@ -10,17 +10,17 @@
 
 	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamGrSub">
 		SELECT exam.exam_name, grade.grade_name, GROUP_CONCAT(subject.name, '-', egs.id, '@', 
-		(SELECT GROUP_CONCAT((SELECT IF(question.quesno > 0, question.quesno, 
+		(SELECT GROUP_CONCAT(question.id, '-', (SELECT IF(question.quesno > 0, question.quesno, 
 		CONCAT(question.startno, ':', question.endno))) SEPARATOR '-') FROM question 
 		WHERE question.type NOT IN ('单选题' , '多选题', '判断题') AND question.exam_grade_sub_id = egs.id 
 		ORDER BY startno), 
-		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT IF(question.quesno > 0, question.quesno, 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT question.id, '-', IF(question.quesno > 0, question.quesno, 
 		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
 		LEFT JOIN paper ON paper.id = answer.paperid 
 		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
 		AND answer.quesid = question.id) 
 		WHERE answer.mflag = 'BEST' AND paper.exam_grade_sub_id = egs.id ORDER BY question.startno), '-'), 
-		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT IF(question.quesno > 0, question.quesno, 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT question.id, '-', IF(question.quesno > 0, question.quesno, 
 		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
 		LEFT JOIN paper ON paper.id = answer.paperid 
 		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
