@@ -163,11 +163,11 @@ public class AnswerServiceImpl implements AnswerService {
 
 			Map<Integer, Long> quesids = getRefAnswers(egsId, ques);
 
-			getQuesAnswers(egsId, ques, quesids);
+			saveQuesAnswers(egsId, ques, quesids);
 
-			getQuesAnswerDivs(egsId, ques, quesids);
+			saveQuesAnswerDivs(egsId, ques, quesids);
 
-			getCheckBoxScores(egsId, ques);
+			saveCheckBoxScores(egsId, ques);
 
 			return true;
 		} catch (Exception e) {
@@ -275,7 +275,7 @@ public class AnswerServiceImpl implements AnswerService {
 		return quesids;
 	}
 
-	private void getQuesAnswers(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
+	private void saveQuesAnswers(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
 		List<RefAnswer> refAnswers = new ArrayList<>();
 		JSONArray objectiveAnswers = ques.getJSONArray("objectiveAnswers");
 		for (int i = 0; i < objectiveAnswers.size(); i++) {
@@ -304,7 +304,7 @@ public class AnswerServiceImpl implements AnswerService {
 
 	}
 
-	private void getQuesAnswerDivs(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
+	private void saveQuesAnswerDivs(Long egsId, JSONObject ques, Map<Integer, Long> quesids) throws Exception {
 		List<QuesAnswerDiv> quesAnswerDivs = new ArrayList<>();
 		JSONArray subjectives = ques.getJSONArray("subjectives");
 		for (int i = 0; i < subjectives.size(); i++) {
@@ -465,7 +465,7 @@ public class AnswerServiceImpl implements AnswerService {
 	    return quesAnswerDivs;
     }
 
-	private void getCheckBoxScores(Long egsId, JSONObject ques) throws Exception {
+	private void saveCheckBoxScores(Long egsId, JSONObject ques) throws Exception {
 		List<MultipleScoreSet> multipleScoreSets = new ArrayList<>();
 		JSONArray checkBoxScores = ques.getJSONArray("checkBoxScores");
 		for (int i = 0; i < checkBoxScores.size(); i++) {

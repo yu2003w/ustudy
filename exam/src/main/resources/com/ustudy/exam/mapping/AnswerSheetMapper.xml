@@ -1,0 +1,36 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ustudy.exam.mapper.AnswerSheetMapper">
+
+	<resultMap type="com.ustudy.exam.model.answersheet.ExamGrSubMeta" id="ExamGrSub">
+	  <result property="examName" column="exam_name"/>
+	  <result property="gradeName" column="grade_name"/>
+	  <result property="details" column="details"/>
+	</resultMap>
+
+	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamBrifAnaly">
+		SELECT exam.exam_name, grade.grade_name, GROUP_CONCAT(subject.name, '-', egs.id, '@', 
+		(SELECT GROUP_CONCAT((SELECT IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno))) SEPARATOR '-') FROM question 
+		WHERE question.type NOT IN ('单选题' , '多选题', '判断题') AND question.exam_grade_sub_id = egs.id 
+		ORDER BY startno), 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
+		LEFT JOIN paper ON paper.id = answer.paperid 
+		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
+		AND answer.quesid = question.id) 
+		WHERE answer.mflag = 'BEST' AND paper.exam_grade_sub_id = egs.id ORDER BY question.startno), '-'), 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
+		LEFT JOIN paper ON paper.id = answer.paperid 
+		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
+		AND answer.quesid = question.id) 
+		WHERE answer.mflag = 'FAQ' AND paper.exam_grade_sub_id = egs.id ORDER BY question.startno), '-')) AS details 
+		FROM examgradesub as egs LEFT JOIN exam ON egs.examid = exam.id 
+		LEFT JOIN grade ON egs.grade_id = grade.id 
+		LEFT JOIN subject ON egs.sub_id = subject.id 
+		LEFT JOIN examschool ON exam.id = examschool.examid 
+		WHERE examschool.schid = #{orgid} GROUP BY egs.examid, egs.grade_id
+	</select>
+
+</mapper>
