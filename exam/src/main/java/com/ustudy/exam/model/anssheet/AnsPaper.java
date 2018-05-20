@@ -26,6 +26,8 @@ public class AnsPaper implements Serializable {
 	
 	// maybe teacher want to comments the answer again, so paperid needed to update
 	private long paperid = 0;
+	
+	private float score = 0;
 
 	public AnsPaper() {
 		super();
@@ -80,10 +82,18 @@ public class AnsPaper implements Serializable {
 		this.paperid = paperid;
 	}
 
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+
 	@Override
 	public String toString() {
 		return "AnsPaper [eeCode=" + eeCode + ", eeName=" + eeName + ", clsName=" + clsName + ", fullPaper=" + fullPaper
-				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + "]";
+				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + ", score=" + score + "]";
 	}
 
 }
