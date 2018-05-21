@@ -260,7 +260,7 @@
 		select oa.quesno, oa.score, oa.answer, q.type, qa.pageno, qa.posx, qa.posy, qa.width, qa.height 
 		from obj_answer as oa
 		join paper as p on oa.paperid = p.id 
-		join question as q on q.exam_grade_sub_id = p.exam_grade_sub_id and oa.quesno >= q.startno and oa.quesno <= q.endno
+		join question as q on q.exam_grade_sub_id = p.exam_grade_sub_id and oa.quesno >= q.startno and q.endno >= oa.quesno
 		left join quesarea qa on q.id = qa.quesid
 		where p.id = #{paperId}
 		order by quesno

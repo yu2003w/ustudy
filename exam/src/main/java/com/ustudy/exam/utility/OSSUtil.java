@@ -159,7 +159,7 @@ public class OSSUtil {
      */
     public static void putObject(String baseKey, String targetKey, List<String> marks, int x, int y) throws Exception {
         try {
-            int size = 10;
+            int size = 30;
             String url = bucketURL + "/" + baseKey;
             url += "?x-oss-process=image";
 

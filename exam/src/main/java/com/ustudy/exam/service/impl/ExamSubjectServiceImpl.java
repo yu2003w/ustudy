@@ -403,6 +403,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		for (ObjAnswer answer : answers) {
 			if (!answer.getType().equals(preType)) {
+				preType = answer.getType();
 				marks.add(answer.getType());
 				start = answer.getQuesno();
 				end = answer.getQuesno();
@@ -418,6 +419,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
 				}
 			}
+		}
+
+		if(answerText.length() >= 0) {
+			marks.add(start + "-" + end + ": " + answerText);
 		}
 
 		try{
