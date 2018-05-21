@@ -17,6 +17,7 @@
 	  <result property="markAnsPaper" column="mapaper"/>
 	  <result property="paperid" column="paperid"/>
 	  <result property="score" column="score"/>
+	  <result property="fscore" column="fullscore"/>
 	</resultMap>
 	
 	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamGrSub">
@@ -47,7 +48,7 @@
 	
 	<select id="getAnsPapers" resultMap="AnsPaper">
 	    SELECT ee.exam_code, ee.name, answer.paperid, answer.score, subscore.mark_img, class.cls_name, 
-	    group_concat(ansimg.ans_mark_img order by ansimg.qarea_id) as mapaper 
+	    subscore.score as fullscore, group_concat(ansimg.ans_mark_img order by ansimg.qarea_id) as mapaper 
 	    FROM ustudy.answer 
 	    left join answer_img as ansimg on ansimg.ans_id = answer.id 
 	    left join question on question.id = answer.quesid 
@@ -62,7 +63,7 @@
 	    <if test="mflag != null and mflag != 'NONE'">
 	    and answer.mflag = #{mflag}
 	    </if>
-	    group by ee.id, answer.paperid, subscore.id
+	    group by ee.id, answer.id, subscore.id
 	</select>
 
 </mapper>

@@ -28,6 +28,8 @@ public class AnsPaper implements Serializable {
 	private long paperid = 0;
 	
 	private float score = 0;
+	
+	private float fscore = 0;
 
 	public AnsPaper() {
 		super();
@@ -90,10 +92,19 @@ public class AnsPaper implements Serializable {
 		this.score = score;
 	}
 
+	public float getFscore() {
+		return fscore;
+	}
+
+	public void setFscore(float fscore) {
+		this.fscore = fscore;
+	}
+
 	@Override
 	public String toString() {
 		return "AnsPaper [eeCode=" + eeCode + ", eeName=" + eeName + ", clsName=" + clsName + ", fullPaper=" + fullPaper
-				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + ", score=" + score + "]";
+				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + ", score=" + score + ", fscore=" + fscore
+				+ "]";
 	}
 
 }
