@@ -51,6 +51,18 @@
         <result property="posY" column="posy"/>
     </resultMap>
 
+    <resultMap type="com.ustudy.exam.model.score.ObjAnswer" id="ObjAnswer">
+        <result property="quesno"    column="quesno"/>
+        <result property="score"  column="score"/>
+        <result property="answer" column="answer"/>
+        <result property="type" column="type"/>
+        <result property="pageno" column="pageno"/>
+        <result property="x" column="posx"/>
+        <result property="y" column="posy"/>
+        <result property="w" column="width"/>
+        <result property="h" column="height"/>
+    </resultMap>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
@@ -243,4 +255,14 @@
 		SET mark_img=#{markImg} 
 		WHERE p.id = ${paperId}
 	</update>
+
+    <select id="getObjAnsScore" parameterType="Long" resultMap="ObjAnswer">
+		select oa.quesno, oa.score, oa.answer, q.type, qa.pageno, qa.posx, qa.posy, qa.width, qa.height 
+		from obj_answer as oa
+		join paper as p on oa.paperid = p.id 
+		join question as q on q.exam_grade_sub_id = p.exam_grade_sub_id and oa.quesno >= q.startno and oa.quesno <= q.endno
+		left join quesarea qa on q.id = qa.quesid
+		where p.id = #{paperId}
+		order by quesno
+	</select>
 </mapper>
