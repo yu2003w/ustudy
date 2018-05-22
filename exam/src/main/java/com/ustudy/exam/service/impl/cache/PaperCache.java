@@ -659,11 +659,19 @@ public class PaperCache {
 	}
 
 	public int getTotal(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid).getTotal();
+		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid);
+		if (msc != null) {
+			return msc.getTotal();
+		} else
+			return -1;
 	}
 
 	public int getMarked(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid).getCompleted();
+		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid);
+		if (msc != null ) {
+			return msc.getCompleted();
+		} else 
+			return -1;
 	}
 
 	public String getProgress(String quesid, String tid) {

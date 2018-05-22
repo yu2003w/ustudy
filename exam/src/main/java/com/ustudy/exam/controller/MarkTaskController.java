@@ -32,21 +32,21 @@ public class MarkTaskController {
 	
 	@RequestMapping(value = "/marktask/list/", method = RequestMethod.GET)
 	public List<MarkTaskBrife> getMarkTask(HttpServletResponse resp) {
-		logger.debug("getMarkTask(), start to retrieving all examination result.");
 		
 		// fetch score task for currently logged in teacher
 		List<MarkTaskBrife> st = null;
 		String teacid = null;
 		try {
 			teacid = ExamUtil.getCurrentUserId();
+			logger.debug("getMarkTask(), to retrieve all mark task for " + teacid);
 			st = stS.getMarkTaskBrife(teacid);
 		} catch (Exception e) {
-			logger.warn("getMarkTask()" + e.getMessage());
+			logger.error("getMarkTask()" + e.getMessage());
 			String msg = "Failed to retrieve score task for teacher " + teacid;
 			try {
 				resp.sendError(500, msg);
 			} catch (Exception re) {
-				logger.warn("Failed to set error status in response");
+				logger.error("Failed to set error status in response");
 			}
 		}
 

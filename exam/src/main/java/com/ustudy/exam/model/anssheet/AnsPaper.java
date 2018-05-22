@@ -2,6 +2,8 @@ package com.ustudy.exam.model.anssheet;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author jared
  * 
@@ -25,6 +27,7 @@ public class AnsPaper implements Serializable {
 	private String markAnsPaper = null;
 	
 	// maybe teacher want to comments the answer again, so paperid needed to update
+	@JsonProperty("paperId")
 	private long paperid = 0;
 	
 	private float score = 0;
