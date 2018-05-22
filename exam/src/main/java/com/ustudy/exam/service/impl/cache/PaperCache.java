@@ -663,7 +663,7 @@ public class PaperCache {
 		if (msc != null) {
 			return msc.getTotal();
 		} else
-			return -1;
+			return 0;
 	}
 
 	public int getMarked(String quesid, String tid) {
@@ -671,7 +671,7 @@ public class PaperCache {
 		if (msc != null ) {
 			return msc.getCompleted();
 		} else 
-			return -1;
+			return 0;
 	}
 
 	public String getProgress(String quesid, String tid) {
@@ -679,7 +679,11 @@ public class PaperCache {
 	}
 
 	public String getAveScore(String quesid, String tid) {
-		return teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid).getAvescore();
+		MarkStaticsCache msc = teaPaperC.opsForValue().get(TEA_PAPER_PREFIX + tid + TEA_QUES_PREFIX + quesid);
+		if (msc != null) {
+			return msc.getAvescore();
+		} else
+			return "";
 	}
 
 	// this method should be called before score released

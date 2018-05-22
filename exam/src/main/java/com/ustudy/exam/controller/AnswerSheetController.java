@@ -24,7 +24,7 @@ public class AnswerSheetController {
 	@Autowired
 	private AnswerSheetService ansS;
 	
-	@RequestMapping(value = "summary/", method = RequestMethod.GET)
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
 	public UResp retrieveAnswerSheet(@RequestParam(value = "startdate", required = false) String startdate,
 			@RequestParam(value = "enddate", required = false) String enddate, 
 			@RequestParam(value = "key", required = false) String key,
@@ -37,6 +37,7 @@ public class AnswerSheetController {
 			res.setData(ansS.getAnswerSheetMeta());
 			res.setRet(true);
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("retrieveAnswerSheet(), exception->" + e.getMessage());
 			res.setMessage(e.getMessage());
 			resp.setStatus(500);
