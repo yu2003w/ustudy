@@ -30,8 +30,11 @@ import com.ustudy.exam.model.Subject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.score.SubChildScore;
+import com.ustudy.exam.model.score.PaperSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
+import com.ustudy.exam.model.score.ObjAnswer;
+import com.ustudy.exam.model.score.DblAnswer;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
@@ -327,6 +330,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						if (prePaperId.equals(curPaperId)) {
 							preMarkImg += targetName + ";";
 						} else {
+							addFinalMarks(prePaperId, preMarkImg + targetName);
 							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
 							preMarkImg = "";
 						}
@@ -364,11 +368,14 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 			if (!preMarkImg.isEmpty()) {
 				if (preMarkImg.contains(targetName)) {
+					addFinalMarks(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
 					egsDaoImpl.updateMarkImg(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
 				} else {
+					addFinalMarks(prePaperId, preMarkImg + targetName);
 					egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);				
 				}
 			} else {
+				addFinalMarks(prePaperId, targetName);
 				egsDaoImpl.updateMarkImg(prePaperId, targetName);
 			}
 		} catch (Exception e) {
@@ -376,6 +383,123 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return false;
 		}
 		return true;
+	}
+
+	private void addFinalMarks(Long paperId, String paperImgs) {
+		//1. get objective answers and scores
+		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
+
+		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
+
+		if (answers == null || answers.size() <= 0 || paperImgs.length() <= 0 || paperScore == null) {
+			return;
+		}
+
+		String[] imgs = paperImgs.split(";");
+		int pageno = answers.get(0).getPageno();
+		int x = answers.get(0).getX() + answers.get(0).getW();
+		int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
+		int y = answers.get(0).getY();
+		String preType = "";
+		int start = 0;
+		int end = 0;
+		List<String> marks = new ArrayList<String>();
+		String answerText = "";
+
+		for (ObjAnswer answer : answers) {
+			if (!answer.getType().equals(preType)) {
+				preType = answer.getType();
+				marks.add(answer.getType());
+				start = answer.getQuesno();
+				end = answer.getQuesno();
+				answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+			} else {
+				if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
+					marks.add(start + "-" + end + ": " + answerText);
+					start = answer.getQuesno();
+					end = answer.getQuesno();
+					answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+				} else {
+					end = answer.getQuesno();
+					answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
+				}
+			}
+		}
+
+		if(answerText.length() >= 0) {
+			marks.add(start + "-" + end + ": " + answerText);
+		}
+
+		try{
+			if (OSSUtil.getClient() == null) {
+				// need to initialize OSSMetaInfo
+				logger.info("addFinalMarks(), initialize OSSClient before use");
+				synchronized(OSSMetaInfo.class) {
+					if (OSSUtil.getClient() == null) {
+						OSSMetaInfo omi = cgM.getOSSInfo("oss");
+						logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+						OSSUtil.initOSS(omi);
+					}
+				}
+			}
+			OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+			OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
+			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 50, 50);
+		} catch (Exception e) {
+			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+			return;
+		}
+
+		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
+		List<String> dblMarks = new ArrayList<String>();
+		if (dblAnswers != null && dblAnswers.size()>0) {		
+			int preQuesId = 0;
+			boolean isFirst = true;
+			int dblX = 0;
+			int dblY = 0;
+			int dblPageno = 0;
+			for (DblAnswer dblAnswer: dblAnswers) {
+				if (dblAnswer.getQuesId() != preQuesId) {
+					if (dblMarks.size() >= 0) {
+						try{
+							if (OSSUtil.getClient() == null) {
+								// need to initialize OSSMetaInfo
+								logger.info("addFinalMarks(), initialize OSSClient before use");
+								synchronized(OSSMetaInfo.class) {
+									if (OSSUtil.getClient() == null) {
+										OSSMetaInfo omi = cgM.getOSSInfo("oss");
+										logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+										OSSUtil.initOSS(omi);
+									}
+								}
+							}
+							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+							dblMarks.clear();
+						} catch (Exception e) {
+							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+							return;
+						}
+					}
+					dblPageno = dblAnswer.getPageno();
+					dblX = dblAnswer.getX() + dblAnswer.getW();
+					dblY = dblAnswer.getY();
+					dblMarks.add("双评阅卷");
+					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
+					if(dblAnswer.getIsFinal() == false) {
+						dblMarks.add("阅卷人A: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					} else {
+						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					}
+				} else {
+					if(dblAnswer.getIsFinal() == false) {
+						dblMarks.add("阅卷人B: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					} else {
+						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					}
+				}
+			}
+		}
+
 	}
 
 	@Override
