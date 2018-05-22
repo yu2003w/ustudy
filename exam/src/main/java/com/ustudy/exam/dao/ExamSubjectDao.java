@@ -11,6 +11,7 @@ import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.ObjAnswer;
+import com.ustudy.exam.model.score.DblAnswer;
 
 @Mapper
 public interface ExamSubjectDao {
@@ -66,5 +67,7 @@ public interface ExamSubjectDao {
 	long isExamAllSubjectPublished(Long examId);
 
 	List<ObjAnswer> getObjAnsScore(Long paperId);
+
+	List<DblAnswer> getDblAns(Long paperId);
 	
 }

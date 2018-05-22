@@ -34,6 +34,7 @@ import com.ustudy.exam.model.score.PaperSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.model.score.ObjAnswer;
+import com.ustudy.exam.model.score.DblAnswer;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
@@ -443,10 +444,60 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 			OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
 			OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
-			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 10, 10);
+			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 50, 50);
 		} catch (Exception e) {
 			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 			return;
+		}
+
+		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
+		List<String> dblMarks = new ArrayList<String>();
+		if (dblAnswers != null && dblAnswers.size()>0) {		
+			int preQuesId = 0;
+			boolean isFirst = true;
+			int dblX = 0;
+			int dblY = 0;
+			int dblPageno = 0;
+			for (DblAnswer dblAnswer: dblAnswers) {
+				if (dblAnswer.getQuesId() != preQuesId) {
+					if (dblMarks.size() >= 0) {
+						try{
+							if (OSSUtil.getClient() == null) {
+								// need to initialize OSSMetaInfo
+								logger.info("addFinalMarks(), initialize OSSClient before use");
+								synchronized(OSSMetaInfo.class) {
+									if (OSSUtil.getClient() == null) {
+										OSSMetaInfo omi = cgM.getOSSInfo("oss");
+										logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+										OSSUtil.initOSS(omi);
+									}
+								}
+							}
+							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+							dblMarks.clear();
+						} catch (Exception e) {
+							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+							return;
+						}
+					}
+					dblPageno = dblAnswer.getPageno();
+					dblX = dblAnswer.getX() + dblAnswer.getW();
+					dblY = dblAnswer.getY();
+					dblMarks.add("双评阅卷");
+					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
+					if(dblAnswer.getIsFinal() == false) {
+						dblMarks.add("阅卷人A: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					} else {
+						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					}
+				} else {
+					if(dblAnswer.getIsFinal() == false) {
+						dblMarks.add("阅卷人B: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					} else {
+						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					}
+				}
+			}
 		}
 
 	}
