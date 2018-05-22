@@ -33,6 +33,8 @@ public class AnsPaper implements Serializable {
 	private float score = 0;
 	
 	private float fscore = 0;
+	
+	private boolean hasProblem = false;
 
 	public AnsPaper() {
 		super();
@@ -103,11 +105,19 @@ public class AnsPaper implements Serializable {
 		this.fscore = fscore;
 	}
 
+	public boolean isHasProblem() {
+		return hasProblem;
+	}
+
+	public void setHasProblem(boolean hasProblem) {
+		this.hasProblem = hasProblem;
+	}
+
 	@Override
 	public String toString() {
 		return "AnsPaper [eeCode=" + eeCode + ", eeName=" + eeName + ", clsName=" + clsName + ", fullPaper=" + fullPaper
 				+ ", markAnsPaper=" + markAnsPaper + ", paperid=" + paperid + ", score=" + score + ", fscore=" + fscore
-				+ "]";
+				+ ", hasProblem=" + hasProblem + "]";
 	}
 
 }
