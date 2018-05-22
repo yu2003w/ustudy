@@ -30,6 +30,7 @@ import com.ustudy.exam.model.Subject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.score.SubChildScore;
+import com.ustudy.exam.model.score.PaperSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.model.score.ObjAnswer;
@@ -387,13 +388,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		//1. get objective answers and scores
 		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
 
-		if (answers == null || answers.size() <= 0 || paperImgs.length() <= 0) {
+		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
+
+		if (answers == null || answers.size() <= 0 || paperImgs.length() <= 0 || paperScore == null) {
 			return;
 		}
 
 		String[] imgs = paperImgs.split(";");
 		int pageno = answers.get(0).getPageno();
 		int x = answers.get(0).getX() + answers.get(0).getW();
+		int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
 		int y = answers.get(0).getY();
 		String preType = "";
 		int start = 0;
@@ -438,6 +442,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				}
 			}
 			OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+			OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
+			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 10, 10);
 		} catch (Exception e) {
 			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 			return;
