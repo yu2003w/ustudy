@@ -127,7 +127,7 @@
 		group by question.id order by question.quesno
 	</select>
 	
-	<select id="getPaperSubScores" parameterType="Long" resultMap="paperSubScore">
+	<select id="getPaperSubScores" parameterType="Long" resultMap="PaperSubScore">
 		SELECT ss.score, ss.obj_score from subscore ss
 		JOIN paper p ON ss.exam_grade_sub_id = p.exam_grade_sub_id
 		JOIN examinee e ON e.id = ss.stuid and p.exam_code = e.exam_code
