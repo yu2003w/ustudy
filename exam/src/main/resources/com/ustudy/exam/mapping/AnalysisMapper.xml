@@ -90,7 +90,7 @@
 	  left join refanswer on (refanswer.quesid = question.id and refanswer.quesno = obj_answer.quesno) 
 	  left join examinee as ee on ee.exam_code = paper.exam_code 
 	  where egs.id = #{egsid} 
-	  <if test="clsid">
+	  <if test="clsid > 0">
 	  and ee.class_id = #{clsid}
 	  </if> 
 	  group by quesno, question.id, obj_answer.answer) tb1 group by tb1.quesno, tb1.quesid
