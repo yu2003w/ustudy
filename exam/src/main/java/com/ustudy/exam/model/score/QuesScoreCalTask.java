@@ -35,7 +35,7 @@ public class QuesScoreCalTask implements Callable<UResp> {
 	@Transactional
     public UResp call() throws Exception {
         
-        logger.debug("QuesScoreCalTask:call(), egsId: " + egsId + ", quesno=" + sr.getQuesno() + 
+        logger.trace("QuesScoreCalTask:call(), egsId: " + egsId + ", quesno=" + sr.getQuesno() + 
         		", answer=" + sr.getAnswer());
         
         UResp ret = new UResp();
