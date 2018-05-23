@@ -454,12 +454,15 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		List<String> dblMarks = new ArrayList<String>();
 		if (dblAnswers != null && dblAnswers.size()>0) {		
 			int preQuesId = 0;
+			String preTeacName = "";
 			boolean isFirst = true;
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
 			for (DblAnswer dblAnswer: dblAnswers) {
 				if (dblAnswer.getQuesId() != preQuesId) {
+					preQuesId = dblAnswer.getQuesId();
+					preTeacName = dblAnswer.getTeacName();
 					if (dblMarks.size() >= 0) {
 						try{
 							if (OSSUtil.getClient() == null) {
@@ -491,10 +494,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					}
 				} else {
-					if(dblAnswer.getIsFinal() == false) {
-						dblMarks.add("阅卷人B: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
-					} else {
-						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					if (!dblAnswer.getTeacName().equals(preTeacName)) {
+						preTeacName = dblAnswer.getTeacName();
+						if(dblAnswer.getIsFinal() == false) {
+							dblMarks.add("阅卷人B: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						} else {
+							dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						}
 					}
 				}
 			}
