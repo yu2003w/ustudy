@@ -164,7 +164,7 @@ public class OSSUtil {
             url += "?x-oss-process=image";
 
             for(String mark : marks) {
-                String text = Base64Utils.encodeToString(mark.getBytes());
+                String text = Base64Utils.encodeToUrlSafeString(mark.getBytes());
                 url += "/watermark";
                 url += ",type_d3F5LXplbmhlaQ";
                 url += ",size_" + size;
@@ -207,7 +207,7 @@ public class OSSUtil {
             String url = bucketURL + "/" + baseKey;
             url += "?x-oss-process=image";
 
-            String text = Base64Utils.encodeToString(mark.getBytes());
+            String text = Base64Utils.encodeToUrlSafeString(mark.getBytes());
             url += "/watermark";
             url += ",type_d3F5LXplbmhlaQ";
             url += ",size_" + size;

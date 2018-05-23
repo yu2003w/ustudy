@@ -452,18 +452,22 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
 		List<String> dblMarks = new ArrayList<String>();
-		if (dblAnswers != null && dblAnswers.size()>0) {		
+		if (dblAnswers != null && dblAnswers.size()>0) {
 			int preQuesId = 0;
 			String preTeacName = "";
 			boolean isFirst = true;
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
+			logger.debug("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
+			logger.debug("dblMarks size->" + dblMarks.size());
 			for (DblAnswer dblAnswer: dblAnswers) {
+				logger.debug("dblAnswer ->" + dblAnswer.toString());
 				if (dblAnswer.getQuesId() != preQuesId) {
+					logger.debug("dblAnswer different quesid");
 					preQuesId = dblAnswer.getQuesId();
 					preTeacName = dblAnswer.getTeacName();
-					if (dblMarks.size() >= 0) {
+					if (dblMarks.size() > 0) {
 						try{
 							if (OSSUtil.getClient() == null) {
 								// need to initialize OSSMetaInfo
@@ -477,6 +481,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 								}
 							}
 							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+							logger.debug("dblAnswer put object");
 							dblMarks.clear();
 						} catch (Exception e) {
 							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
@@ -494,6 +499,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					}
 				} else {
+					logger.debug("dblAnswer same quesid");
 					if (!dblAnswer.getTeacName().equals(preTeacName)) {
 						preTeacName = dblAnswer.getTeacName();
 						if(dblAnswer.getIsFinal() == false) {
@@ -502,6 +508,27 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 						}
 					}
+				}
+			}
+			if (dblMarks.size() > 0) {
+				try{
+					if (OSSUtil.getClient() == null) {
+						// need to initialize OSSMetaInfo
+						logger.info("addFinalMarks(), initialize OSSClient before use");
+						synchronized(OSSMetaInfo.class) {
+							if (OSSUtil.getClient() == null) {
+								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+								OSSUtil.initOSS(omi);
+							}
+						}
+					}
+					OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+					logger.debug("dblAnswer put object");
+					dblMarks.clear();
+				} catch (Exception e) {
+					logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+					return;
 				}
 			}
 		}
