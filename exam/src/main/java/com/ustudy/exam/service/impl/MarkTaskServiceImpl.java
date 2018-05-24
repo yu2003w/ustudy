@@ -393,7 +393,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 		for (BlockAnswer ba : blocks) {
 			// front end maybe allow user to mark the answer as a single question or a group of questions
-			if ((ba.getScore() == null || ba.getScore().compareTo("0") == 0) && !ba.getSteps().isEmpty()) {
+			// TODO: Not implemented yet
+			// if ((ba.getScore() == null || ba.getScore().compareTo("0") == 0) && !ba.getSteps().isEmpty()) {
+			if (!ba.getSteps().isEmpty()) {
 				float realScore = 0;
 				List<SingleAnswer> saL = ba.getSteps();
 				for (SingleAnswer sa : saL) {

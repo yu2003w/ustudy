@@ -21,6 +21,7 @@ public class EgsScoreAnaly implements Serializable {
 	private float midScore = 0;
 	private int passCount = 0;
 	private float levelOfDiff = 0;
+	private float fscore = 0;
 	// discrimination
 	private float dis7tion = 0;
 	// standard deviation
@@ -122,6 +123,14 @@ public class EgsScoreAnaly implements Serializable {
 
 	public void setStdDevia(float stdDevia) {
 		this.stdDevia = stdDevia;
+	}
+
+	public float getFscore() {
+		return fscore;
+	}
+
+	public void setFscore(float fscore) {
+		this.fscore = fscore;
 	}
 
 	public String getAggrscore() {

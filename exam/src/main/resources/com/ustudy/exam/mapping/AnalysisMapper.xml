@@ -14,6 +14,7 @@
 	  <result property="aveScore" column="aveScore"/>
 	  <result property="midScore" column="midScore"/>
 	  <result property="aggrscore" column="aggrscore"/>
+	  <result property="fscore" column="fscore"/>
 	</resultMap>
 
 	<resultMap type="com.ustudy.exam.model.analysis.QuesObjScoreAnaly" id="QuesObjScoreAnaly">
@@ -49,7 +50,10 @@
 	</select>
 	
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
-	  SELECT COUNT(*) AS exCount, TRUNCATE(AVG(score), 1) AS aveScore, MAX(score) AS maxScore, MIN(score) AS minScore,
+	  SELECT COUNT(*) AS exCount, TRUNCATE(AVG(score), 1) AS aveScore, MAX(score) AS maxScore, MIN(score) AS minScore, 
+	  (SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), question.score * (question.endno - question.startno + 1), 
+	  (if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
+	  question.score)))) FROM ustudy.question WHERE exam_grade_sub_id = #{egsid}) as fscore,
 	  (SELECT score FROM (SELECT (@row:=@row + 1) AS row, score FROM (SELECT score, rank FROM ustudy.subscore 
 	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid}
 	  <if test="clsid > 0">
@@ -119,7 +123,7 @@
 	  </if> 
 	  and question.quesno > 0 group by question.quesno order by question.quesno) tb2 
 	  on tb1.quesname = tb2.quesname group by quesname, fscore, aveScore) 
-	  union (select tb1.quesname, tb1.fscore, tb2.aveScore, group_concat(tb1.num, '-', score) as aggrscore from 
+	  union (select tb1.quesname, tb1.fscore, tb2.aveScore, group_concat(tb1.score, '-', tb1.num) as aggrscore from 
 	  (select quest.quesno as quesname, quest.score as fscore, count(anst.score) as num, anst.score from answer_step as anst 
 	  left join answer as ans on anst.answer_id = ans.id 
 	  left join paper on ans.paperid = paper.id 
