@@ -391,44 +391,11 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
 
-		if (answers == null || answers.size() <= 0 || paperImgs.length() <= 0 || paperScore == null) {
+		if (paperImgs.length() <= 0 || paperScore == null) {
 			return;
 		}
 
 		String[] imgs = paperImgs.split(";");
-		int pageno = answers.get(0).getPageno();
-		int x = answers.get(0).getX() + answers.get(0).getW();
-		int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
-		int y = answers.get(0).getY();
-		String preType = "";
-		int start = 0;
-		int end = 0;
-		List<String> marks = new ArrayList<String>();
-		String answerText = "";
-
-		for (ObjAnswer answer : answers) {
-			if (!answer.getType().equals(preType)) {
-				preType = answer.getType();
-				marks.add(answer.getType());
-				start = answer.getQuesno();
-				end = answer.getQuesno();
-				answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
-			} else {
-				if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
-					marks.add(start + "-" + end + ": " + answerText);
-					start = answer.getQuesno();
-					end = answer.getQuesno();
-					answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
-				} else {
-					end = answer.getQuesno();
-					answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
-				}
-			}
-		}
-
-		if(answerText.length() >= 0) {
-			marks.add(start + "-" + end + ": " + answerText);
-		}
 
 		try{
 			if (OSSUtil.getClient() == null) {
@@ -442,28 +409,87 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					}
 				}
 			}
-			OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
-			OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
 			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 50, 50);
 		} catch (Exception e) {
 			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 			return;
 		}
 
+		if (answers == null || answers.size() <= 0) {
+			return;
+		} else {
+			int pageno = answers.get(0).getPageno();
+			int x = answers.get(0).getX() + answers.get(0).getW();
+			int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
+			int y = answers.get(0).getY();
+			String preType = "";
+			int start = 0;
+			int end = 0;
+			List<String> marks = new ArrayList<String>();
+			String answerText = "";
+
+			for (ObjAnswer answer : answers) {
+				if (!answer.getType().equals(preType)) {
+					preType = answer.getType();
+					marks.add(answer.getType());
+					start = answer.getQuesno();
+					end = answer.getQuesno();
+					answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+				} else {
+					if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
+						marks.add(start + "-" + end + ": " + answerText);
+						start = answer.getQuesno();
+						end = answer.getQuesno();
+						answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+					} else {
+						end = answer.getQuesno();
+						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
+					}
+				}
+			}
+
+			if(answerText.length() >= 0) {
+				marks.add(start + "-" + end + ": " + answerText);
+			}
+
+			try{
+				if (OSSUtil.getClient() == null) {
+					// need to initialize OSSMetaInfo
+					logger.info("addFinalMarks(), initialize OSSClient before use");
+					synchronized(OSSMetaInfo.class) {
+						if (OSSUtil.getClient() == null) {
+							OSSMetaInfo omi = cgM.getOSSInfo("oss");
+							logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+							OSSUtil.initOSS(omi);
+						}
+					}
+				}
+				OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+				OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
+			} catch (Exception e) {
+				logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+				return;
+			}
+		}
+
 		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
 		List<String> dblMarks = new ArrayList<String>();
-		if (dblAnswers != null && dblAnswers.size()>0) {		
+		if (dblAnswers != null && dblAnswers.size()>0) {
 			int preQuesId = 0;
 			String preTeacName = "";
 			boolean isFirst = true;
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
+			logger.debug("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
+			logger.debug("dblMarks size->" + dblMarks.size());
 			for (DblAnswer dblAnswer: dblAnswers) {
+				logger.debug("dblAnswer ->" + dblAnswer.toString());
 				if (dblAnswer.getQuesId() != preQuesId) {
+					logger.debug("dblAnswer different quesid");
 					preQuesId = dblAnswer.getQuesId();
 					preTeacName = dblAnswer.getTeacName();
-					if (dblMarks.size() >= 0) {
+					if (dblMarks.size() > 0) {
 						try{
 							if (OSSUtil.getClient() == null) {
 								// need to initialize OSSMetaInfo
@@ -477,6 +503,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 								}
 							}
 							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+							logger.debug("dblAnswer put object");
 							dblMarks.clear();
 						} catch (Exception e) {
 							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
@@ -494,6 +521,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					}
 				} else {
+					logger.debug("dblAnswer same quesid");
 					if (!dblAnswer.getTeacName().equals(preTeacName)) {
 						preTeacName = dblAnswer.getTeacName();
 						if(dblAnswer.getIsFinal() == false) {
@@ -502,6 +530,27 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 						}
 					}
+				}
+			}
+			if (dblMarks.size() > 0) {
+				try{
+					if (OSSUtil.getClient() == null) {
+						// need to initialize OSSMetaInfo
+						logger.info("addFinalMarks(), initialize OSSClient before use");
+						synchronized(OSSMetaInfo.class) {
+							if (OSSUtil.getClient() == null) {
+								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+								OSSUtil.initOSS(omi);
+							}
+						}
+					}
+					OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+					logger.debug("dblAnswer put object");
+					dblMarks.clear();
+				} catch (Exception e) {
+					logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+					return;
 				}
 			}
 		}
