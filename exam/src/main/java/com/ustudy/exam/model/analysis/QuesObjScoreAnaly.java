@@ -32,6 +32,9 @@ public class QuesObjScoreAnaly implements Serializable {
 	// reference answer
 	private String refa = null;
 	
+	// choice number for this question
+	private int cnum = 0;
+	
 	// scoring average
 	private String scor7age = null;
 	
@@ -119,6 +122,7 @@ public class QuesObjScoreAnaly implements Serializable {
 					
 					}
 				}
+				
 				if (ansM.size() > 0) {
 					for (Map.Entry<Character, Integer> ans: ansM.entrySet()) {
 						this.choices.put(String.valueOf(ans.getKey()), 
@@ -130,6 +134,19 @@ public class QuesObjScoreAnaly implements Serializable {
 		
 	}
 
+	public void adjustChoices() {
+		if (this.choices != null && this.choices.size() > 0 && this.cnum >0) {
+			// check whether size of ansM equals to cnum, fill missed answers
+			char ch = 'A';
+			for (int i = 0; i < cnum; i++) {
+				if (!this.choices.containsKey(String.valueOf(ch))) {
+					this.choices.put(String.valueOf(ch), "0%");
+				}
+				ch += 1;
+			}
+		}
+	}
+	
 	public int getTotal() {
 		return total;
 	}
@@ -146,11 +163,19 @@ public class QuesObjScoreAnaly implements Serializable {
 		this.refa = refa;
 	}
 
+	public int getCnum() {
+		return cnum;
+	}
+
+	public void setCnum(int cnum) {
+		this.cnum = cnum;
+	}
+
 	@Override
 	public String toString() {
 		return "QuesObjScoreAnaly [quesno=" + quesno + ", score=" + score + ", aveScore=" + aveScore + ", dist7tion="
-				+ dist7tion + ", total=" + total + ", opts=" + opts + ", refa=" + refa + ", scor7age=" + scor7age
-				+ ", choices=" + choices + "]";
+				+ dist7tion + ", total=" + total + ", opts=" + opts + ", refa=" + refa + ", cnum=" + cnum
+				+ ", scor7age=" + scor7age + ", choices=" + choices + "]";
 	}
 	
 }

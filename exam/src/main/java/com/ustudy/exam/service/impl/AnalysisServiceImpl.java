@@ -28,6 +28,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		List<QuesObjScoreAnaly> osL = anaM.calQuesObjReport(egsId, clsId);
 		
+		for (QuesObjScoreAnaly qos: osL) {
+			qos.adjustChoices();
+		}
+		
 		logger.debug("getObjQuesReport(), score analysis for egsid=" + egsId + ", clsid=" + clsId + 
 				", number of items retrived " + osL.size());
 		logger.trace("getObjQuesReport(), details->" + osL.toString());

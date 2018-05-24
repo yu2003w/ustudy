@@ -24,6 +24,7 @@
 	  <result property="total" column="total"/>
 	  <result property="opts" column="opts"/>
 	  <result property="refa" column="refa"/>
+	  <result property="cnum" column="cnum"/>
 	</resultMap>
 
 	<resultMap type="com.ustudy.exam.model.analysis.QuesSubScoreAnaly" id="QuesSubScoreAnaly">
@@ -85,9 +86,9 @@
 	
 	<select id="calQuesObjReport" parameterType="long" resultMap="QuesObjScoreAnaly">
 	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 1) as aveScore, sum(num) as total, 
-	  group_concat(tb1.answer, '-', num) opts, refa from 
+	  group_concat(tb1.answer, '-', num) opts, refa, choice_num as cnum from 
 	  (select obj_answer.quesno, question.score, sum(obj_answer.score) as ss, obj_answer.answer, 
-	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa from obj_answer 
+	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa, question.choice_num from obj_answer 
 	  left join paper on obj_answer.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and obj_answer.quesno >= question.startno and question.endno >= obj_answer.quesno) 
