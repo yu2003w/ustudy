@@ -449,7 +449,7 @@ public class ClientServiceImpl implements ClientService {
                 JSONArray pages = templateInfo.getJSONArray("pages");
                 for (int i = 0; i < pages.size(); i++) {
                     JSONObject page = pages.getJSONObject(i);
-                    if (null != page.get("OmrSubjectiveList")) {
+                    if (null != page.get("OmrSubjectiveList") && !page.get("OmrSubjectiveList").equals(null)) {
                         JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
                         for (int j = 0; j < subjectives.size(); j++) {
                             JSONObject subjective = subjectives.getJSONObject(j);
@@ -458,7 +458,7 @@ public class ClientServiceImpl implements ClientService {
                             logger.trace("after insert quesarea ->" + quesAnswersId);
                         }
                     }
-                    if (null != page.get("OmrObjectives")) {
+                    if (null != page.get("OmrObjectives") && !page.get("OmrObjectives").equals(null)) {
                         JSONArray objectives = page.getJSONArray("OmrObjectives");
                         for (int j = 0; j < objectives.size(); j++) {
                             JSONObject objective = objectives.getJSONObject(j);
