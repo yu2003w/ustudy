@@ -434,16 +434,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					marks.add(answer.getType());
 					start = answer.getQuesno();
 					end = answer.getQuesno();
-					answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+					answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
 				} else {
 					if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
 						marks.add(start + "-" + end + ": " + answerText);
 						start = answer.getQuesno();
 						end = answer.getQuesno();
-						answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+						answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
 					} else {
 						end = answer.getQuesno();
-						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
+						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? "*" : answer.getAnswer());
 					}
 				}
 			}
