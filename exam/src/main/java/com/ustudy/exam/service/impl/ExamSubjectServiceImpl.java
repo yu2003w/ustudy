@@ -386,9 +386,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	private void addFinalMarks(Long paperId, String paperImgs) {
-		//1. get objective answers and scores
-		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
-
+		//1. get scores
 		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
 
 		if (paperImgs.length() <= 0 || paperScore == null) {
@@ -414,6 +412,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 			return;
 		}
+
+		//2. get objective answers
+		/*
+		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
 
 		if (answers == null || answers.size() <= 0) {
 			return;
@@ -471,6 +473,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				return;
 			}
 		}
+		*/
+
+		//3. get double markings.
 
 		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
 		List<String> dblMarks = new ArrayList<String>();
