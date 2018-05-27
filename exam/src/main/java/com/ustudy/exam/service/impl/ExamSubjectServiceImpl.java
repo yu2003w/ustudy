@@ -414,7 +414,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		}
 
 		//2. get objective answers
-		/*
+		
 		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
 
 		if (answers == null || answers.size() <= 0) {
@@ -466,14 +466,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 				}
-				OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+				//OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
 				OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
 			} catch (Exception e) {
 				logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 				return;
 			}
 		}
-		*/
 
 		//3. get double markings.
 
