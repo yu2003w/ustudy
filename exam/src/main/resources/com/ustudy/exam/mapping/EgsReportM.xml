@@ -77,7 +77,7 @@
         LEFT JOIN subscore ON subscore.stuid = ee.id
         LEFT JOIN examgradesub AS egs ON (egs.examid = ee.examid AND egs.grade_id = ee.gradeid 
         AND egs.id = subscore.exam_grade_sub_id) 
-        WHERE egs.id = #{egsid} ORDER BY rank
+        WHERE egs.id = #{egsid} ORDER BY ee.exam_code
 	</select>
 	
 </mapper>

@@ -1,7 +1,7 @@
 package com.ustudy.dashboard.model;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,11 +19,11 @@ public class Subject implements Serializable {
     @JsonProperty("id")
 	private String subId = null;
 
-    // contains child subject information with format {"ids":[7,8,9]}
+    // contains child subject information with format '[7,8,9]'
     @JsonIgnore
     private String child = null;
     
-    private Map<String, String> childSubs = null;
+    private TreeMap<Integer, String> childSubs = null;
     
 	public Subject() {
 		super();
@@ -53,11 +53,11 @@ public class Subject implements Serializable {
 		this.subId = subId;
 	}
 
-	public Map<String, String> getChildSubs() {
+	public TreeMap<Integer, String> getChildSubs() {
 		return childSubs;
 	}
 
-	public void setChildSubs(Map<String, String> childSubs) {
+	public void setChildSubs(TreeMap<Integer, String> childSubs) {
 		this.childSubs = childSubs;
 	}
 
@@ -74,6 +74,5 @@ public class Subject implements Serializable {
 		return "Subject [subName=" + subName + ", subId=" + subId + ", child=" + child + ", childSubs=" + childSubs
 				+ "]";
 	}
-
 	
 }

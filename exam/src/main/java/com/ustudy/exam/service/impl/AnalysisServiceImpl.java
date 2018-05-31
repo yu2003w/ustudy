@@ -62,14 +62,31 @@ public class AnalysisServiceImpl implements AnalysisService {
 		
 		String orgType = ExamUtil.retrieveSessAttr("orgType");
 		String orgId = ExamUtil.retrieveSessAttr("orgId");
-		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty()) {
-			logger.error("getAllExamsForAnaly(), failed to retrieve org info");
+		String teaid = ExamUtil.retrieveSessAttr("uid");
+		String tearole = ExamUtil.retrieveSessAttr("role");
+		if (orgId == null || orgType == null || orgId.isEmpty() || orgType.isEmpty() || 
+				teaid == null || teaid.isEmpty() || tearole == null || tearole.isEmpty()) {
+			logger.error("getAllExamsForAnaly(), failed to user identity information");
 			throw new RuntimeException("failed to retrieve org info");
 		}
 		
-		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for " + orgId);
+		logger.debug("getExamsForAnaly(), retrieve exams brife infomation for orgid=" + orgId + ", teaid=" + teaid + 
+				",tearole=" + tearole);
 		
-		List<ExamBrifeAnaly> examL = anaM.getExamBrifeList(orgId);
+		//filter result set based on user's role and subject
+		// TODO: authentication metrics needed here
+		List<ExamBrifeAnaly> examL = null;
+		if (tearole.equals("清道夫") || tearole.equals("校长") || tearole.equals("考务老师")) {
+			examL = anaM.getExamBrifeList(orgId, null);
+		} /* else if (tearole.equals("年级主任")) {
+			// access all subjects in his grade
+			examL = anaM.getExamBrifeList(orgId, teaid);
+		} else if (tearole.equals("学科组长")) {
+			// access only his subjects
+			examL = anaM.getExamBrifeList(orgId, teaid);
+		} */ else {
+			examL = anaM.getExamBrifeList(orgId, teaid);
+		}
 		
 		logger.trace("getExamsForAnaly(), details->" + examL.toString());
 		return examL;

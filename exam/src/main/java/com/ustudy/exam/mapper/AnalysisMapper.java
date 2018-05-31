@@ -13,7 +13,7 @@ import com.ustudy.exam.model.analysis.QuesSubScoreAnaly;
 @Mapper
 public interface AnalysisMapper {
 
-	public List<ExamBrifeAnaly> getExamBrifeList(String orgid);
+	public List<ExamBrifeAnaly> getExamBrifeList(@Param("orgid") String orgid, @Param("teacid") String teacid);
 	
 	public List<QuesObjScoreAnaly> calQuesObjReport(@Param("egsid")long egsId, @Param("clsid") long clsId);
 	

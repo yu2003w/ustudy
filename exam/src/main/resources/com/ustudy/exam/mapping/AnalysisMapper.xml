@@ -44,9 +44,17 @@
 		LEFT JOIN grade ON grade.id = egs.grade_id 
 		LEFT JOIN class ON class.grade_id = grade.id 
 		LEFT JOIN subject ON egs.sub_id = subject.id 
+		<if test="teacid != null and teacid.length > 0">
+		left join teachergrade as teagr on teagr.grade_id = egs.grade_id
+        left join teachersub as teasub on (teasub.sub_id = egs.sub_id and teasub.teac_id = teagr.teac_id)
+		</if>
 		LEFT JOIN examschool ON examschool.examid = exam.id 
 		LEFT JOIN school ON examschool.schid = school.schid 
-		WHERE examschool.schid = #{orgid} GROUP BY exam.id , egs.grade_id) gsub 
+		WHERE examschool.schid = #{orgid} 
+		<if test="teacid != null and teacid.length >0">
+		and teasub.teac_id = #{teacid}
+		</if>
+		GROUP BY exam.id , egs.grade_id) gsub 
 		GROUP BY id , schid) ggr GROUP BY id
 	</select>
 	

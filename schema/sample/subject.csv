@@ -1,6 +1,7 @@
 id,name,type,child
 NULL,语文,0,NULL
 NULL,数学,0,NULL
+NULL,数学(文),0,NULL
 NULL,英语,0,NULL
 NULL,物理,4,NULL
 NULL,生物,4,NULL
@@ -8,6 +9,5 @@ NULL,化学,4,NULL
 NULL,政治,3,NULL
 NULL,历史,3,NULL
 NULL,地理,3,NULL
-NULL,文综,1,${"ids":[7,8,9]}$
-NULL,理综,2,${"ids":[4,5,6]}$
-NULL,数学(文),0,NULL
+NULL,文综,1,$[8,9,10]$
+NULL,理综,2,$[5,6,7]$
