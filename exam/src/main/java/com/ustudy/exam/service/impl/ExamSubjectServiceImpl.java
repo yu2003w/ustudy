@@ -386,9 +386,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	private void addFinalMarks(Long paperId, String paperImgs) {
-		//1. get objective answers and scores
-		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
-
+		//1. get scores
 		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
 
 		if (paperImgs.length() <= 0 || paperScore == null) {
@@ -415,6 +413,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return;
 		}
 
+		//2. get objective answers
+		
+		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
+
 		if (answers == null || answers.size() <= 0) {
 			return;
 		} else {
@@ -434,16 +436,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					marks.add(answer.getType());
 					start = answer.getQuesno();
 					end = answer.getQuesno();
-					answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+					answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
 				} else {
 					if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
 						marks.add(start + "-" + end + ": " + answerText);
 						start = answer.getQuesno();
 						end = answer.getQuesno();
-						answerText = (answer.getScore() == 0 ? " " : answer.getAnswer());
+						answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
 					} else {
 						end = answer.getQuesno();
-						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? " " : answer.getAnswer());
+						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? "*" : answer.getAnswer());
 					}
 				}
 			}
@@ -464,13 +466,15 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 				}
-				OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+				//OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
 				OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
 			} catch (Exception e) {
 				logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
 				return;
 			}
 		}
+
+		//3. get double markings.
 
 		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
 		List<String> dblMarks = new ArrayList<String>();
