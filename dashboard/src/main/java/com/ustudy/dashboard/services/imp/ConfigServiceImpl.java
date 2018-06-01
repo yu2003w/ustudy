@@ -40,16 +40,17 @@ public class ConfigServiceImpl implements ConfigService {
 		// parse and populate basic subject information for child subs
 		Map<Integer, String> subM = new HashMap<Integer, String>();
 		for (Subject sub: subL) {
-			if (sub.getChild() != null && sub.getChild().length() > 0) {
+			if (sub.getChild() == null || sub.getChild().isEmpty()) {
 				subM.put(Integer.valueOf(sub.getSubId()), sub.getSubName());
 			}
 		}
+		logger.trace("getSubList(), basic subject->" + subM.toString());
 		for (Subject sub: subL) {
 			if (sub.getChild() != null && sub.getChild().length() > 0) {
 				sub.setChildSubs(getChilds(sub.getChild(), subM));
 			}
 		}
-		logger.debug("getSubList(), subject configured->" + subL.toString());
+		logger.debug("getSubList(), subjects->" + subL.toString());
 		return subL;
 	}
 

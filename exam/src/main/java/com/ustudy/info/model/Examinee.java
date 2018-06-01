@@ -163,6 +163,10 @@ public class Examinee implements Serializable {
 
 	public void setSubs(List<Long> subs) {
 		this.subs = subs;
+		// only set for creating examinees
+		if (subs != null && subs.size() > 0) {
+			this.subI = subs.toString();
+		}
 	}
 
 	public List<String> getSubDetails() {
@@ -205,7 +209,7 @@ public class Examinee implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", stuExamId=" + examCode
+		return "Examinee [id=" + id + ", stuName=" + stuName + ", stuId=" + stuId + ", examCode=" + examCode
 				+ ", examId=" + examId + ", schId=" + schId + ", gradeId=" + gradeId + ", classId=" + classId
 				+ ", className=" + className + ", subs=" + subs + ", subN=" + subN + ", subI=" + subI + ", subDetails="
 				+ subDetails + "]";

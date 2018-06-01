@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.info.mapper.ExamineeMapper;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Examinee;
-import com.ustudy.info.model.ExamineeSub;
 import com.ustudy.info.services.ExamineeService;
 import com.ustudy.info.util.InfoUtil;
 
@@ -31,7 +30,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 	public int createExaminee(List<Examinee> ex) {
 		int count = 0;
 		logger.trace("createExaminee(), " + ex.size() + " examinees submitted");
-		List<ExamineeSub> eeSubs = new ArrayList<ExamineeSub>();
+		// List<ExamineeSub> eeSubs = new ArrayList<ExamineeSub>();
 		Map<String, Long> clsDict = populateClsInfo(ex);
 		for (Examinee ee : ex) {
 			if (ee.getSchId() == null || ee.getSchId().isEmpty()) {
@@ -59,7 +58,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 				throw new RuntimeException("insert into ustudy.examinee failed with " + ret);
 			}
 			
-			if (ee.getId() <= 0) {
+			/*if (ee.getId() <= 0) {
 				logger.error("createExaminee(), invalid id after creation " + ee.getId() + 
 						", exam_code " + ee.getExamCode());
 				throw new RuntimeException("invalid id after creation " + ee.getId());
@@ -67,14 +66,14 @@ public class ExamineeServiceImpl implements ExamineeService {
 			
 			for (long sid : ee.getSubs()) {
 				eeSubs.add(new ExamineeSub(ee.getId(), sid));
-			}
+			}*/
 			count++;
 		}
 		
-		if (eeSubs.size() > 0) {
+	/*	if (eeSubs.size() > 0) {
 			int ret = exM.createExamineeSubs(eeSubs);
 			logger.info("createExaminee(), populate subjects for examinees, number is " + ret);
-		}
+		}*/
 		return count;
 
 	}

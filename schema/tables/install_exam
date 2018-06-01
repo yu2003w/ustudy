@@ -140,7 +140,7 @@ exam_code varchar(20) NOT NULL COMMENT '考号',
 examid int NOT NULL COMMENT '考试ID',
 schid varchar(11) NOT NULL COMMENT '学校ID',
 # subjects of examinee in this exam, which is useful for score report generation
-subids JSON NOT NULL COMMENT 'subjects for examinee in this examination',
+subs JSON NOT NULL COMMENT 'subjects for examinee in this examination',
 gradeid int NOT NULL COMMENT '年级ID',
 class_id INT COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',

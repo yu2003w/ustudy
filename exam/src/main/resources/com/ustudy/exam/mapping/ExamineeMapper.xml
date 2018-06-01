@@ -16,30 +16,29 @@
 	</resultMap>
 	
 	<insert id="createExaminee" useGeneratedKeys="true" keyProperty="id">
-	    insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) 
-	    values(#{examCode}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
-	    on duplicate key update schid=values(schid), gradeid=values(gradeid), class_id=values(class_id), 
+	    insert into ustudy.examinee (exam_code, examid, schid, subs, gradeid, class_id, class_name, name, stuno) 
+	    values(#{examCode}, #{examId}, #{schId}, #{subI}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
+	    on duplicate key update schid=values(schid), subs=values(subs), gradeid=values(gradeid), class_id=values(class_id), 
 	    class_name=values(class_name), name=values(name), stuno=values(stuno), id=LAST_INSERT_ID(id)
 	</insert>
 	
-	<insert id="createExamineeSubs" >
+	<!-- <insert id="createExamineeSubs" >
 	    insert into ustudy.examineesub (eeid, subid) values
 	    <foreach item="item" collection="list" separator=",">
 	        (#{item.eeid}, #{item.subid})
 	    </foreach>
 	    on duplicate key update eeid=values(eeid), subid=values(subid)
-	</insert>
+	</insert> -->
 	
 	<delete id="deleteExaminee" parameterType="long">
 	    delete from ustudy.examinee where id=#{id}
 	</delete>
 	
 	<select id="getExamineeById" parameterType="long" resultMap="Examinee">
-		select ee.id, exam_code, examid, schid, gradeid, class_id, class.cls_name as class_name, ee.name, 
-		stuno, group_concat(eesub.subid) as subI, group_concat(subject.name) as subN 
+		select ee.id, exam_code, examid, schid, gradeid, class_id, class.cls_name as class_name, ee.name, stuno, 
+		GROUP_CONCAT(subject.id order by subject.id) as subI, group_concat(subject.name order by subject.id) as subN 
 		from ustudy.examinee as ee 
-		left join examineesub as eesub on ee.id = eesub.eeid 
-        left join subject on subject.id = eesub.subid 
+        left join subject on json_contains(ee.subs, cast(subject.id as CHAR)) 
         left join class on class.id = ee.class_id 
 		where ee.id = #{id}
 	</select>
@@ -52,10 +51,10 @@
 	
 	<select id="getExamineeByFilter" resultMap="Examinee">
 	    SELECT ee.id, ee.exam_code, ee.name, ee.examid, ee.schid, ee.gradeid, ee.class_id, class.cls_name as class_name, 
-	    GROUP_CONCAT(eesub.subid) as subI, group_concat(subject.name) AS subN FROM ustudy.examinee AS ee 
-	    LEFT JOIN examineesub AS eesub ON ee.id = eesub.eeid 
+	    GROUP_CONCAT(subject.id order by subject.id) as subI, group_concat(subject.name order by subject.id) AS subN 
+	    FROM ustudy.examinee AS ee 
 	    LEFT JOIN class ON ee.class_id = class.id 
-	    LEFT JOIN subject ON subject.id = eesub.subid 
+	    LEFT JOIN subject ON json_contains(ee.subs, cast(subject.id as CHAR))
 	    WHERE examid = #{examid} AND gradeid = #{gradeid} 
 	    <if test="clsid > 0">
 	    AND class_id = #{clsid} 
@@ -69,9 +68,8 @@
 	<select id="getAbsentListPerEgs" resultMap="Examinee">
 	    SELECT ee.id, ee.exam_code, ee.name, ee.examid, ee.gradeid, ee.schid, ee.stuno, class.id as class_id, 
 	    class.cls_name as class_name FROM ustudy.examinee as ee 
-	    left join examineesub as esub on ee.id = esub.eeid 
 	    left join class on class.id = ee.class_id 
-	    left join examgradesub as egs on egs.sub_id = esub.subid 
+	    left join examgradesub as egs on json_contains(ee.subs, cast(egs.sub_id as CHAR))
 	    left join paper on (paper.exam_code = ee.exam_code and paper.exam_grade_sub_id = egs.id) 
 	    where egs.id = #{egsid} and paper.id is null order by exam_code
 	</select>
