@@ -20,9 +20,9 @@ public class SubjectServiceImpl implements SubjectService {
 	@Resource
 	private SubjectDao subjectDaoImpl;
 	
-	public List<Subject> getAllSubject(){
+/*	public List<Subject> getAllSubject(){
 		logger.debug("getAllSubject");
 		return subjectDaoImpl.getAllSubject();
-	}
+	}*/
 	
 }

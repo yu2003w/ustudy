@@ -122,8 +122,8 @@ public class ExamineeServiceImpl implements ExamineeService {
 				logger.debug("updateExaminee(), populated schIds " + ee.getSchId().toString());
 			}
 			else {
-				logger.error("updateExam(), schId is not specified in item->" + ee.toString());
-				throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
+				logger.error("updateExaminee(), schId is not specified in item->" + ee.toString());
+				throw new RuntimeException("updateExaminee(), [schId] is not specified in request parameter");
 			}
 
 			// check whether examId or stuExamId updated, whether unique key changed or not

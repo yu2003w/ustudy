@@ -2,12 +2,11 @@ package com.ustudy.exam.model;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeMap;
 
 import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
+import javax.json.JsonNumber;
 import javax.json.JsonReader;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,11 +20,11 @@ public class Subject implements Serializable {
 	private String type = null;
 	
 	// child subs contains subject ids with format as below, 
-	// {"ids":[7,8,9]}
+	// [7,8,9]
 	@JsonIgnore
-	private String childsubs = null;
+	private String child = null;
 	
-	private List<Integer> childSubIds = null;
+	private TreeMap<Integer, String> childSubs = null;
 	
 	public Long getId() {
 		return id;
@@ -51,45 +50,43 @@ public class Subject implements Serializable {
 		this.type = type;
 	}
 
-	public String getChildsubs() {
-		return childsubs;
+	public String getChild() {
+		return child;
 	}
 
-	public void setChildsubs(String childsubs) {
-		this.childsubs = childsubs;
-		if (this.childsubs != null && this.childsubs.length() > 0) {
-			try {
-				JsonReader reader = Json.createReader(new StringReader(this.childsubs));
-				JsonObject jObj = reader.readObject();
-				reader.close();
-				if (jObj.containsKey("ids")) {
-					JsonArray jArr = jObj.getJsonArray("ids");
-					int len = jArr.size();
-					for (int i = 0; i < len; i++) {
-						if (this.childSubIds == null) {
-							this.childSubIds = new ArrayList<Integer>();
-						}
-						this.childSubIds.add(jArr.getInt(i));
-					}
-				}
-			} catch (Exception e) {
-				throw e;
+	public void setChild(String child) {
+		this.child = child;
+	}
+
+	public TreeMap<Integer, String> getChildSubs() {
+		return childSubs;
+	}
+
+	public void setChildSubs(TreeMap<Integer, String> childSubs) {
+		this.childSubs = childSubs;
+	}
+	
+	public void populateChild(TreeMap<Long, String> subM) {
+		if (this.child != null && this.child.length() > 0) {
+			
+			JsonReader reader = Json.createReader(new StringReader(this.child));
+			JsonArray ids = reader.readArray();
+			reader.close();
+			if (this.childSubs == null) {
+				childSubs = new TreeMap<Integer, String>();
+			}
+
+			for (int i = 0; i < ids.size(); i++) {
+				JsonNumber sid = ids.getJsonNumber(i);
+				childSubs.put(Integer.valueOf(sid.intValue()), subM.get(sid.longValue()));
 			}
 		}
 	}
 
-	public List<Integer> getChildSubIds() {
-		return childSubIds;
-	}
-
-	public void setChildSubIds(List<Integer> childSubIds) {
-		this.childSubIds = childSubIds;
-	}
-
 	@Override
 	public String toString() {
-		return "Subject [id=" + id + ", name=" + name + ", type=" + type + ", childsubs=" + childsubs + ", childSubIds="
-				+ childSubIds + "]";
+		return "Subject [id=" + id + ", name=" + name + ", type=" + type + ", child=" + child + ", childSubs="
+				+ childSubs + "]";
 	}
 	
 }

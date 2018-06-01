@@ -17,7 +17,6 @@ import com.ustudy.exam.service.SubjectService;
 
 @RestController
 @RequestMapping(value = "/")
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectController {
 	
 	private static final Logger logger = LogManager.getLogger(SubjectController.class);
@@ -38,8 +37,8 @@ public class SubjectController {
 		
 		Map result = new HashMap<>();
 
-		result.put("success", true);
-		result.put("data", service.getAllSubject());
+		/*result.put("success", true);
+		result.put("data", service.getAllSubject());*/
 
 		return result;
 	}

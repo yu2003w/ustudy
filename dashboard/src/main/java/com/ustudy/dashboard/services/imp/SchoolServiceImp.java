@@ -423,8 +423,8 @@ public class SchoolServiceImp implements SchoolService {
 				for (int i = 0; i < ids.size(); i++) {
 					JsonNumber sid = ids.getJsonNumber(i);
 					childSubs.put(Integer.valueOf(sid.intValue()), subD.get(sid.intValue()));
-					sub.setChildSubs(childSubs);
 				}
+				sub.setChildSubs(childSubs);
 			}
 		}
 		return subL;

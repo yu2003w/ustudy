@@ -344,4 +344,20 @@ public class SchoolController {
 		return res;
 	}
 	
+	@RequestMapping(value = "subjects/", method = RequestMethod.GET)
+	public UResp getAllSubjects(HttpServletResponse resp) {
+		UResp res = new UResp();
+		
+		try {
+			res.setData(schS.getAllSubjects());
+			res.setRet(true);
+		} catch (Exception e) {
+			logger.error("getAllSubjects(), exception->" + e.getMessage());
+			res.setMessage(e.getMessage());
+			resp.setStatus(500);
+		}
+		
+		return res;
+	}
+	
 }

@@ -9,7 +9,7 @@ import com.ustudy.exam.model.Subject;
 @MapperScan
 public interface SubjectDao {
 
-	List<Subject> getAllSubject();
+/*	List<Subject> getAllSubject();
 	
-	Subject getSubjectByEgsId(Long egsId);
+	Subject getSubjectByEgsId(Long egsId);*/
 }

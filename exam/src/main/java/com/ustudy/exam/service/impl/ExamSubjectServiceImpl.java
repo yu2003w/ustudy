@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
-import com.ustudy.exam.dao.SubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.mapper.ConfigMapper;
@@ -40,6 +39,7 @@ import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
 import com.ustudy.exam.utility.OSSMetaInfo;
 import com.ustudy.exam.utility.OSSUtil;
+import com.ustudy.info.mapper.SchoolMapper;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -68,7 +68,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	private QuesAnswerDao qaDao;
 
 	@Autowired
-	private SubjectDao subjectD;
+	private SchoolMapper schM;
 	
 	@Autowired
 	private ConfigMapper cgM;
@@ -481,7 +481,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		if (dblAnswers != null && dblAnswers.size()>0) {
 			int preQuesId = 0;
 			String preTeacName = "";
-			boolean isFirst = true;
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
@@ -677,9 +676,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			// populate sub child scores
 			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
 			
-			Subject mainSub = subjectD.getSubjectByEgsId(egsId);
+			Subject mainSub = schM.getSubjectByEgsId(egsId);
 			logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
-			if (mainSub != null && mainSub.getChildSubIds() != null && mainSub.getChildSubIds().size() > 0) {
+			if (mainSub != null && mainSub.getChildSubs() != null && mainSub.getChildSubs().size() > 0) {
 				// current subject contains child subjects, need to retrieve ids of SubScores
 				List<Long> ssIDs = scoreDaoImpl.getSSIDsByEgsId(egsId);
 				if (ssIDs == null || ssIDs.size() != scores.size()) {
@@ -692,7 +691,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 		
 			// load subject into hashmap
-			List<Subject> subs = subjectD.getAllSubject();
+			List<Subject> subs = schM.getAllSubjects();
 			Map<String, Long> subMap = new HashMap<String, Long>();
 			for (Subject sub: subs) {
 				subMap.put(sub.getName(), sub.getId());
