@@ -43,15 +43,17 @@ public class ExamineeServiceImpl implements ExamineeService {
 					throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
 				}
 			}
-			if (ee.getClassName() == null || ee.getClassName().length() == 0 || ee.getGradeId() <= 0 ||
+			if (ee.getClassId() <= 0) {
+				if (ee.getClassName() == null || ee.getClassName().length() == 0 || ee.getGradeId() <= 0 ||
 					!clsDict.containsKey(ee.getGradeId() + ee.getClassName())) {
-				logger.warn("createExainee(), invalid grade id or class name", ee);
-				continue;
+					logger.warn("createExainee(), invalid grade id or class name", ee);
+					continue;
+				}
+				ee.setClassId(clsDict.get(ee.getGradeId() + ee.getClassName()));
 			}
 			
-			ee.setClassId(clsDict.get(ee.getGradeId() + ee.getClassName()));
 			int ret = exM.createExaminee(ee);
-			//TODO: need to populate examinee subjects here
+			//examinee subjects stored as json array
 			if (ret < 0 || ret > 2) {
 				logger.error("createExaminee(), create examinee failed with " + ret + 
 						", exam_code " + ee.getExamCode());
@@ -113,7 +115,7 @@ public class ExamineeServiceImpl implements ExamineeService {
 		int count = 0, ret = -1;
 		for (Examinee ee : exs) {
 			if (ee.getId() < 1) {
-				logger.error("updateExaminee(), id is not valid\n" + ee.toString());
+				logger.error("updateExaminee(), id is not valid" + ee.toString());
 				throw new RuntimeException("updateExaminee(), invalid ids");
 			}
 			
