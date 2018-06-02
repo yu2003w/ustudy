@@ -678,7 +678,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			
 			Subject mainSub = schM.getSubjectByEgsId(egsId);
 			logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
-			if (mainSub != null && mainSub.getChildSubs() != null && mainSub.getChildSubs().size() > 0) {
+			if (mainSub != null && mainSub.getChild() != null && mainSub.getChild().length() > 0) {
 				// current subject contains child subjects, need to retrieve ids of SubScores
 				List<Long> ssIDs = scoreDaoImpl.getSSIDsByEgsId(egsId);
 				if (ssIDs == null || ssIDs.size() != scores.size()) {

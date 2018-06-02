@@ -40,12 +40,12 @@ public class ExamineeServiceImpl implements ExamineeService {
 				}
 				else {
 					logger.error("createExaminee(), schId is not specified in item->" + ee.toString());
-					throw new RuntimeException("createExam(), [schId] is not specified in request parameter");
+					throw new RuntimeException("createExaminee(), [schId] is not specified in request parameter");
 				}
 			}
 			if (ee.getClassId() <= 0) {
-				if (ee.getClassName() == null || ee.getClassName().length() == 0 || ee.getGradeId() <= 0 ||
-					!clsDict.containsKey(ee.getGradeId() + ee.getClassName())) {
+				if (ee.getClassName() == null || ee.getClassName().length() == 0 || ee.getGradeId() <= 0 || 
+						clsDict == null || !clsDict.containsKey(ee.getGradeId() + ee.getClassName())) {
 					logger.warn("createExainee(), invalid grade id or class name", ee);
 					continue;
 				}
@@ -104,7 +104,10 @@ public class ExamineeServiceImpl implements ExamineeService {
 				clsM = new HashMap<String, Long>();
 			clsM.put(ci.getGradeId() + ci.getClassName(), ci.getId());
 		}
-		logger.debug("populateClsInfo(), class info dictionary" + clsM.toString());
+		if (clsM == null || clsM.isEmpty()) {
+			logger.warn("populateClsInfo(), class info dictionary is empty, maybe class id specified for examinees");
+		} else
+			logger.debug("populateClsInfo(), class info dictionary" + clsM.toString());
 		
 		return clsM;
 	}
