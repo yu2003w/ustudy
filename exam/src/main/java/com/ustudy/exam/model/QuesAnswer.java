@@ -200,17 +200,24 @@ public class QuesAnswer implements Serializable {
 		}
 		
 		// need to check steps to make sure sum of step scores equals to that of question score
-		if (steps != null && !steps.isEmpty() && this.type.compareTo("填空题") != 0) {
+		if (steps != null && !steps.isEmpty()) {
 			float scoSum = 0;
 			String[] sts = steps.split(",");
 			for (String st: sts) {
 				if (st != null && !st.isEmpty()) {
 					String[] data = st.split("-");
-					if (data.length == 2)
-						scoSum += Float.valueOf(data[1]);
+					if (data.length == 2) {
+						float tmp = Float.valueOf(data[1]);
+						if (tmp <= 0 && ((this.type.equals("填空题") && this.score == 0) || 
+								!this.type.equals("填空题"))) {
+							ret = false;
+							break;
+						}
+						scoSum += tmp;
+					}
 				}
 			}
-			if (scoSum != this.score) {
+			if (ret && scoSum != this.score && this.type.compareTo("填空题") != 0) {
 				ret = false;
 			}
 		}

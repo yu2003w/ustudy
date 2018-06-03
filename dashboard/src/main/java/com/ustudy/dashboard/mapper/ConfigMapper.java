@@ -10,7 +10,7 @@ import com.ustudy.dashboard.model.Subject;
 @Mapper
 public interface ConfigMapper {
 
-	@Select("select id as subId, name as subName from ustudy.subject")
+	@Select("select id as subId, name as subName, child from ustudy.subject order by id")
 	public List<Subject> getSubList();
 	
 }

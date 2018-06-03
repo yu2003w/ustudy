@@ -16,6 +16,8 @@ public interface StudentPaperDao {
 	int getStudentPaperId(@Param("egsId")Long egsId, @Param("examCode")String examCode);
 	
 	void updatePaperStatus(@Param("paperid")Long paperid, @Param("status")String status);
+
+	void updatePapersStatus(Map<String, Object> paper);
 	
 	void deleteStudentPapers(@Param("egsId")Long egsId, @Param("batchNum")Integer batchNum);
 	

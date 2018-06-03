@@ -16,10 +16,10 @@ import java.util.Map.Entry;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
-import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -417,15 +417,14 @@ public class SchoolServiceImp implements SchoolService {
 			if (sub.getChild() != null && sub.getChild().length() > 0) {
 				// need to parse child subjects
 				JsonReader reader = Json.createReader(new StringReader(sub.getChild()));
-				JsonObject jObj = reader.readObject();
+				JsonArray ids = reader.readArray();
 				reader.close();
-				JsonArray ids = jObj.getJsonArray("ids");
-				Map<String, String> childSubs = new HashMap<String, String>();
+				TreeMap<Integer, String> childSubs = new TreeMap<Integer, String>();
 				for (int i = 0; i < ids.size(); i++) {
 					JsonNumber sid = ids.getJsonNumber(i);
-					childSubs.put(sid.toString(), subD.get(sid.intValue()));
-					sub.setChildSubs(childSubs);
+					childSubs.put(Integer.valueOf(sid.intValue()), subD.get(sid.intValue()));
 				}
+				sub.setChildSubs(childSubs);
 			}
 		}
 		return subL;

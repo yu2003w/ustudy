@@ -23,7 +23,12 @@ public class ExamSubject implements Serializable {
 	private int subItemNum;
 	private boolean markSwitch;
 	private boolean taskDispatch;
-	private boolean answerSet ;
+	
+	// indicate whether answer of subject questions are set or not, added by Jared on May 11, 2018
+	private boolean isSubAnsSet = false;
+	// indicate whether answer of object questions are set or not
+	private boolean isObjAnsSet = false;
+	
 	private int uploadBathCount ;
 	private String blankAnswerPaper ;
 	private String blankQuestionsPaper ;
@@ -33,6 +38,13 @@ public class ExamSubject implements Serializable {
 	private List<QuesAnswer> questions;
 
 	public ExamSubject() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public ExamSubject(Long id) {
+		super();
+		this.id = id;
 	}
 
 	public ExamSubject(Long id, Long examid, Long gradeId, Long subId) {
@@ -170,12 +182,20 @@ public class ExamSubject implements Serializable {
 		this.taskDispatch = taskDispatch;
 	}
 
-	public boolean getAnswerSet() {
-		return answerSet;
+	public boolean isSubAnsSet() {
+		return isSubAnsSet;
 	}
 
-	public void setAnswerSet(boolean answerSet) {
-		this.answerSet = answerSet;
+	public void setSubAnsSet(boolean isSubAnsSet) {
+		this.isSubAnsSet = isSubAnsSet;
+	}
+
+	public boolean isObjAnsSet() {
+		return isObjAnsSet;
+	}
+
+	public void setObjAnsSet(boolean isObjAnsSet) {
+		this.isObjAnsSet = isObjAnsSet;
 	}
 
 	public int getUploadBathCount() {
@@ -232,9 +252,9 @@ public class ExamSubject implements Serializable {
 				+ ", subId=" + subId + ", subName=" + subName + ", stuNum=" + stuNum + ", teacNum=" + teacNum
 				+ ", examPaper=" + examPaper + ", examAnswer=" + examAnswer + ", examPaperNum=" + examPaperNum
 				+ ", template=" + template + ", objItemNum=" + objItemNum + ", subItemNum=" + subItemNum
-				+ ", markSwitch=" + markSwitch + ", taskDispatch=" + taskDispatch + ", answerSeted=" + answerSet
-				+ ", uploadBathCount=" + uploadBathCount + ", blankAnswerPaper=" + blankAnswerPaper
-				+ ", blankQuestionsPaper=" + blankQuestionsPaper + ", xmlServerPath=" + xmlServerPath
+				+ ", markSwitch=" + markSwitch + ", taskDispatch=" + taskDispatch + ", isSubAnsSet=" + isSubAnsSet
+				+ ", isObjAnsSet=" + isObjAnsSet + ", uploadBathCount=" + uploadBathCount + ", blankAnswerPaper="
+				+ blankAnswerPaper + ", blankQuestionsPaper=" + blankQuestionsPaper + ", xmlServerPath=" + xmlServerPath
 				+ ", originalData=" + originalData + ", examName=" + examName + ", questions=" + questions + "]";
 	}
 	

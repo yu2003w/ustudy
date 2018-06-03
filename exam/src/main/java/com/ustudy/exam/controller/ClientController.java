@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ustudy.UResp;
 import com.ustudy.exam.model.Teacher;
 import com.ustudy.exam.service.ClientService;
-import com.ustudy.exam.service.ExamStuService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
 import com.ustudy.exam.service.StudentPaperService;
+import com.ustudy.info.services.ExamineeService;
 
 import net.sf.json.JSONObject;
 
@@ -46,11 +46,10 @@ public class ClientController {
 	private StudentAnswerService sas;
 	
 	@Autowired
-	private ExamStuService eeS;
-	
-	@Autowired
 	private StudentPaperService sps;
 
+	@Autowired
+	private ExamineeService eeS;
 	/**
 	 * 保存模板
 	 * @param templates 
@@ -418,8 +417,11 @@ public class ClientController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getStudentsInfo/{examId}/{gradeId}", method = RequestMethod.POST)
-	public UResp getStudentsInfo(@PathVariable Long examId, @PathVariable Long gradeId, HttpServletRequest request, HttpServletResponse responseonse) {
+	public UResp getStudentsInfo(@PathVariable Long examId, @PathVariable Long gradeId, HttpServletRequest request, 
+			HttpServletResponse resp) {
 		
+		logger.info("getStudentsInfo(), retrieving examinee information for examid=" + examId + 
+				", gradeId=" + gradeId);
 		String token = request.getHeader("token");
 		UResp result = cs.login(token);
 		if(!result.isRet()){
@@ -427,11 +429,23 @@ public class ClientController {
 		}
 		
 		result = new UResp();
-		result.setRet(true);
-		result.setData(eeS.getStudentInfoByExamGrade(examId, gradeId));
-		
-		return result;
-		
+		try {
+			if (examId <= 0 || gradeId <= 0) {
+				logger.warn("getStudentsInfo(), invalid parameters");
+				result.setRet(false);
+				result.setMessage("invalid parameter");
+				resp.setStatus(400);
+			} else {
+				result.setData(eeS.getExamineeListByClient(examId, gradeId));
+				result.setRet(true);
+			}
+		} catch (Exception e) {
+			logger.error("getStudentsInfo(), exception->" + e.getMessage());
+			result.setRet(false);
+			resp.setStatus(500);
+		}
+
+		return result;		
 	}
 	
 	/**

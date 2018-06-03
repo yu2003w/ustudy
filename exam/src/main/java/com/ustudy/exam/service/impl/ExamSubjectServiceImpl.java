@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
-import com.ustudy.exam.dao.SubjectDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.mapper.ConfigMapper;
@@ -30,13 +29,17 @@ import com.ustudy.exam.model.Subject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.score.SubChildScore;
+import com.ustudy.exam.model.score.PaperSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
+import com.ustudy.exam.model.score.ObjAnswer;
+import com.ustudy.exam.model.score.DblAnswer;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
 import com.ustudy.exam.utility.OSSMetaInfo;
 import com.ustudy.exam.utility.OSSUtil;
+import com.ustudy.info.mapper.SchoolMapper;
 
 @Service
 public class ExamSubjectServiceImpl implements ExamSubjectService {
@@ -65,7 +68,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	private QuesAnswerDao qaDao;
 
 	@Autowired
-	private SubjectDao subjectD;
+	private SchoolMapper schM;
 	
 	@Autowired
 	private ConfigMapper cgM;
@@ -108,8 +111,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	public ExamSubject getExamSubject(Long id) {
 		logger.debug("getExamSubject -> id:" + id);
 		ExamSubject es = egsDaoImpl.getExamSubjectById(id);
-		// set status for exam subject
-		es.setAnswerSet(this.isAnswerSet(es.getId()));
+		// populate sub/obj answer set status
+		this.checkAnswerSet(es);
 		es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		return es;
 	}
@@ -327,6 +330,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						if (prePaperId.equals(curPaperId)) {
 							preMarkImg += targetName + ";";
 						} else {
+							addFinalMarks(prePaperId, preMarkImg + targetName);
 							egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);
 							preMarkImg = "";
 						}
@@ -364,11 +368,14 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 			if (!preMarkImg.isEmpty()) {
 				if (preMarkImg.contains(targetName)) {
+					addFinalMarks(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
 					egsDaoImpl.updateMarkImg(prePaperId, preMarkImg.substring(0, preMarkImg.length()-1));
 				} else {
+					addFinalMarks(prePaperId, preMarkImg + targetName);
 					egsDaoImpl.updateMarkImg(prePaperId, preMarkImg + targetName);				
 				}
 			} else {
+				addFinalMarks(prePaperId, targetName);
 				egsDaoImpl.updateMarkImg(prePaperId, targetName);
 			}
 		} catch (Exception e) {
@@ -376,6 +383,181 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			return false;
 		}
 		return true;
+	}
+
+	private void addFinalMarks(Long paperId, String paperImgs) {
+		//1. get scores
+		PaperSubScore paperScore = scoreDaoImpl.getPaperSubScores(paperId);
+
+		if (paperImgs.length() <= 0 || paperScore == null) {
+			return;
+		}
+
+		String[] imgs = paperImgs.split(";");
+
+		try{
+			if (OSSUtil.getClient() == null) {
+				// need to initialize OSSMetaInfo
+				logger.info("addFinalMarks(), initialize OSSClient before use");
+				synchronized(OSSMetaInfo.class) {
+					if (OSSUtil.getClient() == null) {
+						OSSMetaInfo omi = cgM.getOSSInfo("oss");
+						logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+						OSSUtil.initOSS(omi);
+					}
+				}
+			}
+			OSSUtil.putObject(imgs[0], imgs[0], "" + paperScore.getScore(), 50, 50);
+		} catch (Exception e) {
+			logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+			return;
+		}
+
+		//2. get objective answers
+		
+		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
+
+		if (answers == null || answers.size() <= 0) {
+			return;
+		} else {
+			int pageno = answers.get(0).getPageno();
+			int x = answers.get(0).getX() + answers.get(0).getW();
+			int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
+			int y = answers.get(0).getY();
+			String preType = "";
+			int start = 0;
+			int end = 0;
+			List<String> marks = new ArrayList<String>();
+			String answerText = "";
+
+			for (ObjAnswer answer : answers) {
+				if (!answer.getType().equals(preType)) {
+					preType = answer.getType();
+					marks.add(answer.getType());
+					start = answer.getQuesno();
+					end = answer.getQuesno();
+					answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
+				} else {
+					if ((answer.getQuesno() == end + 1) && (answer.getQuesno() > start + 4) || (answer.getQuesno() != end +1)) {
+						marks.add(start + "-" + end + ": " + answerText);
+						start = answer.getQuesno();
+						end = answer.getQuesno();
+						answerText = (answer.getScore() == 0 ? "*" : answer.getAnswer());
+					} else {
+						end = answer.getQuesno();
+						answerText = answerText + (answer.getType().equals("多选题") ? "," : "" ) + (answer.getScore() == 0 ? "*" : answer.getAnswer());
+					}
+				}
+			}
+
+			if(answerText.length() >= 0) {
+				marks.add(start + "-" + end + ": " + answerText);
+			}
+
+			try{
+				if (OSSUtil.getClient() == null) {
+					// need to initialize OSSMetaInfo
+					logger.info("addFinalMarks(), initialize OSSClient before use");
+					synchronized(OSSMetaInfo.class) {
+						if (OSSUtil.getClient() == null) {
+							OSSMetaInfo omi = cgM.getOSSInfo("oss");
+							logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+							OSSUtil.initOSS(omi);
+						}
+					}
+				}
+				//OSSUtil.putObject(imgs[pageno], imgs[pageno], marks, x, y);
+				OSSUtil.putObject(imgs[pageno], imgs[pageno], "" + paperScore.getObjScore(), titleX, y);
+			} catch (Exception e) {
+				logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+				return;
+			}
+		}
+
+		//3. get double markings.
+
+		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
+		List<String> dblMarks = new ArrayList<String>();
+		if (dblAnswers != null && dblAnswers.size()>0) {
+			int preQuesId = 0;
+			String preTeacName = "";
+			int dblX = 0;
+			int dblY = 0;
+			int dblPageno = 0;
+			logger.debug("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
+			logger.debug("dblMarks size->" + dblMarks.size());
+			for (DblAnswer dblAnswer: dblAnswers) {
+				logger.debug("dblAnswer ->" + dblAnswer.toString());
+				if (dblAnswer.getQuesId() != preQuesId) {
+					logger.debug("dblAnswer different quesid");
+					preQuesId = dblAnswer.getQuesId();
+					preTeacName = dblAnswer.getTeacName();
+					if (dblMarks.size() > 0) {
+						try{
+							if (OSSUtil.getClient() == null) {
+								// need to initialize OSSMetaInfo
+								logger.info("addFinalMarks(), initialize OSSClient before use");
+								synchronized(OSSMetaInfo.class) {
+									if (OSSUtil.getClient() == null) {
+										OSSMetaInfo omi = cgM.getOSSInfo("oss");
+										logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+										OSSUtil.initOSS(omi);
+									}
+								}
+							}
+							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+							logger.debug("dblAnswer put object");
+							dblMarks.clear();
+						} catch (Exception e) {
+							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+							return;
+						}
+					}
+					dblPageno = dblAnswer.getPageno();
+					dblX = dblAnswer.getX() + dblAnswer.getW();
+					dblY = dblAnswer.getY();
+					dblMarks.add("双评阅卷");
+					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
+					if(dblAnswer.getIsFinal() == false) {
+						dblMarks.add("阅卷人A: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					} else {
+						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					}
+				} else {
+					logger.debug("dblAnswer same quesid");
+					if (!dblAnswer.getTeacName().equals(preTeacName)) {
+						preTeacName = dblAnswer.getTeacName();
+						if(dblAnswer.getIsFinal() == false) {
+							dblMarks.add("阅卷人B: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						} else {
+							dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						}
+					}
+				}
+			}
+			if (dblMarks.size() > 0) {
+				try{
+					if (OSSUtil.getClient() == null) {
+						// need to initialize OSSMetaInfo
+						logger.info("addFinalMarks(), initialize OSSClient before use");
+						synchronized(OSSMetaInfo.class) {
+							if (OSSUtil.getClient() == null) {
+								OSSMetaInfo omi = cgM.getOSSInfo("oss");
+								logger.debug("addFinalMarks(), OSS Client init with->" + omi.toString());
+								OSSUtil.initOSS(omi);
+							}
+						}
+					}
+					OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
+					logger.debug("dblAnswer put object");
+					dblMarks.clear();
+				} catch (Exception e) {
+					logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
+					return;
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -386,9 +568,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		try {
 			egsDaoImpl.updateExamSubjectStatusById(egsId, release);
 			if (release) {
-			    // calculate subscore for egs
+				// calculate subscore for egs，scores of object questions should be recalculated, 
+				// caller should ensure that obj score calculation is completed
 				SummaryEgsScore(egsId);
-				// 清除缓存
+				// clear cache
 				paperC.clearSubCache(String.valueOf(egsId));
 				// 更新考试状态
 				// TODO: possibly need to optimize logic and sql instructions here
@@ -493,9 +676,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			// populate sub child scores
 			List<SubChildScore> childScores = new ArrayList<SubChildScore>();
 			
-			Subject mainSub = subjectD.getSubjectByEgsId(egsId);
+			Subject mainSub = schM.getSubjectByEgsId(egsId);
 			logger.trace("SummaryEgsScore(), main subject->" + mainSub.toString());
-			if (mainSub != null && mainSub.getChildSubIds() != null && mainSub.getChildSubIds().size() > 0) {
+			if (mainSub != null && mainSub.getChild() != null && mainSub.getChild().length() > 0) {
 				// current subject contains child subjects, need to retrieve ids of SubScores
 				List<Long> ssIDs = scoreDaoImpl.getSSIDsByEgsId(egsId);
 				if (ssIDs == null || ssIDs.size() != scores.size()) {
@@ -508,7 +691,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 		
 			// load subject into hashmap
-			List<Subject> subs = subjectD.getAllSubject();
+			List<Subject> subs = schM.getAllSubjects();
 			Map<String, Long> subMap = new HashMap<String, Long>();
 			for (Subject sub: subs) {
 				subMap.put(sub.getName(), sub.getId());
@@ -640,35 +823,46 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		return scoreM;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ustudy.exam.service.ExamSubjectService#isAnswerSet(java.lang.Long)
-	 * 
-	 * Check whether all questions' answer are set at runtime rather than determine that via
-	 * fields in table of database. As settings are allowed to be changed before examination completed.
+	/**
+	 * Check whether all subject questions' answer are set at runtime rather than determine that via
+	 * fields in table of database. As settings are allowed to be changed before examination completed
+	 * @param es --- ExamSubject to be populated
 	 */
-	private boolean isAnswerSet(Long id) {
+	private void checkAnswerSet(ExamSubject es) {
 		// retrieve answer settings for egs firstly
-		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(id);
-		
+		List<QuesAnswer> quesAns = qaDao.getQuesAnswerForValidation(es.getId());
+		es.setSubAnsSet(true);
+		es.setObjAnsSet(true);
 		if (quesAns == null || quesAns.isEmpty()) {
-			logger.warn("isAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
-					+ "for egs " + id);
-			return false;
+			logger.warn("checkAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
+					+ "for egs " + es.getId());
+			es.setSubAnsSet(false);
+			es.setObjAnsSet(false);
 		}
 		
 		for (QuesAnswer qa: quesAns) {
-			if (!qa.isValid()) {
-				logger.warn("isAnswerSet(), answer setting is not completed for question->" + qa.toString());
-				return false;
+			if (qa.getType() == null || qa.getType().isEmpty()) {
+				es.setSubAnsSet(false);
+				es.setObjAnsSet(false);
+				return;
+			}
+			if ((qa.getType().equals("单选题") || qa.getType().equals("多选题") || qa.getType().equals("判断题")) 
+					&& !qa.isValid() ) {
+				logger.warn("checkAnswerSet(), answer setting is not completed for question->" + qa.toString());
+				es.setObjAnsSet(false);
+			}
+			else if (!qa.isValid()) {
+				es.setSubAnsSet(false);
 			}
 		}
-		
-		return true;
+		logger.trace("checkAnswerSet(), subAnsSet=" + es.isSubAnsSet() + ", objAnsSet=" + es.isObjAnsSet() + 
+				",egsid=" + es.getId());
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ustudy.exam.service.ExamSubjectService#isMarkTaskDispatched(java.lang.Long)
-	 * Check whether all questions' mark task are already dispatched
+	/**
+	 * Check whether all questions' mark task for specified egs are already dispatched
+	 * @param id --- egsid
+	 * @return
 	 */
 	private boolean isMarkTaskDispatched(Long id) {
 		
@@ -685,14 +879,13 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				return false;
 			}
 		}
-		
 		return true;
 	}
 
 	private void populateExamSubStatus(List<ExamSubject> esL) {
 		logger.trace("populateExamSubStatus(), populate answer set and task dispatch status for examsubjects");
 		for (ExamSubject es: esL) {
-			es.setAnswerSet(this.isAnswerSet(es.getId()));
+			checkAnswerSet(es);
 			es.setTaskDispatch(this.isMarkTaskDispatched(es.getId()));
 		}
 	}

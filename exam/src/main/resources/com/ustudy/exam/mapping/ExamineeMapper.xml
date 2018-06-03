@@ -1,0 +1,82 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ustudy.info.mapper.ExamineeMapper">
+
+	<resultMap type="com.ustudy.info.model.Examinee" id="Examinee">
+	  <result property="id" column="id"/>
+	  <result property="examCode" column="exam_code"/>
+	  <result property="examId" column="examid"/>
+	  <result property="schId" column="schid"/>
+	  <result property="gradeId" column="gradeid"/>
+	  <result property="classId" column="class_id"/>
+	  <result property="className" column="class_name"/>
+	  <result property="stuName" column="name"/>
+	  <result property="stuId" column="stuno"/>
+	  <result property="subD" column="subD"/>
+	</resultMap>
+	
+	<insert id="createExaminee" useGeneratedKeys="true" keyProperty="id">
+	    insert into ustudy.examinee (exam_code, examid, schid, subs, gradeid, class_id, class_name, name, stuno) 
+	    values(#{examCode}, #{examId}, #{schId}, #{subI}, #{gradeId}, #{classId}, #{className}, #{stuName}, #{stuId}) 
+	    on duplicate key update schid=values(schid), subs=values(subs), gradeid=values(gradeid), class_id=values(class_id), 
+	    class_name=values(class_name), name=values(name), stuno=values(stuno), id=LAST_INSERT_ID(id)
+	</insert>
+	
+	<!-- <insert id="createExamineeSubs" >
+	    insert into ustudy.examineesub (eeid, subid) values
+	    <foreach item="item" collection="list" separator=",">
+	        (#{item.eeid}, #{item.subid})
+	    </foreach>
+	    on duplicate key update eeid=values(eeid), subid=values(subid)
+	</insert> -->
+	
+	<delete id="deleteExaminee" parameterType="long">
+	    delete from ustudy.examinee where id=#{id}
+	</delete>
+	
+	<select id="getExamineeById" parameterType="long" resultMap="Examinee">
+		select ee.id, exam_code, examid, schid, gradeid, class_id, class.cls_name as class_name, ee.name, stuno, 
+		GROUP_CONCAT(subject.id order by subject.id) as subI, group_concat(subject.name order by subject.id) as subN 
+		from ustudy.examinee as ee 
+        left join subject on json_contains(ee.subs, cast(subject.id as CHAR)) 
+        left join class on class.id = ee.class_id 
+		where ee.id = #{id}
+	</select>
+	
+	<insert id="saveClsInfo" useGeneratedKeys="true" keyProperty="id">
+	    insert into ustudy.class (grade_id, cls_name) values (#{gradeId}, #{className})
+	    on duplicate key update grade_id=values(grade_id), cls_name=values(cls_name), 
+	    id=LAST_INSERT_ID(id)
+	</insert>
+	
+	<select id="getExamineeByFilter" resultMap="Examinee">
+	    SELECT ee.id, ee.exam_code, ee.name, ee.examid, ee.schid, ee.gradeid, ee.class_id, class.cls_name as class_name, 
+	    GROUP_CONCAT(subject.id order by subject.id) as subI, group_concat(subject.name order by subject.id) AS subN 
+	    FROM ustudy.examinee AS ee 
+	    LEFT JOIN class ON ee.class_id = class.id 
+	    LEFT JOIN subject ON json_contains(ee.subs, cast(subject.id as CHAR))
+	    WHERE examid = #{examid} AND gradeid = #{gradeid} 
+	    <if test="clsid > 0">
+	    AND class_id = #{clsid} 
+	    </if>
+	    <if test="key != null and key.length() > 0">
+	    AND ee.name LIKE '%#{key}%' 
+	    </if>
+	    GROUP BY ee.id
+	</select>
+	
+	<select id="getAbsentListPerEgs" resultMap="Examinee">
+	    SELECT ee.id, ee.exam_code, ee.name, ee.examid, ee.gradeid, ee.schid, ee.stuno, class.id as class_id, 
+	    class.cls_name as class_name FROM ustudy.examinee as ee 
+	    left join class on class.id = ee.class_id 
+	    left join examgradesub as egs on json_contains(ee.subs, cast(egs.sub_id as CHAR))
+	    left join paper on (paper.exam_code = ee.exam_code and paper.exam_grade_sub_id = egs.id) 
+	    where egs.id = #{egsid} and paper.id is null order by exam_code
+	</select>
+	
+	<select id="getExamineeByClient" resultMap="Examinee">
+	    SELECT ee.id, ee.exam_code, ee.name FROM ustudy.examinee as ee 
+	    where examid = #{examid} and gradeid = #{gradeid} order by ee.exam_code
+	</select>
+	
+</mapper>

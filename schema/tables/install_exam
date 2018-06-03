@@ -24,7 +24,7 @@ duration INT,
 teac_owner CHAR(11),
 exam_grade_sub_id INT NOT NULL,
 remark varchar(1000) DEFAULT NULL COMMENT '备注、注释',
-INDEX(exam_grade_sub_id, quesno),
+INDEX(exam_grade_sub_id, quesno, startno),
 UNIQUE KEY(exam_grade_sub_id, quesno, startno, endno),
 PRIMARY KEY (id),
 FOREIGN KEY (exam_grade_sub_id)
@@ -46,6 +46,7 @@ branch varchar(16) DEFAULT '不分科',
 answer VARCHAR(128),
 PRIMARY KEY (id),
 INDEX(quesid, quesno),
+UNIQUE KEY(quesid, quesno),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
@@ -93,6 +94,7 @@ branch varchar(16) default '不分科',
 score float(3,1) NOT NULL,
 remark varchar(1000) DEFAULT NULL COMMENT '备注、注释',
 PRIMARY KEY (id),
+UNIQUE KEY (quesid, quesno, step),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)
     ON DELETE CASCADE ON UPDATE CASCADE
@@ -137,12 +139,14 @@ id int(11) NOT NULL AUTO_INCREMENT,
 exam_code varchar(20) NOT NULL COMMENT '考号',
 examid int NOT NULL COMMENT '考试ID',
 schid varchar(11) NOT NULL COMMENT '学校ID',
+# subjects of examinee in this exam, which is useful for score report generation
+subs JSON NOT NULL COMMENT 'subjects for examinee in this examination',
 gradeid int NOT NULL COMMENT '年级ID',
 class_id INT COMMENT '班级ID',
 class_name varchar(20) DEFAULT NULL COMMENT '班级',
 name varchar(100) NOT NULL COMMENT '学生姓名',
 stuno varchar(20) DEFAULT NULL COMMENT '学号',
-paper_status char(1) DEFAULT '1' COMMENT '考生状态(0：缺考，1：正常)',
+status char(1) DEFAULT '1' COMMENT '考生状态(0：缺考，1：正常)',
 PRIMARY KEY (id),
 UNIQUE KEY (exam_code, examid),
 KEY name (name,exam_code,gradeid,schid),
@@ -159,6 +163,20 @@ FOREIGN KEY (schid)
     REFERENCES ustudy.school(schid)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考生信息表';
+
+create table if not exists ustudy.examineesub (
+id int(11) NOT NULL AUTO_INCREMENT,
+eeid int NOT NULL,
+subid int NOT NULL,
+PRIMARY KEY(id),
+UNIQUE KEY(eeid, subid),
+FOREIGN KEY (eeid)
+    REFERENCES ustudy.examinee(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (subid)
+    REFERENCES ustudy.subject(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 # tables for student paper
 create table if not exists ustudy.paper (
@@ -215,7 +233,7 @@ isfinal boolean default false,
 score float(3,1) default 0,
 teacid CHAR(11),
 PRIMARY KEY(id),
-INDEX (quesid, paperid, isviewed, isfinal),
+INDEX (quesid, paperid, isviewed, isfinal, mflag),
 UNIQUE KEY (quesid, paperid, teacid),
 FOREIGN KEY (quesid)
     REFERENCES ustudy.question(id)

@@ -73,39 +73,4 @@ public class ExamUtil {
 		rolemapping.put("cleaner", "清道夫");
 	}
 	
-	/*public static int getStudentCorrectCount(String stuAnswer, String correctAnswer){
-        
-        int studentCorrectCount = 0;
-        
-        if (null != stuAnswer && stuAnswer.length()>0 && null != correctAnswer && correctAnswer.length()>0) {
-            if (stuAnswer.indexOf(",") >= 0) {
-                stuAnswer = stuAnswer.replaceAll(",", "");
-            }
-            
-            if(stuAnswer.length()>0){
-                stuAnswer = stuAnswer.toUpperCase();
-                correctAnswer = correctAnswer.toUpperCase();
-                
-                Set<String> stuAnswers = new HashSet<>();
-                
-                byte[] bytes = stuAnswer.getBytes();
-                for (int i=0; i<bytes.length; i++) {
-                    stuAnswers.add(new String(bytes, i, 1));
-                }
-                
-                for (String answer : stuAnswers) {
-                    if(correctAnswer.contains(answer)){
-                        studentCorrectCount++;
-                    }else {
-                        studentCorrectCount = 0;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return studentCorrectCount;
-        
-    }*/
-	
 }

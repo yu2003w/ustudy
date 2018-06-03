@@ -1,0 +1,14 @@
+# views for examschools
+set names utf8;
+create or replace view ustudy.exschbrife as 
+select exam.id as examid, exam_name, exam_date, exam.type, sch.schid, sch.schname from ustudy.exam 
+left join ustudy.examschool as esh on exam.id = esh.examid 
+left join ustudy.school as sch on sch.schid = esh.schid;
+
+create or replace view ustudy.eebrife as
+SELECT ee.exam_code, ee.name, ee.status, exam.exam_name, exam.exam_date, 
+school.schid, school.schname, grade.grade_name, class.cls_name FROM ustudy.examinee as ee 
+left join ustudy.exam on exam.id = ee.examid 
+left join ustudy.school on school.schid = ee.schid 
+left join ustudy.grade on grade.id = ee.gradeid 
+left join ustudy.class on class.id = ee.class_id; 

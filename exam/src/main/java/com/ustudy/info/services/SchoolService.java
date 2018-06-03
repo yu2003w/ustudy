@@ -3,6 +3,7 @@ package com.ustudy.info.services;
 import java.util.List;
 
 import com.ustudy.Item;
+import com.ustudy.exam.model.Subject;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Grade;
 import com.ustudy.info.model.GradeSubRoles;
@@ -63,5 +64,13 @@ public interface SchoolService {
 	 * @return
 	 */
 	public List<Item> getGrClsList(int id);
+	
+	/**
+	 * @return  all subjects with child subject id and names
+	 */
+	public List<Subject> getAllSubjects();
+	
+	public Subject getSubjectByEgsId(long egsid);
+	
 	
 }

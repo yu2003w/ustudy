@@ -41,4 +41,6 @@ Procedure to setup development environment:
    
 5, mysql/tomcat logs is under ~/bench/logs/
 
+# Noted: sample data in directory schema is not maintained anymore. Need to populate via database directly.
+
 

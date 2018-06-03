@@ -348,11 +348,21 @@ public class ClientServiceImpl implements ClientService {
                                         if (number < 1) {
                                             number = 1;
                                         }
-                                        if (startno > number) {
+                                        if (number < startno) {
                                             startno = number;
                                         }
-                                        if (endno < number) {
+                                        if (number == (endno + 1)) {
                                             endno = number;
+                                        } else if (number > (endno + 1)) {
+                                            if (startno == endno) {
+                                                quesno = startno;
+                                            }
+                                            quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                                            logger.trace("put ques answer ->" + quesno + "-" + startno + "-" + endno);
+                                            quesno = 0;
+                                            startno = number;
+                                            endno = number;
+
                                         }
                                     }
                                 }
@@ -363,6 +373,7 @@ public class ClientServiceImpl implements ClientService {
 
                             //quesAnswers.add(new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
                             quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                            logger.trace("put ques answer ->" + quesno + "-" + startno + "-" + endno);
                         }
                     }
                 }
@@ -438,11 +449,22 @@ public class ClientServiceImpl implements ClientService {
                 JSONArray pages = templateInfo.getJSONArray("pages");
                 for (int i = 0; i < pages.size(); i++) {
                     JSONObject page = pages.getJSONObject(i);
-                    if (null != page.get("OmrSubjectiveList")) {
+                    if (null != page.get("OmrSubjectiveList") && !page.get("OmrSubjectiveList").equals(null)) {
                         JSONArray subjectives = page.getJSONArray("OmrSubjectiveList");
                         for (int j = 0; j < subjectives.size(); j++) {
                             JSONObject subjective = subjectives.getJSONObject(j);
+                            logger.trace("before insert quesarea ->" + quesAnswersId);
                             quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, egsId, page, subjective));
+                            logger.trace("after insert quesarea ->" + quesAnswersId);
+                        }
+                    }
+                    if (null != page.get("OmrObjectives") && !page.get("OmrObjectives").equals(null)) {
+                        JSONArray objectives = page.getJSONArray("OmrObjectives");
+                        for (int j = 0; j < objectives.size(); j++) {
+                            JSONObject objective = objectives.getJSONObject(j);
+                            logger.trace("before insert quesarea ->" + quesAnswersId);
+                            quesareaDaoImpl.insertQuesareas(getQuesareas(quesAnswersId, egsId, page, objective));
+                            logger.trace("after insert quesarea ->" + quesAnswersId);
                         }
                     }
                 }
@@ -481,8 +503,12 @@ public class ClientServiceImpl implements ClientService {
         int areaId = 0;
         int startQuestionNo = 1;
         int endQuestionNo = 0;
-        String type = initType(subjective.getString("TopicType"));
-        
+        String type = ""; 
+        if (null != subjective.get("TopicType")) {
+            type = initType(subjective.getString("TopicType"));
+        } else if (null != subjective.get("topicType")) {
+            type = initType(subjective.getString("topicType"));
+        } 
         if (null != subjective.get("AreaID")) {
             areaId = subjective.getInt("AreaID");
         }
@@ -492,7 +518,46 @@ public class ClientServiceImpl implements ClientService {
         if (null != subjective.get("EndQid")) {
             endQuestionNo = subjective.getInt("EndQid");
         }
-        long quesid = quesAnswersId.get(startQuestionNo + "-" + endQuestionNo);
+
+        long quesid =0L;
+        if (null == subjective.get("StartQid") && null == subjective.get("EndQid")) {
+            logger.trace("this is an objective question");
+            for (String key : quesAnswersId.keySet()) {
+                // set the area to the first objective question
+                if (key.startsWith("1-")) {
+                    quesid = quesAnswersId.get(key);
+                    startQuestionNo = 1;
+                    logger.trace("objective key ->" + key);
+                    endQuestionNo = Integer.parseInt(key.substring(2));
+                    break;
+                }
+            }
+        } else {
+            quesid = quesAnswersId.get(startQuestionNo + "-" + endQuestionNo);
+        }
+
+        if (null != subjective.get("region")) {
+            JSONObject region = subjective.getJSONObject("region");
+                int posx = 0;
+                int posy = 0;
+                int width = 0;
+                int height = 0;
+                int bottom = 0;
+                int right = 0;
+               if (null != region.get("x")) {
+                    posx = region.getInt("x");
+                }
+                if (null != region.get("y")) {
+                    posy = region.getInt("y");
+                }
+                if (null != region.get("width")) {
+                    width = region.getInt("width");
+                }
+                if (null != region.get("height")) {
+                    height = region.getInt("height");
+                }
+                resault.add(new Quesarea(pageno, fileName, areaId, posx, posy, width, height, bottom, right, type, startQuestionNo, endQuestionNo, egsId, quesid));
+        }
 
         if (null != subjective.get("regionList")) {
             JSONArray regions = subjective.getJSONArray("regionList");
@@ -667,7 +732,7 @@ public class ClientServiceImpl implements ClientService {
                 object.put("examName", exam.getExamName());
 
                 object.put("templatStatus", examSubject.getTemplate());
-                object.put("answerScoreStatus", examSubject.getAnswerSet());
+                //object.put("answerScoreStatus", examSubject.isSubAnsSet());
                 object.put("teachTaskStatus", examSubject.getTaskDispatch());
                 object.put("tcaStatus", examSubject.getExamAnswer());
                 object.put("uploadBathCount", examSubject.getUploadBathCount());

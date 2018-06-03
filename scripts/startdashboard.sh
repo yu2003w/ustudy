@@ -49,8 +49,14 @@ else
 fi
 
 # before launching tomcat, clear logs generated last time
-echo "clear logs generated in ${WORK_DIR}/logs/dashboard/"
-rm ${WORK_DIR}/logs/dashboard/*
+echo "backup logs generated in ${WORK_DIR}/logs/dashboard/"
+if [ -e ${WORK_DIR}/logs/dashboard/dashboard.log ]; then
+  mv  ${WORK_DIR}/logs/dashboard/dashboard.log ${WORK_DIR}/logs/dashboard/dashboard-`date +%F-%H%M`.log
+  if [ $? != 0 ]; then
+    echo "failed to backup dashboard log"
+    return
+  fi
+fi
 
 docker run --rm --name dashboard -p 8081:8080 -v ${WORK_DIR}/dashboard/webapps/:/usr/local/tomcat/webapps \
     -v ${WORK_DIR}/logs/dashboard:/usr/local/tomcat/logs/ -d tomcat:9.0

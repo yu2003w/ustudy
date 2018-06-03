@@ -10,6 +10,8 @@ import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.score.ChildObjScore;
 import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.MarkImage;
+import com.ustudy.exam.model.score.ObjAnswer;
+import com.ustudy.exam.model.score.DblAnswer;
 
 @Mapper
 public interface ExamSubjectDao {
@@ -63,5 +65,9 @@ public interface ExamSubjectDao {
 	List<Map<String, Object>> getExamSubjectMarkMode(Long egsId);
 	
 	long isExamAllSubjectPublished(Long examId);
+
+	List<ObjAnswer> getObjAnsScore(Long paperId);
+
+	List<DblAnswer> getDblAns(Long paperId);
 	
 }

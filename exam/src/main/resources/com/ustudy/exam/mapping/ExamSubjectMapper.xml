@@ -51,6 +51,30 @@
         <result property="posY" column="posy"/>
     </resultMap>
 
+    <resultMap type="com.ustudy.exam.model.score.ObjAnswer" id="ObjAnswer">
+        <result property="quesno"    column="quesno"/>
+        <result property="score"  column="score"/>
+        <result property="answer" column="answer"/>
+        <result property="type" column="type"/>
+        <result property="pageno" column="pageno"/>
+        <result property="x" column="posx"/>
+        <result property="y" column="posy"/>
+        <result property="w" column="width"/>
+        <result property="h" column="height"/>
+    </resultMap>
+
+    <resultMap type="com.ustudy.exam.model.score.DblAnswer" id="DblAnswer">
+        <result property="quesId" column="quesid"/>
+        <result property="score"  column="score"/>
+        <result property="teacName" column="teacname"/>
+        <result property="scoreDiff" column="scorediff"/>
+        <result property="isFinal" column="isfinal"/>
+        <result property="x" column="posx"/>
+        <result property="y" column="posy"/>
+        <result property="w" column="width"/>
+        <result property="h" column="height"/>
+    </resultMap>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
@@ -187,18 +211,6 @@
 		where paper.exam_grade_sub_id = #{egsId} group by eid, question.branch order by eid
 	</select>
 	
-	<!--  commented by Jared on April 11, 2018 -->
-	<!-- 
-	<select id="getExamSubjectSubjScores" parameterType="Long" resultType="java.util.Map">
-		SELECT e.id,a.quesid,a.isviewed,a.isfinal,a.score, question.branch from answer a
-		LEFT JOIN paper p on a.paperid=p.id 
-		LEFT JOIN examinee e ON p.exam_code=e.exam_code 
-		join question on (question.id = a.quesid) 
-		WHERE p.exam_grade_sub_id=#{egsId} 
-		ORDER BY e.id,a.quesid
-	</select>
-	-->
-	
 	<select id="getExamSubjectMarkMode" parameterType="Long" resultType="java.util.Map">
 		SELECT id,mark_mode AS markMode from question where exam_grade_sub_id=#{egsId}
 	</select>
@@ -255,4 +267,28 @@
 		SET mark_img=#{markImg} 
 		WHERE p.id = ${paperId}
 	</update>
+
+    <select id="getObjAnsScore" parameterType="Long" resultMap="ObjAnswer">
+		select oa.quesno, oa.score, oa.answer, q.type, qa.pageno, qa.posx, qa.posy, qa.width, qa.height 
+		from obj_answer as oa
+		join paper as p on oa.paperid = p.id 
+		join question as q on q.exam_grade_sub_id = p.exam_grade_sub_id and oa.quesno >= q.startno and q.endno >= oa.quesno
+		left join quesarea qa on q.id = qa.quesid
+		where p.id = #{paperId}
+		order by quesno
+	</select>
+
+    <select id="getDblAns" parameterType="Long" resultMap="DblAnswer">
+		SELECT ans.quesid, ans.score, t.teacname, q.scorediff, ans.isfinal, qa.pageno, qa.posx, qa.posy, qa.width, qa.height
+		from
+		(SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 2
+		UNION
+		SELECT quesid, paperid FROM answer where isfinal = 1) qp
+		join answer ans on ans.quesid = qp.quesid and ans.paperid = qp.paperid
+		join question q on q.id = ans.quesid
+		join quesarea qa on qa.quesid = ans.quesid
+		join teacher t on t.teacid = ans.teacid
+		where ans.paperid = #{paperId}
+		order by ans.quesid, ans.isfinal
+	</select>
 </mapper>

@@ -13,5 +13,7 @@ public interface ExcePaperService {
 	public Collection<Map<String,Object>> getErrorPapers(Long egsId);
 	
 	public boolean updateErrorPaper(String paper);
+
+	public boolean updatePaperStatus(String paperIds, String paperStatus);
 	
 }

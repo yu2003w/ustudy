@@ -11,6 +11,7 @@ import com.ustudy.exam.model.score.ObjQuesScore;
 import com.ustudy.exam.model.score.SubChildScore;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.model.score.SubjectQuesScore;
+import com.ustudy.exam.model.score.PaperSubScore;
 
 @Mapper
 public interface SubscoreDao {
@@ -36,5 +37,7 @@ public interface SubscoreDao {
 	List<Map<String, Object>> getStudentSubScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
 	
 	List<Map<String, Object>> getStudentStepScores(@Param("stuId")Long stuId, @Param("examId")Long examId, @Param("subjectId")Long subjectId);
+
+	PaperSubScore getPaperSubScores(@Param("paperId")Long paperId);
 	
 }

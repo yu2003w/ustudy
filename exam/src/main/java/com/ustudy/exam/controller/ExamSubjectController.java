@@ -185,51 +185,38 @@ public class ExamSubjectController {
      * @return 返回状态
      */
     @RequestMapping(value = "/examsubject/status/{egsId}/{release}", method = RequestMethod.POST)
-    public Map updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release) {
+    public UResp updateExamSubjectStatus(@PathVariable Long egsId, @PathVariable Boolean release, 
+    		HttpServletResponse resp) {
         
         logger.debug("updateExamSubjectStatus(), " + (release == true? "release": "withdraw") + 
         		" score results");
         
-        Map result = new HashMap<>();
+        UResp res = new UResp();
         
-        if(release){
-        	// first, calculate score of object questions for specified egs
-            try {
-                scoreService.calObjScoreOfEgs(egsId);
-            } catch (Exception e) {
-                logger.error("updateExamSubjectStatus(), " + e.getMessage(), e);
-                result.put("success", false);
-                result.put("data", "更新失败");
-                return result;
-            }
-        }
+        /*
+         * Noted: score calculation maybe time-costed, make this as asynchronous operation
+         * calculate scores of object questions should be pipelined with that of summary of egs score
+         */
+        new Thread() {
+        	public void run() {
+        		if (release){
+        			// first, calculate score of object questions for specified egsid via thread pool
+                    if (!scoreService.calObjScoreOfEgs(egsId)) {
+                         logger.error("updateExamSubjectStatus(), calObjScoreOfEgs() failed for egsid " + egsId);
+                         return;
+                    }
+                }
+        		// score summation for specified exam grade subject
+                if(!exSubS.updateEgsScoreStatus(egsId, release)){            
+                    logger.error("updateExamSubjectStatus(), calculating score failed for " + egsId);
+                }
+        	}
+        }.start();
 
-        // Don't automatically publish the score of the whole exam after one subject is published.
+        res.setRet(true);
+        logger.info("updateExamSubjectStatus(), scheduled task to calculating score for " + egsId);
 
-        // score summation for specified exam grade subject
-        if(exSubS.updateEgsScoreStatus(egsId, release)){
-            
-            // new Thread() {
-            //     public void run() {
-            //         try {
-            //             ExamSubject examSubject = service.getExamSubject(egsId);
-            //             if(null != examSubject && examSubject.getExamid() > 0){
-            //                 scoreService.publishExamScore(examSubject.getExamid(), true);
-            //             }
-            //         } catch (Exception e) {
-            //             logger.error(e.getMessage());
-            //         }                    
-            //     }
-            // }.start();
-            
-            result.put("success", true);
-            result.put("data", "更新成功");
-        }else {
-            result.put("success", false);
-            result.put("data", "更新失败");
-        }
-
-        return result;
+        return res;
     }
     
     /**
@@ -334,20 +321,20 @@ public class ExamSubjectController {
      * @return 更新答题卡结果
      */
     @RequestMapping(value = "/examsubject/papers/{egsId}", method = RequestMethod.POST)
-    public Map updateExamSubPapers(@PathVariable Long egsId) {
+    public UResp updateExamSubPapers(@PathVariable Long egsId, HttpServletResponse resp) {
         
-        logger.debug("updateExamSubPapers().");
+        logger.debug("updateExamSubPapers(), egsid=" + egsId);
         
-        Map result = new HashMap<>();
+        UResp res = new UResp();        
 
         if(exSubS.updateExamSubPapers(egsId)){
-            result.put("success", true);
-            result.put("data", "更新成功");
+        	res.setRet(true);
+            res.setMessage("update succeed");
         }else {
-            result.put("success", false);
-            result.put("data", "更新失败");
+            res.setMessage("update failed");
+            resp.setStatus(500);
         }
 
-        return result;
+        return res;
     }
 }

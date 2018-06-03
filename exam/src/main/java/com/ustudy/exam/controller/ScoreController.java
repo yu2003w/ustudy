@@ -1,8 +1,6 @@
 package com.ustudy.exam.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +21,6 @@ import com.ustudy.exam.service.ScoreService;
 
 @RestController
 @RequestMapping(value = "/score")
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ScoreController {
 
 	private static final Logger logger = LogManager.getLogger(ScoreController.class);
@@ -54,27 +51,24 @@ public class ScoreController {
     }
 
     @RequestMapping(value = "/recalculate/{egsId}", method = RequestMethod.POST)
-    public Map recalculateEgsScore(@PathVariable Long egsId, HttpServletRequest request,
-            HttpServletResponse response) {
+    public UResp calObjScoreOfEgs(@PathVariable Long egsId, HttpServletResponse response) {
 
-        logger.debug("recalculateEgsScore(), egs->" + egsId);
+        logger.debug("calObjScoreOfEgs(), egsid=" + egsId);
 
-        Map result = new HashMap<>();
+        UResp res = new UResp();
 
-        try {
-            if (scoreS.calObjScoreOfEgs(egsId)) {
-                result.put("success", true);
-            } else {
-                result.put("success", false);
-            }
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.getMessage());
-            logger.error("recalculateEgsScore(), failed with->" + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return result;
+        new Thread() {
+        	public void run() {
+        		if (!scoreS.calObjScoreOfEgs(egsId)) {
+        			logger.error("calObjScoreOfEgs(), calulation failed for egsid=" + egsId);
+        		}
+        	}
+        }.start();
+       
+        res.setRet(true);
+        res.setMessage("scheduled task to calculate scores of object questions");
+        logger.debug("calObjScoreOfEgs(), scheduled task for egsid=" + egsId);
+        return res;
     }
 
     @RequestMapping(value = "/publish/{examId}/{release}", method = RequestMethod.POST)

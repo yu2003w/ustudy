@@ -65,7 +65,7 @@ public class ExamInfoController {
 			logger.debug("createExam(), examination created.");
 			res.setRet(true);
 		} catch (Exception e) {
-			logger.error("createExam(), failed to create examination with exception " + e.getMessage());
+			logger.error("createExam(), failed exception->" + e.getMessage());
 			res.setMessage("failed to create examination with exception " + e.getMessage());
 			resp.setStatus(500);
 		}

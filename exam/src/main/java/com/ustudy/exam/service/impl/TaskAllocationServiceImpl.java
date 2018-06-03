@@ -17,7 +17,6 @@ import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.GradeDao;
 import com.ustudy.exam.dao.QuesAnswerDao;
 import com.ustudy.exam.dao.SchoolDao;
-import com.ustudy.exam.dao.TaskAllocationDao;
 import com.ustudy.exam.dao.TeacherDao;
 import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.Grade;
@@ -40,9 +39,6 @@ public class TaskAllocationServiceImpl implements TaskAllocationService {
 
 	@Resource
 	private ExamSubjectDao examSubjectDaoImpl;
-
-	@Resource
-	private TaskAllocationDao taskAllocationDaoImpl;
 
 	@Resource
 	private TeacherDao teacherDaoImpl;

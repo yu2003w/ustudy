@@ -1,26 +1,32 @@
 package com.ustudy.info.mapper;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Examinee;
+import com.ustudy.info.model.ExamineeSub;
 
 @Mapper
 public interface ExamineeMapper {
 
-	@Insert("insert into ustudy.examinee (exam_code, examid, schid, gradeid, class_id, class_name, name, stuno) "
-			+ "values(#{stuExamId}, #{examId}, #{schId}, #{gradeId}, #{classId}, #{className}, #{stuName}, "
-			+ "#{stuId}) on duplicate key update schid=#{schId}, gradeid=#{gradeId}, class_id=#{classId}, "
-			+ "class_name=#{className}, name=#{stuName}, stuno=#{stuId}")
-	public int createExaminee(Examinee exs);
+	int createExaminee(Examinee exs);
 	
-	@Delete("delete from ustudy.examinee where id=#{id}")
-	public int deleteExaminee(int id);
+	int createExamineeSubs(List<ExamineeSub> eeSubs);
 	
-	@Select("select id, exam_code, examid, schid, gradeid, class_id, class_name, name, stuno from "
-			+ "ustudy.examinee where id=#{id}")
-	public Examinee getExamineeById(int id);
+	int deleteExaminee(long id);
+	
+	Examinee getExamineeById(long id);
+	
+	int saveClsInfo(ClassInfo ci);
+	
+	List<Examinee> getExamineeByFilter(@Param("examid") long examid, @Param("gradeid") long gradeid, 
+			@Param("clsid") long clsid, @Param("key") String key);
+	
+	List<Examinee> getAbsentListPerEgs(long egsid);
+	
+	List<Examinee> getExamineeByClient(@Param("examid") long examid, @Param("gradeid") long gradeid);
 	
 }

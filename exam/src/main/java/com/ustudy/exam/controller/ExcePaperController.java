@@ -66,6 +66,26 @@ public class ExcePaperController {
 		
 		return res;
 	}
+
+	@RequestMapping(value = "/exception/paper/update/{paperStatus}", method = RequestMethod.POST)
+	public UResp updatePaperStatus(@PathVariable String paperStatus, @RequestBody String paperIds) {
+		UResp res = new UResp();
+		
+		try {
+			if (epS.updatePaperStatus(paperIds, paperStatus)) {
+				res.setRet(true);
+				logger.info("updatePaperStatus("+paperIds+", " + paperStatus + "), exception paper status is updated successfully");
+			} else {
+				res.setRet(false);
+				logger.info("updatePaperStatus("+paperIds+", " + paperStatus + "), exception paper status failed to update");
+			}
+		} catch(Exception e) {
+			logger.error("updatePaperStatus("+paperIds+", " + paperStatus + "), exception paper status failed to update," + e.getMessage());
+			res.setMessage("failed to update exception paper status");
+		}
+		
+		return res;
+	}
 	
 	@RequestMapping(value = "/paper", method = RequestMethod.POST)
 	public UResp updateErrorPaper(@RequestBody String paper) {
