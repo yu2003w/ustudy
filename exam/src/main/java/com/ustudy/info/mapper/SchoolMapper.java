@@ -59,10 +59,12 @@ public interface SchoolMapper {
 			+ "where class.id = #{cid}")
 	public ClassInfo getClsInfoById(long cid);
 	
+	// Noted: '（' and '）' are chinese characters
 	@Select("select class.id, cls_name as className, cls_type as classType, cls_owner as teacId, "
 			+ "teacname as teacName from ustudy.class left join ustudy.teacher on "
 			+ "(cls_owner is not null and teacher.teacid = class.cls_owner) "
-			+ "where class.grade_id = #{gid} order by class.id")
+			+ "where class.grade_id = #{gid} order by "
+			+ "cast(substring_index(substring_index(cls_name, '）', 1), '（', -1) as signed)")
 	public List<ClassInfo> getClsInfoByGrId(long gid);
 	
 	@Select("select subject.name as sub, sub_owner as teacid, teacname from classsub "

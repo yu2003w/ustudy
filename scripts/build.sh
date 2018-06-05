@@ -27,6 +27,7 @@ if [ -d ${SRC_DIR}/dashboard/ ]; then
   else
     find . -name "applicationContext.xml" | xargs sed -i "s/localhost/${InternalIP}/g"
   fi
+  mvn eclipse:clean eclipse:eclipse
   mvn clean package -DskipTests
 else
   echo "${SRC_DIR}/dashboard/ not existed. Please check again"
@@ -47,6 +48,7 @@ if [ -d ${SRC_DIR}/exam/ ]; then
     # setting log levels
     find . -type f -name "log4j2.xml" | xargs sed -i "s/USTUDYLOGLEVEL/${TRACE_LEVEL}/g"
   fi
+  mvn eclipse:clean eclipse:eclipse
   mvn clean package -DskipTests
 else
   echo "${SRC_DIR}/exam/ not existed. Please check again"
