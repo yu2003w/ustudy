@@ -1,4 +1,4 @@
-package com.ustudy.exam.model;
+package com.ustudy.exam.model.score;
 
 import java.io.Serializable;
 
@@ -61,5 +61,11 @@ public class ExameeScore implements Serializable, Comparable<ExameeScore> {
             return 0;
         }
     }
+
+	@Override
+	public String toString() {
+		return "ExameeScore [id=" + id + ", stuid=" + stuid + ", examId=" + examId + ", score=" + score + ", rank="
+				+ rank + "]";
+	}
 
 }

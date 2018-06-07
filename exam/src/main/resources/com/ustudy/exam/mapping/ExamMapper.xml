@@ -14,7 +14,7 @@
 	<select id="getAllExams" parameterType="string" resultMap="ExamResult">
 		select exam.id, exam.exam_name, exam.exam_date, exam.type, exam.status from exam 
 		left join examschool on examschool.examid = exam.id 
-		where examschool.schid = #{orgid}
+		where examschool.schid = #{orgid} and exam.status != '2' order by exam.exam_date desc
 	</select>
 	
 	<select id="getExams" parameterType="java.util.Map" resultMap="ExamResult">
