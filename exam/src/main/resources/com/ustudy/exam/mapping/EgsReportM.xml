@@ -26,37 +26,46 @@
 	</resultMap>
 	
 	<select id="getEEAnsDetails" parameterType="long" resultMap="ExamineeAnsDetail">
-	    SELECT otb.exam_code, otb.name, otb.cls_name, otb.score, otb.objans, stb.subans FROM 
+	    SELECT if(otb.exam_code is null, stb.exam_code, otb.exam_code) as exam_code, 
+	    if(otb.name is null, stb.name, otb.name) as name, 
+	    if(otb.cls_name is null, stb.cls_name, otb.cls_name) as cls_name, 
+	    if(otb.score is null, stb.score, otb.score) as score, otb.objans, stb.subans FROM 
 	    (SELECT paper.exam_code, ee.name, class.cls_name, subscore.score, 
-	    GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans 
-	    FROM ustudy.paper LEFT JOIN obj_answer AS oans ON oans.paperid = paper.id 
+	    GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans FROM ustudy.paper 
+	    LEFT JOIN obj_answer AS oans ON oans.paperid = paper.id 
 	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
 	    left join class on class.id = ee.class_id 
 	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
-	    LEFT JOIN question ON (question.exam_grade_sub_id = paper.exam_grade_sub_id AND oans.quesno >= question.startno 
-	    AND question.endno >= oans.quesno) 
+	    LEFT JOIN question ON (question.exam_grade_sub_id = paper.exam_grade_sub_id AND 
+	    oans.quesno >= question.startno AND question.endno >= oans.quesno) 
 	    WHERE paper.exam_grade_sub_id = #{egsid} AND question.type IN ('单选题' , '多选题', '判断题') 
 	    GROUP BY paper.exam_code, ee.name, class.id, subscore.score ORDER BY class.id, paper.exam_code) otb 
-	    LEFT JOIN (SELECT exam_code, name, GROUP_CONCAT(quesno, '-', score ORDER BY quesno) AS subans FROM 
-	    ((SELECT ee.exam_code, ee.name, question.quesno, answer.score FROM ustudy.answer 
-	    LEFT JOIN paper ON paper.id = paperid 
+	    RIGHT JOIN (SELECT exam_code, name, cls_name, fscore as score, 
+	    GROUP_CONCAT(quesno, '-', score ORDER BY quesno) AS subans FROM 
+	    ((SELECT ee.exam_code, ee.name, class.cls_name, question.quesno, subscore.score as fscore, 
+	    answer.score FROM ustudy.answer LEFT JOIN paper ON paper.id = paperid 
 	    LEFT JOIN question ON answer.quesid = question.id 
 	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    left join class on class.id = ee.class_id 
+	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
 	    WHERE question.exam_grade_sub_id = #{egsid} AND question.type NOT IN ('单选题' , '多选题', '判断题') 
 	    AND question.quesno > 0 ORDER BY ee.exam_code , question.startno) 
-	    UNION (SELECT ee.exam_code, ee.name, anst.quesno, anst.score FROM ustudy.answer 
-	    LEFT JOIN paper ON paper.id = paperid 
+	    UNION (SELECT ee.exam_code, ee.name, class.cls_name, anst.quesno, subscore.score as fscore, 
+	    anst.score FROM ustudy.answer LEFT JOIN paper ON paper.id = paperid 
 	    LEFT JOIN question ON answer.quesid = question.id 
 	    LEFT JOIN answer_step AS anst ON anst.answer_id = answer.id 
 	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    left join class on class.id = ee.class_id 
+	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
 	    WHERE question.exam_grade_sub_id = #{egsid} AND question.type NOT IN ('单选题' , '多选题', '判断题') 
-	    AND question.quesno = 0 ORDER BY ee.exam_code , question.startno , anst.quesno) 
-	    ORDER BY exam_code , quesno) tb1 
-	    GROUP BY exam_code , name) stb ON otb.exam_code = stb.exam_code order by cls_name, exam_code
+	    AND question.quesno = 0 ORDER BY ee.exam_code, question.startno , anst.quesno) 
+	    ORDER BY exam_code , quesno) tb1 GROUP BY exam_code , name, cls_name, fscore) stb 
+	    ON otb.exam_code = stb.exam_code order by cast(substring_index(
+	    substring_index(if(otb.cls_name is null, stb.cls_name, otb.cls_name), '）', 1), '（', -1) as signed), exam_code
 	</select>
 	
 	<select id="getEgsAnsMeta" parameterType="long" resultMap="EgsAnsMeta">
-	    select otbl.rans, stbl.qscore, (otbl.fscore + stbl.fscore) as score from 
+	    select otbl.rans, stbl.qscore, (if(otbl.fscore is null, 0, otbl.fscore) + if(stbl.fscore is null, 0, stbl.fscore)) as score from 
 	    (SELECT group_concat(refanswer.quesno, '-', answer order by refanswer.quesno) as rans, 
 	    sum(score) as fscore FROM ustudy.refanswer left join question on 
 	    (question.exam_grade_sub_id = refanswer.exam_grade_sub_id and refanswer.quesid = question.id) 

@@ -55,7 +55,7 @@
 		and teasub.teac_id = #{teacid}
 		</if>
 		GROUP BY exam.id , egs.grade_id) gsub 
-		GROUP BY id , schid) ggr GROUP BY id
+		GROUP BY id , schid) ggr GROUP BY id order by id desc
 	</select>
 	
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
