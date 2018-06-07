@@ -215,12 +215,8 @@ public class ScoreServiceImpl implements ScoreService {
     	if (release) {
     		// 是否已全部发布
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
-    		if(count == 0){    			
-    			examDao.updateExamStatus(examId, "2");
-                // update the status of all the sub-exams accordingly.
-                examDao.updateEgsStatus(examId, "2");
-    			
-                //TODO: examinee score calculation based on examinee group which is determined by subs in examinee
+    		if(count == 0){
+    			//examinee score calculation based on subs in table examinee
                 List<String> subGrp = eeScoreDao.getExamineeGrp(examId);
                 if (subGrp == null || subGrp.size() <= 0) {
                 	// at least there is one group
@@ -266,7 +262,12 @@ public class ScoreServiceImpl implements ScoreService {
                 	} catch (Exception e) {
                 		logger.error("publishExamScore(), exception->" + e.getMessage());
                 		return false;
-                	}      	
+                	}
+                	
+                	// insert exameescore then update exam staus to avoid mysql table lock
+                	examDao.updateExamStatus(examId, "2");
+                    // update the status of all the sub-exams accordingly.
+                    examDao.updateEgsStatus(examId, "2");
                 }
 
     		}else {
