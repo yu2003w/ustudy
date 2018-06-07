@@ -56,6 +56,16 @@ where quesid in (408,404,409) group by paperid, ee.exam_code, ee.name order by e
 on (tb4.exam_code = tb1.exam_code and tb4.name = tb1.name and tb1.id = tb4.id) 
 order by tb1.exam_code) tbl5
 
+从subscore获取分科成绩
+SELECT ee.exam_code as '考号', ee.name as '姓名', subscore.score as '总分', subscore.rank as '排名', 
+ scs.score1 as '政治', scs.rank1, scs.score2 as '历史', scs.rank2 FROM ustudy.subscore 
+left join (SELECT scs1.parent_id, scs1.sub_id as sub1, scs1.score as score1, scs1.rank as rank1, 
+scs2.sub_id as sub2, scs2.score as score2, scs2.rank as rank2
+FROM ustudy.subchildscore as scs1 
+inner join ustudy.subchildscore as scs2 on (scs1.parent_id = scs2.parent_id and scs1.id > scs2.id) ) 
+as scs on scs.parent_id = subscore.id 
+left join examinee as ee on ee.id = subscore.stuid 
+ where subscore.exam_grade_sub_id = 18 order by ee.exam_code
 
 7, 获取各科成绩明细
 主观题

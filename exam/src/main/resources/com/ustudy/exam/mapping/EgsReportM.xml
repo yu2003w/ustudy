@@ -72,12 +72,15 @@
 	</select>
 	
 	<select id="getSingleEgsScore" parameterType="long" resultMap="SingleEgsScore">
-	    SELECT ee.exam_code, ee.name, class.cls_name, score, rank FROM examinee AS ee
+	    SELECT ee.exam_code, ee.name, class.cls_name, subscore.score, subscore.rank, 
+	    group_concat(subject.name, '-', scs.score, '-', scs.rank) as child FROM examinee AS ee
         LEFT JOIN class ON class.id = ee.class_id
         LEFT JOIN subscore ON subscore.stuid = ee.id
-        LEFT JOIN examgradesub AS egs ON (egs.examid = ee.examid AND egs.grade_id = ee.gradeid 
-        AND egs.id = subscore.exam_grade_sub_id) 
-        WHERE egs.id = #{egsid} ORDER BY ee.exam_code
+        left join subchildscore as scs on scs.parent_id = subscore.id
+        left join subject on subject.id = scs.sub_id
+        LEFT JOIN examgradesub AS egs ON (egs.examid = ee.examid AND egs.grade_id = ee.gradeid
+        AND egs.id = subscore.exam_grade_sub_id)
+        WHERE egs.id = #{egsid} group by subscore.stuid ORDER BY ee.exam_code
 	</select>
 	
 </mapper>
