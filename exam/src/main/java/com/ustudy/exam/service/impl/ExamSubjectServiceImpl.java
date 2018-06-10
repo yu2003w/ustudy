@@ -196,7 +196,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						-> if rank >= (number of students)*99%, set markType to FAQ, get the position, put object
 			*/
 			
-			addFlags(egsId);
+			//addFlags(egsId);
 
 			// 1. merge the paper images of double marking
 			  /* 1.1 list the double marking answers
@@ -569,7 +569,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 	}
 
 	private void addFlags(Long egsId) {
-		logger.debug("addFlag(), egsId=" + egsId);
+		logger.debug("addFlags(), egsId=" + egsId);
 		List<UncommonAnswer> topAnswers = egsDaoImpl.getTopAns(egsId);
 		if (topAnswers != null && topAnswers.size()>0) {
 			addFlag(topAnswers, "BEST");
