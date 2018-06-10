@@ -236,5 +236,37 @@ public class OSSUtil {
             throw new Exception("can not put object due to exception", e);
         }
     } 
-	
+
+    /** 
+     * watermark a mark image on one base image, and then put object
+     * @param baseKey,markKey,x,y 
+     * @return 
+     */
+    public static void addMarkImage(String baseKey, String markKey, int x, int y) throws Exception {
+    	try {
+    		String base64MarkKey = Base64Utils.encodeToUrlSafeString(markKey.getBytes());
+    		String url = bucketURL + "/" + baseKey;
+    		url += "?x-oss-process=image";
+    		url += "/watermark,";
+    		url += "image_" + base64MarkKey;
+    		url += ",x_" + x + ",y_" + y + ",g_nw";
+    		logger.debug("URL of the combined file: " + url);
+    		InputStream in = new URL(url).openStream();
+    		ossClient.putObject(bucketName, baseKey, in);
+    	} catch (OSSException oe) {
+    		logger.error("Caught an OSSException");
+    		logger.error("Error Message: " + oe.getErrorMessage());
+    		logger.error("Error Code: " + oe.getErrorCode());
+    		throw new Exception("can not put object due to oss exception", oe);
+    	} catch (ClientException ce) {
+    		logger.error("Caught an ClientException");
+    		logger.error("Error Message: " + ce.getErrorMessage());
+    		logger.error("Error Code: " + ce.getErrorCode());
+    		ce.getStackTrace();
+    		throw new Exception("can not put object due to client exception", ce);
+    	} catch (Exception e) {
+    		logger.error("Error Message: " + e.getMessage());
+    		throw new Exception("can not put object due to exception", e);
+    	}
+    }
 }
