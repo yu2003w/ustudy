@@ -61,8 +61,8 @@
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
 	  SELECT COUNT(*) AS exCount, TRUNCATE(AVG(score), 1) AS aveScore, MAX(score) AS maxScore, MIN(score) AS minScore, 
 	  (SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), question.score * (question.endno - question.startno + 1), 
-	  (if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
-	  question.score)))) FROM ustudy.question WHERE exam_grade_sub_id = #{egsid}) as fscore,
+	  if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
+	  question.score))) FROM ustudy.question WHERE exam_grade_sub_id = #{egsid}) as fscore,
 	  (SELECT score FROM (SELECT (@row:=@row + 1) AS row, score FROM (SELECT score, rank FROM ustudy.subscore 
 	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid}
 	  <if test="clsid > 0">
@@ -74,8 +74,9 @@
 	  AND ee.class_id = #{clsid}
 	  </if>
 	  ) DIV 2)) AS midscore, (SELECT COUNT(*) FROM subscore LEFT JOIN examinee AS ee ON ee.id = subscore.stuid 
-	  WHERE score >= ((SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), 
-	  question.score * (question.endno - question.startno + 1), question.score)) AS fullscore FROM ustudy.question 
+	  WHERE score >= ((SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), question.score * (question.endno - question.startno + 1), 
+	  if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
+	  question.score))) FROM ustudy.question 
 	  WHERE exam_grade_sub_id = #{egsid}) * 0.6) AND exam_grade_sub_id = #{egsid} 
 	  <if test="clsid > 0">
 	  AND ee.class_id = #{clsid}

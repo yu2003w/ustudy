@@ -81,7 +81,7 @@ public interface MarkProgMapper {
 			+ "cross join ustudy.answer as ans2 where ans1.quesid = ans2.quesid and ans1.paperid = ans2.paperid "
 			+ "and ans1.isfinal = ans2.isfinal and ans1.teacid <> ans2.teacid and ans1.isfinal <> 1 and "
 			+ "ans1.id < ans2.id and ans1.quesid = question.id) "
-			+ "END) as total, group_concat(marktask.teacid) as teal from question "
+			+ "END) as total, group_concat(marktask.teacid order by teacid) as teal from question "
 			+ "left join marktask on marktask.quesid = question.id where exam_grade_sub_id = #{egsid} and "
 			+ "question.type not in ('单选题', '多选题', '判断题') group by question.id, marktask.marktype")
 	public List<QuesMarkTask> getQuesMarkTask(@Param("egsid") int egsid);
