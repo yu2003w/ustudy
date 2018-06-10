@@ -188,6 +188,16 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
 	public boolean updateExamSubPapers(Long egsId) {
 		try {
+			// 0. mark the BEST and FAQ papers.
+			//set BEST for top 2% students and FAQ for bottom 1% students(not including blank answer), only set for Chinese articles.
+			/* paperid -> is yuwen and is last question?
+					-> is not BEST or FAQ
+						-> if rank <= (number of students)*2%, set markType to BEST, get the position, put object
+						-> if rank >= (number of students)*99%, set markType to FAQ, get the position, put object
+			*/
+			
+			addFlags(egsId);
+
 			// 1. merge the paper images of double marking
 			  /* 1.1 list the double marking answers
 				{paperid: xx, quesid: xx, qarea_id: xx, paper_img: xx, 
@@ -556,34 +566,26 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				}
 			}
 		}
-
-		//4. set BEST for top 2% students and FAQ for bottom 1% students(not including blank answer), only set for Chinese articles.
-		/* paperid -> is yuwen and is last question?
-		           -> is not BEST or FAQ
-				   	-> if rank <= (number of students)*2%, set markType to BEST, get the position, put object
-					-> if rank >= (number of students)*99%, set markType to FAQ, get the position, put object
-		*/
-		addFlag(paperId, imgs);
 	}
 
-	private void addFlag(Long paperId, String[] imgs) {
-		logger.debug("addFlag(), paperId=" + paperId);
-		String flag = "NONE";
-		List<UncommonAnswer> answers = egsDaoImpl.getTopAns(paperId);
-		if (answers != null && answers.size()>0) {
-			flag = "BEST";
+	private void addFlags(Long egsId) {
+		logger.debug("addFlag(), egsId=" + egsId);
+		List<UncommonAnswer> topAnswers = egsDaoImpl.getTopAns(egsId);
+		if (topAnswers != null && topAnswers.size()>0) {
+			addFlag(topAnswers, "BEST");
 		} else {
-			answers = egsDaoImpl.getBottomAns(paperId);
-			if (answers != null && answers.size()>0) {
-				flag = "FAQ";
-			}
-		}
-		// set flag in the DB
-		if (flag.equals("NONE")) {
 			return;
-		} else {
-			UncommonAnswer answer = answers.get(0);
-			egsDaoImpl.updateMarkFlag(answer.getQuesId(), paperId, flag);
+		}
+		
+		List<UncommonAnswer> bottomAnswers = egsDaoImpl.getBottomAns(egsId);
+		if (bottomAnswers != null && bottomAnswers.size()>0) {
+			addFlag(bottomAnswers, "FAQ");
+		}
+	}
+
+	private void addFlag(List<UncommonAnswer> answers, String flag) {
+		for (UncommonAnswer answer : answers) {
+			egsDaoImpl.updateMarkFlag(answer.getAnsId(), flag);
 			try{
 				if (OSSUtil.getClient() == null) {
 					// need to initialize OSSMetaInfo
@@ -598,18 +600,15 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				}
 				if(flag.equals("BEST")) {
 					OSSUtil.addMarkImage(answer.getAnsMarkImg(), "icon-bestanswer.png", 0, 0);
-					OSSUtil.addMarkImage(imgs[answer.getPageno()], "icon-bestanswer.png", answer.getX(), answer.getY());
 				} else if (flag.equals("FAQ")) {
 					OSSUtil.addMarkImage(answer.getAnsMarkImg(), "icon-faq.png", 0, 0);
-					OSSUtil.addMarkImage(imgs[answer.getPageno()], "icon-faq.png", answer.getX(), answer.getY());
 				}
 			} catch (Exception e) {
 				logger.error("addFlag(), failed to add flag -> " + e.getMessage());
 				return;
-			}
+			}	
 		}
 	}
-
 	@Override
 	@Transactional
 	public boolean updateEgsScoreStatus(Long egsId, Boolean release) {

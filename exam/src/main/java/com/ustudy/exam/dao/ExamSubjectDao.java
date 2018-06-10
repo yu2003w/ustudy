@@ -71,10 +71,10 @@ public interface ExamSubjectDao {
 
 	List<DblAnswer> getDblAns(Long paperId);
 
-	List<UncommonAnswer> getTopAns(Long paperId);
+	List<UncommonAnswer> getTopAns(Long egsId);
 
-	List<UncommonAnswer> getBottomAns(Long paperId);
+	List<UncommonAnswer> getBottomAns(Long egsId);
 
-	void updateMarkFlag(@Param("quesId")Long quesId, @Param("paperId")Long paperId, @Param("mflag")String mflag);
+	void updateMarkFlag(@Param("ansId")Long ansId, @Param("mflag")String mflag);
 	
 }
