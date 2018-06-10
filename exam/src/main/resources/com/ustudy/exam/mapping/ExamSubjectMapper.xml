@@ -75,6 +75,17 @@
         <result property="h" column="height"/>
     </resultMap>
 
+    <resultMap type="com.ustudy.exam.model.score.UncommonAnswer" id="UncommonAnswer">
+        <result property="quesId" column="id"/>
+        <result property="pageno"  column="pageno"/>
+        <result property="x" column="posx"/>
+        <result property="y" column="posy"/>
+        <result property="w" column="width"/>
+        <result property="h" column="height"/>
+		<result property="rank" column="rank"/>
+		<result property="ansMarkImg" column="ans_mark_img"/>
+    </resultMap>
+
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
 	<select id="getAllExamSubject" parameterType="java.util.Map" resultMap="ExamSubjectResult">
 		SELECT egs.*, e.exam_name, g.grade_name FROM examgradesub egs LEFT JOIN exam e ON egs.examid=e.id LEFT JOIN grade g ON g.id=egs.grade_id WHERE 1=1
@@ -291,4 +302,42 @@
 		where ans.paperid = #{paperId}
 		order by ans.quesid, ans.isfinal
 	</select>
+
+    <select id="getTopAns" parameterType="Long" resultMap="UncommonAnswer">
+		select q.id, qa.pageno, qa.posx, qa.posy, qa.width, qa.height, sc.rank, ai.ans_mark_img from ustudy.paper p
+		inner join ustudy.examgradesub egs on p.exam_grade_sub_id = egs.id
+		inner join ustudy.question q on q.exam_grade_sub_id = egs.id
+		inner join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		inner join ustudy.quesarea qa on qa.quesid = q.id
+		inner join ustudy.subscore sc on sc.exam_grade_sub_id = egs.id
+		inner join ustudy.examinee ee on ee.id = sc.stuid and ee.exam_code = p.exam_code
+		inner join ustudy.answer_img ai on ai.ans_id = ans.id and ai.qarea_id = qa.id
+		where p.id = #{paperId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20 and ans.mflag = 'NONE'
+		and (sc.rank <= (select count(*) from ustudy.paper p join ustudy.examgradesub egs on p.exam_grade_sub_id = egs.id
+		where egs.id in (select egs.id from ustudy.examgradesub egs join ustudy.paper p on p.exam_grade_sub_id = egs.id 
+		where p.id = #{paperId}))*0.02)
+		group by p.id, ans.mflag, qa.pageno, qa.posx, qa.posy, qa.width, qa.height, sc.rank, q.id, ai.ans_mark_img
+		order by pageno, posx
+	</select>
+
+    <select id="getBottomAns" parameterType="Long" resultMap="UncommonAnswer">
+		select q.id, qa.pageno, qa.posx, qa.posy, qa.width, qa.height, sc.rank, ai.ans_mark_img from ustudy.paper p
+		inner join ustudy.examgradesub egs on p.exam_grade_sub_id = egs.id
+		inner join ustudy.question q on q.exam_grade_sub_id = egs.id
+		inner join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		inner join ustudy.quesarea qa on qa.quesid = q.id
+		inner join ustudy.subscore sc on sc.exam_grade_sub_id = egs.id
+		inner join ustudy.examinee ee on ee.id = sc.stuid and ee.exam_code = p.exam_code
+		inner join ustudy.answer_img ai on ai.ans_id = ans.id and ai.qarea_id = qa.id
+		where p.id = #{paperId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20 and ans.mflag = 'NONE'
+		and (sc.rank >= (select count(*) from ustudy.paper p join ustudy.examgradesub egs on p.exam_grade_sub_id = egs.id
+		where egs.id in (select egs.id from ustudy.examgradesub egs join ustudy.paper p on p.exam_grade_sub_id = egs.id 
+		where p.id = #{paperId}))*0.98)
+		group by p.id, ans.mflag, qa.pageno, qa.posx, qa.posy, qa.width, qa.height, sc.rank, q.id, ai.ans_mark_img
+		order by pageno, posx
+	</select>
+
+	<update id="updateMarkFlag" parameterType="java.util.Map">
+		UPDATE ustudy.answer SET mflag=#{mflag,jdbcType=VARCHAR} where quesid=#{quesId} and paperid=#{paperId}; 
+	</update>
 </mapper>

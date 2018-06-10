@@ -34,6 +34,7 @@ import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.SubScore;
 import com.ustudy.exam.model.score.ObjAnswer;
 import com.ustudy.exam.model.score.DblAnswer;
+import com.ustudy.exam.model.score.UncommonAnswer;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.impl.cache.PaperCache;
 import com.ustudy.exam.service.impl.cache.ScoreCache;
@@ -417,9 +418,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 		
 		List<ObjAnswer> answers = egsDaoImpl.getObjAnsScore(paperId);
 
-		if (answers == null || answers.size() <= 0) {
-			return;
-		} else {
+		if (answers != null && answers.size() > 0) {
 			int pageno = answers.get(0).getPageno();
 			int x = answers.get(0).getX() + answers.get(0).getW();
 			int titleX = answers.get(0).getX() + answers.get(0).getW()/2;
@@ -558,6 +557,57 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 		}
 
+		//4. set BEST for top 2% students and FAQ for bottom 1% students(not including blank answer), only set for Chinese articles.
+		/* paperid -> is yuwen and is last question?
+		           -> is not BEST or FAQ
+				   	-> if rank <= (number of students)*2%, set markType to BEST, get the position, put object
+					-> if rank >= (number of students)*99%, set markType to FAQ, get the position, put object
+		*/
+		addFlag(paperId, imgs);
+	}
+
+	private void addFlag(Long paperId, String[] imgs) {
+		logger.debug("addFlag(), paperId=" + paperId);
+		String flag = "NONE";
+		List<UncommonAnswer> answers = egsDaoImpl.getTopAns(paperId);
+		if (answers != null && answers.size()>0) {
+			flag = "BEST";
+		} else {
+			answers = egsDaoImpl.getBottomAns(paperId);
+			if (answers != null && answers.size()>0) {
+				flag = "FAQ";
+			}
+		}
+		// set flag in the DB
+		if (flag.equals("NONE")) {
+			return;
+		} else {
+			UncommonAnswer answer = answers.get(0);
+			egsDaoImpl.updateMarkFlag(answer.getQuesId(), paperId, flag);
+			try{
+				if (OSSUtil.getClient() == null) {
+					// need to initialize OSSMetaInfo
+					logger.info("addFlag(), initialize OSSClient before use");
+					synchronized(OSSMetaInfo.class) {
+						if (OSSUtil.getClient() == null) {
+							OSSMetaInfo omi = cgM.getOSSInfo("oss");
+							logger.debug("addFlag(), OSS Client init with->" + omi.toString());
+							OSSUtil.initOSS(omi);
+						}
+					}
+				}
+				if(flag.equals("BEST")) {
+					OSSUtil.addMarkImage(answer.getAnsMarkImg(), "icon-bestanswer.png", 0, 0);
+					OSSUtil.addMarkImage(imgs[answer.getPageno()], "icon-bestanswer.png", answer.getX(), answer.getY());
+				} else if (flag.equals("FAQ")) {
+					OSSUtil.addMarkImage(answer.getAnsMarkImg(), "icon-faq.png", 0, 0);
+					OSSUtil.addMarkImage(imgs[answer.getPageno()], "icon-faq.png", answer.getX(), answer.getY());
+				}
+			} catch (Exception e) {
+				logger.error("addFlag(), failed to add flag -> " + e.getMessage());
+				return;
+			}
+		}
 	}
 
 	@Override

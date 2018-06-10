@@ -12,6 +12,7 @@ import com.ustudy.exam.model.score.ChildSubScore;
 import com.ustudy.exam.model.MarkImage;
 import com.ustudy.exam.model.score.ObjAnswer;
 import com.ustudy.exam.model.score.DblAnswer;
+import com.ustudy.exam.model.score.UncommonAnswer;
 
 @Mapper
 public interface ExamSubjectDao {
@@ -69,5 +70,11 @@ public interface ExamSubjectDao {
 	List<ObjAnswer> getObjAnsScore(Long paperId);
 
 	List<DblAnswer> getDblAns(Long paperId);
+
+	List<UncommonAnswer> getTopAns(Long paperId);
+
+	List<UncommonAnswer> getBottomAns(Long paperId);
+
+	void updateMarkFlag(@Param("quesId")Long quesId, @Param("paperId")Long paperId, @Param("mflag")String mflag);
 	
 }
