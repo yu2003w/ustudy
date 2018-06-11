@@ -196,7 +196,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						-> if rank >= (number of students)*99%, set markType to FAQ, get the position, put object
 			*/
 			
-			//addFlags(egsId);
+			addFlags(egsId);
 
 			// 1. merge the paper images of double marking
 			  /* 1.1 list the double marking answers
@@ -493,12 +493,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
-			logger.debug("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
-			logger.debug("dblMarks size->" + dblMarks.size());
+			logger.trace("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
+			logger.trace("dblMarks size->" + dblMarks.size());
 			for (DblAnswer dblAnswer: dblAnswers) {
-				logger.debug("dblAnswer ->" + dblAnswer.toString());
+				logger.trace("dblAnswer ->" + dblAnswer.toString());
 				if (dblAnswer.getQuesId() != preQuesId) {
-					logger.debug("dblAnswer different quesid");
+					logger.trace("dblAnswer different quesid");
 					preQuesId = dblAnswer.getQuesId();
 					preTeacName = dblAnswer.getTeacName();
 					if (dblMarks.size() > 0) {
@@ -515,7 +515,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 								}
 							}
 							OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
-							logger.debug("dblAnswer put object");
+							logger.trace("dblAnswer put object");
 							dblMarks.clear();
 						} catch (Exception e) {
 							logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());
@@ -533,7 +533,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					}
 				} else {
-					logger.debug("dblAnswer same quesid");
+					logger.trace("dblAnswer same quesid");
 					if (!dblAnswer.getTeacName().equals(preTeacName)) {
 						preTeacName = dblAnswer.getTeacName();
 						if(dblAnswer.getIsFinal() == false) {
@@ -558,7 +558,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 					OSSUtil.putObject(imgs[dblPageno], imgs[dblPageno], dblMarks, dblX, dblY);
-					logger.debug("dblAnswer put object");
+					logger.trace("dblAnswer put object");
 					dblMarks.clear();
 				} catch (Exception e) {
 					logger.error("addFinalMarks(), failed to add marks -> " + e.getMessage());

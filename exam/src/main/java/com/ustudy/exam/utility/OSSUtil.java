@@ -98,7 +98,7 @@ public class OSSUtil {
                 url += ",x_" + (overlapped? 0 : markImgs.get(i).getPosX()) + ",y_" + (overlapped? 0 : markImgs.get(i).getPosY()) + ",g_nw";
             }
 
-            logger.debug("URL of the combined file: " + url);
+            logger.trace("URL of the combined file: " + url);
             InputStream in = new URL(url).openStream();
             ossClient.putObject(bucketName, targetKey, in);
         } catch (OSSException oe) {
@@ -132,7 +132,7 @@ public class OSSUtil {
     		url += "/watermark,";
     		url += "image_" + base64MarkKey;
     		url += ",x_0,y_0,g_nw";
-    		logger.debug("URL of the combined file: " + url);
+    		logger.trace("URL of the combined file: " + url);
     		InputStream in = new URL(url).openStream();
     		ossClient.putObject(bucketName, targetKey, in);
     	} catch (OSSException oe) {
@@ -176,7 +176,7 @@ public class OSSUtil {
                 y += size;
             }
 
-            logger.debug("URL of the combined file: " + url);
+            logger.trace("URL of the combined file: " + url);
             InputStream in = new URL(url).openStream();
             ossClient.putObject(bucketName, targetKey, in);
         } catch (OSSException oe) {
@@ -217,7 +217,7 @@ public class OSSUtil {
             url += ",x_" + x;
             url += ",y_" + y;
 
-            logger.debug("URL of the combined file: " + url);
+            logger.trace("URL of the combined file: " + url);
             InputStream in = new URL(url).openStream();
             ossClient.putObject(bucketName, targetKey, in);
         } catch (OSSException oe) {
@@ -250,7 +250,7 @@ public class OSSUtil {
     		url += "/watermark,";
     		url += "image_" + base64MarkKey;
     		url += ",x_" + x + ",y_" + y + ",g_nw";
-    		logger.debug("URL of the combined file: " + url);
+    		logger.trace("URL of the combined file: " + url);
     		InputStream in = new URL(url).openStream();
     		ossClient.putObject(bucketName, baseKey, in);
     	} catch (OSSException oe) {

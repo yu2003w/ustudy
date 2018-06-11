@@ -299,43 +299,45 @@
 	</select>
 
     <select id="getTopAns" parameterType="Long" resultMap="UncommonAnswer">
-		PREPARE s1 FROM 'select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p 
-		join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
-		join ustudy.question q on q.exam_grade_sub_id = egs.id
-		join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
-		join ustudy.answer_img ai on ai.ans_id = ans.id
-		where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
-		and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
-		and ans.score > 0 order by ans.score desc
-		limit ?';
-		set @_limit= (select count(*) from ustudy.paper p 
-		join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
-		join ustudy.question q on q.exam_grade_sub_id = egs.id
-		join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
-		where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
-		and ans.score > 0);
-		set @_limit2 = floor(@_limit/50);
-		EXECUTE s1 USING @_limit2;
-	</select>
+        select id, ans_mark_img, score from (
+	        select (@cnt:=@cnt+1) as cnt, id, ans_mark_img, score from (
+		        select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p
+		        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+		        join ustudy.question q on q.exam_grade_sub_id = egs.id
+		        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		        join ustudy.answer_img ai on ai.ans_id = ans.id
+		        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
+		        and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
+		        and ans.score > 0 order by ans.score desc
+			) tb1, (select @cnt:=0) cnt
+	    ) tb2
+		where ((select count(*) from ustudy.paper p
+        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+        join ustudy.question q on q.exam_grade_sub_id = egs.id
+        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
+        and ans.score > 0)/50) > cnt
+    </select>
 
     <select id="getBottomAns" parameterType="Long" resultMap="UncommonAnswer">
-		PREPARE s1 FROM 'select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p 
-		join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
-		join ustudy.question q on q.exam_grade_sub_id = egs.id
-		join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
-		join ustudy.answer_img ai on ai.ans_id = ans.id
-		where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
-		and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
-		and ans.score > 0 order by ans.score desc
-		limit ?,?';
-		set @_limit= (select count(*) from ustudy.paper p 
-		join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
-		join ustudy.question q on q.exam_grade_sub_id = egs.id
-		join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
-		where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
-		and ans.score > 0);
-		set @_limit2 = floor(@_limit/1.01);
-		EXECUTE s1 USING @_limit2, @_limit;
+        select id, ans_mark_img, score from (
+	        select (@cnt:=@cnt+1) as cnt, id, ans_mark_img, score from (
+		        select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p
+		        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+		        join ustudy.question q on q.exam_grade_sub_id = egs.id
+		        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		        join ustudy.answer_img ai on ai.ans_id = ans.id
+		        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
+		        and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
+		        and ans.score > 0 order by ans.score asc
+			) tb1, (select @cnt:=0) cnt
+	    ) tb2
+		where ((select count(*) from ustudy.paper p
+        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+        join ustudy.question q on q.exam_grade_sub_id = egs.id
+        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
+        and ans.score > 0)/100) > cnt
 	</select>
 
 	<update id="updateMarkFlag" parameterType="java.util.Map">
