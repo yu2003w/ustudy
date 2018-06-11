@@ -21,6 +21,7 @@ import com.ustudy.exam.mapper.MarkProgMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrBrife;
+import com.ustudy.exam.model.ExamSubject;
 import com.ustudy.exam.model.GrClsBrife;
 import com.ustudy.exam.model.MarkTask;
 import com.ustudy.exam.model.QuesAnswer;
@@ -42,7 +43,7 @@ public class ExamServiceImpl implements ExamService {
 	private ExamDao examDaoImpl;
 
 	@Autowired
-	private QuesAnswerDao questionDaoImpl;
+	private QuesAnswerDao qaDaoImpl;
 
 	@Resource
 	private QuesareaDao quesareaDao;
@@ -138,13 +139,8 @@ public class ExamServiceImpl implements ExamService {
 
 			Map<Long, Long> egsStudentCounts = getEgsStudentCounts(examId);
 
-			/* comment out by jared
-			Map<Long, Long> subjectPaperCounts = getSubjectPaperCounts(examId);
-			Map<Long, Long> subjectAnswers = getSubjectAnswers(examId);
-			*/
 			Map<Long, Map<String, Long>> subjectQuestions = getSubjectQuestions(examId);
 
-			// return summary(examSubjects, gradeStudentCounts, subjectPaperCounts, subjectAnswers, subjectQuestions);
 			return summary(examSubjects, gradeStudentCounts, egsStudentCounts, subjectQuestions);
 		}
 
@@ -184,34 +180,6 @@ public class ExamServiceImpl implements ExamService {
 		}
 		return counts;
 	}
-
-	/*private Map<Long, Long> getSubjectPaperCounts(Long examId) {
-
-		Map<Long, Long> counts = new HashMap<>();
-
-		List<Map<String, Object>> subjectPaperCounts = examDaoImpl.getSubjectPaperCounts(examId);
-		for (Map<String, Object> map : subjectPaperCounts) {
-			long egsId = (int) map.get("egsId");
-			long count = (long) map.get("count");
-			counts.put(egsId, count);
-		}
-
-		return counts;
-	}*/
-
-	/*private Map<Long, Long> getSubjectAnswers(Long examId) {
-
-		Map<Long, Long> counts = new HashMap<>();
-
-		List<Map<String, Object>> subjectAnswers = examDaoImpl.getSubjectAnswers(examId);
-		for (Map<String, Object> map : subjectAnswers) {
-			long egsId = (int) map.get("egsId");
-			long count = (long) map.get("count");
-			counts.put(egsId, count);
-		}
-
-		return counts;
-	}*/
 
 	private Map<Long, Map<String, Long>> getSubjectQuestions(Long examId) {
 
@@ -365,15 +333,12 @@ public class ExamServiceImpl implements ExamService {
 			
 			// added by Jared, check table MarkTask by to determine whether all marktask are assigned
 			subject.put("taskDispatch", this.isMarkTaskDispatched(egsId));
-			subject.put("answerSet", this.isAnswerSet(egsId));
+			ExamSubject es = new ExamSubject(egsId);
+			this.checkAnswerSet(es);
+			subject.put("isObjAnsSet", es.isObjAnsSet());
+			subject.put("isSubAnsSet", es.isSubAnsSet());
 			logger.trace("summary(), taskDispatch->" + subject.get("taskDispatch") + 
 					", answerSet->" + subject.get("answerSet"));
-			
-			/* commented by Jared
-			long paperCount = 0;
-			if (null != subjectPaperCounts.get(egsId)) {
-				paperCount = subjectPaperCounts.get(egsId);
-			} */
 			
 			EgsMarkMetrics emm = mpM.getOverallMarkMetrics(egsId);
 			if (emm == null) {
@@ -404,10 +369,7 @@ public class ExamServiceImpl implements ExamService {
 
 			answerCount = emm.getTotal();
 			long markedCount = emm.getMarked();
-			/* commented by Jared
-			if (null != subjectAnswers.get(egsId)) {
-				markedCount = subjectAnswers.get(egsId);
-			}*/
+			
 			if (answerCount == 0 || markedCount == 0) {
 				subject.put("progressRate", 0);
 			} else {
@@ -482,7 +444,7 @@ public class ExamServiceImpl implements ExamService {
 
 		Map<Long, List<Map<String, Object>>> result = new HashMap<>();
 
-		List<QuesAnswer> questions = questionDaoImpl.getQuestions(egsIds);
+		List<QuesAnswer> questions = qaDaoImpl.getQuestions(egsIds);
 		if (null != questions && questions.size() > 0) {
 			for (QuesAnswer question : questions) {
 				if (null != question.getExamGradeSubId()) {
@@ -534,13 +496,30 @@ public class ExamServiceImpl implements ExamService {
 			if (null != papers && papers.size() > 0) {
 				Map<String, List<Map<String, Object>>> markImgs = getSubjectQuestionMarkImgs(egsId, quesId);
 				for (Map<String, Object> map : papers) {
+					if (map.get("paperStatus").equals("2") && map.get("errorStatus").equals("2")) {
+						map.put("hasProblem", true);
+					} else {
+						map.put("hasProblem", false);
+					}
 					if (null != map.get("paperImg") && null != map.get("examCode")) {
 						String examCode = map.get("examCode").toString();
 						List<Map<String, Object>> markImg = markImgs.get(examCode);
+						boolean isBest = false;
+						boolean isFAQ = false;
 						if (null == markImg) {
 							markImg = new ArrayList<>();
+						} else {
+							for(Map<String, Object> mi : markImg) {
+								if (mi.get("mflag").equals("BEST")) {
+									isBest = true;
+								} else if (mi.get("mflag").equals("FAQ")) {
+									isFAQ = true;
+								}
+							}
 						}
 						map.put("markImgs", markImg);
+						map.put("isBest", isBest);
+						map.put("isFAQ", isFAQ);
 
 						String[] paperImgs = map.get("paperImg").toString().split(",");
 						String quesImgs = "";
@@ -630,23 +609,39 @@ public class ExamServiceImpl implements ExamService {
 		return true;
 	}
 	
-	private boolean isAnswerSet(Long id) {
-		
+	/**
+	 * This function is copied from ExamSubjectServiceImpl.java. The same functionality.
+	 * @param es
+	 */
+	private void checkAnswerSet(ExamSubject es) {
 		// retrieve answer settings for egs firstly
-		List<QuesAnswer> quesAns = questionDaoImpl.getQuesAnswerForValidation(id);
+		List<QuesAnswer> quesAns = qaDaoImpl.getQuesAnswerForValidation(es.getId());
+		es.setSubAnsSet(true);
+		es.setObjAnsSet(true);
 		if (quesAns == null || quesAns.isEmpty()) {
-			logger.warn("isAnswerSet(), no records retrieved for answer set, maybe templates not "
-					+ "uploaded for egs " + id);
-			return false;
+			logger.warn("checkAnswerSet(), no answer set records retrieved, maybe templates not uploaded "
+					+ "for egs " + es.getId());
+			es.setSubAnsSet(false);
+			es.setObjAnsSet(false);
 		}
 		
 		for (QuesAnswer qa: quesAns) {
-			if (!qa.isValid()) {
-				logger.warn("isAnswerSet(), answer setting is not completed for question " + qa.toString());
-				return false;
+			if (qa.getType() == null || qa.getType().isEmpty()) {
+				es.setSubAnsSet(false);
+				es.setObjAnsSet(false);
+				return;
+			}
+			if ((qa.getType().equals("单选题") || qa.getType().equals("多选题") || qa.getType().equals("判断题")) 
+					&& !qa.isValid() ) {
+				logger.warn("checkAnswerSet(), answer setting is not completed for question->" + qa.toString());
+				es.setObjAnsSet(false);
+			}
+			else if (!qa.isValid()) {
+				es.setSubAnsSet(false);
 			}
 		}
-		return true;
+		logger.trace("checkAnswerSet(), subAnsSet=" + es.isSubAnsSet() + ", objAnsSet=" + es.isObjAnsSet() + 
+				",egsid=" + es.getId());
 	}
 	
 }

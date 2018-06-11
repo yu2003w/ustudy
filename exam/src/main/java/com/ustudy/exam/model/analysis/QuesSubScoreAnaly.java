@@ -1,7 +1,10 @@
 package com.ustudy.exam.model.analysis;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class QuesSubScoreAnaly implements Serializable {
 
@@ -13,9 +16,13 @@ public class QuesSubScoreAnaly implements Serializable {
 	private String quesname = null;
 	private float score = 0;
 	private float aveScore = 0;
-	private float levelOfDiff = 0;
+	//discrimination index
+	private float dist7tion = 0;
 	
-	private Map<Integer, String> details = null;
+	@JsonIgnore
+	private String aggrscore = null;
+	
+	private Map<Float, Integer> details = null;
 
 	public QuesSubScoreAnaly() {
 		super();
@@ -46,26 +53,47 @@ public class QuesSubScoreAnaly implements Serializable {
 		this.aveScore = aveScore;
 	}
 
-	public float getLevelOfDiff() {
-		return levelOfDiff;
-	}
-
-	public void setLevelOfDiff(float levelOfDiff) {
-		this.levelOfDiff = levelOfDiff;
-	}
-
-	public Map<Integer, String> getDetails() {
+	public Map<Float, Integer> getDetails() {
 		return details;
 	}
 
-	public void setDetails(Map<Integer, String> details) {
+	public void setDetails(Map<Float, Integer> details) {
 		this.details = details;
+	}
+
+	public float getDist7tion() {
+		return dist7tion;
+	}
+
+	public void setDist7tion(float dist7tion) {
+		this.dist7tion = dist7tion;
+	}
+
+	public String getAggrscore() {
+		return aggrscore;
+	}
+
+	public void setAggrscore(String aggrscore) {
+		this.aggrscore = aggrscore;
+		if (this.aggrscore != null && this.aggrscore.length() > 0) {
+			String []data = this.aggrscore.split(",");
+			if (data != null && data.length >  0) {
+				for (String item: data) {
+					String [] pair = item.split("-");
+					if (pair != null && pair.length == 2) {
+						if (this.details == null) 
+							this.details = new HashMap<Float, Integer>();
+						this.details.put(Float.valueOf(pair[0]), Integer.valueOf(pair[1]));
+					}
+				}
+			}
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "QuesSubScoreAnaly [quesno=" + quesname + ", fullScore=" + score + ", aveScore=" + aveScore
-				+ ", levelOfDiff=" + levelOfDiff + ", details=" + details + "]";
+		return "QuesSubScoreAnaly [quesname=" + quesname + ", score=" + score + ", aveScore=" + aveScore
+				+ ", dist7tion=" + dist7tion + ", aggrscore=" + aggrscore + ", details=" + details + "]";
 	}
 
 }

@@ -37,6 +37,7 @@ docker run --rm -it --name ustudy-dw-2 --hostname dw-slave -v ${WORK_DIR}/slave/
     -v ${WORK_DIR}/slave/schema/:/root/mysql/schema/ -v ${MYSQL_LOG_DIR}:/var/log/mysql/ \
     -v ${SCHEMA_DIR}/../scripts/slave-mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf \
     -p 13307:3306 -e MYSQL_ROOT_PASSWORD=mysql -d mysql:5.7 \
+    --group-concat-max-len=8192 \
     --log-error=/var/log/mysql/mysqld.log  \
     --general_log=1 --general_log_file /var/log/mysql/gen.log \
     --slow_query_log=1 --slow_query_log_file /var/log/mysql/slow.log

@@ -160,7 +160,7 @@
 	
 	<select id="getSubjectQuestionPapers" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT p.exam_code examCode,p.paper_img paperImg, ss.mark_img paperMarkImg, IFNULL(cl.id,'') classId, IFNULL(cl.cls_name,'') clsName,
-		p.exam_grade_sub_id egsId,q.id quesId from paper p
+		p.exam_grade_sub_id egsId,q.id quesId, p.id paperId, p.paper_status paperStatus, p.error_status errorStatus from paper p
 		LEFT JOIN question q ON p.exam_grade_sub_id=q.exam_grade_sub_id
 		LEFT JOIN examinee ee ON p.exam_code=ee.exam_code
 		LEFT JOIN class cl ON ee.class_id=cl.id

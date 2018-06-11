@@ -1,8 +1,8 @@
 package com.ustudy.exam.model.analysis;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +21,7 @@ public class EgsScoreAnaly implements Serializable {
 	private float midScore = 0;
 	private int passCount = 0;
 	private float levelOfDiff = 0;
+	private float fscore = 0;
 	// discrimination
 	private float dis7tion = 0;
 	// standard deviation
@@ -29,9 +30,9 @@ public class EgsScoreAnaly implements Serializable {
 	@JsonIgnore
 	private String aggrscore = null;
 	
-	// score placement
+	// score placement, need to sort by keys, so use TreeMap, although TreeMap has some performance limitations
 	@JsonProperty("scoreplacement")
-	private Map<Float, Integer> splace = null;
+	private TreeMap<Float, Integer> splace = null;
 	
 	public EgsScoreAnaly() {
 		super();
@@ -124,6 +125,14 @@ public class EgsScoreAnaly implements Serializable {
 		this.stdDevia = stdDevia;
 	}
 
+	public float getFscore() {
+		return fscore;
+	}
+
+	public void setFscore(float fscore) {
+		this.fscore = fscore;
+	}
+
 	public String getAggrscore() {
 		return aggrscore;
 	}
@@ -137,7 +146,7 @@ public class EgsScoreAnaly implements Serializable {
 					String []datas = pl.split("-");
 					if (datas != null && datas.length == 2) {
 						if (this.splace == null) {
-							this.splace = new HashMap<Float, Integer>();
+							this.splace = new TreeMap<Float, Integer>();
 						}
 						this.splace.put(Float.valueOf(datas[1]), Integer.valueOf(datas[0]));
 					}
@@ -150,7 +159,7 @@ public class EgsScoreAnaly implements Serializable {
 		return splace;
 	}
 
-	public void setSplace(Map<Float, Integer> splace) {
+	public void setSplace(TreeMap<Float, Integer> splace) {
 		this.splace = splace;
 	}
 

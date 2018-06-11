@@ -1,0 +1,71 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ustudy.exam.mapper.AnswerSheetMapper">
+
+	<resultMap type="com.ustudy.exam.model.anssheet.ExamGrSubMeta" id="ExamGrSub">
+	  <result property="examName" column="exam_name"/>
+	  <result property="gradeName" column="grade_name"/>
+	  <result property="gradeId" column="gradeId"/>
+	  <result property="details" column="details"/>
+	</resultMap>
+	
+	<resultMap type="com.ustudy.exam.model.anssheet.AnsPaper" id="AnsPaper">
+	  <result property="eeCode" column="exam_code"/>
+	  <result property="eeName" column="name"/>
+	  <result property="clsName" column="cls_name"/>
+	  <result property="fullPaper" column="mark_img"/>
+	  <result property="markAnsPaper" column="mapaper"/>
+	  <result property="paperid" column="paperid"/>
+	  <result property="hasProblem" column="except"/>
+	  <result property="score" column="score"/>
+	  <result property="fscore" column="fullscore"/>
+	</resultMap>
+	
+	<select id="getAnswerSheetMeta" parameterType="String" resultMap="ExamGrSub">
+		SELECT exam.exam_name, grade.grade_name, grade.id as gradeId, 
+		GROUP_CONCAT(subject.id, '-', subject.name, '-', egs.id, '@', 
+		(SELECT GROUP_CONCAT(question.id, '-', (SELECT IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno))) SEPARATOR '-') FROM question 
+		WHERE question.type NOT IN ('单选题' , '多选题', '判断题') AND question.exam_grade_sub_id = egs.id 
+		ORDER BY startno), 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT question.id, '-', IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
+		LEFT JOIN paper ON paper.id = answer.paperid 
+		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
+		AND answer.quesid = question.id) 
+		WHERE answer.mflag = 'BEST' AND paper.exam_grade_sub_id = egs.id ORDER BY question.startno), '-'), 
+		'@', COALESCE((SELECT GROUP_CONCAT(DISTINCT question.id, '-', IF(question.quesno > 0, question.quesno, 
+		CONCAT(question.startno, ':', question.endno)) SEPARATOR '-') FROM ustudy.answer 
+		LEFT JOIN paper ON paper.id = answer.paperid 
+		LEFT JOIN question ON (paper.exam_grade_sub_id = question.exam_grade_sub_id 
+		AND answer.quesid = question.id) 
+		WHERE answer.mflag = 'FAQ' AND paper.exam_grade_sub_id = egs.id ORDER BY question.startno), '-')) AS details 
+		FROM examgradesub as egs LEFT JOIN exam ON egs.examid = exam.id 
+		LEFT JOIN grade ON egs.grade_id = grade.id 
+		LEFT JOIN subject ON egs.sub_id = subject.id 
+		LEFT JOIN examschool ON exam.id = examschool.examid 
+		WHERE examschool.schid = #{orgid} GROUP BY egs.examid, egs.grade_id
+	</select>
+	
+	<select id="getAnsPapers" resultMap="AnsPaper">
+	    SELECT ee.exam_code, ee.name, answer.paperid, answer.score, subscore.mark_img, class.cls_name, 
+	    if (paper.paper_status = '2' and paper.error_status = '2', true, false) as except, 
+	    subscore.score as fullscore, group_concat(ansimg.ans_mark_img order by ansimg.qarea_id) as mapaper 
+	    FROM ustudy.answer 
+	    left join answer_img as ansimg on ansimg.ans_id = answer.id 
+	    left join question on question.id = answer.quesid 
+	    left join paper on (paper.exam_grade_sub_id = question.exam_grade_sub_id and answer.paperid = paper.id) 
+	    left join examinee as ee on ee.exam_code = paper.exam_code 
+	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
+	    left join class on class.id = ee.class_id
+	    where quesid = #{qid} 
+	    <if test="clsid > 0">
+	    and ee.class_id =  #{clsid}
+	    </if>
+	    <if test="mflag != null and mflag != 'NONE'">
+	    and answer.mflag = #{mflag}
+	    </if>
+	    group by ee.id, answer.id, subscore.id
+	</select>
+
+</mapper>

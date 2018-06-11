@@ -39,8 +39,14 @@ fi
 echo "Deploying exam.war successfully"
 
 # before launching tomcat, clear logs generated last time
-echo "clear logs generated in ${WORK_DIR}/ustudy/logs/"
-rm ${WORK_DIR}/logs/ustudy/*
+echo "backup logs generated in ${WORK_DIR}/ustudy/logs/"
+if [ -e ${WORK_DIR}/logs/ustudy/exam.log ]; then
+  mv ${WORK_DIR}/logs/ustudy/exam.log ${WORK_DIR}/logs/ustudy/exam-`date +%F-%H%M`.log
+  if [ $? != 0 ]; then
+    echo "failed to backup logs"
+    return
+  fi
+fi
 if [ $OS_NAME = "Darwin" ]; then
   mkdir -p ${WORK_DIR}/ustudy/redis
   chmod -R 777 ${WORK_DIR}/ustudy

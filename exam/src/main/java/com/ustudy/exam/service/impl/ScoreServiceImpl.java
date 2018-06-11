@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ustudy.UResp;
 import com.ustudy.exam.dao.ExamDao;
 import com.ustudy.exam.dao.ExamSubjectDao;
 import com.ustudy.exam.dao.ExameeScoreDao;
@@ -139,55 +140,55 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public boolean calObjScoreOfEgs(Long egsId) throws Exception {
+    public boolean calObjScoreOfEgs(Long egsId) {
         logger.debug("calEgsScore(), calculate egs score for " + egsId);
         
-        new Thread() {
-            public void run() {                
-                /**
-                 * 创建线程池，并发量最大为5
-                 * LinkedBlockingDeque，表示执行任务或者放入队列
-                 */
-                ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
-                        TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
-                        new ThreadPoolExecutor.CallerRunsPolicy());
-                
-                //存储线程的返回值
-                List<Future<String>> results = new LinkedList<Future<String>>();
-                
-                //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
-                List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
-                
-                for (ScoreRule sr : scoreRules) {
-                    QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
-                    Future<String> result = tpe.submit(task);
-                    results.add(result);
-                }
-                
-                //此函数表示不再接收新任务，
-                //如果不调用，awaitTermination将一直阻塞
-                tpe.shutdown();
-                //1天，模拟永远等待
-                try {
-                    tpe.awaitTermination(1, TimeUnit.DAYS);
-                } catch (InterruptedException e) {
-                    logger.error("calEgsScore() in new thread->" + e.getMessage());                    
-                } catch (Exception ex) {
-                	logger.error("calEgsScore() in new thread->" + ex.getMessage());
-                }
-                
-                ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
-                if(null != examSubject && null != examSubject.getExamid()){
-                    calClsSubScore(examSubject.getExamid().intValue(), -1);
-                }
-                
-                scoC.setScoreColStatus(egsId.intValue(), true);
-                
+        /**
+         * 创建线程池，并发量最大为5
+         * LinkedBlockingDeque，表示执行任务或者放入队列
+         */
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
+                TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        
+        //存储线程的返回值
+        List<Future<UResp>> results = new LinkedList<Future<UResp>>();
+        
+        //List<RefAnswer> refAnswers = refAnswerDaoImpl.getRefAnswers(egsId);
+        List<ScoreRule> scoreRules = refAnswerDaoImpl.getEgsScoreRules(egsId);
+        
+        for (ScoreRule sr : scoreRules) {
+            QuesScoreCalTask task = new QuesScoreCalTask(egsId, sr, answerDaoImpl);
+            Future<UResp> result = tpe.submit(task);
+            results.add(result);
+        }
+        
+        //此函数表示不再接收新任务，
+        //如果不调用，awaitTermination将一直阻塞
+        tpe.shutdown();
+        //1天，模拟永远等待
+        try {
+            tpe.awaitTermination(1, TimeUnit.DAYS);
+            for (Future<UResp> res : results) {
+            	logger.trace("calObjScoreOfEgs(), result->" + res.get());
+            	// check Future to get status of calculation
+            	if (!res.get().isRet()) {
+            		logger.error("calObjScoreOfEgs(), " + res.get().getMessage());
+            		return false;
+            	}
             }
-        }.start();
+        } catch (Exception e) {
+        	logger.error("calObjScoreOfEgs(), exception->" + e.getMessage());
+        	return false;
+        }
         
+        ExamSubject examSubject = examSubjectDao.getExamSubjectById(egsId);
+        if(null != examSubject && null != examSubject.getExamid()){
+            calClsSubScore(examSubject.getExamid().intValue(), -1);
+        }
+        
+        scoC.setScoreColStatus(egsId.intValue(), true);
         return true;
-        
     }
     
     private Map<Integer, Float> getMultipleScoreSet(String answer, Long egsId){
@@ -318,166 +319,7 @@ public class ScoreServiceImpl implements ScoreService {
 		}
 		
 		return examSubS;
-		/*JSONObject object = new JSONObject();
-		
-		List<Map<String, Object>> scores = subscoreDao.getStudentScores(exameeId, examId);
-		if(scores.size()>0){
-			JSONArray array = new JSONArray();
-			Map<String, Map<Long, List<Map<String, Object>>>> questions = getQuestions(stuId, examId);
-			Map<Long, List<Map<String, Object>>> subjectives = questions.get("subjectives");
-			Map<Long, List<Map<String, Object>>> objectives = questions.get("objectives");
-			for (Map<String, Object> map : scores) {
-				JSONObject subject = new JSONObject();
-				long egsId = (int)map.get("egsId");
-				long subId = (int)map.get("subId");
-				String subName = map.get("subName").toString();
-				float score = (float)map.get("score");
-				float subScore = (float)map.get("subScore");
-				float objScore = (float)map.get("objScore");
-				subject.put("egsId", egsId);
-				subject.put("subId", subId);
-				subject.put("subName", subName);
-				subject.put("score", score);
-				subject.put("subScore", subScore);
-				subject.put("objScore", objScore);
-				if(null != subjectives.get(subId)){
-					subject.put("subjectives", subjectives.get(subId));
-				}
-				if(null != objectives.get(subId)){
-					subject.put("objectives", objectives.get(subId));
-				}
-				
-				array.add(subject);
-				
-				if(null != map.get("stuid")){
-					long stuid = (int)map.get("stuid");
-					String name = map.get("name").toString();
-					String stuno = map.get("stuno").toString();
-					long gradeId = (int) map.get("gradeid");
-					object.put("stuId", stuid);
-					object.put("name", name);
-					object.put("stuno", stuno);
-					object.put("gradeId", gradeId);
-				}
-			}
-			object.put("subjects", array);
-		}
-		
-		return object;*/
 	}
-	
-/*	private Map<String, Map<Long, List<Map<String, Object>>>> getQuestions(Long stuId, Long examId){
-		
-		Map<String, Map<Long, List<Map<String, Object>>>> result = new HashMap<>();
-		
-		List<Map<String, Object>> questions = examDao.getSubjectQuestions(examId);
-		
-		Map<String, Object> markModes = new HashMap<>();
-		for (Map<String, Object> map : questions) {
-		    long subId = (int)map.get("subId");
-            int startno = (int)map.get("startno");
-            String markMode = "单评";
-            if(null != map.get("markMode")){
-                markMode = map.get("markMode").toString();
-            }
-            markModes.put(subId + "-" + startno, markMode);
-		}
-		
-		Map<Long, List<Map<String, Object>>> objectives = new HashMap<>();
-		List<Map<String, Object>> objScores = subscoreDao.getStudentObjScores(stuId, examId, null);
-		for (Map<String, Object> map : objScores) {
-		    float score = (float)map.get("score");
-		    objectives = setScores(objectives, map.get("id").toString(), score);
-        }
-		
-		List<Map<String, Object>> subScores = subscoreDao.getStudentSubScores(stuId, examId, null);
-		Map<String, List<Map<String, Object>>> subScoreMap = new HashMap<>();
-		for (Map<String, Object> map : subScores) {
-		    String id = map.get("id").toString();
-		    List<Map<String, Object>> list = subScoreMap.get(id);
-		    if(null == list){
-		        list = new ArrayList<>();
-		    }
-		    list.add(map);
-		    
-		    subScoreMap.put(id, list);
-		}
-		
-		Map<Long, List<Map<String, Object>>> subjectives = new HashMap<>();		
-		for (Entry<String,List<Map<String,Object>>> entry : subScoreMap.entrySet()) {
-		    String id = entry.getKey();
-		    if (null != markModes.get(id) && null != subScoreMap.get(id)) {
-		        String markMode = markModes.get(id).toString();
-		        if (markMode.equals("单评")) {
-		            Map<String, Object> map = subScoreMap.get(id).get(0);
-		            subjectives = setScores(subjectives, id, (float)map.get("score"));
-		        }else{
-		            List<Map<String,Object>> list = subScoreMap.get(id);
-		            float viewedScore = 0;
-		            float finalScore = 0;
-		            int count = 0;
-		            for (Map<String, Object> map : list) {
-		                boolean isfinal = (boolean) map.get("isfinal");
-		                if (isfinal) {
-		                    finalScore += (float)map.get("score");
-		                } else {
-		                    viewedScore += (float)map.get("score");
-		                    count += 1;
-                        }
-                    }
-		            if (finalScore > 0) {
-		                subjectives = setScores(subjectives, id, finalScore);
-		            } else {
-		                subjectives = setScores(subjectives, id, viewedScore/count);
-                    }
-		        }
-		    }
-        }
-		
-		List<Map<String, Object>> stepScores = subscoreDao.getStudentStepScores(stuId, examId, null);
-		for (Map<String, Object> map : stepScores) {
-		    float score = (float)map.get("score");
-		    subjectives = setScores(subjectives, map.get("id").toString(), score);
-        }
-		
-		for (Entry<Long,List<Map<String,Object>>> entry : subjectives.entrySet()) {
-		    Collections.sort(entry.getValue(), new Comparator<Map<String,Object>>() {
-	            @Override
-	            public int compare(Map<String,Object> o1, Map<String,Object> o2) {
-	                //升序
-	                return Integer.valueOf(o1.get("quesno").toString()).compareTo(Integer.valueOf(o2.get("quesno").toString()));
-	            }
-	        });
-        }
-		
-		result.put("subjectives", subjectives);
-		result.put("objectives", objectives);
-		
-		return result;
-	}*/
-	
-/*	private Map<Long, List<Map<String, Object>>> setScores(Map<Long, List<Map<String, Object>>> scores,String id, float score){
-	    
-	    if (null != id && id.indexOf("-")>=0) {
-	        String[] ids = id.split("-");
-	        long subId = Long.valueOf(ids[0]);
-	        int quesno = Integer.valueOf(ids[1]);
-	        List<Map<String, Object>> list = scores.get(subId);
-	        if(null == list){
-	            list = new ArrayList<>();
-	        }
-	        
-	        Map<String, Object> question = new HashMap<>();
-            question.put("quesno", quesno);
-            question.put("score", score);
-	        
-	        list.add(question);
-	        
-	        scores.put(subId, list);
-	    }
-	    
-	    return scores;
-	}*/
 
 	@Override
 	public List<ScoreClass> getClsScores(int eid, int gid) {

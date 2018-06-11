@@ -378,8 +378,8 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 		ExamSubject es = examSubjectDao.getMarkSwitchById(egsId);
 		if (es.getMarkSwitch() == false) {
-			logger.error("updateMarkResult(), the marking is already paused.");
-			throw new RuntimeException("updateMarkResult(), the marking is paused");
+			logger.error("updateMarkResult(), the marking is already suspended.");
+			throw new RuntimeException("suspended");
 		}
 		// here only one student paper need to be handled
 		// int pid = up.getPaperSeq();
@@ -392,7 +392,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 
 		for (BlockAnswer ba : blocks) {
-
+			// front end maybe allow user to mark the answer as a single question or a group of questions
+			// TODO: Not implemented yet
+			// if ((ba.getScore() == null || ba.getScore().compareTo("0") == 0) && !ba.getSteps().isEmpty()) {
 			if (!ba.getSteps().isEmpty()) {
 				float realScore = 0;
 				List<SingleAnswer> saL = ba.getSteps();

@@ -76,7 +76,8 @@ public interface MarkTaskMapper {
 			+ "and teacid=#{tid}")
 	public List<PaperScoreCache> getPaperScoreByQuesId(@Param("qid") String quesid, @Param("tid") String tid);
 
-	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid}")
+	@Select("select quesno, score as fullscore from ustudy.question_step where quesid = #{qid} "
+			+ "order by cast(quesno as SIGNED)")
 	public List<SingleAnswer> getQuesDiv(@Param("qid") String quesid);
 	
 	@Select("select answer_step.quesno, answer_step.score, question_step.score as fullscore from answer_step "

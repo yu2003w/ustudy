@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.Item;
+import com.ustudy.exam.model.Subject;
 import com.ustudy.info.mapper.SchoolMapper;
 import com.ustudy.info.model.ClassInfo;
 import com.ustudy.info.model.Department;
@@ -140,7 +142,7 @@ public class SchoolServiceImp implements SchoolService {
 				if (!gr.isType() && cls.getClassType().compareTo("none") != 0) {
 					gr.setType(true);
 				}
-				List<SubjectTeac> cSub = schM.getClsSubs(Integer.valueOf(cls.getId()));
+				List<SubjectTeac> cSub = schM.getClsSubs(cls.getId());
 				if (cSub == null || cSub.isEmpty())
 					cSub = new ArrayList<SubjectTeac>();
 				cls.setSubs(cSub);
@@ -394,8 +396,7 @@ public class SchoolServiceImp implements SchoolService {
 			List<Item> gSubs = schM.getGradeSub(it.getId());
 			SchGradeSub tg = null;
 			if (gSubs == null || gSubs.isEmpty()) {
-				logger.warn("getGrSubs(), no subjects set for grade->" + it.getId() + 
-						", school->" + schid);
+				logger.warn("getGrSubs(), no subjects set for grade->" + it.getId() + ", school->" + schid);
 				// no subjects set for this grade, just skip it
 				tg = new SchGradeSub(it.getId(), it.getName(), new ArrayList<Item>());
 			}
@@ -407,6 +408,38 @@ public class SchoolServiceImp implements SchoolService {
 		
 		logger.debug("getGrSubs(), SchGrSubs->" + schid + "," + tgL.toString());
 		return tgL;
+	}
+
+	@Override
+	public List<Subject> getAllSubjects() {
+		List<Subject> subS = schM.getAllSubjects();
+		// fetch basic subjects firstly, then populate child subjects
+		TreeMap<Long, String> subM = new TreeMap<Long, String>();
+		for (Subject s: subS) {
+			if (s.getChild() == null || s.getChild().length() == 0) {
+				subM.put(s.getId(), s.getName());
+			}
+		}
+		logger.trace("getAllSubjects(), basic subject->" + subM.toString());
+		for (Subject s: subS) {
+			if (s.getChild() != null && s.getChild().length() > 0) {
+				s.populateChild(subM);
+			}
+		}
+		logger.trace("getAllSubjects(), subjects->" + subS.toString());
+		return subS;
+	}
+
+	@Override
+	public Subject getSubjectByEgsId(long egsid) {
+		Subject sub = null; 
+		
+		try {
+			sub = schM.getSubjectByEgsId(egsid);
+		} catch (Exception e) {
+			logger.error("getSubjectByEgsId(), exception->" + e.getMessage());
+		}
+		return sub;
 	}
 
 }
