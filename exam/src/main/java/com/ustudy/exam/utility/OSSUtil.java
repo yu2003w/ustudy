@@ -270,3 +270,53 @@ public class OSSUtil {
     	}
     }
 }
+
+/** 
+ * watermark a set of images on one base image, and then put object
+ * @param baseKey,targetKey,marImgs,x,y,w,h,score
+ * overlapped: does the basekey have the same size as the markImg?
+ * @return 
+ */
+public static void addDblMarks(String baseKey, String targetKey, List<MarkImage> markImgs, Long x, Long y, Long w, Long h, float score) throws Exception {
+	try {
+		String url = bucketURL + "/" + baseKey;
+		url += "?x-oss-process=image/crop,x_" + x + ",y_" + y + ",w_" + w + ",h_" + h;
+        for(int i=0; i<markImgs.size(); i++) {
+        	String markImg = markImgs.get(i).getMarkImg() + "?x-oss-process=image/blur,r_5,s_3";
+            String base64MarkKey = Base64Utils.encodeToUrlSafeString(markImg.getBytes());
+            url += "/watermark,";
+            url += "image_" + base64MarkKey;
+            url += ",x_0,y_0,g_nw";
+        }
+        
+        int size = 60;
+        String scoreText = "" + score;
+        String text = Base64Utils.encodeToUrlSafeString(scoreText.getBytes());
+        url += "/watermark";
+        url += ",type_d3F5LXplbmhlaQ";
+        url += ",size_" + size;
+        url += ",text_" + text;
+        url += ",color_" + "FF0000";
+        url += ",t_100,g_nw";
+        url += ",x_" + Math.round(w/2);
+        url += ",y_" + size;
+        
+		logger.trace("URL of the combined file: " + url);
+		InputStream in = new URL(url).openStream();
+		ossClient.putObject(bucketName, targetKey, in);
+	} catch (OSSException oe) {
+		logger.error("Caught an OSSException");
+		logger.error("Error Message: " + oe.getErrorMessage());
+		logger.error("Error Code: " + oe.getErrorCode());
+		throw new Exception("can not put object due to oss exception", oe);
+	} catch (ClientException ce) {
+		logger.error("Caught an ClientException");
+		logger.error("Error Message: " + ce.getErrorMessage());
+		logger.error("Error Code: " + ce.getErrorCode());
+		ce.getStackTrace();
+		throw new Exception("can not put object due to client exception", ce);
+	} catch (Exception e) {
+		logger.error("Error Message: " + e.getMessage());
+		throw new Exception("can not put object due to exception", e);
+	}
+} 
