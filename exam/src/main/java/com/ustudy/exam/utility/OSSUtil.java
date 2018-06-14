@@ -297,7 +297,7 @@ public class OSSUtil {
             url += ",color_" + "FF0000";
             url += ",t_100,g_nw";
             url += ",x_" + Math.round(w/2);
-            url += ",y_" + size;
+            url += ",y_" + 0;
             
     		logger.trace("URL of the combined file: " + url);
     		InputStream in = new URL(url).openStream();

@@ -527,7 +527,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					}
 					dblPageno = dblAnswer.getPageno();
 					dblX = dblAnswer.getX() + Math.round(dblAnswer.getW()/2);
-					dblY = dblAnswer.getY();
+					dblY = dblAnswer.getY() + 65;
 					dblMarks.add("双评阅卷");
 					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
 					if(dblAnswer.getIsFinal() == false) {
