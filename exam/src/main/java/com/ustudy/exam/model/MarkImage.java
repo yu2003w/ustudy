@@ -17,13 +17,16 @@ public class MarkImage implements Serializable {
 	private String markImg = null;
 	private Long posX;
 	private Long posY;
+	private Long width;
+	private Long height;
+	private float score;
 		
 	public MarkImage() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public MarkImage(Long paperId, Long quesId, Long qareaId, Long pageNo, String paperImg, String markImg, Long posX, Long posY) {
+	public MarkImage(Long paperId, Long quesId, Long qareaId, Long pageNo, String paperImg, String markImg, Long posX, Long posY, Long width, Long height, float score) {
 		super();
 		// TODO Auto-generated constructor stub
 		this.paperId = paperId;
@@ -34,6 +37,9 @@ public class MarkImage implements Serializable {
 		this.markImg = markImg;
 		this.posX = posX;
 		this.posY = posY;
+		this.width = width;
+		this.height = height;
+		this.score = score;
 	}
 
 	public Long getPaperId() {
@@ -101,12 +107,35 @@ public class MarkImage implements Serializable {
 		this.posY = posY;
 	}
 	
+	public Long getWidth() {
+		return width;
+	}
+
+	public void setWidth(Long width) {
+		this.width = width;
+	}
 	
+	public Long getHeight() {
+		return height;
+	}
+
+	public void setHeight(Long height) {
+		this.height = height;
+	}
+	
+	public float getScore() {
+		return score;
+	}
+
+	public void setScore(float score) {
+		this.score = score;
+	}
+		
 	@Override
 	public String toString() {
 		return "MarkImage [paperId=" + paperId + ", quesId=" + quesId + ", qareaId=" + qareaId + ", pageNo="
 				+ pageNo + ", paperImg=" + paperImg + ", markImg=" + markImg + ", posX=" + posX + ", posY="
-				+ posY + "]";
+				+ posY + ", width=" + width + ", height=" + height + ", score=" + score + "]";
 	}
 	
 }

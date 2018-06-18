@@ -243,7 +243,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 
 			String paperImg = mi1.getPaperImg();
-			String markImg1 = "A" + mi1.getMarkImg(); // mark image is not suitable for watermark, add answer image. 
+			
+			String markImg1 = mi1.getMarkImg(); 
 			String markImg2 = mi1.getMarkImg();
 			
 			if (paperImg == null || paperImg.isEmpty() || markImg1 == null || markImg1.isEmpty() || markImg2 == null || markImg2.isEmpty()) {
@@ -266,8 +267,10 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 
 			List<MarkImage> markImgs = new ArrayList<>();
+			markImgs.add(mi1);
 			markImgs.add(mi2);
-
+			
+			float score = Math.round((mi1.getScore() + mi2.getScore())/2*10)/10;
 			try {
 				if (OSSUtil.getClient() == null) {
 					// need to initialize OSSMetaInfo
@@ -280,7 +283,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 				}
-				OSSUtil.putObject(markImg1, targetName, markImgs, true);
+				OSSUtil.addDblMarks(paperImg, targetName, markImgs, mi1.getPosX(), mi1.getPosY(), mi1.getWidth(), mi1.getHeight(), score);
 			} catch (Exception e) {
 				logger.error("uploadMarkImgs(), failed to upload image to oss -> " + e.getMessage());
 				return false;
@@ -523,8 +526,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 						}
 					}
 					dblPageno = dblAnswer.getPageno();
-					dblX = dblAnswer.getX() + dblAnswer.getW();
-					dblY = dblAnswer.getY();
+					dblX = dblAnswer.getX() + Math.round(dblAnswer.getW()/2);
+					dblY = dblAnswer.getY() + 65;
 					dblMarks.add("双评阅卷");
 					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
 					if(dblAnswer.getIsFinal() == false) {
