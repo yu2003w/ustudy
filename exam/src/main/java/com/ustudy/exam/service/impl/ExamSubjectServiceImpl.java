@@ -629,8 +629,9 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				// TODO: possibly need to optimize logic and sql instructions here
 				examDao.updateExamStatusByEgsid(egsId,"2");
 			}else {
-			    // 更新考试状态
-			    examDao.updateExamStatusByEgsid(egsId,"1");
+				// 更新考试状态
+				// Change the exam status to 0 so that client can still view the exam.
+			    examDao.updateExamStatusByEgsid(egsId,"0");
 			    scoC.setScoreColStatus(egsId.intValue(), false);
             }
 			return true;
