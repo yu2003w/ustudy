@@ -178,7 +178,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		}
 		mt.setProgress(String.valueOf(marked) + "/" + String.valueOf(total));
 		mt.setSummary(sumL);
-		logger.debug("getTaskPapers()," + mt.toString());
+		logger.trace("getTaskPapers()," + mt.toString());
 		return mt;
 	}
 

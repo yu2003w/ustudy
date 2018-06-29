@@ -97,7 +97,7 @@ public class MarkTaskController {
 			}
 		}
 		else
-			logger.debug("updateMarkResult(), update marked result ->" + up.toString());
+			logger.trace("updateMarkResult(), update marked result ->" + up.toString());
 		
 		List<MarkUpdateResult> mur= null;
 		try {

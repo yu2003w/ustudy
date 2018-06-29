@@ -42,7 +42,7 @@
 		join grade on grade.id=teachergrade.grade_id 
 		join teachersub on teachersub.teac_id = teachergrade.teac_id 
 		join subject on subject.id = teachersub.sub_id
-		where schid=#{schId,jdbcType=VARCHAR}
+		where schid=#{schId,jdbcType=VARCHAR} order by gradeId, subId, convert(teacName using gbk)
 	</select>
 	
 	<select id="getSchoolOwner" parameterType="string" resultType="java.util.Map">
