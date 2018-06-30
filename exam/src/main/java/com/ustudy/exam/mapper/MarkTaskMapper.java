@@ -118,14 +118,14 @@ public interface MarkTaskMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "ba.id")
 	public int insertAnswer(@Param("ba") BlockAnswer ba, @Param("tid") String teacid);
 
-	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values (#{ir.markImg}, "
+/*	@Insert("insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values (#{ir.markImg}, "
 			+ "#{ir.ansMarkImg}, #{ir.id}, #{ansid}) on duplicate key update mark_img=#{ir.markImg}, "
 			+ "ans_mark_img=#{ir.ansMarkImg}")
 	public int insertAnsImg(@Param("ir") ImgRegion ir, @Param("ansid") int ansid);
 
 	@Insert("insert into ustudy.answer_step(quesno, score, answer_id) values(#{sa.quesno},#{sa.score},#{aid}) "
 			+ "on duplicate key update score=#{sa.score}")
-	public int insertAnswerStep(@Param("sa") SingleAnswer sa, @Param("aid") int aid);
+	public int insertAnswerStep(@Param("sa") SingleAnswer sa, @Param("aid") int aid);*/
 
 	@Select("select id from question where exam_grade_sub_id = (select id from examgradesub "
 			+ "where examid=#{examId} and grade_id=#{gradeId} and sub_id=#{subjectId})")

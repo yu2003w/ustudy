@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ustudy.exam.mapper.AnswerMapper">
+
+	<insert id="saveAnswerSteps">
+		insert into ustudy.answer_step(quesno, score, answer_id) values   
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.quesno},#{item.score},#{ansid})  
+	    </foreach>
+	    on duplicate key update score=values(score)
+	</insert>
+
+	<insert id="saveAnswerImgs">
+		insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.markImg}, #{item.ansMarkImg}, #{item.id}, #{ansid})  
+	    </foreach>
+	    on duplicate key update mark_img=values(mark_img), ans_mark_img=values(ans_mark_img)
+	</insert>
+	
+</mapper>
