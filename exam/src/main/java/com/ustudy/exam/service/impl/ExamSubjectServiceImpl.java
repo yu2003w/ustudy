@@ -486,7 +486,8 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			}
 		}
 
-		//3. get double markings.
+		//3. get double markings(now also include the single markings).
+		// TODO: change DblAns to AllAns
 
 		List<DblAnswer> dblAnswers = egsDaoImpl.getDblAns(paperId);
 		List<String> dblMarks = new ArrayList<String>();
@@ -496,14 +497,17 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 			int dblX = 0;
 			int dblY = 0;
 			int dblPageno = 0;
+			String markMode = "";
 			logger.trace("dblAnswers size->" + dblAnswers.size() + " paperid is " + paperId);
 			logger.trace("dblMarks size->" + dblMarks.size());
 			for (DblAnswer dblAnswer: dblAnswers) {
 				logger.trace("dblAnswer ->" + dblAnswer.toString());
+				// new question found
 				if (dblAnswer.getQuesId() != preQuesId) {
 					logger.trace("dblAnswer different quesid");
 					preQuesId = dblAnswer.getQuesId();
 					preTeacName = dblAnswer.getTeacName();
+					//add the score and teacher names to the paper
 					if (dblMarks.size() > 0) {
 						try{
 							if (OSSUtil.getClient() == null) {
@@ -525,15 +529,20 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 							return;
 						}
 					}
+					markMode = dblAnswer.getMarkMode();
 					dblPageno = dblAnswer.getPageno();
 					dblX = dblAnswer.getX() + Math.round(dblAnswer.getW()/2);
 					dblY = dblAnswer.getY() + 65;
-					dblMarks.add("双评阅卷");
-					dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
-					if(dblAnswer.getIsFinal() == false) {
-						dblMarks.add("阅卷人A: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+					if (markMode.equals("单评")) {
+						dblMarks.add("阅卷人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					} else {
-						dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						dblMarks.add("双评阅卷");
+						dblMarks.add("分差设置: " + dblAnswer.getScoreDiff() + "分");
+						if(dblAnswer.getIsFinal() == false) {
+							dblMarks.add("阅卷人A: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						} else {
+							dblMarks.add("终评人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
+						}
 					}
 				} else {
 					logger.trace("dblAnswer same quesid");

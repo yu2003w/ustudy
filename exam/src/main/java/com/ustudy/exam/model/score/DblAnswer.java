@@ -12,6 +12,7 @@ public class DblAnswer implements Serializable {
 	private int quesId = 0;
 	private float score = 0;
 	private String teacName = null;
+	private String markMode = null;
 	private float scoreDiff  = 0;
 	private boolean isFinal = false;
 	private int pageno = 0;
@@ -25,11 +26,12 @@ public class DblAnswer implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DblAnswer(int quesId, float score, String teacName, float scoreDiff, boolean isFinal, int pageno, int x, int y, int w, int h) {
+	public DblAnswer(int quesId, float score, String teacName, String markMode, float scoreDiff, boolean isFinal, int pageno, int x, int y, int w, int h) {
 		super();
 		this.quesId = quesId;
 		this.score = score;
 		this.teacName = teacName;
+		this.markMode = markMode;
 		this.scoreDiff = scoreDiff;
 		this.isFinal = isFinal;
 		this.pageno = pageno;
@@ -61,6 +63,14 @@ public class DblAnswer implements Serializable {
 
 	public void setTeacName(String teacName) {
 		this.teacName = teacName;
+	}
+
+	public String getMarkMode() {
+		return markMode;
+	}
+
+	public void setMarkMode(String markMode) {
+		this.markMode = markMode;
 	}
 
 	public float getScoreDiff() {
@@ -121,7 +131,7 @@ public class DblAnswer implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DblAnswer [quesId=" + quesId + ", score=" + score + ", teacName=" + teacName + ", scoreDiff=" + scoreDiff + ", isFinal=" + isFinal + ", pageno=" + pageno + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h
+		return "DblAnswer [quesId=" + quesId + ", score=" + score + ", teacName=" + teacName + ", markMode=" + markMode + ", scoreDiff=" + scoreDiff + ", isFinal=" + isFinal + ", pageno=" + pageno + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h
 				+ "]";
 	}
 	

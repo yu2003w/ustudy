@@ -70,6 +70,7 @@
         <result property="quesId" column="quesid"/>
         <result property="score"  column="score"/>
         <result property="teacName" column="teacname"/>
+		<result property="markMode" column="mark_mode"/>
         <result property="scoreDiff" column="scorediff"/>
         <result property="isFinal" column="isfinal"/>
         <result property="x" column="posx"/>
@@ -288,12 +289,8 @@
 	</select>
 
     <select id="getDblAns" parameterType="Long" resultMap="DblAnswer">
-		SELECT ans.quesid, ans.score, t.teacname, q.scorediff, ans.isfinal, qa.pageno, qa.posx, qa.posy, qa.width, qa.height
-		from
-		(SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 2
-		UNION
-		SELECT quesid, paperid FROM answer where isfinal = 1) qp
-		join answer ans on ans.quesid = qp.quesid and ans.paperid = qp.paperid
+		SELECT ans.quesid, ans.score, t.teacname, q.mark_mode, q.scorediff, ans.isfinal, qa.pageno, qa.posx, qa.posy, qa.width, qa.height
+		from answer ans
 		join question q on q.id = ans.quesid
 		join quesarea qa on qa.quesid = ans.quesid
 		join teacher t on t.teacid = ans.teacid
