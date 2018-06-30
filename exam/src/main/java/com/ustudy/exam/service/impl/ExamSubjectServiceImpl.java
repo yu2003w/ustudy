@@ -531,8 +531,12 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 					}
 					markMode = dblAnswer.getMarkMode();
 					dblPageno = dblAnswer.getPageno();
-					dblX = dblAnswer.getX() + Math.round(dblAnswer.getW()/2);
-					dblY = dblAnswer.getY() + 65;
+					if (Math.round(dblAnswer.getW()/2) < 400) {
+						dblX = dblAnswer.getX() + Math.round(dblAnswer.getW()/2);
+					} else {
+						dblX = dblAnswer.getX() + 400;
+					}
+					dblY = dblAnswer.getY() + 64;
 					if (markMode.equals("单评")) {
 						dblMarks.add("阅卷人: " + dblAnswer.getTeacName() + " (" + dblAnswer.getScore() + ")");
 					} else {
