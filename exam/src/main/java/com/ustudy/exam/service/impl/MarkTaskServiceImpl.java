@@ -12,10 +12,12 @@ import java.io.ByteArrayInputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ustudy.exam.dao.ExamSubjectDao;
+import com.ustudy.exam.mapper.AnswerMapper;
 import com.ustudy.exam.mapper.ConfigMapper;
 import com.ustudy.exam.mapper.MarkTaskMapper;
 import com.ustudy.exam.model.MetaMarkTask;
@@ -53,6 +55,9 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 	@Autowired
 	private MarkTaskMapper markTaskM;
+	
+	@Autowired
+	private AnswerMapper ansM;
 
 	@Autowired
 	private PaperCache paperC;
@@ -415,14 +420,10 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			} else
 				logger.debug("updateMarkResult(), answer updated and primary key->" + ba.getId() + " returned " + num);
 
-			if (!ba.getSteps().isEmpty()) {
-				List<SingleAnswer> saL = ba.getSteps();
-				for (SingleAnswer sa : saL) {
-					num = markTaskM.insertAnswerStep(sa, ba.getId());
-					if (num < 0 || num > 2) {
-						logger.error("updateMarkResult(),failed to insert record -> " + sa.toString());
-						throw new RuntimeException("updateMarkResult(), insertAnswerStep() returned " + num);
-					}
+			if (ba.getSteps() != null && !ba.getSteps().isEmpty()) {
+				if (!saveAnsSteps(ba.getSteps(), ba.getId())) {
+					logger.error("updateMarkResult(), failed to save answer steps" + ba.getSteps().toString());
+					throw new RuntimeException("updateMarkResult, failed to save answer steps");
 				}
 			}
 
@@ -430,7 +431,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
 				throw new RuntimeException("updateMarkResult(), save answer images failed");
 			}
-
 		}
 
 		// need to update statics here, make sure this is called only after database
@@ -444,13 +444,46 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return murL;
 	}
 
-	private boolean saveAnsImgByRegion(List<ImgRegion> irs, int id, String teacid) {
+	private boolean saveAnsSteps(List<SingleAnswer> saL, long ansId) {
+		int deadLockRetry = 3;
+		boolean success = false;
+		do {
+			try {
+				int ret = ansM.saveAnswerSteps(saL, ansId);
+				if (ret > 2 || ret < 0) {
+					logger.error("saveAnsSteps(), failed to save answer steps, returned " + ret);
+					return false;
+				}
+				success = true;
+			} catch (DeadlockLoserDataAccessException deadLock) {
+				if (deadLockRetry == 1) {
+					logger.error("saveAnsSteps(), " + deadLock.toString());
+					return false;
+				}
+				else {
+					logger.warn("saveAnsSteps(), deadlock catched, retried left " + deadLockRetry);
+					try {
+					    Thread.sleep(500);
+					} catch (Exception e) {
+						logger.error("saveAnsSteps(), failed to delay when catching deadlock");
+						return false;
+					}
+				}	
+			}
+		} while (!success && deadLockRetry-- > 0);
+		
+		logger.trace("saveAnsSteps(), answer steps saved, " + saL.toString());
+		return true;
+	}
+	
+	private boolean saveAnsImgByRegion(List<ImgRegion> irs, long id, String teacid) {
 
 		if (irs == null || irs.isEmpty()) {
 			logger.error("saveAnsImgByRegion(), regions are absent.");
 			return false;
 		}
 
+		// firstly upload answer images to oss, then update database
 		for (ImgRegion ir : irs) {
 			String mark = ir.getMarkImgData();
 
@@ -485,18 +518,42 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					logger.error("saveAnsImgByRegion(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
-				int ret = markTaskM.insertAnsImg(ir, id);
-				if (ret > 2 || ret < 0) {
-					logger.error("saveAnsImgByRegion(), failed to save answer images, returned " + ret);
-					return false;
-				}
+	
 			} else {
 				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");
 				return false;
 			}
 		}
+		
+		// insert records into answer image easily cause deadlock occurred, retry to make this happen less
+		int deadLockRetry = 3;
+		boolean success = false;
+		do {
+			try {
+				int ret = ansM.saveAnswerImgs(irs, id);
+				if (ret > 2 || ret < 0) {
+					logger.error("saveAnsImgByRegion(), failed to save answer images, returned " + ret);
+					return false;
+				}
+				success = true;
+			} catch (DeadlockLoserDataAccessException deadLock) {
+				if (deadLockRetry == 1) {
+					logger.error("saveAnsImgByRegion(), " + deadLock.toString());
+					return false;
+				}
+				else {
+					logger.warn("saveAnsImgByRegion(), deadlock catched, retried left " + deadLockRetry);
+					try {
+					    Thread.sleep(500);
+					} catch (Exception e) {
+						logger.error("saveAnsImgByRegion(), failed to delay when catching deadlock");
+						return false;
+					}
+				}	
+			}
+		} while (!success && deadLockRetry-- > 0);
 
-		logger.debug("updateMarkResult(), save answer image succeed. " + irs.toString());
+		logger.trace("updateMarkResult(), save answer image succeed. " + irs.toString());
 		return true;
 	}
 
