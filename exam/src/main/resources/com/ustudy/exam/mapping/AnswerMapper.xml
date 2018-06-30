@@ -4,7 +4,7 @@
 
 	<insert id="saveAnswerSteps">
 		insert into ustudy.answer_step(quesno, score, answer_id) values   
-	    <foreach collection="list" item="item" index="index" separator="," >  
+	    <foreach collection="saL" item="item" index="index" separator="," >  
 	        (#{item.quesno},#{item.score},#{ansid})  
 	    </foreach>
 	    on duplicate key update score=values(score)
@@ -12,7 +12,7 @@
 
 	<insert id="saveAnswerImgs">
 		insert into ustudy.answer_img (mark_img, ans_mark_img, qarea_id, ans_id) values  
-	    <foreach collection="list" item="item" index="index" separator="," >  
+	    <foreach collection="irL" item="item" index="index" separator="," >  
 	        (#{item.markImg}, #{item.ansMarkImg}, #{item.id}, #{ansid})  
 	    </foreach>
 	    on duplicate key update mark_img=values(mark_img), ans_mark_img=values(ans_mark_img)

@@ -450,10 +450,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		do {
 			try {
 				int ret = ansM.saveAnswerSteps(saL, ansId);
-				if (ret > 2 || ret < 0) {
+				if (ret < 0) {
+					// multiple row insert
 					logger.error("saveAnsSteps(), failed to save answer steps, returned " + ret);
 					return false;
 				}
+				logger.trace("saveAnsSteps(), " + ret + " answer steps saved");
 				success = true;
 			} catch (DeadlockLoserDataAccessException deadLock) {
 				if (deadLockRetry == 1) {
@@ -531,10 +533,12 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		do {
 			try {
 				int ret = ansM.saveAnswerImgs(irs, id);
-				if (ret > 2 || ret < 0) {
+				if (ret < 0) {
+					// multiple row insert
 					logger.error("saveAnsImgByRegion(), failed to save answer images, returned " + ret);
 					return false;
 				}
+				logger.trace("saveAnsImgByRegion(), " + ret + " answer images saved");
 				success = true;
 			} catch (DeadlockLoserDataAccessException deadLock) {
 				if (deadLockRetry == 1) {

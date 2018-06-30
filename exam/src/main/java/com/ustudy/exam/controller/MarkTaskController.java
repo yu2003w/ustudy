@@ -93,7 +93,7 @@ public class MarkTaskController {
 			try {
 				resp.sendError(500, "updateMarkResult(), request parameter is not valid");
 			} catch (Exception e) {
-				logger.warn("Failed to set error status in response");
+				logger.error("Failed to set error status in response");
 			}
 		}
 		else
@@ -116,7 +116,8 @@ public class MarkTaskController {
 					resp.sendError(500, "updateMarkResult(), failed to update mark result.");
 				}
 			} catch (Exception re) {
-				logger.warn("updateMarkResult(), failed to set error status. " + re.getMessage());
+				logger.error("updateMarkResult(), failed to set error status. " + re.getMessage());
+				resp.setStatus(500);
 			}
 		}
 		
