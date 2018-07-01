@@ -378,7 +378,6 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 	}
 
 	@Override
-	@Transactional
 	public List<MarkUpdateResult> updateMarkResult(QuestionPaper up, Long egsId) {
 
 		ExamSubject es = examSubjectDao.getMarkSwitchById(egsId);
@@ -395,6 +394,26 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			logger.error("updateMarkResult(), failed to get login user, maybe service restarted.");
 			throw new RuntimeException("updateMarkResult(), failed to get login user");
 		}
+
+		// firstly upload images to oss, then do transaction to update database
+		for (BlockAnswer ba : blocks) {
+			if (!saveOssAnsImgByRegion(ba.getRegions())) {
+				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
+				throw new RuntimeException("updateMarkResult(), save answer images failed");
+			}
+		}
+
+		List<MarkUpdateResult> murL = new ArrayList<MarkUpdateResult>();
+		murL = persistMarkResult(up, teacid);
+		return murL;
+	}
+
+	@Transactional
+	private List<MarkUpdateResult> persistMarkResult(QuestionPaper up, String teacid) {
+
+		// here only one student paper need to be handled
+		// int pid = up.getPaperSeq();
+		List<BlockAnswer> blocks = up.getBlocks();
 
 		for (BlockAnswer ba : blocks) {
 			// front end maybe allow user to mark the answer as a single question or a group of questions
@@ -414,22 +433,22 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 			int num = markTaskM.insertAnswer(ba, teacid);
 			if (num < 0 || num > 2 || ba.getId() < 0) {
-				logger.error("updateMarkResult(), set answer record for mark result failed. number->" + num
+				logger.error("persistMarkResult(), set answer record for mark result failed. number->" + num
 						+ ",pri key->" + ba.getId());
-				throw new RuntimeException("updateMarkResult(), set answer record failed.");
+				throw new RuntimeException("persistMarkResult(), set answer record failed.");
 			} else
-				logger.debug("updateMarkResult(), answer updated and primary key->" + ba.getId() + " returned " + num);
+				logger.debug("persistMarkResult(), answer updated and primary key->" + ba.getId() + " returned " + num);
 
 			if (ba.getSteps() != null && !ba.getSteps().isEmpty()) {
 				if (!saveAnsSteps(ba.getSteps(), ba.getId())) {
-					logger.error("updateMarkResult(), failed to save answer steps" + ba.getSteps().toString());
-					throw new RuntimeException("updateMarkResult, failed to save answer steps");
+					logger.error("persistMarkResult(), failed to save answer steps" + ba.getSteps().toString());
+					throw new RuntimeException("persistMarkResult, failed to save answer steps");
 				}
 			}
 
 			if (!saveAnsImgByRegion(ba.getRegions(), ba.getId(), teacid)) {
-				logger.error("updateMarkResult(), save answer images failed." + ba.getRegions().toString());
-				throw new RuntimeException("updateMarkResult(), save answer images failed");
+				logger.error("persistMarkResult(), save answer images failed." + ba.getRegions().toString());
+				throw new RuntimeException("persistMarkResult(), save answer images failed");
 			}
 		}
 
@@ -478,14 +497,14 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 		return true;
 	}
 	
-	private boolean saveAnsImgByRegion(List<ImgRegion> irs, long id, String teacid) {
+	private boolean saveOssAnsImgByRegion(List<ImgRegion> irs) {
 
 		if (irs == null || irs.isEmpty()) {
-			logger.error("saveAnsImgByRegion(), regions are absent.");
+			logger.error("saveOssAnsImgByRegion(), regions are absent.");
 			return false;
 		}
 
-		// firstly upload answer images to oss, then update database
+		// upload answer images to oss
 		for (ImgRegion ir : irs) {
 			String mark = ir.getMarkImgData();
 
@@ -502,11 +521,11 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 
 					if (OSSUtil.getClient() == null) {
 						// need to initialize OSSMetaInfo
-						logger.info("saveAnsImgByRegion(), initialize OSSClient before use");
+						logger.info("saveOssAnsImgByRegion(), initialize OSSClient before use");
 						synchronized (OSSMetaInfo.class) {
 							if (OSSUtil.getClient() == null) {
 								OSSMetaInfo omi = cgM.getOSSInfo("oss");
-								logger.debug("saveAnsImgByRegion(), OSS Client init with->" + omi.toString());
+								logger.debug("saveOssAnsImgByRegion(), OSS Client init with->" + omi.toString());
 								OSSUtil.initOSS(omi);
 							}
 						}
@@ -517,16 +536,28 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 					// upload answer&mark image
 					OSSUtil.putObject(ir.getAnsImg(), ir.getMarkImg(), ir.getAnsMarkImg(), x, y, w, h);
 				} catch (Exception e) {
-					logger.error("saveAnsImgByRegion(), failed to upload image to oss -> " + e.getMessage());
+					logger.error("saveOssAnsImgByRegion(), failed to upload image to oss -> " + e.getMessage());
 					return false;
 				}
 	
 			} else {
-				logger.error("saveAnsImgByPage(), ansmark image or mark image missed.");
+				logger.error("saveOssAnsImgByPage(), ansmark image or mark image missed.");
 				return false;
 			}
 		}
 		
+		logger.trace("updateMarkResult(), save answer image to OSS succeed. " + irs.toString());
+		return true;
+	}
+
+	private boolean saveAnsImgByRegion(List<ImgRegion> irs, long id, String teacid) {
+
+		if (irs == null || irs.isEmpty()) {
+			logger.error("saveAnsImgByRegion(), regions are absent.");
+			return false;
+		}
+
+		// update answer images to database
 		// insert records into answer image easily cause deadlock occurred, retry to make this happen less
 		int deadLockRetry = 3;
 		boolean success = false;
@@ -557,7 +588,7 @@ public class MarkTaskServiceImpl implements MarkTaskService {
 			}
 		} while (!success && deadLockRetry-- > 0);
 
-		logger.trace("updateMarkResult(), save answer image succeed. " + irs.toString());
+		logger.trace("updateMarkResult(), save answer image to database succeed. " + irs.toString());
 		return true;
 	}
 
