@@ -94,7 +94,7 @@
 	</select>
 	
 	<select id="calQuesObjReport" parameterType="long" resultMap="QuesObjScoreAnaly">
-	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 1) as aveScore, sum(num) as total, 
+	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 2) as aveScore, sum(num) as total, 
 	  group_concat(tb1.answer, '-', num) opts, refa, choice_num as cnum from 
 	  (select obj_answer.quesno, question.score, sum(obj_answer.score) as ss, obj_answer.answer, 
 	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa, question.choice_num from obj_answer 
@@ -122,7 +122,7 @@
 	  and ee.class_id = #{clsid}
 	  </if> 
 	  and question.quesno > 0 group by question.quesno, question.score, ans.score order by question.quesno) tb1 
-	  left join (select question.quesno as quesname, truncate(avg(ans.score), 1) as aveScore from answer as ans 
+	  left join (select question.quesno as quesname, truncate(avg(ans.score), 2) as aveScore from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
@@ -145,7 +145,7 @@
 	  <if test="clsid > 0">
 	  and ee.class_id = #{clsid}
 	  </if> and question.quesno = 0 group by quest.quesno,fscore, anst.score order by quest.quesno) tb1 
-	  left join (select quest.quesno as quesname, truncate(avg(anst.score),1) as aveScore from answer_step as anst 
+	  left join (select quest.quesno as quesname, truncate(avg(anst.score),2) as aveScore from answer_step as anst 
 	  left join answer as ans on anst.answer_id = ans.id 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
