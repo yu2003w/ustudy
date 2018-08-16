@@ -192,7 +192,7 @@ INDEX (exam_code, exam_grade_sub_id),
 UNIQUE KEY (exam_code, exam_grade_sub_id),
 FOREIGN KEY (exam_code)
     REFERENCES ustudy.examinee(exam_code)
-    ON DELETE CASCADE ON UPDATE CASCADE,
+    ON UPDATE CASCADE,
 FOREIGN KEY (exam_grade_sub_id)
     REFERENCES ustudy.examgradesub(id)
     ON DELETE CASCADE ON UPDATE CASCADE
