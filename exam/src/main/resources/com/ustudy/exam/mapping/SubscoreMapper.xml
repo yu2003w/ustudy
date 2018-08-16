@@ -53,12 +53,6 @@
 	    SELECT id FROM ustudy.subscore where exam_grade_sub_id = #{egsid} order by rank
 	</select>
 	
-	<select id="getExamScores" parameterType="Long" resultType="java.util.Map">
-		SELECT SUM(score) score,stuid from subscore 
-		where exam_grade_sub_id IN (SELECT id from examgradesub where examid=#{examId}) 
-		GROUP BY stuid
-	</select>
-	
 	<select id="getExameeSubScores" parameterType="java.util.Map" resultMap="ExameeSubScore">
 		select ee.id as exameeId, ee.exam_code as exameeNO, class.cls_name as clsName, 
 		ee.name as exameeName, group_concat(egs.id, '-', subject.name, '-', coalesce(subscore.score, 'NULL'), 

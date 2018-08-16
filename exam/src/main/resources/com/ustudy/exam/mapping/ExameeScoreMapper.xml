@@ -13,6 +13,14 @@
 	    <result property="rank" column="rank"/>
 	</resultMap>
 
+    <resultMap type="com.ustudy.exam.model.score.ExameeScore" id="ExameeScore">
+        <result property="id" column="id"/>
+        <result property="stuid" column="stuid"/>
+        <result property="examId" column="examid"/>
+        <result property="score" column="score"/>
+	    <result property="rank" column="rank"/>
+	</resultMap>
+	
 	<insert id="insertExameeScores" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		insert into exameescore (examee_id,exam_id,score,rank) values  
 	    <foreach collection="list" item="item" index="index" separator="," >  
@@ -51,6 +59,21 @@
 			AND class.cls_type=#{branch, jdbcType=VARCHAR}
 		</if>
 		group by ee.id ORDER BY ee.exam_code
+	</select>
+	
+	<select id="getExamineeGrp" resultType="java.lang.String">
+	    SELECT distinct subs FROM ustudy.examinee where examid = #{examid}
+	</select>
+	
+	<select id="calExameeScore" resultMap="ExameeScore">
+		SELECT subscore.stuid, egs.examid, sum(subscore.score) as score FROM ustudy.subscore 
+		left join examgradesub as egs on egs.id = subscore.exam_grade_sub_id 
+		left join examinee as ee on ee.id = subscore.stuid 
+		where egs.examid = #{examid} 
+		<if test="gid > 0">
+		and egs.grade_id = #{gid}
+		</if>
+		and ee.subs = cast(#{subs} as JSON) group by stuid
 	</select>
 
 </mapper>
