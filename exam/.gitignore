@@ -2,6 +2,7 @@
 # Initiated by Jared on Sep 04, 2017.
 #
 target/
+logs/
 
 .apt_generated
 .classpath

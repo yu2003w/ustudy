@@ -140,10 +140,11 @@ public interface MarkTaskMapper {
 			+ "question.id=#{qid}")
 	public MarkTask getAllMarkTasksByQuesId(@Param("qid") String qid);
 
-	@Select("select teacid from ustudy.marktask where quesid = #{qid} and marktype = #{type}")
+	@Select("select teacid from ustudy.marktask where quesid = #{qid} and "
+			+ "marktype = #{type} order by marktask.id")
 	public List<String> getTeachersByQidType(@Param("qid") String qid, @Param("type") String mtype);
 
-	@Select("select teacid from ustudy.marktask where quesid = #{qid}")
+	@Select("select teacid from ustudy.marktask where quesid = #{qid} order by marktask.id")
 	public List<String> getTeachersByQid(@Param("qid") String qid);
 
 	// meta mark task related functions

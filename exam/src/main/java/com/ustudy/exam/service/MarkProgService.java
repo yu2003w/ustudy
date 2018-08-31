@@ -12,8 +12,6 @@ public interface MarkProgService {
 	
 	public List<QuesMarkMetrics> getEgsMarkProg(int eid, int egsid);
 	
-	//public Collection<Map<String, Object>> getTeacherMarkProgress(String orgId, int egsId);
-	
 	public List<TeaMarkProgress> getTeaMarkProg(String orgId, int egsid);
 	
 }
