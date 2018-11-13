@@ -3,6 +3,7 @@
 	<Properties>
 		<Property name="examlogfile">logs/exam.log</Property>
 		<Property name="infologfile">logs/info.log</Property>
+		<Property name="clientlogfile">logs/client.log</Property>
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
@@ -17,20 +18,32 @@
 			<PatternLayout
 				pattern="%d{yy/MM/dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</File>
+		<File name="clientlog" fileName="${clientlogfile}">
+			<PatternLayout
+				pattern="%d{yy/MM/dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</File>
 	</Appenders>
 	<Loggers>
-		<Logger name="org.springframework.beans.factory" level="DEBUG" />
-		<logger name="org.springframework.transaction" level="DEBUG" />
-		<logger name="org.springframework.transaction.interceptor"
-			level="DEBUG" />
+		<!-- <Logger name="org.springframework.beans.factory" level="DEBUG" additivity="false"> 
+			<AppenderRef ref="Console" /> </Logger> <Logger name="org.springframework.transaction," 
+			level="DEBUG" additivity="false"> </Logger> <Logger name="org.springframework.transaction.interceptor" 
+			level="DEBUG" additivity="false"> </Logger> -->
 		<Root level="info">
 			<AppenderRef ref="examlog" />
 		</Root>
 		<Logger name="com.ustudy.exam" level="trace" additivity="false">
 			<AppenderRef ref="examlog" />
 		</Logger>
-		<Logger name="com.ustudy.info" level="info" additivity="false">
+		<Logger name="com.ustudy.info" level="DEBUG" additivity="false">
 			<AppenderRef ref="infolog" />
+		</Logger>
+		<Logger name="com.ustudy.exam.service.impl.ClientServiceImpl"
+			level="trace" additivity="false">
+			<AppenderRef ref="clientlog" />
+		</Logger>
+		<Logger name="com.ustudy.exam.model.template.PaperTemplate"
+			level="trace" additivity="false">
+			<AppenderRef ref="clientlog" />
 		</Logger>
 	</Loggers>
 </Configuration>
