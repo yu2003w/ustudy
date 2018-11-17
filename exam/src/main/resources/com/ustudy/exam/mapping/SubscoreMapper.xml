@@ -126,6 +126,7 @@
 		JOIN paper p ON ss.exam_grade_sub_id = p.exam_grade_sub_id
 		JOIN examinee e ON e.id = ss.stuid and p.exam_code = e.exam_code
 		WHERE p.id=#{paperId}
+		GROUP BY ss.score, ss.obj_score
 	</select>
 
 </mapper>
