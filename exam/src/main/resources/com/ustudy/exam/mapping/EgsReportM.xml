@@ -33,7 +33,8 @@
 	    (SELECT paper.exam_code, ee.name, class.cls_name, subscore.score, 
 	    GROUP_CONCAT(oans.quesno, '-', oans.answer ORDER BY oans.quesno) AS objans FROM ustudy.paper 
 	    LEFT JOIN obj_answer AS oans ON oans.paperid = paper.id 
-	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    LEFT JOIN examgradesub AS egs ON paper.exam_grade_sub_id = egs.id
+	    LEFT JOIN examinee AS ee ON (ee.exam_code = paper.exam_code and egs.examid = ee.examid)
 	    left join class on class.id = ee.class_id 
 	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
 	    LEFT JOIN question ON (question.exam_grade_sub_id = paper.exam_grade_sub_id AND 
@@ -45,7 +46,8 @@
 	    ((SELECT ee.exam_code, ee.name, class.cls_name, question.quesno, subscore.score as fscore, 
 	    answer.score FROM ustudy.answer LEFT JOIN paper ON paper.id = paperid 
 	    LEFT JOIN question ON answer.quesid = question.id 
-	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    LEFT JOIN examgradesub AS egs ON paper.exam_grade_sub_id = egs.id
+	    LEFT JOIN examinee AS ee ON (ee.exam_code = paper.exam_code and egs.examid = ee.examid)
 	    left join class on class.id = ee.class_id 
 	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
 	    WHERE question.exam_grade_sub_id = #{egsid} AND question.type NOT IN ('单选题' , '多选题', '判断题') 
@@ -54,7 +56,8 @@
 	    anst.score FROM ustudy.answer LEFT JOIN paper ON paper.id = paperid 
 	    LEFT JOIN question ON answer.quesid = question.id 
 	    LEFT JOIN answer_step AS anst ON anst.answer_id = answer.id 
-	    LEFT JOIN examinee AS ee ON ee.exam_code = paper.exam_code 
+	    LEFT JOIN examgradesub AS egs ON paper.exam_grade_sub_id = egs.id
+	    LEFT JOIN examinee AS ee ON (ee.exam_code = paper.exam_code and egs.examid = ee.examid)
 	    left join class on class.id = ee.class_id 
 	    left join subscore on (subscore.exam_grade_sub_id = paper.exam_grade_sub_id and subscore.stuid = ee.id) 
 	    WHERE question.exam_grade_sub_id = #{egsid} AND question.type NOT IN ('单选题' , '多选题', '判断题') 
