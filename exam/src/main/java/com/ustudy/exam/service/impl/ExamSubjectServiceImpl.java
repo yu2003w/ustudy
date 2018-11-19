@@ -393,7 +393,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 				egsDaoImpl.updateMarkImg(prePaperId, targetName);
 			}
 		} catch (Exception e) {
-			logger.error("mergePaperImg(), failed to merge images -> " + e.getMessage());
+			logger.error("mergePaperImg(), failed to merge images -> ", e);
 			return false;
 		}
 		return true;
