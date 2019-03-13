@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ustudy.UResp;
 import com.ustudy.exam.model.Teacher;
+import com.ustudy.exam.model.template.PaperTemplate;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.ExamSubjectService;
 import com.ustudy.exam.service.StudentAnswerService;
@@ -31,10 +32,9 @@ import net.sf.json.JSONObject;
 
 @RestController
 @RequestMapping(value = "/client")
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ClientController {
 
-	private static final Logger logger = LogManager.getLogger(ClientController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
 	@Autowired
 	private ClientService cs;
@@ -56,7 +56,7 @@ public class ClientController {
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
 	public UResp saveExamTemplate(@PathVariable Long egsId, @RequestBody String parameters, HttpServletRequest request, HttpServletResponse responseonse) {
 
 		logger.info("saveTemplate(), egsId->" + egsId + ", parameters:->" + parameters);
@@ -70,6 +70,30 @@ public class ClientController {
 		result = new UResp();
 		try {
 			result.setRet(cs.saveTemplates(egsId, parameters));
+			result.setRet(true);
+		} catch (Exception e) {
+			result.setRet(false);
+			result.setMessage(e.getMessage());
+			logger.error("saveExamTemplate(), " + e.getMessage());
+		}
+
+		return result;
+	}*/
+	
+	@RequestMapping(value = "/saveExamTemplate/{egsId}", method = RequestMethod.POST)
+	public UResp saveExamTemplate(@PathVariable Long egsId, @RequestBody PaperTemplate temp, HttpServletRequest request, HttpServletResponse responseonse) {
+
+		logger.debug("saveTemplate(), save paper template for egs " + egsId);
+		
+		String token = request.getHeader("token");
+		UResp result = cs.login(token);		
+		if(!result.isRet()){
+			return result;
+		}
+		
+		result = new UResp();
+		try {
+			cs.saveTemplates(egsId, temp);
 			result.setRet(true);
 		} catch (Exception e) {
 			result.setRet(false);
@@ -311,7 +335,7 @@ public class ClientController {
 			}
 		}
 		
-		Map data = new HashMap<>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("BeAvailableUpdates", beAvailableUpdates);
 		data.put("DownLoadPath", downLoadPath);
 		

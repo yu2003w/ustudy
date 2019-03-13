@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +15,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -24,6 +23,8 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,11 @@ import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.Quesarea;
 import com.ustudy.exam.model.School;
 import com.ustudy.exam.model.Teacher;
+import com.ustudy.exam.model.template.ObjectQuesTemplate;
+import com.ustudy.exam.model.template.PageTemplate;
+import com.ustudy.exam.model.template.PaperTemplate;
+import com.ustudy.exam.model.template.QuesRegion;
+import com.ustudy.exam.model.template.SubjectQuesTemplate;
 import com.ustudy.exam.service.ClientService;
 import com.ustudy.exam.service.TeacherService;
 import com.ustudy.exam.utility.Base64Util;
@@ -56,20 +62,10 @@ import com.ustudy.exam.utility.ExamUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-/**
- * 
- * 类名称：ClientServiceImpl
- * 类描述：TODO
- * 创建人：dulei
- * 创建时间：2017年12月2日 下午8:39:50
- * 修改人：dulei
- * 修改时间：2017年12月2日 下午8:39:50
- * 修改备注：
- */
 @Service
 public class ClientServiceImpl implements ClientService {
 
-    private static final Logger logger = LogManager.getLogger(ClientServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientServiceImpl.class);
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Resource
@@ -223,7 +219,7 @@ public class ClientServiceImpl implements ClientService {
      * @return
      * @throws Exception
      */
-    @Transactional
+    /*@Transactional
     public boolean saveTemplates(Long id, String data) throws Exception {
 
         logger.debug("saveTemplates(), egsid=" + id + ", originalData->" + data);
@@ -238,9 +234,104 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return false;
+    }*/
+    
+    @Transactional
+    public void saveTemplates(Long id, PaperTemplate temp) {
+
+        logger.debug("saveTemplates(), egsid->" + id + ", originalData->" + temp.toString());
+
+        // save paper templates origin data firstly, then clear corresponding questions 
+        // in case re-upload paper templates
+        try {            
+            examSubjectDaoImpl.saveOriginalData(id, temp.accumPageFilenames(), temp.getPaperPath(), temp.toString());
+            cleanQuestion(id);
+            Map<String, Long> quesAnswersId = saveQuestions(id, temp.getPagesL());
+            logger.trace("saveTemplates(), question info->" + quesAnswersId.toString());
+            if (null != quesAnswersId && quesAnswersId.size() > 0) {
+                saveQuesareas(id, quesAnswersId, temp.getPagesL());
+            }
+        } catch (Exception e) {
+            logger.error("saveTemplates(), save templates origin data failed as below:" + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+	private Map<String, Long> saveQuestions(Long egsId, List<PageTemplate> pgL) {
+
+        Map<String,QuesAnswer> quesAnswers = new HashMap<>();
+
+        for (PageTemplate pg: pgL) {
+        	if (pg.getSubQuesL() != null && pg.getSubQuesL().size() > 0) {
+                for (SubjectQuesTemplate subQ: pg.getSubQuesL()) {
+                    int startno = subQ.getsQid();
+                    int endno = subQ.geteQid();
+                    int quesno = 0;
+                    String type = convertQType(subQ.getQuesType());
+                    
+                    if (startno == endno) {
+                        quesno = startno;
+                    }
+                    quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, egsId));
+                }
+            }
+            if (pg.getObjQuesL() != null && pg.getObjQuesL().size() > 0) {
+                for (ObjectQuesTemplate objQ: pg.getObjQuesL()) {
+                    int startno = 0;
+                    int endno = 0;
+                    int quesno = 0;
+                    String type = convertQType(objQ.getQuesType());
+                    
+                    List<Integer> quesNoL = objQ.getQuesNoL();
+                    logger.trace("parseQuestions(), object question sequences->" + quesNoL.toString());
+                    for (Integer qno: quesNoL) {
+                    	if (startno == 0) {
+                    		startno = qno;
+                    		endno = qno;
+                    	} else if (qno == (endno + 1)) {
+                    		endno = qno;
+                    	} else {
+                    		if (startno == endno)
+                    			quesno = startno;
+                    		quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, egsId));
+                    		quesno = 0;
+                    		startno = endno = qno;
+                    	}
+                    }
+                    
+                    if (startno == endno)
+            			quesno = startno;
+            		quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, egsId));
+                }
+            }
+        }
+
+        logger.debug("parseQuestions(), questions detected as below:" + quesAnswers.toString());
+        
+        List<QuesAnswer> quesAnswerList = new ArrayList<QuesAnswer>();
+        
+        if (null != quesAnswers && quesAnswers.size() > 0) {
+            quesAnswerList = new ArrayList<QuesAnswer>(quesAnswers.values());
+            quesAnswerList.sort(new Comparator<QuesAnswer>() {
+            	public int compare(QuesAnswer q1, QuesAnswer q2) {
+            		if (q1.getStartno() > q2.getStartno()) {
+            			return 1;
+            		} else if (q1.getStartno() < q2.getStartno()) {
+            			return -1;
+            		} else
+            			return 0;
+            	}
+            });
+            
+            logger.trace("parseQuestions(), Questions to be saved->" + quesAnswerList.toString());
+            quesAnswerDaoImpl.initQuesAnswers(quesAnswerList);
+        }
+
+        return getQuesAnswersId(quesAnswerList);
     }
     
-    private JSONObject saveOriginalData(Long id, String data){
+    /*private JSONObject saveOriginalData(Long id, String data){
         
         JSONObject originalData = null;
         try {
@@ -257,7 +348,7 @@ public class ClientServiceImpl implements ClientService {
         }
         
         return originalData;
-    }
+    }*/
     
     private String getFileNames(JSONObject originalData){
         
@@ -291,9 +382,8 @@ public class ClientServiceImpl implements ClientService {
      * @return
      * @throws Exception
      */
-    private Map<String, Long> parseQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception {
+/*    private Map<String, Long> parseQuesAnswer(Long examGradeSubId, JSONObject originalData) throws Exception {
 
-//        List<QuesAnswer> quesAnswers = new ArrayList<>();
         Map<String,QuesAnswer> quesAnswers = new HashMap<>();
 
         if (null != originalData.get("TemplateInfo")) {
@@ -389,9 +479,9 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return getQuesAnswersId(quesAnswerList);
-    }
+    }*/
     
-    private String initType(String type){
+/*    private String initType(String type){
         //0-未设置，1-客观题，2-填空题，3-主观题，4-隐藏曲云
         if(null != type){
             if(type.equals("1")){
@@ -408,8 +498,23 @@ public class ClientServiceImpl implements ClientService {
         }
         
         return type;
-    }
+    }*/
 
+    private String convertQType(int flag){
+        //0-未设置，1-客观题，2-填空题，3-主观题，4-隐藏曲云
+    	String type = null;
+    	if(flag == 1){
+            type = "单选题";
+        }else if(flag == 2){
+            type = "填空题";
+        }else if(flag == 3){
+            type = "解答题";
+        }else {
+            type = "解答题";
+        }
+    	
+        return type;
+    }
     /**
      * 
      * getQuesAnswersId[获取题目、数据库编号]
@@ -430,6 +535,22 @@ public class ClientServiceImpl implements ClientService {
         return quesAnswersId;
     }
 
+    private boolean saveQuesareas(Long egsId, Map<String, Long> quesAnswersId, List<PageTemplate> pageL) {
+    	
+        for (PageTemplate pg: pageL) {
+        	for (SubjectQuesTemplate subQ: pg.getSubQuesL()) {
+        		logger.trace("saveQuesareas(), save subject question area for " + quesAnswersId);
+        		quesareaDaoImpl.insertQuesareas(getSubQuesAreas(quesAnswersId, egsId, pg, subQ));
+        	}
+            
+        	for (ObjectQuesTemplate objQ: pg.getObjQuesL()) {
+        		logger.trace("saveQuesareas(), save object question area for " + quesAnswersId);
+        		quesareaDaoImpl.insertQuesareas(getObjQuesAreas(quesAnswersId, egsId, pg, objQ));
+        	}
+        }
+
+        return true;
+    }
     /**
      * 
      * saveQuesareas[保存题块坐标信息]
@@ -441,7 +562,7 @@ public class ClientServiceImpl implements ClientService {
      * @param originalData
      * @return
      */
-    private boolean saveQuesareas(Map<String, Long> quesAnswersId, JSONObject originalData) {
+/*    private boolean saveQuesareas(Map<String, Long> quesAnswersId, JSONObject originalData) {
         if (null != originalData.get("TemplateInfo") && null != originalData.get("CSID")) {
             Long egsId = originalData.getLong("CSID");
             JSONObject templateInfo = originalData.getJSONObject("TemplateInfo");
@@ -472,8 +593,75 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return true;
-    }
+    }*/
 
+    private List<Quesarea> getSubQuesAreas(Map<String, Long> quesAnswersId, Long egsId, PageTemplate page, SubjectQuesTemplate subQ) {
+
+        List<Quesarea> ret = new ArrayList<>();
+        int pageno = page.getPageIndex();
+        String fileName = page.getFileName();
+
+        int areaId = subQ.getAreaId();
+        int startQuesNo = subQ.getsQid();
+        int endQuesNo = subQ.geteQid();
+        String type = convertQType(subQ.getQuesType());
+        
+        long quesid = quesAnswersId.get(startQuesNo + "-" + endQuesNo);
+        
+        if (subQ.getRegionList() == null || subQ.getRegionList().size() < 1) {
+        	logger.error("getSubQuesAreas(), region info lost for " + startQuesNo + "-" + endQuesNo);
+        	throw new RuntimeException("region info lost for " + startQuesNo + "-" + endQuesNo);
+        }
+        
+        for (QuesRegion reg: subQ.getRegionList()) {
+            ret.add(new Quesarea(pageno, fileName, areaId, reg.getX(), reg.getY(), reg.getWidth(), reg.getHeight(), reg.getBottom(), reg.getRight(), type, startQuesNo, endQuesNo, egsId, quesid));
+        }
+
+        logger.trace("getSubQuesAreas(), region info for question " + startQuesNo + "-" + endQuesNo + "->" + ret.toString());
+        return ret;
+    }
+    
+    private List<Quesarea> getObjQuesAreas(Map<String, Long> quesAnswersId, Long egsId, PageTemplate page, ObjectQuesTemplate objQ) {
+
+        List<Quesarea> ret = new ArrayList<>();
+
+        int pageno = page.getPageIndex();
+        String fileName = page.getFileName();
+        String type = convertQType(objQ.getQuesType());
+        
+        int startQuesNo = -1;
+        int endQuesNo = -1;
+        long quesid = 0;
+        
+        for (String key : quesAnswersId.keySet()) {
+        	// parse key to get start ques no and end ques no
+        	// set the area to the first objective question
+        	if (key == null || key.isEmpty()) {
+        		logger.error("getObjQuesAreas(), invalid key");
+        		throw new RuntimeException("empty start qid and end qid");
+        	}
+        	
+        	String data[] = key.split("-");
+        	if (data == null || data.length != 2) {
+        		logger.error("getObjQuesAreas(), invalid key " + key);
+        		throw new RuntimeException("invalid key for start qid and end qid");
+        	}
+        	
+        	startQuesNo = Integer.valueOf(data[0]);
+        	endQuesNo = Integer.valueOf(data[1]);
+        	
+        	QuesRegion reg = objQ.getRegion();
+            if (reg == null) {
+            	logger.error("getObjQuesAreas(), invalid region info for ");
+            	throw new RuntimeException("");
+            }
+            quesid = quesAnswersId.get(key);
+            ret.add(new Quesarea(pageno, fileName, 0, reg.getX(), reg.getY(), reg.getWidth(), reg.getHeight(), reg.getBottom(), reg.getRight(), type, startQuesNo, endQuesNo, egsId, quesid));
+        }
+
+        return ret;
+    }
+    
     /**
      * 
      * getQuesareas[解析题目坐标信息]
@@ -487,7 +675,7 @@ public class ClientServiceImpl implements ClientService {
      * @param subjective
      * @return
      */
-    private List<Quesarea> getQuesareas(Map<String, Long> quesAnswersId, Long egsId, JSONObject page, JSONObject subjective) {
+    /*private List<Quesarea> getQuesareas(Map<String, Long> quesAnswersId, Long egsId, JSONObject page, JSONObject subjective) {
 
         List<Quesarea> resault = new ArrayList<>();
 
@@ -594,7 +782,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         return resault;
-    }
+    }*/
 
     public Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId) {
 
@@ -883,22 +1071,22 @@ public class ClientServiceImpl implements ClientService {
      * @return
      * @throws Exception
      */
-    private boolean cleanQuestion(Long egsId) throws Exception {
+    private boolean cleanQuestion(Long egsId) {
 
         logger.info("cleanQuestion -> egsId=" + egsId);
 
-        try {
+        //try {
             quesAnswerDivDaoImpl.deleteQuesAnswerDivs(egsId);
             quesAnswerDaoImpl.deleteQuesAnswers(egsId);
             refAnswerDaoImpl.deleteRefAnswers(egsId);
             multipleScoreSetDaoImpl.deleteMultipleScoreSets(egsId);
 
             return true;
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             logger.error("deleteQuesAnswers delete error. -> msg = " + e.getMessage());
             e.printStackTrace();
             throw e;
-        }
+        }*/
 
     }
 

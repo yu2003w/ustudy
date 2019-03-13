@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ustudy.UResp;
 import com.ustudy.exam.model.Exam;
 import com.ustudy.exam.model.ExamGrade;
+import com.ustudy.exam.model.template.PaperTemplate;
 
 import net.sf.json.JSONArray;
 
@@ -15,7 +16,9 @@ public interface ClientService {
 	
 	UResp login(String token);
 
-	boolean saveTemplates(Long egsId, String data) throws Exception;
+	//boolean saveTemplates(Long egsId, String data) throws Exception;
+	
+	void saveTemplates(Long egsId, PaperTemplate data);
 	
 	Map<String, String> getTemplateById(Long examId, Long gradeId, Long subjectId);
 	
