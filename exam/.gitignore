@@ -9,4 +9,5 @@ target/
 .project
 .settings
 .springBeans
+logs/
 
