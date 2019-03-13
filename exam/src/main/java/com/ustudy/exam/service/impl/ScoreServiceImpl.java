@@ -1,12 +1,13 @@
 package com.ustudy.exam.service.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,13 +32,13 @@ import com.ustudy.exam.dao.StudentObjectAnswerDao;
 import com.ustudy.exam.dao.SubscoreDao;
 import com.ustudy.exam.mapper.ScoreMapper;
 import com.ustudy.exam.model.ExamSubject;
-import com.ustudy.exam.model.ExameeScore;
 import com.ustudy.exam.model.MultipleScoreSet;
 import com.ustudy.exam.model.QuesAnswer;
 import com.ustudy.exam.model.RefAnswer;
 import com.ustudy.exam.model.StudentObjectAnswer;
 import com.ustudy.exam.model.score.DetailedSubScore;
 import com.ustudy.exam.model.score.ExameeSubScore;
+import com.ustudy.exam.model.score.ExamineeScoreCalTask;
 import com.ustudy.exam.model.score.QuesScoreCalTask;
 import com.ustudy.exam.model.score.ScoreRule;
 import com.ustudy.exam.model.score.StudentScore;
@@ -73,7 +74,7 @@ public class ScoreServiceImpl implements ScoreService {
     private SubscoreDao subscoreDao;
     
     @Autowired
-    private ExameeScoreDao exameeScoreDao;
+    private ExameeScoreDao eeScoreDao;
     
     @Autowired
     private ScoreMapper scoM;
@@ -214,49 +215,61 @@ public class ScoreServiceImpl implements ScoreService {
     	if (release) {
     		// 是否已全部发布
     		long count = examSubjectDao.isExamAllSubjectPublished(examId);
-    		if(count == 0){    			
-    			examDao.updateExamStatus(examId, "2");
-                // update the status of all the sub-exams accordingly.
-                examDao.updateEgsStatus(examId, "2");
-    			
-    			List<Map<String, Object>> scores = subscoreDao.getExamScores(examId);
-    			if(scores.size() > 0){
-    				List<ExameeScore> exameeScores = new ArrayList<>();
-    				for (Map<String, Object> map : scores) {
-    					ExameeScore exameeScore = new ExameeScore();
-    					exameeScore.setExamId(examId);
-    					long stuid = (int) map.get("stuid");
-    					exameeScore.setStuid(stuid);
-    					double score = (double) map.get("score");
-    					exameeScore.setScore(Float.valueOf(String.valueOf(score)));
-    					
-    					exameeScores.add(exameeScore);
-    				}
-    				Collections.sort(exameeScores);
-    				
-    				int rank = 1;
-    				// modified by jared, alreay sorted examinee scores
-    				// if score equals, rank should be the same, however, 
-    				// others' rank should be adjusted corresponding
-    				for (int i = 0; i < exameeScores.size(); i++) {
-    					if (i == 0) {
-    						exameeScores.get(i).setRank(rank);
-    					}
-    					else {
-    						if (exameeScores.get(i).getScore().compareTo(exameeScores.get(i-1).getScore()) == 0) {
-    							exameeScores.get(i).setRank(exameeScores.get(i-1).getRank());
-    						}
-    						else {
-    							exameeScores.get(i).setRank(rank);
-    						}
-    					}
-    					rank++;
-    				}
-    				
-    				// exameeScoreDao.deleteExameeScores(examId);
-    				int ret = exameeScoreDao.insertExameeScores(exameeScores);
-    				logger.debug("publishExamScore(), number of examee scores saved is " + ret);
-    			}
+    		if(count == 0){
+    			//examinee score calculation based on subs in table examinee
+                List<String> subGrp = eeScoreDao.getExamineeGrp(examId);
+                if (subGrp == null || subGrp.size() <= 0) {
+                	// at least there is one group
+                	logger.error("publishExamScore(), examinee group is empty, maybe something goes wrong");
+                	return false;
+                }
+                
+                synchronized(examId) {
+                	try {
+                		if (subGrp.size() == 1) {
+                    		// only one group for this grade
+                    		ExecutorService execS = Executors.newSingleThreadExecutor();
+                    		Future<UResp> result = execS.submit(
+                    				new ExamineeScoreCalTask(examId, 0, subGrp.get(0), eeScoreDao));
+                    		execS.shutdown();
+                    		execS.awaitTermination(1, TimeUnit.HOURS);
+                    		if (!result.get().isRet()) {
+                    			logger.error("publishExamScore(), " + result.get().getMessage());
+                    			return false;
+                    		}
+                    		logger.info("publishExamScore(), examinee score calculation for " + subGrp.get(0) + " completed");
+                    	} else {
+                    		// multiple groups for examinees in this grade
+                    		ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 100, 0,
+                                    TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                                    new ThreadPoolExecutor.CallerRunsPolicy());
+                            
+                            List<Future<UResp>> results = new LinkedList<Future<UResp>>();
+                            for (String grp: subGrp) {
+                            	logger.trace("publishExamScore(), calculate examinee score for grp=" + grp + ", examid=" + examId);
+                            	results.add(tpe.submit(new ExamineeScoreCalTask(examId, 0, grp, eeScoreDao)));
+                            }
+                            tpe.shutdown();
+                            tpe.awaitTermination(1, TimeUnit.HOURS);
+                            for (Future<UResp> ret: results) {
+                            	if (!ret.get().isRet()) {
+                            		logger.error("publishExamScore(), " + ret.get().getMessage());
+                            		return false;
+                            	}
+                            	logger.info("publishExamScore(), " + ret.get().getMessage());
+                            }
+                    	}
+                	} catch (Exception e) {
+                		logger.error("publishExamScore(), exception->" + e.getMessage());
+                		return false;
+                	}
+                	
+                	// insert exameescore then update exam staus to avoid mysql table lock
+                	examDao.updateExamStatus(examId, "2");
+                    // update the status of all the sub-exams accordingly.
+                    examDao.updateEgsStatus(examId, "2");
+                }
+
     		}else {
     		    return false;
             }
@@ -290,7 +303,7 @@ public class ScoreServiceImpl implements ScoreService {
             }
         }
 
-        List<StudentScore> exameeScores = exameeScoreDao.getExameeScores(examId, schId, gradeId, 
+        List<StudentScore> exameeScores = eeScoreDao.getExameeScores(examId, schId, gradeId, 
         		classId, branch, text);
 
         logger.debug("getStudentScores(), number of items retrieved is " + exameeScores.size());

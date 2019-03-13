@@ -22,8 +22,6 @@ public interface SubscoreDao {
 	
 	int saveSubChildScores(List<SubChildScore> scores);
 	
-	List<Map<String, Object>> getExamScores(Long examId);
-	
 	List<Long> getSSIDsByEgsId(long egsid);
 	
 	ExameeSubScore getExameeSubScores(@Param("exameeId")Long exameeId, @Param("examId")Long examId);

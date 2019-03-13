@@ -49,6 +49,9 @@
         <result property="markImg" column="mark_img"/>
         <result property="posX" column="posx"/>
         <result property="posY" column="posy"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="score" column="score"/>
     </resultMap>
 
     <resultMap type="com.ustudy.exam.model.score.ObjAnswer" id="ObjAnswer">
@@ -67,12 +70,19 @@
         <result property="quesId" column="quesid"/>
         <result property="score"  column="score"/>
         <result property="teacName" column="teacname"/>
+		<result property="markMode" column="mark_mode"/>
         <result property="scoreDiff" column="scorediff"/>
         <result property="isFinal" column="isfinal"/>
         <result property="x" column="posx"/>
         <result property="y" column="posy"/>
         <result property="w" column="width"/>
         <result property="h" column="height"/>
+    </resultMap>
+
+    <resultMap type="com.ustudy.exam.model.score.UncommonAnswer" id="UncommonAnswer">
+        <result property="ansId" column="id"/>
+		<result property="ansMarkImg" column="ans_mark_img"/>
+		<result property="score" column="score"/>
     </resultMap>
 
 	<!-- 根据考试ID和年级ID查询得到一个ExamSubject对象-->
@@ -220,7 +230,7 @@
 	</select>
 
 	<select id="getDblMarkImgs" parameterType="Long" resultMap="MarkImageResult">
-		SELECT qp.quesid, qp.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy 
+		SELECT qp.quesid, qp.paperid, qarea_id, pageno, paper_img, mark_img, posx, posy, width, height, score
 		FROM (SELECT quesid, paperid FROM answer WHERE quesid in (SELECT id FROM question WHERE exam_grade_sub_id = ${egsId}) GROUP BY quesid, paperid HAVING COUNT(*) = 2) qp 
 		JOIN paper p ON qp.paperid = p.id 
 		JOIN answer ans ON qp.quesid = ans.quesid AND qp.paperid = ans.paperid 
@@ -279,16 +289,58 @@
 	</select>
 
     <select id="getDblAns" parameterType="Long" resultMap="DblAnswer">
-		SELECT ans.quesid, ans.score, t.teacname, q.scorediff, ans.isfinal, qa.pageno, qa.posx, qa.posy, qa.width, qa.height
-		from
-		(SELECT quesid, paperid FROM answer GROUP BY quesid, paperid HAVING COUNT(*) = 2
-		UNION
-		SELECT quesid, paperid FROM answer where isfinal = 1) qp
-		join answer ans on ans.quesid = qp.quesid and ans.paperid = qp.paperid
+		SELECT ans.quesid, ans.score, t.teacname, q.mark_mode, q.scorediff, ans.isfinal, qa.pageno, qa.posx, qa.posy, qa.width, qa.height
+		from answer ans
 		join question q on q.id = ans.quesid
 		join quesarea qa on qa.quesid = ans.quesid
 		join teacher t on t.teacid = ans.teacid
 		where ans.paperid = #{paperId}
 		order by ans.quesid, ans.isfinal
 	</select>
+
+    <select id="getTopAns" parameterType="Long" resultMap="UncommonAnswer">
+        select id, ans_mark_img, score from (
+	        select (@cnt:=@cnt+1) as cnt, id, ans_mark_img, score from (
+		        select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p
+		        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+		        join ustudy.question q on q.exam_grade_sub_id = egs.id
+		        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		        join ustudy.answer_img ai on ai.ans_id = ans.id
+		        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
+		        and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
+		        and ans.score > 0 order by ans.score desc
+			) tb1, (select @cnt:=0) cnt
+	    ) tb2
+		where ((select count(*) from ustudy.paper p
+        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+        join ustudy.question q on q.exam_grade_sub_id = egs.id
+        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
+        and ans.score > 0)/50) > cnt
+    </select>
+
+    <select id="getBottomAns" parameterType="Long" resultMap="UncommonAnswer">
+        select id, ans_mark_img, score from (
+	        select (@cnt:=@cnt+1) as cnt, id, ans_mark_img, score from (
+		        select ans.id, ai.ans_mark_img, ans.score  from ustudy.paper p
+		        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+		        join ustudy.question q on q.exam_grade_sub_id = egs.id
+		        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+		        join ustudy.answer_img ai on ai.ans_id = ans.id
+		        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = "解答题" and q.score > 20
+		        and ai.ans_mark_img = (select min(ans_mark_img) from ustudy.answer_img ai2 where ai2.ans_id = ai.ans_id)
+		        and ans.score > 0 order by ans.score asc
+			) tb1, (select @cnt:=0) cnt
+	    ) tb2
+		where ((select count(*) from ustudy.paper p
+        join ustudy.examgradesub egs on egs.id = p.exam_grade_sub_id
+        join ustudy.question q on q.exam_grade_sub_id = egs.id
+        join ustudy.answer ans on ans.quesid = q.id and ans.paperid = p.id
+        where egs.id = #{egsId} and egs.sub_id = 1 and q.type = '解答题' and q.score > 20
+        and ans.score > 0)/100) > cnt
+	</select>
+
+	<update id="updateMarkFlag" parameterType="java.util.Map">
+		UPDATE ustudy.answer SET mflag=#{mflag,jdbcType=VARCHAR} where id=#{ansId}; 
+	</update>
 </mapper>

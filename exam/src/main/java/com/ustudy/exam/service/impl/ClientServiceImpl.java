@@ -357,8 +357,8 @@ public class ClientServiceImpl implements ClientService {
                                             if (startno == endno) {
                                                 quesno = startno;
                                             }
-                                            quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
-                                            logger.trace("put ques answer ->" + quesno + "-" + startno + "-" + endno);
+                                            //quesAnswers.put(quesno + "-" + startno + "-" + endno, new QuesAnswer(quesno, startno, endno, type, examGradeSubId));
+                                            //logger.trace("put ques answer ->" + quesno + "-" + startno + "-" + endno);
                                             quesno = 0;
                                             startno = number;
                                             endno = number;

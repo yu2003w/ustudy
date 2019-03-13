@@ -2,6 +2,7 @@ package com.ustudy.exam.model.report;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -102,6 +103,7 @@ public class EgsAnsDetail implements Serializable {
 				String [] paras = item.split("-");
 				this.objRef.add(new ReItem(paras[0], paras[1]));
 			}
+			Collections.sort(this.objRef);
 		}
 	}
 
@@ -118,6 +120,7 @@ public class EgsAnsDetail implements Serializable {
 				String [] paras = item.split("-");
 				this.subRef.add(new ReItem(paras[0], paras[1]));
 			}
+			Collections.sort(this.subRef);
 		}
 		
 	}

@@ -44,7 +44,7 @@
 		LEFT JOIN grade ON egs.grade_id = grade.id 
 		LEFT JOIN subject ON egs.sub_id = subject.id 
 		LEFT JOIN examschool ON exam.id = examschool.examid 
-		WHERE examschool.schid = #{orgid} GROUP BY egs.examid, egs.grade_id
+		WHERE examschool.schid = #{orgid} GROUP BY egs.examid, egs.grade_id order by exam.exam_date desc
 	</select>
 	
 	<select id="getAnsPapers" resultMap="AnsPaper">

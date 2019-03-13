@@ -55,14 +55,14 @@
 		and teasub.teac_id = #{teacid}
 		</if>
 		GROUP BY exam.id , egs.grade_id) gsub 
-		GROUP BY id , schid) ggr GROUP BY id
+		GROUP BY id , schid) ggr GROUP BY id order by id desc
 	</select>
 	
 	<select id="calEgsScoreRepport" parameterType="long" resultMap="EgsScoreAnaly">
 	  SELECT COUNT(*) AS exCount, TRUNCATE(AVG(score), 1) AS aveScore, MAX(score) AS maxScore, MIN(score) AS minScore, 
 	  (SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), question.score * (question.endno - question.startno + 1), 
-	  (if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
-	  question.score)))) FROM ustudy.question WHERE exam_grade_sub_id = #{egsid}) as fscore,
+	  if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
+	  question.score))) FROM ustudy.question WHERE exam_grade_sub_id = #{egsid}) as fscore,
 	  (SELECT score FROM (SELECT (@row:=@row + 1) AS row, score FROM (SELECT score, rank FROM ustudy.subscore 
 	  LEFT JOIN examinee AS ee ON ee.id = subscore.stuid WHERE exam_grade_sub_id = #{egsid}
 	  <if test="clsid > 0">
@@ -74,8 +74,9 @@
 	  AND ee.class_id = #{clsid}
 	  </if>
 	  ) DIV 2)) AS midscore, (SELECT COUNT(*) FROM subscore LEFT JOIN examinee AS ee ON ee.id = subscore.stuid 
-	  WHERE score >= ((SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), 
-	  question.score * (question.endno - question.startno + 1), question.score)) AS fullscore FROM ustudy.question 
+	  WHERE score >= ((SELECT SUM(IF((question.type IN ('单选题' , '多选题', '判断题')), question.score * (question.endno - question.startno + 1), 
+	  if(question.type = '填空题', (select sum(question_step.score) from question_step where question_step.quesid = question.id), 
+	  question.score))) FROM ustudy.question 
 	  WHERE exam_grade_sub_id = #{egsid}) * 0.6) AND exam_grade_sub_id = #{egsid} 
 	  <if test="clsid > 0">
 	  AND ee.class_id = #{clsid}
@@ -93,7 +94,7 @@
 	</select>
 	
 	<select id="calQuesObjReport" parameterType="long" resultMap="QuesObjScoreAnaly">
-	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 1) as aveScore, sum(num) as total, 
+	  select tb1.quesno, score, truncate((sum(ss)/sum(num)), 2) as aveScore, sum(num) as total, 
 	  group_concat(tb1.answer, '-', num) opts, refa, choice_num as cnum from 
 	  (select obj_answer.quesno, question.score, sum(obj_answer.score) as ss, obj_answer.answer, 
 	  count(obj_answer.answer) as num, question.id as quesid, refanswer.answer as refa, question.choice_num from obj_answer 
@@ -121,7 +122,7 @@
 	  and ee.class_id = #{clsid}
 	  </if> 
 	  and question.quesno > 0 group by question.quesno, question.score, ans.score order by question.quesno) tb1 
-	  left join (select question.quesno as quesname, truncate(avg(ans.score), 1) as aveScore from answer as ans 
+	  left join (select question.quesno as quesname, truncate(avg(ans.score), 2) as aveScore from answer as ans 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 
 	  left join question on (question.exam_grade_sub_id = egs.id and question.id = ans.quesid) 
@@ -144,7 +145,7 @@
 	  <if test="clsid > 0">
 	  and ee.class_id = #{clsid}
 	  </if> and question.quesno = 0 group by quest.quesno,fscore, anst.score order by quest.quesno) tb1 
-	  left join (select quest.quesno as quesname, truncate(avg(anst.score),1) as aveScore from answer_step as anst 
+	  left join (select quest.quesno as quesname, truncate(avg(anst.score),2) as aveScore from answer_step as anst 
 	  left join answer as ans on anst.answer_id = ans.id 
 	  left join paper on ans.paperid = paper.id 
 	  left join examgradesub as egs on paper.exam_grade_sub_id = egs.id 

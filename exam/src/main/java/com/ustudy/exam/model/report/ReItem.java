@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Basic Item for report
  *
  */
-public class ReItem implements Serializable {
+public class ReItem implements Serializable, Comparable<ReItem> {
 
 	/**
 	 * 
@@ -33,18 +33,30 @@ public class ReItem implements Serializable {
 		return quesno;
 	}
 
-	public void setQuesno(String quesno) {
-		this.quesno = quesno;
-	}
-
 	public String getValue() {
 		return value;
+	}
+
+	public void setQuesno(String quesno) {
+		this.quesno = quesno;
 	}
 
 	public void setValue(String value) {
 		this.value = value;
 	}
 
+
+	@Override
+	public int compareTo(ReItem re) {
+		if (Float.valueOf(this.quesno) > Float.valueOf(re.getQuesno())) {
+            return 1;
+        } else if (Float.valueOf(this.quesno) < Float.valueOf(re.getQuesno())) {
+            return -1;
+        } else {
+            return 0;
+        }
+	}
+	
 	@Override
 	public String toString() {
 		return "ReItem [quesno=" + quesno + ", value=" + value + "]";
