@@ -1,2 +1,2 @@
 id,cgname,cgval
-NULL,oss,${"endpoint": "http://oss-cn-beijing.aliyuncs.com", "bucketURL": "http://ustudy.oss-cn-beijing.aliyuncs.com", "bucketName": "ustudy", "accessKeyId": "LTAIIyWV2k5MfhvR", "accessKeySecret": "GdRSce29XMmRND29a5RwKu8uFZMhBp"}$
+NULL,oss,${"endpoint": "aliyundizhi", "bucketURL": "aliyundizhi", "bucketName": "ustudy", "accessKeyId": "LTAIIyWV2k5MfhvR", "accessKeySecret": "GdRSce29XMmRND29a5RwKu8uFZMhBp"}$
